@@ -1,0 +1,43 @@
+diff --git a/sprechanlage.html b/sprechanlage.html
+index b33486a..b345bbb 100644
+--- a/sprechanlage.html
++++ b/sprechanlage.html
+@@ -8,6 +8,7 @@
+ <meta name="description" content="Moderne Türsprechanlagen von Metzler: Video- & Audio-Gegensprechanlagen, IP- und 2-Draht-BUS-Systeme, Ein- und Mehrfamilien, mit Fingerprint, Gesichtserkennung & App-Anbindung." />
+ <link rel="stylesheet" href="Home/styles-v2.css?v=9" />
+ <link rel="stylesheet" href="plp.css?v=261" />
++<link rel="stylesheet" href="vergleichen.css?v=1" /><!-- Vergleichen add-on -->
+   <meta name="robots" content="noindex, nofollow" />
+ </head>
+ <body class="plp sprech">
+@@ -670,6 +671,7 @@
+ </footer>
+ 
+ <script src="sprechanlage.js?v=96"></script>
++<script src="vergleichen.js?v=1"></script><!-- Vergleichen add-on -->
+ <script>
+   /* ===== Header behaviour (ported from home design system) ===== */
+   (function(){
+diff --git a/sprechanlage.js b/sprechanlage.js
+index 37b240b..db86f6e 100644
+--- a/sprechanlage.js
++++ b/sprechanlage.js
+@@ -159,6 +159,10 @@
+       badge:null, colors:['anthrazit'], system:'ip', klingel:'flex', tuer:['rfid'], type:'video', briefkasten:true, img:SP+'briefkasten-paketbox.png' }
+   ];
+ 
++  /* Expose the catalogue to the Vergleichen add-on (vergleichen.js) — read-only hook,
++     mirrors how a JTL plugin would consume the article list without touching core. */
++  try { window.MTZ_PRODUCTS = PRODUCTS; } catch (e) {}
++
+   var TOTAL = 38; // catalogue headline figure (live total)
+ 
+   /* ---- State ---- */
+@@ -385,6 +389,7 @@
+   /* ---- Product card ---- */
+   function card(p) {
+     var c = el('article', 'pcard');
++    c.dataset.id = p.id;   /* hook for the Vergleichen add-on (vergleichen.js) */
+     /* Show the discount badge + price on every card that has the data. */
+     var badge = p.badge ? '<span class="pcard__badge pcard__badge--' + p.badge.type + '">' + p.badge.text + '</span>' : '';
+     var priceRow = (p.price != null)
