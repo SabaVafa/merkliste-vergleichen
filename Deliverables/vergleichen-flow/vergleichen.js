@@ -169,7 +169,7 @@
     trayCta.disabled=!canCompare();
     trayHint.textContent=canCompare()?'':(n>0?('Noch mindestens '+(MIN-n)+' Artikel für den Vergleich wählen'):'');
     traySlots.innerHTML='';
-    for(var s=0;s<MAX;s++){var id=selected[s];if(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));}else{traySlots.appendChild(h('<div class="vgl-slot empty" aria-hidden="true"></div>'));}}
+    selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));});
   }
   function syncAll(){syncCards();syncBar();syncTray();if(view.classList.contains('is-open'))renderView();}
 
