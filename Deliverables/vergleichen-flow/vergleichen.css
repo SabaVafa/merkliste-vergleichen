@@ -4,28 +4,40 @@
    activation → comparison. Decoupled layer; uses the PLP's own tokens.
    ============================================================ */
 
-/* ---- Persistent toolbar compare button (the "disabled → active" affordance) ---- */
+/* ---- Toolbar compare control ----
+   Rest: enabled invitation ("Vergleichen"). Click → compare mode (card fields appear).
+   In mode, <2 selected: waiting (grey). ≥2: active (teal) → opens comparison. */
+.vgl-barwrap{display:inline-flex;align-items:center;gap:10px;margin-left:12px}
 .vgl-bar-btn{
-  display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;margin-left:12px;
-  border-radius:var(--r-m,4px);border:1px solid var(--graphite-300,#DADADA);
-  background:var(--white,#fff);color:var(--graphite-500,#A1A1A1);
-  font:600 var(--text-body-sm,.875rem)/1 inherit;cursor:not-allowed;
+  display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;
+  border-radius:var(--r-m,4px);border:1.5px solid var(--teal,#015253);
+  background:var(--white,#fff);color:var(--teal,#015253);
+  font:600 var(--text-body-sm,.875rem)/1 inherit;cursor:pointer;
   transition:background .15s,color .15s,border-color .15s,box-shadow .15s;white-space:nowrap;
 }
+.vgl-bar-btn:hover{background:var(--teal-5,rgba(1,82,83,.05))}
 .vgl-bar-btn svg{width:18px;height:18px}
 .vgl-bar-btn .cnt{
   min-width:20px;height:20px;padding:0 6px;border-radius:999px;
-  background:var(--graphite-300,#DADADA);color:var(--white,#fff);
-  font-weight:700;font-size:.75rem;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--teal,#015253);color:var(--white,#fff);
+  font-weight:700;font-size:.75rem;display:none;align-items:center;justify-content:center;
 }
-.vgl-bar-btn.is-active{
-  background:var(--teal,#015253);color:var(--white,#fff);border-color:var(--teal,#015253);cursor:pointer;
-}
-.vgl-bar-btn.is-active .cnt{background:rgba(255,255,255,.22)}
+/* waiting state: compare mode on, fewer than 2 selected */
+.vgl-bar-btn.is-wait{border-color:var(--graphite-300,#DADADA);background:var(--white,#fff);color:var(--graphite-500,#A1A1A1);cursor:not-allowed}
+.vgl-bar-btn.is-wait .cnt{display:inline-flex;background:var(--graphite-300,#DADADA)}
+.vgl-bar-btn.is-wait:hover{background:var(--white,#fff)}
+/* active state: ≥2 selected, ready to open */
+.vgl-bar-btn.is-active{background:var(--teal,#015253);color:var(--white,#fff);border-color:var(--teal,#015253)}
+.vgl-bar-btn.is-active .cnt{display:inline-flex;background:rgba(255,255,255,.22)}
 .vgl-bar-btn.is-active:hover{background:var(--teal-600,#014A4B)}
+.vgl-cancel{background:none;border:none;color:var(--text-muted,#6A6A6A);font:500 .8125rem/1 inherit;cursor:pointer;text-decoration:underline;display:none}
+.vgl-cancel.is-shown{display:inline}
+.vgl-cancel:hover{color:var(--schwarz,#1A171B)}
 
-/* ---- Compare toggle on each product card ---- */
-.vgl-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:var(--sp-3,12px);font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--text-muted,#6A6A6A);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+/* ---- Compare toggle on each product card — HIDDEN until compare mode ---- */
+.vgl-toggle{display:none;align-items:center;gap:8px;margin-top:var(--sp-3,12px);font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--text-muted,#6A6A6A);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+body.vgl-mode .vgl-toggle{display:inline-flex;animation:vglfade .25s ease}
+@keyframes vglfade{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
 .vgl-toggle:hover{color:var(--teal,#015253)}
 .vgl-toggle input{position:absolute;opacity:0;width:1px;height:1px}
 .vgl-box{width:18px;height:18px;border:2px solid var(--graphite-500,#A1A1A1);border-radius:var(--r-s,3px);display:inline-flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s,border-color .15s}

@@ -61,6 +61,7 @@
   ];
 
   var selected=[];
+  var compareMode=false;   /* card compare fields are hidden until the user starts a comparison */
   try{var raw=sessionStorage.getItem(KEY);if(raw)selected=JSON.parse(raw).filter(function(id){return BY_ID[id];});}catch(e){}
   function persist(){try{sessionStorage.setItem(KEY,JSON.stringify(selected));}catch(e){}}
   function isFull(){return selected.length>=MAX;}
@@ -72,7 +73,7 @@
   var SCALE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M4 6h6M4 12h6M4 18h6M20 8l-3-3-3 3M17 5v9"/></svg>';
   function swHTML(colors,lim){lim=lim||8;var o='';(colors||[]).slice(0,lim).forEach(function(c){if(SW[c])o+='<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>';});return '<span class="vgl-sw">'+o+'</span>';}
 
-  var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,diffCb,toastEl,toastT,barBtn,lastFocus;
+  var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,diffCb,toastEl,toastT,barBtn,cancelBtn,lastFocus;
 
   function buildChrome(){
     tray=h('<div class="vgl-tray" role="region" aria-label="Vergleichsauswahl">'+
@@ -108,13 +109,20 @@
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open'))closeView();});
   }
 
-  /* toolbar "Vergleichen (n)" — the persistent disabled→active affordance */
+  /* toolbar control — rest: "Vergleichen" (starts compare mode → card fields appear);
+     in mode: "Vergleich anzeigen (n)", grey until ≥2, teal + opens comparison from 2. */
   function injectBarButton(){
-    var bar=document.querySelector('.catalog__bar'); if(!bar||bar.querySelector('.vgl-bar-btn'))return;
-    barBtn=h('<button class="vgl-bar-btn" type="button" aria-label="Vergleich öffnen" disabled>'+SCALE+'Vergleichen <span class="cnt">0</span></button>');
-    barBtn.addEventListener('click',function(){if(canCompare())openView();});
-    bar.appendChild(barBtn);
+    var bar=document.querySelector('.catalog__bar'); if(!bar||bar.querySelector('.vgl-barwrap'))return;
+    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt">0</span></button><button class="vgl-cancel" type="button">Abbrechen</button></div>');
+    barBtn=wrap.querySelector('.vgl-bar-btn');
+    cancelBtn=wrap.querySelector('.vgl-cancel');
+    barBtn.addEventListener('click',function(){if(!compareMode){enterMode();}else if(canCompare()){openView();}});
+    cancelBtn.addEventListener('click',exitMode);
+    bar.appendChild(wrap);
+    syncBar();
   }
+  function enterMode(){compareMode=true;document.body.classList.add('vgl-mode');syncBar();var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}toast('Vergleichsmodus: Wählen Sie 2–4 Modelle über „Vergleichen" auf den Karten.');}
+  function exitMode(){compareMode=false;document.body.classList.remove('vgl-mode');selected=[];persist();closeView();syncAll();}
 
   function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},2400);}
 
@@ -134,7 +142,25 @@
   function clearAll(){selected=[];persist();syncAll();}
 
   function syncCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(function(c){var id=c.dataset.id,on=selected.indexOf(id)>-1,cb=c.querySelector('.vgl-toggle input'),lab=c.querySelector('.vgl-toggle');if(cb)cb.checked=on;c.classList.toggle('is-vgl',on);var dis=!on&&isFull();if(cb)cb.disabled=dis;if(lab)lab.classList.toggle('is-disabled',dis);});}
-  function syncBar(){if(!barBtn)return;var n=selected.length;barBtn.querySelector('.cnt').textContent=n;barBtn.classList.toggle('is-active',canCompare());barBtn.disabled=!canCompare();}
+  function syncBar(){
+    if(!barBtn)return;
+    var n=selected.length;
+    barBtn.querySelector('.cnt').textContent=n;
+    var lbl=barBtn.querySelector('.lbl');
+    if(!compareMode){
+      lbl.textContent='Vergleichen';
+      barBtn.classList.remove('is-active','is-wait');
+      barBtn.setAttribute('aria-label','Vergleich starten');
+      barBtn.removeAttribute('aria-disabled');
+    }else{
+      lbl.textContent='Vergleich anzeigen';
+      barBtn.classList.toggle('is-active',canCompare());
+      barBtn.classList.toggle('is-wait',!canCompare());
+      barBtn.setAttribute('aria-label',canCompare()?'Vergleich anzeigen':'Mindestens zwei Modelle wählen');
+      barBtn.setAttribute('aria-disabled',String(!canCompare()));
+    }
+    if(cancelBtn)cancelBtn.classList.toggle('is-shown',compareMode);
+  }
   function syncTray(){
     var n=selected.length;
     trayLabel.textContent='Vergleich ('+n+')';
@@ -186,9 +212,9 @@
   var TRIO=['kai1','colson1','sdm10x'];  // Audio · VDM10 · SDM10X (all on page 1)
   var coach,coachProg,coachStep,coachTitle,coachText,coachBack,coachNext,coachEnd,spotEl,cur=0;
   var STEPS=[
-    {k:'Schritt 1 / 6',t:'Ruhezustand',x:'Am Anfang ist nichts ausgewählt — die Schaltfläche „Vergleichen" in der Ergebnisleiste ist <b>deaktiviert</b> (grau). Die Funktion ist sichtbar, aber noch nicht nutzbar.',target:function(){return barBtn;}},
-    {k:'Schritt 2 / 6',t:'Ersten Artikel merken',x:'Über „Vergleichen" auf einer Produktkarte wählen Sie den ersten Artikel. Die Auswahlleiste erscheint — für eine Gegenüberstellung sind aber <b>mindestens zwei</b> nötig.',target:function(){return cardToggle(TRIO[0])||trayCta;}},
-    {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Artikel markiert sind, wird „Vergleichen (3)" <b>aktiv</b> (grün) — in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
+    {k:'Schritt 1 / 6',t:'Ruhezustand',x:'Zunächst ist der Vergleich reduziert: auf den Produktkarten sind <b>keine Auswahlfelder</b> sichtbar. In der Ergebnisleiste lädt die Schaltfläche „Vergleichen" dazu ein, den Vergleich zu starten.',target:function(){return barBtn;}},
+    {k:'Schritt 2 / 6',t:'Vergleich starten',x:'Ein Klick auf „Vergleichen" aktiviert den Vergleichsmodus — <b>jetzt erscheint auf jeder Produktkarte ein „Vergleichen"-Feld</b>. Wählen Sie damit 2–4 Modelle.',target:function(){return cardToggle(TRIO[0])||barBtn;}},
+    {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Modelle markiert sind, wird „Vergleich anzeigen (3)" <b>aktiv</b> (grün) — in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
     {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: Fachwerte in Gruppen (Grundlagen, Kamera & Bild, Smart & Zutritt, Bauform & Schutz), Unterschiede mit einem Punkt markiert. Audio-Modelle zeigen bei Kamera-Werten neutral „–".',target:function(){return null;}},
     {k:'Schritt 5 / 6',t:'Nur Unterschiede',x:'Mit „Nur Unterschiede anzeigen" bleiben nur die abweichenden Merkmale sichtbar — ideal, um schnell zu entscheiden.',target:function(){return view.querySelector('.vgl-diff');}},
     {k:'Schritt 6 / 6',t:'Weiter im Kauf',x:'Aus dem Vergleich geht es direkt weiter: <b>Konfigurieren</b> bzw. <b>Zum Produkt</b> (kein Direktkauf, da individualisierbar), Artikel entfernen oder weitere hinzufügen. Das ist der komplette Ablauf.',target:function(){return null;},last:true}
@@ -199,7 +225,9 @@
 
   function applyState(step){
     closeView();
-    selected = step>=2 ? TRIO.slice() : (step>=1 ? [TRIO[0]] : []);
+    compareMode = step>=1;                     /* step 1+ = compare mode on → card fields visible */
+    document.body.classList.toggle('vgl-mode',compareMode);
+    selected = step>=2 ? TRIO.slice() : [];    /* models get marked from step 3 (index 2) */
     selected = selected.filter(function(id){return BY_ID[id];});
     persist(); syncAll();
     diffCb.checked = step>=4;
@@ -246,6 +274,8 @@
   function init(){
     if(!window.MTZ_PRODUCTS)return setTimeout(init,50);
     if(!SRC.length){SRC=window.MTZ_PRODUCTS;SRC.forEach(function(p){if(!BY_ID[p.id])BY_ID[p.id]=enrich(p);});}
+    compareMode = selected.length>0;   /* restore mode if a selection persisted across reload */
+    if(compareMode)document.body.classList.add('vgl-mode');
     buildChrome(); buildCoach(); injectBarButton();
     var grid=document.getElementById('productGrid');
     if(grid){scanCards();new MutationObserver(function(){scanCards();injectBarButton();}).observe(grid,{childList:true});}
