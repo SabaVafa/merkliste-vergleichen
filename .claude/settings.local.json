@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '{print $5, $9}')",
+      "Bash(python \"C:\\\\Users\\\\S3BCE~1.VAF\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-s-vafakhah-Desktop-REPOS-Bookmark---Comparing\\\\20d8763a-0a47-4b50-a5cf-4cbc601e9761\\\\scratchpad\\\\summarize.py\")",
+      "Bash(python -c ' *)",
+      "Bash(cd \"/c/Users/s.vafakhah/Desktop/PLP\" && echo \"=== sprechanlage.js: top structure ===\" && head -60 sprechanlage.js && echo && echo \"=== product/data object keys \\(grep\\) ===\" && grep -nE \"^\\\\s*\\(const|let|var\\)\\\\s+\\\\w+\\\\s*=|products\\\\s*[:=]|spec|kamera|sichtwinkel|nachtsicht|schutzart|aufloesung|resolution|app|relais|merkmal|attributes|badge|compare|merken|vergleich|wunsch|favorit\" sprechanlage.js | head -50)",
+      "Bash(cd \"/c/Users/s.vafakhah/Desktop\" && echo \"=== PLP Sprechanlage images ===\" && ls -1 \"PLP/Product Image/Sprechanlage/\" 2>/dev/null && echo && echo \"=== PDP Sprechanlage images ===\" && ls -1 \"PDP METZLER/Product Image/Sprechanlage/\" 2>/dev/null && echo && echo \"=== favicon present? ===\" && ls -1 \"PLP/\"*.svg \"PLP/Home/Logo/\" 2>/dev/null | head)"
+    ]
+  }
+}
