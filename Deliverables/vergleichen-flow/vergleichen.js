@@ -71,6 +71,9 @@
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   var CHK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
   var SCALE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M4 6h6M4 12h6M4 18h6M20 8l-3-3-3 3M17 5v9"/></svg>';
+  var IC_INFO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"/></svg>';
+  var IC_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8.4 12.5 11 15 16 9.5"/></svg>';
+  var IC_LIMIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13.5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
   function swHTML(colors,lim){lim=lim||8;var o='';(colors||[]).slice(0,lim).forEach(function(c){if(SW[c])o+='<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>';});return '<span class="vgl-sw">'+o+'</span>';}
 
   var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,diffCb,toastEl,toastT,barBtn,cancelBtn,lastFocus;
@@ -78,8 +81,10 @@
   function buildChrome(){
     tray=h('<div class="vgl-tray" role="region" aria-label="Vergleichsauswahl">'+
       '<div class="vgl-tray__inner">'+
-        '<span class="vgl-tray__label" aria-live="polite">Vergleich (0)</span>'+
-        '<span class="vgl-tray__hint"></span>'+
+        '<div class="vgl-tray__status">'+
+          '<span class="vgl-tray__label" aria-live="polite">Vergleich (0)</span>'+
+          '<span class="vgl-tray__hint" aria-live="polite"></span>'+
+        '</div>'+
         '<div class="vgl-tray__slots"></div>'+
         '<div class="vgl-tray__actions">'+
           '<button class="vgl-link" type="button" data-vgl="reset">Zurücksetzen</button>'+
@@ -104,7 +109,7 @@
     toastEl=h('<div class="vgl-toast" role="status" aria-live="polite"></div>');document.body.appendChild(toastEl);
 
     tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm)toggle(rm.getAttribute('data-rm'),false);});
-    view.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='close')closeView();if(k==='clear'){clearAll();closeView();}return;}var rm=e.target.closest('[data-rm]');if(rm){toggle(rm.getAttribute('data-rm'),false);if(selected.length<1)closeView();return;}var go=e.target.closest('[data-go]');if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)');});
+    view.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='close')closeView();if(k==='clear'){clearAll();closeView();}return;}var rm=e.target.closest('[data-rm]');if(rm){toggle(rm.getAttribute('data-rm'),false);if(selected.length<1)closeView();return;}var go=e.target.closest('[data-go]');if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');});
     diffCb.addEventListener('change',renderView);
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open'))closeView();});
   }
@@ -121,10 +126,17 @@
     bar.appendChild(wrap);
     syncBar();
   }
-  function enterMode(){compareMode=true;document.body.classList.add('vgl-mode');syncBar();var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}toast('Vergleichsmodus: Wählen Sie 2–4 Modelle über „Vergleichen" auf den Karten.');}
+  function enterMode(){compareMode=true;document.body.classList.add('vgl-mode');syncBar();var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}toast('Vergleichsmodus aktiv — wählen Sie 2 bis 4 Modelle über „Vergleichen" auf den Karten.','info');}
   function exitMode(){compareMode=false;document.body.classList.remove('vgl-mode');selected=[];persist();closeView();syncAll();}
 
-  function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},2400);}
+  function toast(m,type){
+    type=type||'ok';
+    var ic=type==='limit'?IC_LIMIT:(type==='info'?IC_INFO:IC_OK);
+    toastEl.className='vgl-toast t-'+type;
+    toastEl.innerHTML=ic+'<span>'+m+'</span>';
+    toastEl.classList.add('show');
+    clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},2600);
+  }
 
   function injectToggle(cardEl){
     if(cardEl.querySelector('.vgl-toggle'))return;
@@ -138,7 +150,7 @@
   }
   function scanCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(injectToggle);syncCards();}
 
-  function toggle(id,on){var i=selected.indexOf(id);if(on&&i<0){if(isFull()){toast('Sie können bis zu '+MAX+' Modelle vergleichen.');return false;}selected.push(id);}else if(!on&&i>-1){selected.splice(i,1);}persist();syncAll();return true;}
+  function toggle(id,on){var i=selected.indexOf(id);if(on&&i<0){if(isFull()){toast('Maximal '+MAX+' Modelle gleichzeitig — bitte zuerst eines entfernen.','limit');return false;}selected.push(id);}else if(!on&&i>-1){selected.splice(i,1);}persist();syncAll();return true;}
   function clearAll(){selected=[];persist();syncAll();}
 
   function syncCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(function(c){var id=c.dataset.id,on=selected.indexOf(id)>-1,cb=c.querySelector('.vgl-toggle input'),lab=c.querySelector('.vgl-toggle');if(cb)cb.checked=on;c.classList.toggle('is-vgl',on);var dis=!on&&isFull();if(cb)cb.disabled=dis;if(lab)lab.classList.toggle('is-disabled',dis);});}
@@ -163,11 +175,23 @@
   }
   function syncTray(){
     var n=selected.length;
-    trayLabel.textContent='Vergleich ('+n+')';
+    trayLabel.innerHTML='Vergleich ('+n+') <span class="of">/ max. '+MAX+'</span>';
     tray.classList.toggle('is-open',n>0);
-    document.body.style.paddingBottom=n>0?'84px':'';
+    document.body.style.paddingBottom=n>0?'88px':'';
     trayCta.disabled=!canCompare();
-    trayHint.textContent=canCompare()?'':(n>0?('Noch mindestens '+(MIN-n)+' Artikel für den Vergleich wählen'):'');
+    trayHint.className='vgl-tray__hint';
+    if(!canCompare()){
+      var need=MIN-n;
+      trayHint.classList.add('info');
+      trayHint.innerHTML=IC_INFO+'Noch <b>'+need+'</b> Modell'+(need>1?'e':'')+' wählen, um zu vergleichen';
+    }else if(n>=MAX){
+      trayHint.classList.add('limit');
+      trayHint.innerHTML=IC_LIMIT+'Maximum erreicht — mehr als '+MAX+' Modelle sind nicht vergleichbar';
+    }else{
+      var more=MAX-n;
+      trayHint.classList.add('ready');
+      trayHint.innerHTML=IC_OK+'Bereit zum Vergleichen · bis zu '+more+' weitere möglich';
+    }
     traySlots.innerHTML='';
     selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));});
   }
@@ -178,7 +202,7 @@
   function renderView(){
     var items=selected.map(function(id){return BY_ID[id];});
     viewCount.textContent='('+items.length+')';
-    if(items.length<2){viewBody.innerHTML='<div class="vgl-empty"><b>Bitte wählen Sie mindestens zwei Modelle.</b><span>Über „Vergleichen" auf den Produktkarten weitere Anlagen hinzufügen.</span></div>';return;}
+    if(items.length<2){viewBody.innerHTML='<div class="vgl-empty">'+SCALE+'<b>Mindestens zwei Modelle wählen</b><span>Markieren Sie über „Vergleichen" auf den Produktkarten weitere Anlagen, um sie hier gegenüberzustellen.</span></div>';return;}
     var onlyDiff=diffCb.checked;
     var cols='<col class="rl">'+items.map(function(){return '<col class="pc">';}).join('');
     var emptyCells=items.map(function(){return '<td></td>';}).join('');
