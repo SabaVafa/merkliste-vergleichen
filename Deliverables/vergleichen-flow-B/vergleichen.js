@@ -32,7 +32,9 @@
   function klingelLabel(k){return k==='flex'?'Flexibel (1–500)':k;}
 
   var SRC=(window.MTZ_PRODUCTS||[]), BY_ID={};
-  function enrich(p){return {id:p.id,name:p.name,img:p.img,price:p.price,uvp:p.uvp,typ:(p.type==='audio'?'Audio':'Video'),system:(p.line||(p.system==='bus'?'2-Draht-BUS':'IP-System')),klingel:klingelLabel(p.klingel),haushalt:haushaltOf(p),zutritt:(p.tuer&&p.tuer.length)?p.tuer.map(function(k){return ZUT[k]||k;}):['Standard'],colors:p.colors||[],briefkasten:!!p.briefkasten,konfig:konfigOf(p),specs:profile(familyOf(p))};}
+  function designOf(p){var parts=String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);return parts.length>1?parts[parts.length-1]:'–';}
+  function namensschildOf(p){return /austauschbar/i.test(p.name||'')?'Austauschbar':'Lasergravur';}
+  function enrich(p){return {id:p.id,name:p.name,img:p.img,price:p.price,uvp:p.uvp,typ:(p.type==='audio'?'Audio':'Video'),system:(p.line||(p.system==='bus'?'2-Draht-BUS':'IP-System')),klingel:klingelLabel(p.klingel),haushalt:haushaltOf(p),zutritt:(p.tuer&&p.tuer.length)?p.tuer.map(function(k){return ZUT[k]||k;}):['Standard'],colors:p.colors||[],briefkasten:!!p.briefkasten,konfig:konfigOf(p),design:designOf(p),namensschild:namensschildOf(p),specs:profile(familyOf(p))};}
   SRC.forEach(function(p){BY_ID[p.id]=enrich(p);});
 
   /* imp:true = key row (shown by default); others sit behind "Alle technischen Details".
@@ -41,7 +43,10 @@
      Price has no "Bestwert" on purpose — a premium brand shows the price difference neutrally (delta), it doesn't crown the cheapest. */
   var ROWS=[
     {group:'Grundlagen'},
-    {key:'price',label:'Preis',imp:true,get:function(p){return 'ab '+euro(p.price);},hint:'Grundpreis der Standardausführung. Farbe, Namensschild und Gravur werden bei der Konfiguration festgelegt.'},
+    {key:'price',label:'Preis',imp:true,soft:true,get:function(p){return 'ab '+euro(p.price);},hint:'Grundpreis der Standardausführung. Farbe, Namensschild und Gravur werden bei der Konfiguration festgelegt.'},
+    /* soft = non-technical decider (design, nameplate, colours, price). When ONLY soft rows differ, the set is "technisch baugleich". */
+    {key:'design',label:'Design-Linie',imp:true,soft:true,nohl:true,get:function(p){return p.design;},hint:'Formsprache der Frontplatte. Modelle derselben Baureihe teilen sich die Technik — die Linie bestimmt die Optik.'},
+    {key:'namensschild',label:'Namensschild',imp:true,soft:true,get:function(p){return p.namensschild;},hint:'Lasergravur: dauerhaft und edel — für Eigentümer. Austauschbar: Name später wechselbar — ideal bei Mietobjekten.'},
     {key:'typ',label:'Typ',imp:true,get:function(p){return p.typ;},hint:'Video: Kamera an der Außenstation, Bild auf Innenstation/App. Audio: Sprechverbindung ohne Kamera.'},
     {key:'system',label:'System',imp:true,get:function(p){return p.system;},hint:'IP-System: Anbindung ans Heimnetzwerk (LAN/PoE). 2-Draht-BUS: nutzt vorhandene Klingelleitungen — ideal bei Modernisierung.'},
     {key:'haushalt',label:'Geeignet für',imp:true,get:function(p){return p.haushalt;}},
@@ -60,7 +65,7 @@
     {key:'schlagfestigkeit',label:'Schlagfestigkeit',spec:true,hint:'IK-Schutzklasse gegen Stöße (IK07 bis IK10). Höher = robuster.'},
     {key:'display',label:'Display / Innenstation',spec:true},
     {key:'poe',label:'PoE (Power over Ethernet)',better:'yes',spec:true,bool:true,hint:'Stromversorgung über das Netzwerkkabel — kein separates Netzteil an der Tür nötig.'},
-    {key:'colors',label:'Farben',swatches:true},
+    {key:'colors',label:'Farben',swatches:true,soft:true},
     {key:'briefkasten',label:'Mit Briefkasten/Paketbox',get:function(p){return p.briefkasten;},bool:true}
   ];
 
@@ -120,6 +125,7 @@
     tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm)toggle(rm.getAttribute('data-rm'),false);});
     view.addEventListener('click',function(e){
       var a=e.target.closest('[data-vgl]');
+      if(a&&a.getAttribute('data-vgl')==='body')a=null;   /* the body container carries data-vgl too — don't swallow chip/alt clicks */
       if(a){var k=a.getAttribute('data-vgl');
         if(k==='close')closeView();
         if(k==='clear'){clearAll();closeView();}
@@ -128,6 +134,7 @@
         if(k==='print'){printView();}
         return;}
       var j=e.target.closest('[data-jump]');if(j){jumpTo(j.getAttribute('data-jump'));return;}
+      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');if(toggle(aid,true)){toast(esc(shortName(BY_ID[aid]).main)+' zum Vergleich hinzugefügt','ok');scrollEl.scrollTop=0;}return;}
       var rm=e.target.closest('[data-rm]');if(rm){toggle(rm.getAttribute('data-rm'),false);if(selected.length<1)closeView();return;}
       var go=e.target.closest('[data-go]');if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');
     });
@@ -258,7 +265,7 @@
     var out=items.map(function(){return [];});
     var diffs=an.diffs.slice().sort(function(a,b){return (b.row.imp?1:0)-(a.row.imp?1:0);});
     diffs.forEach(function(d){
-      var row=d.row; if(row.key==='price')return;                 /* price already sits in the header */
+      var row=d.row; if(row.key==='price'||row.nohl)return;       /* price already sits in the header; design line is the column itself */
       var bi=bestIdx(row,d.vals,d.texts);
       items.forEach(function(p,i){
         if(out[i].length>=3)return;
@@ -285,7 +292,50 @@
       (same?sames:diffs).push({row:row,vals:vals,texts:texts});
     });
     var total=diffs.length+sames.length;
-    return {diffs:diffs,sames:sames,ratio:total?sames.length/total:0};
+    var tech=diffs.filter(function(d){return !d.row.soft;}).length;
+    /* twin = technically identical: differences only in design / nameplate / colours / price */
+    return {diffs:diffs,sames:sames,ratio:total?sames.length/total:0,tech:tech,twin:diffs.length>0&&tech===0};
+  }
+  /* colour set differences per model: extra = colours no other model offers, missing = colours every other model offers */
+  function colorDiff(items,i){
+    var mine=items[i].colors||[],others=items.filter(function(q,j){return j!==i;}).map(function(q){return q.colors||[];});
+    var extra=mine.filter(function(c){return others.every(function(o){return o.indexOf(c)<0;});});
+    var missing=[];others.length&&others[0].forEach(function(c){if(mine.indexOf(c)<0&&others.every(function(o){return o.indexOf(c)>-1;}))missing.push(c);});
+    return {extra:extra.map(function(c){return SWL[c]||c;}),missing:missing.map(function(c){return SWL[c]||c;})};
+  }
+  /* Alternatives that differ MEANINGFULLY: nearest models with 1–3 technical differences to the compared set, closest price first */
+  function alternatives(items){
+    var techRows=ROWS.filter(function(r){return !r.group&&!r.soft;});
+    var ref=items[0],refPrice=typeof ref.price==='number'?ref.price:0;
+    var out=[];
+    SRC.forEach(function(raw){
+      var p=BY_ID[raw.id]; if(!p||selected.indexOf(p.id)>-1)return;
+      var why=[];
+      techRows.forEach(function(row){var a=disp(cellVal(p,row),row),b=disp(cellVal(ref,row),row);if(a!==b&&a!=='–')why.push({l:row.label,v:(row.bool?(a==='ja'?'Ja':'Nein'):a)});});
+      if(why.length<1||why.length>3)return;
+      out.push({p:p,why:why,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});
+    });
+    out.sort(function(a,b){return a.why.length-b.why.length||a.dist-b.dist;});
+    /* one per design line, so the list doesn't show three Colsons */
+    var seen={},res=[];out.forEach(function(o){var k=o.p.design+'|'+o.why.map(function(w){return w.l+w.v;}).join();if(seen[k])return;seen[k]=1;res.push(o);});
+    return res.slice(0,3);
+  }
+  /* "Für +X € erhalten Sie …" — turns the price delta into a value statement (twin state only) */
+  function valueStatement(items){
+    var cheap=items.reduce(function(a,b){return (b.price<a.price)?b:a;});
+    var lines=[];
+    items.forEach(function(p,i){
+      if(p===cheap)return;
+      var gets=[];
+      var cd=colorDiff([p,cheap],0);
+      if(cd.extra.length)gets.push(cd.extra.length+' zusätzliche Farbe'+(cd.extra.length>1?'n':'')+' ('+cd.extra.join(', ')+')');
+      if(p.namensschild!==cheap.namensschild)gets.push('Namensschild: '+p.namensschild+' statt '+cheap.namensschild);
+      if(p.design!==cheap.design)gets.push('Design-Linie „'+p.design+'"');
+      var less=colorDiff([p,cheap],0).missing;
+      var d=p.price-cheap.price;
+      lines.push('<li><b>'+(d>0?'+ '+euro(d):'Gleicher Preis')+'</b> für <b>'+esc(p.design)+'</b>'+(gets.length?' — dafür: '+esc(gets.join(' · ')):' — ohne technischen Mehrwert, reine Design-Entscheidung')+(less.length?' <span class="vgl-twin__less">(ohne '+esc(less.join(', '))+')</span>':'')+'</li>');
+    });
+    return lines.join('');
   }
   function renderView(){
     var items=selected.map(function(id){return BY_ID[id];});
@@ -305,17 +355,38 @@
     if(an.diffs.length===0){
       sum+='<div class="vgl-sum__txt vgl-sum__txt--same">'+IC_OK+'<span>In allen <b>'+total+'</b> verglichenen Merkmalen identisch — entscheiden Sie nach Optik, Farbe und Namensschild.</span></div>';
     }else{
-      var verdict=an.ratio>=0.6
-        ?'Zu <b>'+Math.round(an.ratio*100)+'&nbsp;%</b> ähnlich — <b>'+an.diffs.length+'</b> Unterschied'+(an.diffs.length>1?'e':'')+' entscheide'+(an.diffs.length>1?'n':'t')+'.'
-        :'<b>'+an.diffs.length+' von '+total+'</b> Merkmalen unterscheiden sich.';
+      var verdict;
+      if(an.twin){
+        var SOFT_ORDER=['design','namensschild','colors','price'];   /* look first, price last */
+        var softLabels=an.diffs.slice().sort(function(a,b){return SOFT_ORDER.indexOf(a.row.key)-SOFT_ORDER.indexOf(b.row.key);}).map(function(d){return d.row.label;});
+        verdict='<b>Technisch baugleich</b> — der Unterschied liegt in '+esc(softLabels.length>1?softLabels.slice(0,-1).join(', ')+' und '+softLabels.slice(-1):softLabels[0])+'.';
+      }else if(an.ratio>=0.6){
+        verdict='Zu <b>'+Math.round(an.ratio*100)+'&nbsp;%</b> ähnlich — <b>'+an.diffs.length+'</b> Unterschied'+(an.diffs.length>1?'e':'')+' entscheide'+(an.diffs.length>1?'n':'t')+'.';
+      }else{
+        verdict='<b>'+an.diffs.length+' von '+total+'</b> Merkmalen unterscheiden sich.';
+      }
       sum+='<div class="vgl-sum__txt">'+IC_INFO+'<span>'+verdict+'</span></div>';
-      var chips=an.diffs.slice().sort(function(a,b){return (b.row.imp?1:0)-(a.row.imp?1:0);});
+      var chips=an.diffs.slice().sort(function(a,b){return an.twin?(['design','namensschild','colors','price'].indexOf(a.row.key)-['design','namensschild','colors','price'].indexOf(b.row.key)):((b.row.imp?1:0)-(a.row.imp?1:0));});
       sum+='<div class="vgl-sum__chips" aria-label="Zu den Unterschieden springen">';
       chips.slice(0,8).forEach(function(d){sum+='<button type="button" class="vgl-chip" data-jump="'+d.row.key+'">'+esc(d.row.label)+'</button>';});
       if(chips.length>8)sum+='<span class="vgl-chip vgl-chip--more">+'+(chips.length-8)+' weitere</span>';
       sum+='</div>';
     }
     sum+='</div>';
+
+    /* ---- Twin state: technically identical → guide the real decision (design, nameplate, colours, price) ---- */
+    view.classList.toggle('is-twin',an.twin);
+    var twin='';
+    if(an.twin){
+      var alts=alternatives(items);
+      twin='<div class="vgl-twin">'+
+        '<section class="vgl-twin__col"><h3 class="vgl-twin__h">Was der Aufpreis bringt</h3><ul class="vgl-twin__list">'+valueStatement(items)+'</ul>'+
+          '<p class="vgl-twin__note">Farbe, Namensschild und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest — die Technik ist bei allen Modellen identisch.</p></section>'+
+        (alts.length?'<section class="vgl-twin__col vgl-twin__col--alt"><h3 class="vgl-twin__h">Alternativen mit echtem Unterschied</h3><ul class="vgl-alts">'+
+          alts.map(function(o){var nm=shortName(o.p);return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt=""></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(nm.main)+(o.p.design!=='–'?' <span>'+esc(o.p.design)+'</span>':'')+'</div><div class="vgl-alt__why">'+o.why.map(function(w){return '<span><em>'+esc(w.l)+':</em> '+esc(w.v)+'</span>';}).join('')+'</div><div class="vgl-alt__foot"><b>ab '+euro(o.p.price)+'</b><button type="button" class="vgl-alt__add" data-alt="'+o.p.id+'"'+(isFull()?' disabled':'')+'>'+IC_PLUS+'Zum Vergleich</button></div></div></li>';}).join('')+
+        '</ul></section>':'')+
+      '</div>';
+    }
 
     /* ---- Table ---- */
     var n=items.length+(addCol?1:0);
@@ -349,7 +420,12 @@
       var bi=same?[]:bestIdx(row,vals,texts);
       var tr='<tr data-key="'+row.key+'" class="'+(same||onlyDiff?'':'is-diff')+'"><th class="rh" scope="row"><span class="rh__l">'+esc(row.label)+'</span>'+(row.hint?'<button class="vgl-i" type="button" aria-label="Erklärung: '+esc(row.label)+'" data-tip="'+esc(row.hint)+'">'+IC_INFO+'</button>':'')+'</th>';
       items.forEach(function(p,i){var v=vals[i],t=texts[i],na=(t==='–'),isb=bi.indexOf(i)>-1,inner;
-        if(row.swatches)inner=swHTML(p.colors,10)+'<span class="vgl-swn">'+(p.colors||[]).length+' Farben</span>';
+        if(row.swatches){
+          var cd=same?{extra:[],missing:[]}:colorDiff(items,i);
+          inner=swHTML(p.colors,10)+'<span class="vgl-swn">'+(p.colors||[]).length+' Farben'+
+            (cd.extra.length?' · <b>zusätzlich:</b> '+esc(cd.extra.join(', ')):'')+
+            (cd.missing.length?' · <b>ohne:</b> '+esc(cd.missing.join(', ')):'')+'</span>';
+        }
         else if(row.bool){inner=v===true?'<span class="vgl-yes">'+CHK+'Ja</span>':(v===false?'<span class="vgl-no">Nein</span>':'<span class="vgl-no">–</span>');}
         else if(row.key==='price'){inner=esc(t)+((typeof p.price==='number'&&p.price>minPrice&&!same)?'<span class="vgl-delta" title="Differenz zum günstigsten Modell im Vergleich">+ '+euro(p.price-minPrice)+'</span>':'');}
         else inner=esc(t);
@@ -373,7 +449,7 @@
     }
     after+='</div>';
 
-    viewBody.innerHTML=sum+table+after;
+    viewBody.innerHTML=sum+table+twin+after;   /* products (the look) first, guidance after the short diff table */
   }
   function openView(){
     if(selected.length<MIN)return;

@@ -64,12 +64,25 @@ Baymard's four scanning rules — remove identical attributes, group by category
 12. **A11y:** focus trap in the dialog, `<caption>`, `aria-expanded` on the details toggle, jump chips are real buttons, tooltips reachable by keyboard.
 13. **Mobile:** two-row bar (title + close / switch + clear), 7 rem frozen label column, 10.5 rem product columns with the next column peeking to signal scroll, compact header, single-column commonalities.
 
+### 3b · "Technisch baugleich" state (added after the question *"what if two products are 90 % similar — is the result almost empty?"*)
+
+Two more deciders are now derived from the product titles and compared as rows: **Design-Linie** (last title segment: Colson, Neo, Kian …) and **Namensschild** (Lasergravur vs. Austauschbar). Rows are flagged *soft* (design, nameplate, colours, price) vs. technical. When only soft rows differ, the view switches to the twin state:
+
+14. **Honest verdict:** "Technisch baugleich — der Unterschied liegt in Design-Linie, Namensschild, Farben und Preis." Chips ordered look-first, price last.
+15. **The image is the comparison:** product hero grows to 200 px in this state.
+16. **"Was der Aufpreis bringt":** the price delta becomes a value statement — "+ 42,50 € für Colson — dafür: 2 zusätzliche Farben (Eisenglimmer, Wunschfarbe) · Namensschild: Lasergravur statt Austauschbar · Design-Linie „Colson"."
+17. **Colours explained, not counted:** the Farben row names what is *zusätzlich* / *ohne* per model.
+18. **"Alternativen mit echtem Unterschied":** the three nearest models with one to three technical differences (e.g. Niko: Fingerprint; Paketbox model; 3-Klingeltaster Neo), each with the reason and a one-click "Zum Vergleich" that adds it to the set.
+19. **Configurator pointer:** colour, nameplate and engraving are decided on the PDP / in the configurator — the technology is identical.
+
+Verified with VDM10 Colson vs. Neo: 4 soft differences, 0 technical → twin state; 16 Gemeinsamkeiten.
+
 ---
 
 ## 4 · Still open (recommendations, not built)
 
-- **Category lens for Briefkästen** (nameplate type, design, norm) once the Phase-0 model exists for mailboxes.
-- **"Mit ähnlichen vergleichen"** entry from the PDP (methodology §3 I).
+- **Category lens for Briefkästen** (nameplate type, design, norm) once the Phase-0 model exists for mailboxes. Design-Linie and Namensschild should become real Merkmale in JTL rather than title-derived.
+- **"Mit ähnlichen vergleichen"** entry from the PDP (methodology §3 I) — the alternatives engine above can be reused for it.
 - **Same model, different colour** → route to the PDP variant selector instead of the comparison (guardrail G) — needs variant data in the catalogue JSON.
 - **Share link** (URL with the selected IDs) — trivial once on JTL (`?vergleich=id,id`).
 
