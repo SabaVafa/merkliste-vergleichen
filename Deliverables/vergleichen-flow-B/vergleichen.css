@@ -188,36 +188,144 @@ tr.is-diff .rh{box-shadow:inset 3px 0 0 var(--teal,#015253),1px 0 0 var(--graphi
 }
 .vgl-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-/* ===== Version B — similarity-aware comparison ===== */
-.vgl-wrap{max-height:calc(100vh - 260px)}
-.vgl-insights{margin-bottom:16px;display:flex;flex-direction:column;gap:12px}
-.vgl-simnote{display:flex;align-items:flex-start;gap:10px;background:var(--teal-5,rgba(1,82,83,.05));border:1px solid var(--teal-100,#E6EEEE);border-radius:var(--r-l,8px);padding:12px 14px;font-size:var(--text-body-sm,.875rem);color:var(--schwarz,#1A171B)}
-.vgl-simnote svg{width:20px;height:20px;flex-shrink:0;color:var(--teal,#015253);margin-top:1px}
-.vgl-simnote--same svg{color:var(--green,#009951)}
-.vgl-simnote b{font-weight:700}
-.vgl-diffpanel{border:1px solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,8px);background:var(--white,#fff);overflow:hidden;box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.04))}
-.vgl-diffpanel__h{display:flex;align-items:center;gap:8px;padding:12px 16px;font-weight:700;color:var(--schwarz,#1A171B);border-bottom:1px solid var(--graphite-100,#F0F0F0);font-size:var(--text-body,1rem)}
-.vgl-diffpanel__h .cnt{min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:var(--teal,#015253);color:#fff;font-size:.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
-.vgl-difflist{list-style:none;margin:0;padding:4px 0}
-.vgl-difflist li{display:flex;gap:16px;padding:8px 16px;border-bottom:1px solid var(--graphite-100,#F0F0F0)}
-.vgl-difflist li:last-child{border-bottom:none}
-.vgl-difflist .k{flex:0 0 12rem;font-weight:600;color:var(--schwarz,#1A171B);font-size:var(--text-body-sm,.875rem)}
-.vgl-difflist .v{flex:1;color:var(--text-muted,#6A6A6A);font-size:var(--text-body-sm,.875rem)}
-.vgl-best{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:999px;background:var(--teal,#015253);color:#fff;font-size:.625rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
+/* =====================================================================
+   Version B — similarity-aware, benchmark-aligned comparison
+   Scroll model: ONE scroll container (.vgl-view__scroll). The product
+   header row sticks to its top and compacts on scroll (Apple/Samsung),
+   the row-label column sticks left (Baymard). No nested scrollers.
+   ===================================================================== */
+.vgl-view__scroll{overflow:auto;overscroll-behavior:contain}
+.vgl-view__scroll-in{padding-top:20px}
+.vgl-wrap{overflow:visible;max-height:none;border-radius:var(--r-l,8px)}
+table.vgl-t col.rl{width:14rem}
+table.vgl-t col.pc{width:15rem}
+table.vgl-t col.pc--add{width:10rem}
+table.vgl-t thead th{top:0;transition:padding .18s ease}
+table.vgl-t thead th.vgl-ph{padding:16px 18px 18px}
+
+/* ---- Summary strip: verdict + jump chips ---- */
+.vgl-sum{display:flex;align-items:center;flex-wrap:wrap;gap:10px 20px;margin-bottom:16px;padding:12px 16px;background:var(--white,#fff);border:1px solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,8px);box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.04))}
+.vgl-sum__txt{display:inline-flex;align-items:center;gap:10px;font-size:var(--text-body-sm,.875rem);color:var(--schwarz,#1A171B);line-height:1.35}
+.vgl-sum__txt svg{width:20px;height:20px;flex-shrink:0;color:var(--teal,#015253)}
+.vgl-sum__txt--same svg{color:var(--green,#009951)}
+.vgl-sum__chips{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px}
+.vgl-sum__chips::before{content:'Unterschiede:';font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--graphite-500,#A1A1A1);margin-right:4px}
+.vgl-chip{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--teal-100,#E6EEEE);background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);font:600 .8125rem/1 inherit;cursor:pointer;transition:background .15s,color .15s,border-color .15s;display:inline-flex;align-items:center}
+.vgl-chip:hover{background:var(--teal,#015253);color:#fff;border-color:var(--teal,#015253)}
+.vgl-chip:focus-visible{outline:3px solid var(--teal,#015253);outline-offset:2px}
+.vgl-chip--more{background:transparent;border-color:var(--graphite-300,#DADADA);color:var(--text-muted,#6A6A6A);cursor:default}
+
+/* ---- Product header: model line + qualifier, price, "Auf einen Blick", CTA ---- */
+.vgl-ph__media{height:124px;transition:height .18s ease,margin .18s ease}
+.vgl-ph__name{font-size:var(--text-body,1rem);font-weight:700;line-height:1.3;-webkit-line-clamp:2;height:2.6em;margin-bottom:2px;transition:height .18s ease}
+.vgl-ph__sub{font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:10px}
+.vgl-ph__price{margin-bottom:10px}
+/* CTA is pinned to the cell bottom, so columns stay aligned however many highlights a model has */
+table.vgl-t thead th.vgl-ph{padding-bottom:74px}
+.vgl-ph .btn{position:absolute;left:18px;right:18px;bottom:18px;width:auto}
+.vgl-ph__hl{list-style:none;margin:0;padding:10px 0 0;border-top:1px solid var(--graphite-100,#F0F0F0);display:flex;flex-direction:column;gap:4px}
+.vgl-ph__hl li{position:relative;padding-left:14px;font-size:.8125rem;line-height:1.3;color:var(--schwarz,#1A171B);font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vgl-ph__hl li::before{content:'';position:absolute;left:0;top:.42em;width:6px;height:6px;border-radius:50%;background:var(--teal,#015253)}
+.vgl-ph__hl li.is-best::before{background:var(--green,#009951)}
+.vgl-ph__hl li.none{color:var(--graphite-500,#A1A1A1);font-weight:400;white-space:normal}
+.vgl-ph__hl li.none::before{display:none}
+.vgl-hl__k{color:var(--text-muted,#6A6A6A);font-weight:400;margin-right:4px}
+.vgl-hl__k::after{content:':'}
+/* compact header while scrolling the specs */
+.vgl-view.is-compact .vgl-ph__media{height:56px;margin-bottom:8px}
+.vgl-view.is-compact .vgl-ph__name{-webkit-line-clamp:1;height:1.3em;font-size:var(--text-body-sm,.875rem)}
+.vgl-view.is-compact .vgl-ph__sub,.vgl-view.is-compact .vgl-ph__hl,.vgl-view.is-compact .vgl-ph__price small,.vgl-view.is-compact .vgl-add small{display:none}
+.vgl-view.is-compact .vgl-ph__price{font-size:var(--text-body,1rem);margin-bottom:8px}
+.vgl-view.is-compact .vgl-ph .btn{height:32px;bottom:12px}
+.vgl-view.is-compact table.vgl-t thead th.vgl-ph{padding:10px 18px 54px}
+.vgl-view.is-compact .vgl-add{min-height:0;padding:12px}
+/* add-a-model column */
+.vgl-ph--add{vertical-align:top}
+.vgl-add{width:100%;min-height:19rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;border:1.5px dashed var(--graphite-300,#DADADA);border-radius:var(--r-l,8px);background:var(--paper-white,#F5F6FA);color:var(--teal,#015253);cursor:pointer;font:inherit;transition:border-color .15s,background .15s}
+.vgl-add:hover{border-color:var(--teal,#015253);background:var(--teal-100,#E6EEEE)}
+.vgl-add:focus-visible{outline:3px solid var(--teal,#015253);outline-offset:2px}
+.vgl-add svg{width:26px;height:26px;margin-bottom:4px}
+.vgl-add b{font-size:var(--text-body-sm,.875rem);font-weight:700}
+.vgl-add small{font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A)}
+td.vgl-addcell{background:var(--paper-white,#F5F6FA)}
+tr.vgl-group td.vgl-addcell{background:var(--teal-100,#E6EEEE)}
+table.vgl-t tbody tr:not(.vgl-group):hover td.vgl-addcell{background:var(--paper-white,#F5F6FA)}
+
+/* ---- Row labels with (i) explanations ---- */
+table.vgl-t tbody .rh{overflow:visible}
+.rh__l{vertical-align:middle}
+.vgl-i{position:relative;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;padding:0;border:none;border-radius:50%;background:transparent;color:var(--graphite-500,#A1A1A1);cursor:help;vertical-align:middle}
+.vgl-i svg{width:16px;height:16px}
+.vgl-i:hover,.vgl-i:focus-visible{color:var(--teal,#015253);outline:none}
+.vgl-i::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 8px);z-index:20;width:17rem;padding:10px 12px;border-radius:var(--r-m,4px);background:var(--schwarz,#1A171B);color:#fff;font:400 .8125rem/1.45 inherit;text-align:left;white-space:normal;box-shadow:var(--shadow-lg,0 12px 32px rgba(0,0,0,.12));opacity:0;visibility:hidden;transform:translateY(-3px);transition:opacity .14s,transform .14s;pointer-events:none}
+.vgl-i:hover::after,.vgl-i:focus-visible::after{opacity:1;visibility:visible;transform:none}
+tr.is-flash td.vgl-val{animation:vglflash 1.6s ease}
+@keyframes vglflash{0%{background:var(--teal-100,#E6EEEE)}100%{background:transparent}}
+
+/* ---- Values ---- */
+.vgl-best{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;background:var(--green,#009951);color:#fff;font-size:.625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}
 td.vgl-val.is-best{font-weight:700}
+.vgl-delta{display:block;margin-top:2px;font-size:var(--text-caption,.75rem);font-weight:500;color:var(--text-muted,#6A6A6A)}
+.vgl-swn{display:block;margin-top:5px;font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A)}
+.vgl-link--ic{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.vgl-link--ic svg{width:16px;height:16px}
+.vgl-link--ic:hover{text-decoration:underline}
+.vgl-diff__n{font-weight:400;color:var(--graphite-500,#A1A1A1)}
+
+/* ---- After the table ---- */
 .vgl-aftertable{margin-top:16px;display:flex;flex-direction:column;gap:14px}
 .vgl-more{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:var(--r-m,4px);border:1px solid var(--graphite-300,#DADADA);background:var(--white,#fff);color:var(--teal,#015253);font:600 var(--text-body-sm,.875rem)/1 inherit;cursor:pointer;transition:background .15s,border-color .15s}
 .vgl-more:hover{background:var(--teal-5,rgba(1,82,83,.05));border-color:var(--teal,#015253)}
-.vgl-more svg{width:16px;height:16px}
-.vgl-common{border:1px solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,8px);background:var(--paper-white,#F5F6FA)}
-.vgl-common>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 16px;font-weight:600;color:var(--text-muted,#6A6A6A);font-size:var(--text-body-sm,.875rem)}
+.vgl-more svg{width:16px;height:16px;transition:transform .18s}
+.vgl-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.vgl-common{border:1px solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,8px);background:var(--white,#fff)}
+.vgl-common>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 16px;font-weight:600;color:var(--schwarz,#1A171B);font-size:var(--text-body-sm,.875rem)}
 .vgl-common>summary::-webkit-details-marker{display:none}
 .vgl-common>summary::before{content:'';width:8px;height:8px;border-right:2px solid var(--graphite-500,#A1A1A1);border-bottom:2px solid var(--graphite-500,#A1A1A1);transform:rotate(-45deg);transition:transform .18s;margin-right:2px}
 .vgl-common[open]>summary::before{transform:rotate(45deg)}
-.vgl-common .cnt{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--graphite-300,#DADADA);color:#fff;font-size:.6875rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
-.vgl-commonlist{list-style:none;margin:0;padding:0 16px 12px;columns:2;column-gap:28px}
-.vgl-commonlist li{break-inside:avoid;display:flex;gap:10px;padding:5px 0;font-size:.8125rem}
-.vgl-commonlist .k{color:var(--schwarz,#1A171B);font-weight:600;flex:0 0 auto}
-.vgl-commonlist .v{color:var(--text-muted,#6A6A6A)}
+.vgl-common .cnt{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);font-size:.6875rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.vgl-common__hint{margin-left:auto;font-weight:400;font-size:var(--text-caption,.75rem);color:var(--graphite-500,#A1A1A1)}
+.vgl-commonlist{list-style:none;margin:0;padding:4px 16px 14px;columns:2;column-gap:32px;border-top:1px solid var(--graphite-100,#F0F0F0)}
+.vgl-commonlist li{break-inside:avoid;display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:.8125rem;border-bottom:1px solid var(--graphite-100,#F0F0F0)}
+.vgl-commonlist .k{color:var(--text-muted,#6A6A6A);flex:0 0 auto}
+.vgl-commonlist .v{color:var(--schwarz,#1A171B);font-weight:600;text-align:right}
 .vgl-vb{margin-left:10px;padding:2px 8px;border-radius:999px;background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);font-size:.625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}
-@media(max-width:768px){.vgl-commonlist{columns:1}.vgl-difflist .k{flex-basis:8rem}.vgl-wrap{max-height:calc(100vh - 300px)}}
+
+/* ---- Mobile: two product columns visible, frozen label column, compact header ---- */
+@media(max-width:768px){
+  /* bar: row 1 = title + close, row 2 = switch + clear (print hidden on phones) */
+  .vgl-view__bar-in{height:auto;min-height:56px;padding-block:8px;flex-wrap:wrap;gap:6px 12px}
+  .vgl-view__title{font-size:var(--text-body,1rem);flex:1 1 auto;order:0}
+  .vgl-close{order:1;width:36px;height:36px}
+  .vgl-diff{margin-left:0;order:2;font-size:.8125rem}
+  .vgl-link--ic{display:none}
+  .vgl-view__bar-in>.vgl-link{order:3;margin-left:auto}
+  .vgl-view__scroll-in{padding:14px 12px 24px}
+  .vgl-sum{padding:10px 12px;gap:8px 14px}
+  .vgl-sum__chips{width:100%}
+  table.vgl-t{min-width:0}
+  table.vgl-t col.rl{width:7rem}
+  table.vgl-t col.pc{width:10.5rem}
+  table.vgl-t col.pc--add{width:7.5rem}
+  table.vgl-t th,table.vgl-t td{padding:10px 12px}
+  table.vgl-t thead th.vgl-ph{padding:12px 12px 62px}
+  .vgl-view.is-compact table.vgl-t thead th.vgl-ph{padding:10px 12px 54px}
+  .vgl-ph__media{height:84px}
+  .vgl-ph__name{font-size:var(--text-body-sm,.875rem)}
+  .vgl-ph .btn{height:34px;font-size:.8125rem;left:12px;right:12px;bottom:14px}
+  .vgl-add{min-height:14rem}
+  .vgl-i::after{width:14rem}
+  .vgl-commonlist{columns:1}
+}
+
+/* ---- Print: the comparison only, expanded, no chrome ---- */
+@media print{
+  body>*:not(.vgl-view){display:none !important}
+  .vgl-view{position:static;opacity:1;visibility:visible;background:#fff}
+  .vgl-view__scroll{overflow:visible}
+  .vgl-view__bar{border-bottom:2px solid #000}
+  .vgl-diff,.vgl-link,.vgl-close,.vgl-ph__rm,.vgl-ph--add,.vgl-addcell,.vgl-more,.vgl-ph .btn,.vgl-sum__chips,.vgl-i,.vgl-vb{display:none !important}
+  table.vgl-t thead th,table.vgl-t .rh{position:static;box-shadow:none}
+  .vgl-common{break-inside:avoid}
+  .vgl-common>summary::before{display:none}
+}

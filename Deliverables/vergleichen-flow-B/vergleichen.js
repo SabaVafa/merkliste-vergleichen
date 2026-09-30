@@ -37,27 +37,29 @@
 
   /* imp:true = key row (shown by default); others sit behind "Alle technischen Details".
      better: 'min' | 'maxnum' | 'yes' → marks the strongest value per row. */
+  /* hint = plain-language explanation shown via the (i) next to the row label (Baymard: explain technical attributes).
+     Price has no "Bestwert" on purpose — a premium brand shows the price difference neutrally (delta), it doesn't crown the cheapest. */
   var ROWS=[
     {group:'Grundlagen'},
-    {key:'price',label:'Preis',imp:true,better:'min',get:function(p){return 'ab '+euro(p.price);}},
-    {key:'typ',label:'Typ',imp:true,get:function(p){return p.typ;}},
-    {key:'system',label:'System',imp:true,get:function(p){return p.system;}},
+    {key:'price',label:'Preis',imp:true,get:function(p){return 'ab '+euro(p.price);},hint:'Grundpreis der Standardausführung. Farbe, Namensschild und Gravur werden bei der Konfiguration festgelegt.'},
+    {key:'typ',label:'Typ',imp:true,get:function(p){return p.typ;},hint:'Video: Kamera an der Außenstation, Bild auf Innenstation/App. Audio: Sprechverbindung ohne Kamera.'},
+    {key:'system',label:'System',imp:true,get:function(p){return p.system;},hint:'IP-System: Anbindung ans Heimnetzwerk (LAN/PoE). 2-Draht-BUS: nutzt vorhandene Klingelleitungen — ideal bei Modernisierung.'},
     {key:'haushalt',label:'Geeignet für',imp:true,get:function(p){return p.haushalt;}},
-    {key:'klingel',label:'Anzahl Klingeltaster',imp:true,get:function(p){return p.klingel;}},
+    {key:'klingel',label:'Anzahl Klingeltaster',imp:true,get:function(p){return p.klingel;},hint:'Ein Klingeltaster je Wohneinheit/Partei.'},
     {group:'Kamera & Bild'},
-    {key:'kameraaufloesung',label:'Kameraauflösung',imp:true,spec:true},
-    {key:'sichtwinkel',label:'Sichtwinkel',imp:true,better:'maxnum',spec:true},
-    {key:'nachtsicht',label:'Nachtsicht',imp:true,better:'yes',spec:true,bool:true},
+    {key:'kameraaufloesung',label:'Kameraauflösung',imp:true,spec:true,hint:'Auflösung des Kamerabilds — 2 MP entspricht Full-HD (1920 × 1080).'},
+    {key:'sichtwinkel',label:'Sichtwinkel',imp:true,better:'maxnum',spec:true,hint:'Horizontaler / vertikaler Erfassungsbereich der Kamera. Je größer, desto mehr vom Eingangsbereich ist sichtbar.'},
+    {key:'nachtsicht',label:'Nachtsicht',imp:true,better:'yes',spec:true,bool:true,hint:'Infrarot-Ausleuchtung für ein klares Bild bei Dunkelheit.'},
     {group:'Smart & Zutritt'},
-    {key:'app_steuerung',label:'App-Steuerung',imp:true,better:'yes',spec:true,bool:true},
-    {key:'sip_fritzbox',label:'SIP / FRITZ!Box',better:'yes',spec:true,bool:true},
-    {key:'zutritt',label:'Zutritt',imp:true,get:function(p){return p.zutritt.join(' · ');}},
-    {key:'tueroeffner_relais',label:'Türöffner-Relais',imp:true,better:'maxnum',spec:true},
+    {key:'app_steuerung',label:'App-Steuerung',imp:true,better:'yes',spec:true,bool:true,hint:'Sehen, sprechen und öffnen per Smartphone — auch von unterwegs.'},
+    {key:'sip_fritzbox',label:'SIP / FRITZ!Box',better:'yes',spec:true,bool:true,hint:'Ruf auf Telefone oder FRITZ!Fon über den SIP-Standard, ohne separate Innenstation.'},
+    {key:'zutritt',label:'Zutritt',imp:true,get:function(p){return p.zutritt.join(' · ');},hint:'Schlüsselloser Zutritt: RFID-Transponder, PIN-Code, QR-Code oder Gesichtserkennung.'},
+    {key:'tueroeffner_relais',label:'Türöffner-Relais',imp:true,better:'maxnum',spec:true,hint:'Schaltbare Ausgänge, z. B. für Haustür und Gartentor.'},
     {group:'Bauform & Schutz'},
-    {key:'schutzart',label:'Schutzart',spec:true},
-    {key:'schlagfestigkeit',label:'Schlagfestigkeit',spec:true},
+    {key:'schutzart',label:'Schutzart',spec:true,hint:'IP-Schutzklasse gegen Staub und Wasser — IP65 = staubdicht und strahlwassergeschützt.'},
+    {key:'schlagfestigkeit',label:'Schlagfestigkeit',spec:true,hint:'IK-Schutzklasse gegen Stöße (IK07 bis IK10). Höher = robuster.'},
     {key:'display',label:'Display / Innenstation',spec:true},
-    {key:'poe',label:'PoE (Power over Ethernet)',better:'yes',spec:true,bool:true},
+    {key:'poe',label:'PoE (Power over Ethernet)',better:'yes',spec:true,bool:true,hint:'Stromversorgung über das Netzwerkkabel — kein separates Netzteil an der Tür nötig.'},
     {key:'colors',label:'Farben',swatches:true},
     {key:'briefkasten',label:'Mit Briefkasten/Paketbox',get:function(p){return p.briefkasten;},bool:true}
   ];
@@ -79,7 +81,9 @@
   var IC_LIMIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13.5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
   function swHTML(colors,lim){lim=lim||8;var o='';(colors||[]).slice(0,lim).forEach(function(c){if(SW[c])o+='<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>';});return '<span class="vgl-sw">'+o+'</span>';}
 
-  var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,diffCb,toastEl,toastT,barBtn,cancelBtn,lastFocus;
+  var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,diffCb,diffN,scrollEl,toastEl,toastT,barBtn,cancelBtn,lastFocus;
+  var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
+  var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
 
   function buildChrome(){
     tray=h('<div class="vgl-tray" role="region" aria-label="Vergleichsauswahl">'+
@@ -101,20 +105,47 @@
     view=h('<div class="vgl-view" role="dialog" aria-modal="true" aria-labelledby="vglTitle" aria-hidden="true">'+
       '<div class="vgl-view__bar"><div class="vgl-view__bar-in">'+
         '<span class="vgl-view__title" id="vglTitle">Vergleich <span data-vgl="count">(0)</span><span class="vgl-vb">Version B</span></span>'+
-        '<label class="vgl-diff"><input type="checkbox" data-vgl="diff"><span class="vgl-switch" aria-hidden="true"></span>Nur Unterschiede anzeigen</label>'+
+        '<label class="vgl-diff"><input type="checkbox" data-vgl="diff"><span class="vgl-switch" aria-hidden="true"></span>Nur Unterschiede <span class="vgl-diff__n" data-vgl="diffn"></span></label>'+
+        '<button class="vgl-link vgl-link--ic" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
         '<button class="vgl-link" type="button" data-vgl="clear">Alle entfernen</button>'+
         '<button class="vgl-close" type="button" data-vgl="close" aria-label="Vergleich schließen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
       '</div></div>'+
       '<div class="vgl-view__scroll"><div class="vgl-view__scroll-in" data-vgl="body"></div></div></div>');
     document.body.appendChild(view);
     viewBody=view.querySelector('[data-vgl="body"]');viewCount=view.querySelector('[data-vgl="count"]');diffCb=view.querySelector('[data-vgl="diff"]');
+    diffN=view.querySelector('[data-vgl="diffn"]');scrollEl=view.querySelector('.vgl-view__scroll');
 
     toastEl=h('<div class="vgl-toast" role="status" aria-live="polite"></div>');document.body.appendChild(toastEl);
 
     tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm)toggle(rm.getAttribute('data-rm'),false);});
-    view.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='close')closeView();if(k==='clear'){clearAll();closeView();}if(k==='details'){detailsOpen=!detailsOpen;renderView();}return;}var rm=e.target.closest('[data-rm]');if(rm){toggle(rm.getAttribute('data-rm'),false);if(selected.length<1)closeView();return;}var go=e.target.closest('[data-go]');if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');});
+    view.addEventListener('click',function(e){
+      var a=e.target.closest('[data-vgl]');
+      if(a){var k=a.getAttribute('data-vgl');
+        if(k==='close')closeView();
+        if(k==='clear'){clearAll();closeView();}
+        if(k==='details'){detailsOpen=!detailsOpen;renderView();}
+        if(k==='add'){closeView();toast('Wählen Sie ein weiteres Modell über „Vergleichen" auf den Produktkarten — bis zu '+MAX+' gleichzeitig.','info');}
+        if(k==='print'){printView();}
+        return;}
+      var j=e.target.closest('[data-jump]');if(j){jumpTo(j.getAttribute('data-jump'));return;}
+      var rm=e.target.closest('[data-rm]');if(rm){toggle(rm.getAttribute('data-rm'),false);if(selected.length<1)closeView();return;}
+      var go=e.target.closest('[data-go]');if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');
+    });
     diffCb.addEventListener('change',renderView);
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open'))closeView();});
+    /* compact product header once the user scrolls into the specs (Apple / Samsung compare pattern) */
+    scrollEl.addEventListener('scroll',function(){view.classList.toggle('is-compact',scrollEl.scrollTop>180);},{passive:true});
+    /* keep keyboard focus inside the dialog */
+    view.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=view.querySelectorAll('button:not([disabled]),input:not([disabled]),summary,[tabindex="0"]');if(!f.length)return;var first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+  }
+  function printView(){var was=detailsOpen;detailsOpen=true;renderView();try{window.print();}catch(e){}detailsOpen=was;renderView();}
+  function jumpTo(key){
+    var tr=viewBody.querySelector('tr[data-key="'+key+'"]');
+    if(!tr&&!detailsOpen&&!diffCb.checked){detailsOpen=true;renderView();tr=viewBody.querySelector('tr[data-key="'+key+'"]');}
+    if(!tr)return;
+    var top=tr.getBoundingClientRect().top-scrollEl.getBoundingClientRect().top+scrollEl.scrollTop-(view.classList.contains('is-compact')?150:300);
+    try{scrollEl.scrollTo({top:Math.max(0,top),behavior:'smooth'});}catch(e){scrollEl.scrollTop=Math.max(0,top);}
+    tr.classList.remove('is-flash');void tr.offsetWidth;tr.classList.add('is-flash');
   }
 
   /* toolbar control — rest: "Vergleichen" (starts compare mode → card fields appear);
@@ -218,6 +249,32 @@
     if(row.bool)return texts.map(function(t){return t==='ja'?'Ja':(t==='nein'?'Nein':'–');}).join('  ·  ');
     return texts.join('  ·  ');
   }
+  /* "Modell | Klingeltaster | Zusatz" → bold model line + muted qualifier line (scannable like Apple/Galaxus headers) */
+  function shortName(p){var parts=String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);return {main:parts[0]||p.name,sub:parts.slice(1).join(' · ')};}
+  function tokens(t){return String(t).split(' · ').map(function(s){return s.trim();}).filter(Boolean);}
+  /* Per-product "Auf einen Blick": up to 3 differentiators that are unique to (or best for) this model.
+     Replaces the unlabeled dot-chain panel — every value is mapped to its product. */
+  function highlights(items,an){
+    var out=items.map(function(){return [];});
+    var diffs=an.diffs.slice().sort(function(a,b){return (b.row.imp?1:0)-(a.row.imp?1:0);});
+    diffs.forEach(function(d){
+      var row=d.row; if(row.key==='price')return;                 /* price already sits in the header */
+      var bi=bestIdx(row,d.vals,d.texts);
+      items.forEach(function(p,i){
+        if(out[i].length>=3)return;
+        var t=d.texts[i]; if(t==='–')return;
+        var label=null,isBest=bi.indexOf(i)>-1;
+        var lab=row.label;
+        if(row.key==='zutritt'){var mine=tokens(t),others=[];items.forEach(function(q,j){if(j!==i)others=others.concat(tokens(d.texts[j]));});var uniq=mine.filter(function(x){return others.indexOf(x)<0&&x!=='Standard';});if(!uniq.length)return;label=uniq.join(', ');}
+        else if(row.bool){if(d.vals[i]!==true)return;label=row.label;lab='';}          /* "Nachtsicht" — not "Nachtsicht: Nachtsicht" */
+        else if(row.swatches){label=(p.colors||[]).length+' Farben';lab='';}
+        else if(row.better){if(!isBest)return;label=t;}                                 /* ranked rows: only the best value is a highlight, never a unique-but-weaker one */
+        else{var unique=d.texts.every(function(x,j){return j===i||x!==t;});if(!unique)return;label=t;}
+        out[i].push({k:row.key,t:label,l:lab,best:isBest});
+      });
+    });
+    return out;
+  }
   function analyze(items){
     var diffs=[],sames=[];
     ROWS.forEach(function(row){
@@ -236,25 +293,48 @@
     if(items.length<2){viewBody.innerHTML='<div class="vgl-empty">'+SCALE+'<b>Mindestens zwei Modelle wählen</b><span>Markieren Sie über „Vergleichen" auf den Produktkarten weitere Anlagen, um sie hier gegenüberzustellen.</span></div>';return;}
     var onlyDiff=diffCb.checked;
     var an=analyze(items);
+    var total=an.diffs.length+an.sames.length;
     var detailCount=ROWS.filter(function(r){return !r.group&&!r.imp;}).length;
+    var hl=highlights(items,an);
+    var minPrice=Math.min.apply(null,items.map(function(p){return typeof p.price==='number'?p.price:Infinity;}));
+    var addCol=items.length<MAX;                               /* Baymard: let users add from inside the comparison */
+    diffN.textContent='('+an.diffs.length+')';
 
-    /* ---- Insights: similarity note + "Das unterscheidet sie" ---- */
-    var insights='<div class="vgl-insights">';
+    /* ---- Summary strip: similarity verdict + jump chips to the differing rows ---- */
+    var sum='<div class="vgl-sum">';
     if(an.diffs.length===0){
-      insights+='<div class="vgl-simnote vgl-simnote--same">'+IC_OK+'<span>Diese Modelle sind in den verglichenen Merkmalen <b>identisch</b> — entscheiden Sie nach Optik, Namensschild und Ausstattung.</span></div>';
+      sum+='<div class="vgl-sum__txt vgl-sum__txt--same">'+IC_OK+'<span>In allen <b>'+total+'</b> verglichenen Merkmalen identisch — entscheiden Sie nach Optik, Farbe und Namensschild.</span></div>';
     }else{
-      if(an.ratio>=0.6)insights+='<div class="vgl-simnote">'+IC_INFO+'<span>Diese Modelle sind sich zu <b>'+Math.round(an.ratio*100)+'%</b> ähnlich — hier die entscheidenden Unterschiede.</span></div>';
-      insights+='<div class="vgl-diffpanel"><div class="vgl-diffpanel__h">Das unterscheidet sie <span class="cnt">'+an.diffs.length+'</span></div><ul class="vgl-difflist">';
-      an.diffs.forEach(function(d){insights+='<li><span class="k">'+esc(d.row.label)+'</span><span class="v">'+esc(panelVal(d.row,items,d.texts))+'</span></li>';});
-      insights+='</ul></div>';
+      var verdict=an.ratio>=0.6
+        ?'Zu <b>'+Math.round(an.ratio*100)+'&nbsp;%</b> ähnlich — <b>'+an.diffs.length+'</b> Unterschied'+(an.diffs.length>1?'e':'')+' entscheide'+(an.diffs.length>1?'n':'t')+'.'
+        :'<b>'+an.diffs.length+' von '+total+'</b> Merkmalen unterscheiden sich.';
+      sum+='<div class="vgl-sum__txt">'+IC_INFO+'<span>'+verdict+'</span></div>';
+      var chips=an.diffs.slice().sort(function(a,b){return (b.row.imp?1:0)-(a.row.imp?1:0);});
+      sum+='<div class="vgl-sum__chips" aria-label="Zu den Unterschieden springen">';
+      chips.slice(0,8).forEach(function(d){sum+='<button type="button" class="vgl-chip" data-jump="'+d.row.key+'">'+esc(d.row.label)+'</button>';});
+      if(chips.length>8)sum+='<span class="vgl-chip vgl-chip--more">+'+(chips.length-8)+' weitere</span>';
+      sum+='</div>';
     }
-    insights+='</div>';
+    sum+='</div>';
 
     /* ---- Table ---- */
-    var cols='<col class="rl">'+items.map(function(){return '<col class="pc">';}).join('');
-    var emptyCells=items.map(function(){return '<td></td>';}).join('');
+    var n=items.length+(addCol?1:0);
+    var cols='<col class="rl">'+items.map(function(){return '<col class="pc">';}).join('')+(addCol?'<col class="pc pc--add">':'');
+    var emptyCells=items.map(function(){return '<td></td>';}).join('')+(addCol?'<td class="vgl-addcell"></td>':'');
     var thead='<thead><tr><th class="rh" scope="col"><span class="vgl-visually-hidden">Merkmal</span></th>';
-    items.forEach(function(p){thead+='<th class="vgl-ph" scope="col"><div class="vgl-ph__media"><button class="vgl-ph__rm" type="button" data-rm="'+p.id+'" aria-label="'+esc(p.name)+' entfernen">×</button><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"></div><div class="vgl-ph__name">'+esc(p.name)+'</div><div class="vgl-ph__price">ab '+euro(p.price)+'<small>'+(p.uvp?'UVP '+euro(p.uvp):'&nbsp;')+'</small></div><button class="btn btn--primary" type="button" data-go>'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</button></th>';});
+    items.forEach(function(p,i){
+      var nm=shortName(p);
+      thead+='<th class="vgl-ph" scope="col">'+
+        '<div class="vgl-ph__media"><button class="vgl-ph__rm" type="button" data-rm="'+p.id+'" aria-label="'+esc(p.name)+' entfernen">×</button><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"></div>'+
+        '<div class="vgl-ph__name" title="'+esc(p.name)+'">'+esc(nm.main)+'</div>'+
+        '<div class="vgl-ph__sub">'+(nm.sub?esc(nm.sub):'&nbsp;')+'</div>'+
+        '<div class="vgl-ph__price">ab '+euro(p.price)+'<small>'+(p.uvp?'UVP '+euro(p.uvp):'&nbsp;')+'</small></div>'+
+        '<ul class="vgl-ph__hl" aria-label="Das zeichnet dieses Modell aus">'+
+          (hl[i].length?hl[i].map(function(c){return '<li'+(c.best?' class="is-best"':'')+'>'+(c.l?'<span class="vgl-hl__k">'+esc(c.l)+'</span>':'')+esc(c.t)+'</li>';}).join(''):'<li class="none">Keine Alleinstellung in den Kernmerkmalen</li>')+
+        '</ul>'+
+        '<button class="btn btn--primary" type="button" data-go>'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</button></th>';
+    });
+    if(addCol)thead+='<th class="vgl-ph vgl-ph--add" scope="col"><button class="vgl-add" type="button" data-vgl="add">'+IC_PLUS+'<b>Modell hinzufügen</b><small>bis zu '+MAX+' Modelle vergleichbar</small></button></th>';
     thead+='</tr></thead>';
     var tbody='<tbody>',curG=null,gRows='',any=false;
     function flush(){if(curG!==null&&gRows!==''){tbody+='<tr class="vgl-group"><th class="rh" scope="rowgroup">'+esc(curG)+'</th>'+emptyCells+'</tr>'+gRows;}gRows='';}
@@ -267,31 +347,33 @@
       if(!visible)return;
       any=true;
       var bi=same?[]:bestIdx(row,vals,texts);
-      var tr='<tr class="'+(same?'':'is-diff')+'"><th class="rh" scope="row">'+esc(row.label)+'</th>';
+      var tr='<tr data-key="'+row.key+'" class="'+(same||onlyDiff?'':'is-diff')+'"><th class="rh" scope="row"><span class="rh__l">'+esc(row.label)+'</span>'+(row.hint?'<button class="vgl-i" type="button" aria-label="Erklärung: '+esc(row.label)+'" data-tip="'+esc(row.hint)+'">'+IC_INFO+'</button>':'')+'</th>';
       items.forEach(function(p,i){var v=vals[i],t=texts[i],na=(t==='–'),isb=bi.indexOf(i)>-1,inner;
-        if(row.swatches)inner=swHTML(p.colors,10);
+        if(row.swatches)inner=swHTML(p.colors,10)+'<span class="vgl-swn">'+(p.colors||[]).length+' Farben</span>';
         else if(row.bool){inner=v===true?'<span class="vgl-yes">'+CHK+'Ja</span>':(v===false?'<span class="vgl-no">Nein</span>':'<span class="vgl-no">–</span>');}
+        else if(row.key==='price'){inner=esc(t)+((typeof p.price==='number'&&p.price>minPrice&&!same)?'<span class="vgl-delta" title="Differenz zum günstigsten Modell im Vergleich">+ '+euro(p.price-minPrice)+'</span>':'');}
         else inner=esc(t);
         if(isb)inner+='<span class="vgl-best">Bestwert</span>';
         tr+='<td class="vgl-val'+(na?' na':'')+(isb?' is-best':'')+'">'+inner+'</td>';});
+      if(addCol)tr+='<td class="vgl-addcell"></td>';
       tr+='</tr>';gRows+=tr;
     });
     flush();
-    if(onlyDiff&&!any)tbody+='<tr><th class="rh" scope="row">—</th><td class="vgl-val na" colspan="'+items.length+'">Alle ausgewählten Modelle sind in diesen Merkmalen identisch.</td></tr>';
+    if(onlyDiff&&!any)tbody+='<tr><th class="rh" scope="row">—</th><td class="vgl-val na" colspan="'+n+'">Alle ausgewählten Modelle sind in diesen Merkmalen identisch.</td></tr>';
     tbody+='</tbody>';
-    var table='<div class="vgl-wrap"><table class="vgl-t"><colgroup>'+cols+'</colgroup>'+thead+tbody+'</table></div>';
+    var table='<div class="vgl-wrap"><table class="vgl-t"><caption class="vgl-visually-hidden">Vergleich von '+items.length+' Türsprechanlagen</caption><colgroup>'+cols+'</colgroup>'+thead+tbody+'</table></div>';
 
     /* ---- After table: details toggle + Gemeinsamkeiten ---- */
     var after='<div class="vgl-aftertable">';
-    if(!onlyDiff&&detailCount)after+='<button class="vgl-more" type="button" data-vgl="details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'+(detailsOpen?'Weniger anzeigen':'Alle technischen Details anzeigen ('+detailCount+')')+'</button>';
+    if(!onlyDiff&&detailCount)after+='<button class="vgl-more" type="button" data-vgl="details" aria-expanded="'+detailsOpen+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'+(detailsOpen?'Weniger anzeigen':'Alle technischen Details anzeigen ('+detailCount+')')+'</button>';
     if(an.sames.length){
-      after+='<details class="vgl-common"'+(onlyDiff?' open':'')+'><summary>Gemeinsamkeiten <span class="cnt">'+an.sames.length+'</span></summary><ul class="vgl-commonlist">';
-      an.sames.forEach(function(s){after+='<li><span class="k">'+esc(s.row.label)+'</span><span class="v">'+esc(panelVal(s.row,items,s.texts))+'</span></li>';});
+      after+='<details class="vgl-common"'+(onlyDiff?' open':'')+'><summary>Gemeinsamkeiten <span class="cnt">'+an.sames.length+'</span><span class="vgl-common__hint">gilt für alle '+items.length+' Modelle</span></summary><ul class="vgl-commonlist">';
+      an.sames.forEach(function(s){after+='<li><span class="k">'+esc(s.row.label)+'</span><span class="v">'+esc(panelVal(s.row,[items[0]],[s.texts[0]]))+'</span></li>';});
       after+='</ul></details>';
     }
     after+='</div>';
 
-    viewBody.innerHTML=insights+table+after;
+    viewBody.innerHTML=sum+table+after;
   }
   function openView(){
     if(selected.length<MIN)return;
@@ -300,6 +382,7 @@
     diffCb.checked=(an.ratio>=0.6 && an.diffs.length>0);   /* auto difference-first when highly similar */
     detailsOpen=false;
     renderView();
+    scrollEl.scrollTop=0;view.classList.remove('is-compact');
     view.classList.add('is-open');view.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';view.querySelector('[data-vgl="close"]').focus();
   }
   function closeView(){view.classList.remove('is-open');view.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus&&lastFocus.focus&&document.contains(lastFocus))lastFocus.focus();}
@@ -313,7 +396,7 @@
     {k:'Schritt 1 / 6',t:'Ruhezustand',x:'Zunächst ist der Vergleich reduziert: auf den Produktkarten sind <b>keine Auswahlfelder</b> sichtbar. In der Ergebnisleiste lädt die Schaltfläche „Vergleichen" dazu ein, den Vergleich zu starten.',target:function(){return barBtn;}},
     {k:'Schritt 2 / 6',t:'Vergleich starten',x:'Ein Klick auf „Vergleichen" aktiviert den Vergleichsmodus — <b>jetzt erscheint auf jeder Produktkarte ein „Vergleichen"-Feld</b>. Wählen Sie damit 2–4 Modelle.',target:function(){return cardToggle(TRIO[0])||barBtn;}},
     {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Modelle markiert sind, wird „Vergleich anzeigen (3)" <b>aktiv</b> (grün) — in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
-    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: Fachwerte in Gruppen (Grundlagen, Kamera & Bild, Smart & Zutritt, Bauform & Schutz), Unterschiede mit einem Punkt markiert. Audio-Modelle zeigen bei Kamera-Werten neutral „–".',target:function(){return null;}},
+    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben das Fazit („x Unterschiede") mit Sprungmarken, je Modell <b>„Auf einen Blick"</b> mit dessen Alleinstellungen, darunter die Kernmerkmale in Gruppen. Erklärungen per (i), Bestwerte markiert, Audio-Modelle zeigen bei Kamera-Werten neutral „–".',target:function(){return null;}},
     {k:'Schritt 5 / 6',t:'Nur Unterschiede',x:'Mit „Nur Unterschiede anzeigen" bleiben nur die abweichenden Merkmale sichtbar — ideal, um schnell zu entscheiden.',target:function(){return view.querySelector('.vgl-diff');}},
     {k:'Schritt 6 / 6',t:'Weiter im Kauf',x:'Aus dem Vergleich geht es direkt weiter: <b>Konfigurieren</b> bzw. <b>Zum Produkt</b> (kein Direktkauf, da individualisierbar), Artikel entfernen oder weitere hinzufügen. Das ist der komplette Ablauf.',target:function(){return null;},last:true}
   ];
