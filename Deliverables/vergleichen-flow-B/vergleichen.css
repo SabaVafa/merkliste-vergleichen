@@ -246,6 +246,9 @@ table.vgl-t thead th.vgl-ph{padding-bottom:74px}
 .vgl-view.is-compact .vgl-add{min-height:0;padding:12px}
 /* add-a-model column */
 .vgl-ph--add{vertical-align:top}
+/* the add box fills the whole header cell: top edge = product image box, bottom edge = CTA bottom */
+.vgl-ph--add .vgl-add{position:absolute;top:16px;left:18px;right:18px;bottom:18px;width:auto;min-height:0}
+.vgl-view.is-compact .vgl-ph--add .vgl-add{top:10px;bottom:12px}
 .vgl-add{width:100%;min-height:19rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;border:1.5px dashed var(--graphite-300,#DADADA);border-radius:var(--r-l,8px);background:var(--paper-white,#F5F6FA);color:var(--teal,#015253);cursor:pointer;font:inherit;transition:border-color .15s,background .15s}
 .vgl-add:hover{border-color:var(--teal,#015253);background:var(--teal-100,#E6EEEE)}
 .vgl-add:focus-visible{outline:3px solid var(--teal,#015253);outline-offset:2px}
@@ -363,7 +366,8 @@ td.vgl-val.is-best{font-weight:700}
   .vgl-ph__media{height:84px}
   .vgl-ph__name{font-size:var(--text-body-sm,.875rem)}
   .vgl-ph .btn{height:34px;font-size:.8125rem;left:12px;right:12px;bottom:14px}
-  .vgl-add{min-height:14rem}
+  .vgl-ph--add .vgl-add{top:12px;left:12px;right:12px;bottom:14px}
+  .vgl-view.is-compact .vgl-ph--add .vgl-add{top:10px;bottom:12px}
   .vgl-i::after{width:14rem}
   .vgl-commonlist{columns:1}
 }
