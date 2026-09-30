@@ -207,7 +207,7 @@
     var cols='<col class="rl">'+items.map(function(){return '<col class="pc">';}).join('');
     var emptyCells=items.map(function(){return '<td></td>';}).join('');
     var thead='<thead><tr><th class="rh" scope="col"><span class="vgl-visually-hidden">Merkmal</span></th>';
-    items.forEach(function(p){thead+='<th class="vgl-ph" scope="col"><div class="vgl-ph__media"><button class="vgl-ph__rm" type="button" data-rm="'+p.id+'" aria-label="'+esc(p.name)+' entfernen">×</button><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"></div><div class="vgl-ph__name">'+esc(p.name)+'</div><div class="vgl-ph__price">ab '+euro(p.price)+(p.uvp?'<small>UVP '+euro(p.uvp)+'</small>':'')+'</div><button class="btn btn--primary" type="button" data-go>'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</button></th>';});
+    items.forEach(function(p){thead+='<th class="vgl-ph" scope="col"><div class="vgl-ph__media"><button class="vgl-ph__rm" type="button" data-rm="'+p.id+'" aria-label="'+esc(p.name)+' entfernen">×</button><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"></div><div class="vgl-ph__name">'+esc(p.name)+'</div><div class="vgl-ph__price">ab '+euro(p.price)+'<small>'+(p.uvp?'UVP '+euro(p.uvp):'&nbsp;')+'</small></div><button class="btn btn--primary" type="button" data-go>'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</button></th>';});
     thead+='</tr></thead>';
     var tbody='<tbody>',curG=null,gRows='',any=false;
     function flush(){if(curG!==null&&gRows!==''){tbody+='<tr class="vgl-group"><th class="rh" scope="rowgroup">'+esc(curG)+'</th>'+emptyCells+'</tr>'+gRows;}gRows='';}
