@@ -77,6 +77,20 @@ Two more deciders are now derived from the product titles and compared as rows: 
 
 Verified with VDM10 Colson vs. Neo: 4 soft differences, 0 technical → twin state; 16 Gemeinsamkeiten.
 
+### 3c · Briefkästen lens (added after the Phase-0 model 01b)
+
+Version B is now **lens-aware**: the page declares `window.MTZ_LENS` and the add-on loads the matching row plan, enrichment, guardrails and demo set. `briefkasten.html` is the PLP prototype's mailbox page (copied from the PLP project, which stays untouched) with the advisor moved above the grid and the add-on included; a link under each page title switches between the two demos.
+
+20. **Row plan from 01b §5**, design first: Design & Namensschild (Preis, Design-Linie, Namensschild, Namensschild-Material, Farben, Sichtfenster) → Post & Einwurf → Schloss & Smart → Aufstellung & Bauform → Optionen & Sets. Design-line is the header name; the title becomes the qualifier.
+21. **Set-valued rows** (Smart-Optionen, Aufstellung, Optional erweiterbar um, Kombi-Sets) compare as sets: bullet list per model plus "zusätzlich / ohne", Bestwert on the larger set; ordered scale for Max. Briefformat.
+22. **Guardrails:** same design line → info "Front, Farbe oder Namensschild auf der Produktseite wählen" (or "Ständer im Konfigurator" when only the Aufstellung differs); a Kombi-Set next to a plain box → warning, price delta and value statement suppressed.
+23. **Equal price = guidance.** The value statement now also appears when prices are equal ("Gleicher Preis — das unterscheidet die Ausstattung"), capped at five gains per model, without identity rows, unknown values or neutral facts (weight, size, body material).
+24. **Hero 170 px in this lens, 220 px in the twin state** — the look is the comparison.
+
+Verified: Siebert vs Ebenhard → 10 of 22 rows differ, equal price, statement "Siebert: Gravurleiste wechselbar statt Einschub · verdeckte Einwurfklappe · smart-fähiges Schloss · Smart-Schloss, Einwurfsensor · Zaun, Einbetonieren" and "Ebenhard: Einschub-Namensschild · offener Schlitz · Standard-Zylinder". Ebenhard vs Ebenhard V2A-Front → twin state + same-line guard, 3 soft rows. Vossberg (Set) next to Ebenhard → set warning, no price delta. Intercom lens unchanged (Colson vs Neo still twin).
+
+**Data caveat:** seed values for the eight lead models follow the Phase-0 document; the other 17 mailbox models use derived prototype defaults (marked in the code) until the Merkmale are maintained in JTL.
+
 ---
 
 ## 4 · Still open (recommendations, not built)

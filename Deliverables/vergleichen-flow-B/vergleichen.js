@@ -34,14 +34,55 @@
   var SRC=(window.MTZ_PRODUCTS||[]), BY_ID={};
   function designOf(p){var parts=String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);return parts.length>1?parts[parts.length-1]:'–';}
   function namensschildOf(p){return /austauschbar/i.test(p.name||'')?'Austauschbar':'Lasergravur';}
-  function enrich(p){return {id:p.id,name:p.name,img:p.img,price:p.price,uvp:p.uvp,typ:(p.type==='audio'?'Audio':'Video'),system:(p.line||(p.system==='bus'?'2-Draht-BUS':'IP-System')),klingel:klingelLabel(p.klingel),haushalt:haushaltOf(p),zutritt:(p.tuer&&p.tuer.length)?p.tuer.map(function(k){return ZUT[k]||k;}):['Standard'],colors:p.colors||[],briefkasten:!!p.briefkasten,konfig:konfigOf(p),design:designOf(p),namensschild:namensschildOf(p),specs:profile(familyOf(p))};}
-  SRC.forEach(function(p){BY_ID[p.id]=enrich(p);});
+  /* ---- Lens: Türsprechanlagen ---- */
+  function enrichSprech(p){return {id:p.id,name:p.name,img:p.img,price:p.price,uvp:p.uvp,typ:(p.type==='audio'?'Audio':'Video'),system:(p.line||(p.system==='bus'?'2-Draht-BUS':'IP-System')),klingel:klingelLabel(p.klingel),haushalt:haushaltOf(p),zutritt:(p.tuer&&p.tuer.length)?p.tuer.map(function(k){return ZUT[k]||k;}):['Standard'],colors:p.colors||[],briefkasten:!!p.briefkasten,konfig:konfigOf(p),design:designOf(p),namensschild:namensschildOf(p),specs:profile(familyOf(p))};}
+
+  /* ---- Lens: Briefkästen — Phase-0 model 01b (Design-first) ----
+     Seeds for the lead models come from the live PDPs (Siebert, Ebenhard) and the catalogue titles;
+     everything else is derived from the PLP fields and marked as prototype defaults. */
+  var BK_SEED={
+    siebert:  {colors:['anthrazit','schwarz','grau','eisenglimmer','weiss','edelstahl','wunschfarbe'],namensschild:'Gravurleiste V4A, wechselbar',einwurf:'Verdeckte Einwurfklappe',einwurfmass:[335,35],din:true,schloss:'Verdeckt, smart-fähig',smart:['Smart-Schloss (Fingerprint/RFID/App)','Einwurfsensor (App)'],zf_abdeckbar:true,aufstellung:['Wand','Stand','Zaun','Einbetonieren'],optionen:['Soft-Close','Entnahmesicherung','Zeitungsfach-Abdeckung','Keine-Werbung-Schild','Blumenkasten/Deko','Ständer'],kombi:['Funkklingel','Video-Sprechanlage VDM10'],abmessungen:'37 × 37 × 10,5 cm',gewicht:3.4},
+    ebenhard: {colors:['anthrazit','schwarz','grau','eisenglimmer','weiss','edelstahl','wunschfarbe'],namensschild:'Austauschbares Namensschild (Einschub)',einwurf:'Offener Einwurfschlitz',din:true,schloss:'Standard-Zylinder',smart:[],zf_abdeckbar:true,aufstellung:['Wand','Stand'],optionen:['Entnahmesicherung','Zeitungsfach-Abdeckung','Keine-Werbung-Schild','Ständer'],kombi:[],abmessungen:'37 × 37 × 10,5 cm',gewicht:5.0},
+    /* same line as Ebenhard, only the front differs → technically identical (twin demo + same-line guardrail) */
+    'ebenhard-v2a':{namensschild:'Austauschbares Namensschild (Einschub)',ns_material:'Edelstahl V2A gebürstet',einwurf:'Offener Einwurfschlitz',din:true,schloss:'Standard-Zylinder',smart:[],zf_abdeckbar:true,aufstellung:['Wand','Stand'],optionen:['Entnahmesicherung','Zeitungsfach-Abdeckung','Keine-Werbung-Schild','Ständer'],kombi:[],korpus:'Galvanisierter Stahl, pulverbeschichtet',abmessungen:'37 × 37 × 10,5 cm',gewicht:5.0},
+    hermann:  {namensschild:'Gravurleiste V4A, fest',einwurf:'Verdeckte Einwurfklappe',schloss:'Verdeckt hinter Einwurfklappe',abmessungen:'37 × 37 × 10,5 cm'},
+    lepo:     {namensschild:'Ohne Namensschild',ns_material:null,einwurf:'Offener Einwurfschlitz',schloss:'Standard-Zylinder',optionen:['Entnahmesicherung','Keine-Werbung-Schild','Ständer']},
+    kompakt:  {namensschild:'Ohne Namensschild',ns_material:null,einwurf:'Offener Einwurfschlitz',max_format:'DIN C5',din:false,schloss:'Standard-Zylinder',optionen:['Keine-Werbung-Schild']},
+    gienger:  {einwurf:'Offener Einwurfschlitz',schloss:'Standard-Zylinder'},
+    cube:     {sichtfenster:3,einwurf:'Offener Einwurfschlitz'},
+    klar:     {sichtfenster:3,ns_material:'Acrylglas'},
+    schneider:{einwurf:'Durchwurf (Unterputz)',aufstellung:['Unterputz'],optionen:[]},
+    castor:   {einwurf:'Durchwurf (Unterputz)',aufstellung:['Unterputz'],optionen:[]},
+    nordkap:  {korpus:'Edelstahl V4A (salzwasserfest)'},
+    trias:    {beleuchtung:true},
+    quartett: {beleuchtung:true,aufstellung:['Unterputz']},
+    'vdm10-zf':{smart:['App (Video-Sprechanlage)'],beleuchtung:true}
+  };
+  function enrichBK(p){
+    var nm=String(p.name||''),s=BK_SEED[p.id]||{},mat=p.material;
+    var ns=s.namensschild||(/austauschbar/i.test(nm)?'Austauschbares Namensschild (Einschub)':(/ohne Gravur|Basic/i.test(nm)?'Ohne Namensschild':(/Edelstahl-Front|Edelstahlblende|gebürstet/i.test(nm)?'Gravierte Edelstahlblende':'Gravurleiste V4A, fest')));
+    var auf=s.aufstellung||({wand:['Wand','Stand'],stand:['Stand'],unterputz:['Unterputz'],durchwurf:['Unterputz']}[p.montage]||['Wand']); if(/Zaun/i.test(nm))auf=['Wand','Zaun'];
+    var isSet=!!(p.sprech||p.klingel);
+    var kombi=s.kombi||[]; if(!s.kombi){if(p.sprech)kombi.push('Enthalten: Video-Sprechanlage');else if(p.klingel)kombi.push('Enthalten: Funkklingel');if(p.paket)kombi.push('Enthalten: Paketfach');}
+    var opt=s.optionen||(p.montage==='wand'?['Entnahmesicherung','Keine-Werbung-Schild','Ständer']:['Entnahmesicherung','Keine-Werbung-Schild']); if(p.blumenkasten&&opt.indexOf('Blumenkasten/Deko')<0)opt=opt.concat(['Blumenkasten/Deko']);
+    var korpus=s.korpus||({stahl:'Galvanisierter Stahl, pulverbeschichtet',edelstahl:'Edelstahl V4A',acrylglas:'Galvanisierter Stahl, pulverbeschichtet',holz:'Stahl, Holzoptik'}[mat]||'Galvanisierter Stahl, pulverbeschichtet');
+    var nsMat=('ns_material' in s)?s.ns_material:(ns==='Ohne Namensschild'?null:(mat==='edelstahl'?'Edelstahl V4A gebürstet':'Edelstahl V4A gebürstet'));
+    var zf={integriert:'Integriert (beidseitig befüllbar)',optional:'Optional (Zubehör)',ohne:'Ohne'}[p.zeitung]||'–';
+    return {id:p.id,name:p.name,img:p.img||'Product%20Image/einfamilien-briefkasten.png',price:p.price,uvp:p.uvp,colors:s.colors||p.colors||[],konfig:!/ohne Gravur|Basic/i.test(nm),isSet:isSet,
+      design:designOf(p),namensschild:ns,ns_material:nsMat,
+      sichtfenster:s.sichtfenster!=null?s.sichtfenster:((mat==='acrylglas'||/Sichtfenster/i.test(nm))?3:0),
+      einwurf:s.einwurf||'Verdeckte Einwurfklappe',einwurfmass:s.einwurfmass||null,max_format:s.max_format||'DIN C4 knickfrei',din:('din' in s)?s.din:true,
+      schloss:s.schloss||'Verdeckt hinter Einwurfklappe',smart:s.smart||[],
+      zeitungsfach:zf,zf_abdeckbar:('zf_abdeckbar' in s)?s.zf_abdeckbar:(p.zeitung==='integriert'),faecher:String(p.faecher||'1'),
+      aufstellung:auf,korpus:korpus,abmessungen:s.abmessungen||(p.faecher==='1'&&p.montage==='wand'?'37 × 37 × 10,5 cm':null),gewicht:s.gewicht||null,beleuchtung:!!s.beleuchtung,
+      optionen:opt,kombi:kombi};
+  }
 
   /* imp:true = key row (shown by default); others sit behind "Alle technischen Details".
      better: 'min' | 'maxnum' | 'yes' → marks the strongest value per row. */
   /* hint = plain-language explanation shown via the (i) next to the row label (Baymard: explain technical attributes).
      Price has no "Bestwert" on purpose — a premium brand shows the price difference neutrally (delta), it doesn't crown the cheapest. */
-  var ROWS=[
+  var ROWS_SPRECH=[
     {group:'Grundlagen'},
     {key:'price',label:'Preis',imp:true,soft:true,get:function(p){return 'ab '+euro(p.price);},hint:'Grundpreis der Standardausführung. Farbe, Namensschild und Gravur werden bei der Konfiguration festgelegt.'},
     /* soft = non-technical decider (design, nameplate, colours, price). When ONLY soft rows differ, the set is "technisch baugleich". */
@@ -68,6 +109,65 @@
     {key:'colors',label:'Farben',swatches:true,soft:true},
     {key:'briefkasten',label:'Mit Briefkasten/Paketbox',get:function(p){return p.briefkasten;},bool:true}
   ];
+
+  /* Briefkästen lens — row plan from 01b_Phase-0 §5: Design first, technology after.
+     set:true = Mehrfachauswahl (arrays, compared as sets → "zusätzlich / ohne"); better:'more' = larger set wins; 'rank' = ordered scale. */
+  function g(k){return function(p){return p[k];};}
+  var ROWS_BK=[
+    {group:'Design & Namensschild'},
+    {key:'price',label:'Preis',imp:true,soft:true,get:function(p){return 'ab '+euro(p.price);},hint:'Grundpreis der Standardausführung. Farbe, Gravur und Zubehör werden im Konfigurator festgelegt.'},
+    {key:'design',label:'Design-Linie',imp:true,soft:true,nohl:true,get:g('design'),hint:'Die Front bestimmt die Optik. Viele Linien teilen sich denselben Korpus (37 × 37 × 10,5 cm).'},
+    {key:'namensschild',label:'Namensschild',imp:true,soft:true,get:g('namensschild'),hint:'Gravurleiste: dauerhaft gelasert, edel — für Eigentümer. Austauschbares Namensschild (Einschub): Name später wechselbar — ideal bei Mietobjekten.'},
+    {key:'ns_material',label:'Namensschild-Material',soft:true,get:g('ns_material')},
+    {key:'colors',label:'Farben',imp:true,swatches:true,soft:true},
+    {key:'sichtfenster',label:'Sichtfenster',imp:true,better:'maxnum',get:function(p){return p.sichtfenster?p.sichtfenster+' Fenster':'Keine';},hint:'Postkontrolle auf einen Blick, ohne den Kasten zu öffnen.'},
+    {group:'Post & Einwurf'},
+    {key:'einwurf',label:'Einwurf',imp:true,get:g('einwurf'),hint:'Verdeckte Einwurfklappe: Post bleibt trocken, Schloss geschützt. Offener Schlitz: schneller Einwurf, weniger Wetterschutz.'},
+    {key:'max_format',label:'Max. Briefformat',imp:true,better:'rank',rank:['DIN Lang','DIN C5','DIN C4 knickfrei'],get:g('max_format'),hint:'DIN C4 (324 × 229 mm) = A4-Umschlag ungefaltet.'},
+    {key:'einwurfmass',label:'Einwurfmaß',neutral:true,get:function(p){return p.einwurfmass?p.einwurfmass[0]+' × '+p.einwurfmass[1]+' mm':null;}},
+    {key:'din',label:'Norm DIN EN 13724',bool:true,better:'yes',get:g('din'),hint:'Europäische Briefkastennorm: Mindestmaße, Einwurf, Entnahmesicherheit.'},
+    {key:'zeitungsfach',label:'Zeitungsfach',imp:true,get:g('zeitungsfach')},
+    {key:'zf_abdeckbar',label:'Zeitungsfach abdeckbar',bool:true,get:g('zf_abdeckbar')},
+    {key:'faecher',label:'Fächer / Parteien',imp:true,get:g('faecher')},
+    {group:'Schloss & Smart'},
+    {key:'schloss',label:'Schloss',get:g('schloss'),hint:'Verdeckt hinter der Klappe: rostet nicht, friert nicht ein. Smart-fähig: kann durch Fingerprint-/RFID-/App-Schloss ersetzt werden.'},
+    {key:'smart',label:'Smart-Optionen',imp:true,set:true,better:'more',get:g('smart'),hint:'Im Konfigurator wählbar: Öffnen ohne Schlüssel (Fingerprint, RFID, App) oder Einwurf-Benachrichtigung aufs Handy.'},
+    {group:'Aufstellung & Bauform'},
+    {key:'aufstellung',label:'Aufstellung',imp:true,set:true,get:g('aufstellung'),hint:'Wand: Befestigungsmaterial liegt bei. Stand: Ständer im Konfigurator wählbar. Zaun / Einbetonieren: passende Halter.'},
+    {key:'korpus',label:'Korpusmaterial',neutral:true,get:g('korpus')},
+    {key:'abmessungen',label:'Abmessungen (B × H × T)',neutral:true,get:g('abmessungen')},
+    {key:'gewicht',label:'Gewicht',neutral:true,get:function(p){return p.gewicht?String(p.gewicht).replace('.',',')+' kg':null;}},
+    {key:'beleuchtung',label:'Beleuchtung',bool:true,get:g('beleuchtung')},
+    {group:'Optionen & Sets'},
+    {key:'optionen',label:'Optional erweiterbar um',set:true,better:'more',get:g('optionen'),hint:'Erweiterungen, die direkt im Konfigurator mitbestellt werden können.'},
+    {key:'kombi',label:'Kombi-Sets',set:true,get:g('kombi'),hint:'Als Set mit Klingel, Video-Sprechanlage oder Paketfach erhältlich — alles aus einer Hand.'}
+  ];
+
+  /* Guardrails (01b §5): same design line → variant hint; set vs. single model → price warning */
+  function guardsBK(items){
+    var gs=[];
+    var lines=[];items.forEach(function(p){if(lines.indexOf(p.design)<0)lines.push(p.design);});
+    if(lines.length===1&&items.length>1){
+      var aufDiff=items.some(function(p){return p.aufstellung.join()!==items[0].aufstellung.join();});
+      gs.push({type:'info',text:'Gleiche Design-Linie „'+lines[0]+'" — '+(aufDiff?'Wand- und Standvariante: der Ständer ist im Konfigurator wählbar.':'die Varianten unterscheiden sich nur in Front, Farbe oder Namensschild — wählen Sie diese auf der Produktseite.')});
+    }
+    var sets=items.filter(function(p){return p.isSet;});
+    if(sets.length&&sets.length<items.length)gs.push({type:'warn',noDelta:true,text:'Set vs. Einzelmodell: „'+sets.map(function(p){return p.design;}).join('", „')+'" enthält Klingel bzw. Sprechanlage — der Preis ist nicht direkt vergleichbar.'});
+    return gs;
+  }
+  function guardsSprech(items){
+    var lines=[];items.forEach(function(p){if(lines.indexOf(p.design)<0)lines.push(p.design);});
+    if(lines.length===1&&items.length>1)return [{type:'info',text:'Gleiche Design-Linie „'+lines[0]+'" — die Varianten unterscheiden sich in Klingeltastern bzw. Namensschild; die Technik ist identisch.'}];
+    return [];
+  }
+
+  var LENSES={
+    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,trio:['kai1','colson1','sdm10x'],guards:guardsSprech,twinHint:'entscheiden Sie nach Optik, Farbe und Namensschild',configNote:'Farbe, Namensschild und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest — die Technik ist bei allen Modellen identisch.',step4:'Audio-Modelle zeigen bei Kamera-Werten neutral „–".'},
+    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,trio:['siebert','ebenhard','hermann'],guards:guardsBK,designFirst:true,twinHint:'entscheiden Sie nach Optik, Namensschild und Farbe — das Produktbild ist hier der eigentliche Vergleich',configNote:'Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest — Korpus und Technik sind bei diesen Modellen identisch.',step4:'Bei Briefkästen steht das Design zuerst, die Technik danach.'}
+  };
+  var LENS=LENSES[window.MTZ_LENS]||LENSES.sprechanlage;
+  var ROWS=LENS.rows;
+  SRC.forEach(function(p){BY_ID[p.id]=LENS.enrich(p);});
 
   var selected=[];
   var compareMode=false;   /* card compare fields are hidden until the user starts a comparison */
@@ -239,12 +339,14 @@
   function syncAll(){syncCards();syncBar();syncTray();if(view.classList.contains('is-open'))renderView();}
 
   function cellVal(p,row){return row.spec?p.specs[row.key]:(row.get?row.get(p):p[row.key]);}
-  function disp(v,row){if(row.bool)return v===true?'ja':(v===false?'nein':'–');if(v==null||v==='')return '–';return String(v);}
+  function disp(v,row){if(row.bool)return v===true?'ja':(v===false?'nein':'–');if(Array.isArray(v))return v.length?v.join(' · '):'Keine';if(v==null||v==='')return '–';return String(v);}
   function numOf(t){var m=String(t).replace(/\.(?=\d{3}(\D|$))/g,'').match(/-?\d+(?:,\d+)?/);return m?parseFloat(m[0].replace(',','.')):null;}
   function bestIdx(row,vals,texts){
     if(!row.better)return [];
     var idxs=[];
     if(row.better==='yes'){var y=vals.some(function(v){return v===true;}),n=vals.some(function(v){return v!==true;});if(y&&n)vals.forEach(function(v,i){if(v===true)idxs.push(i);});return idxs;}
+    if(row.better==='more'){var cs=vals.map(function(v){return Array.isArray(v)?v.length:0;}),mx=Math.max.apply(null,cs);if(mx===0||cs.every(function(c){return c===mx;}))return [];cs.forEach(function(c,i){if(c===mx)idxs.push(i);});return idxs;}
+    if(row.better==='rank'){var rs=vals.map(function(v){return row.rank.indexOf(String(v));}),rm=Math.max.apply(null,rs);if(rm<0||rs.every(function(r){return r===rm;}))return [];rs.forEach(function(r,i){if(r===rm)idxs.push(i);});return idxs;}
     var nums=texts.map(numOf),valid=nums.filter(function(x){return x!=null;});
     if(valid.length<2||new Set(valid).size===1)return [];
     var best=row.better==='min'?Math.min.apply(null,valid):Math.max.apply(null,valid);
@@ -257,7 +359,11 @@
     return texts.join('  ·  ');
   }
   /* "Modell | Klingeltaster | Zusatz" → bold model line + muted qualifier line (scannable like Apple/Galaxus headers) */
-  function shortName(p){var parts=String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);return {main:parts[0]||p.name,sub:parts.slice(1).join(' · ')};}
+  function shortName(p){
+    var parts=String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);
+    if(LENS.designFirst&&parts.length>1)return {main:parts[parts.length-1],sub:parts.slice(0,-1).join(' · ')};   /* Briefkästen: the design line IS the product */
+    return {main:parts[0]||p.name,sub:parts.slice(1).join(' · ')};
+  }
   function tokens(t){return String(t).split(' · ').map(function(s){return s.trim();}).filter(Boolean);}
   /* Per-product "Auf einen Blick": up to 3 differentiators that are unique to (or best for) this model.
      Replaces the unlabeled dot-chain panel — every value is mapped to its product. */
@@ -272,7 +378,7 @@
         var t=d.texts[i]; if(t==='–')return;
         var label=null,isBest=bi.indexOf(i)>-1;
         var lab=row.label;
-        if(row.key==='zutritt'){var mine=tokens(t),others=[];items.forEach(function(q,j){if(j!==i)others=others.concat(tokens(d.texts[j]));});var uniq=mine.filter(function(x){return others.indexOf(x)<0&&x!=='Standard';});if(!uniq.length)return;label=uniq.join(', ');}
+        if(row.key==='zutritt'||row.set){var mine=row.set?(d.vals[i]||[]):tokens(t),others=[];items.forEach(function(q,j){if(j!==i)others=others.concat(row.set?(d.vals[j]||[]):tokens(d.texts[j]));});var uniq=mine.filter(function(x){return others.indexOf(x)<0&&x!=='Standard';});if(!uniq.length)return;label=uniq.join(', ');if(row.set)lab='';}
         else if(row.bool){if(d.vals[i]!==true)return;label=row.label;lab='';}          /* "Nachtsicht" — not "Nachtsicht: Nachtsicht" */
         else if(row.swatches){label=(p.colors||[]).length+' Farben';lab='';}
         else if(row.better){if(!isBest)return;label=t;}                                 /* ranked rows: only the best value is a highlight, never a unique-but-weaker one */
@@ -297,21 +403,30 @@
     return {diffs:diffs,sames:sames,ratio:total?sames.length/total:0,tech:tech,twin:diffs.length>0&&tech===0};
   }
   /* colour set differences per model: extra = colours no other model offers, missing = colours every other model offers */
-  function colorDiff(items,i){
-    var mine=items[i].colors||[],others=items.filter(function(q,j){return j!==i;}).map(function(q){return q.colors||[];});
+  /* set differences per model (colours and every Mehrfachauswahl row): extra = values no other model has, missing = values every other model has */
+  function setDiff(row,items,i){
+    var pick=function(p){return row.swatches?(p.colors||[]):((row.get?row.get(p):p[row.key])||[]);};
+    var lab=function(c){return row.swatches?(SWL[c]||c):c;};
+    var mine=pick(items[i]),others=items.filter(function(q,j){return j!==i;}).map(pick);
     var extra=mine.filter(function(c){return others.every(function(o){return o.indexOf(c)<0;});});
     var missing=[];others.length&&others[0].forEach(function(c){if(mine.indexOf(c)<0&&others.every(function(o){return o.indexOf(c)>-1;}))missing.push(c);});
-    return {extra:extra.map(function(c){return SWL[c]||c;}),missing:missing.map(function(c){return SWL[c]||c;})};
+    return {extra:extra.map(lab),missing:missing.map(lab)};
   }
+  function colorDiff(items,i){return setDiff({swatches:true},items,i);}
   /* Alternatives that differ MEANINGFULLY: nearest models with 1–3 technical differences to the compared set, closest price first */
   function alternatives(items){
-    var techRows=ROWS.filter(function(r){return !r.group&&!r.soft;});
+    var techRows=ROWS.filter(function(r){return !r.group&&!r.soft&&!r.neutral;});
     var ref=items[0],refPrice=typeof ref.price==='number'?ref.price:0;
     var out=[];
     SRC.forEach(function(raw){
       var p=BY_ID[raw.id]; if(!p||selected.indexOf(p.id)>-1)return;
       var why=[];
-      techRows.forEach(function(row){var a=disp(cellVal(p,row),row),b=disp(cellVal(ref,row),row);if(a!==b&&a!=='–')why.push({l:row.label,v:(row.bool?(a==='ja'?'Ja':'Nein'):a)});});
+      techRows.forEach(function(row){
+        var va=cellVal(p,row),vb=cellVal(ref,row),a=disp(va,row),b=disp(vb,row);
+        if(a===b||a==='–')return;
+        if(row.set){var sd=setDiff(row,[p,ref],0);var parts=[];if(sd.extra.length)parts.push('+ '+sd.extra.join(', '));if(sd.missing.length)parts.push('ohne '+sd.missing.join(', '));if(!parts.length)return;why.push({l:row.label,v:parts.join(' · ')});return;}
+        why.push({l:row.label,v:(row.bool?(a==='ja'?'Ja':'Nein'):a)});
+      });
       if(why.length<1||why.length>3)return;
       out.push({p:p,why:why,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});
     });
@@ -321,19 +436,36 @@
     return res.slice(0,3);
   }
   /* "Für +X € erhalten Sie …" — turns the price delta into a value statement (twin state only) */
+  /* What model p offers beyond model ref, phrased from the differing rows (generic over both lenses) */
+  function gains(p,ref){
+    var gets=[],less=[];
+    ROWS.forEach(function(row){
+      if(row.group||row.key==='price'||row.key==='design'||row.neutral)return;   /* identity and neutral facts (weight, size) are no "gain" */
+      var a=cellVal(p,row),b=cellVal(ref,row);
+      if(row.swatches||row.set){
+        var sd=setDiff(row,[p,ref],0);
+        if(sd.extra.length)gets.push(row.swatches?(sd.extra.length+' zusätzliche Farbe'+(sd.extra.length>1?'n':'')+' ('+sd.extra.join(', ')+')'):(sd.extra.join(', ')+' ('+row.label+')'));
+        if(sd.missing.length)less.push((row.swatches?'':row.label+': ')+sd.missing.join(', '));
+        return;
+      }
+      var ta=disp(a,row),tb=disp(b,row); if(ta===tb||ta==='–'||tb==='–')return;   /* unknown on either side → no claim */
+      if(row.bool){if(a===true)gets.push(row.label);else if(b===true)less.push(row.label);return;}
+      if(row.better){var bi=bestIdx(row,[a,b],[ta,tb]);if(bi.indexOf(0)>-1)gets.push(row.label+': '+ta);else if(bi.indexOf(1)>-1)less.push(row.label+': '+tb);else gets.push(row.label+': '+ta+' statt '+tb);return;}
+      gets.push(row.label+': '+ta+' statt '+tb);
+    });
+    return {gets:gets,less:less};
+  }
   function valueStatement(items){
     var cheap=items.reduce(function(a,b){return (b.price<a.price)?b:a;});
     var lines=[];
-    items.forEach(function(p,i){
-      if(p===cheap)return;
-      var gets=[];
-      var cd=colorDiff([p,cheap],0);
-      if(cd.extra.length)gets.push(cd.extra.length+' zusätzliche Farbe'+(cd.extra.length>1?'n':'')+' ('+cd.extra.join(', ')+')');
-      if(p.namensschild!==cheap.namensschild)gets.push('Namensschild: '+p.namensschild+' statt '+cheap.namensschild);
-      if(p.design!==cheap.design)gets.push('Design-Linie „'+p.design+'"');
-      var less=colorDiff([p,cheap],0).missing;
-      var d=p.price-cheap.price;
-      lines.push('<li><b>'+(d>0?'+ '+euro(d):'Gleicher Preis')+'</b> für <b>'+esc(p.design)+'</b>'+(gets.length?' — dafür: '+esc(gets.join(' · ')):' — ohne technischen Mehrwert, reine Design-Entscheidung')+(less.length?' <span class="vgl-twin__less">(ohne '+esc(less.join(', '))+')</span>':'')+'</li>');
+    items.forEach(function(p){
+      var ref=(p===cheap)?items.filter(function(q){return q!==p;})[0]:cheap;
+      if(!ref)return;
+      var d=p.price-ref.price;
+      if(p===cheap&&d!==0)return;                      /* cheapest vs pricier: shown from the pricier side */
+      var gn=gains(p,ref),CAP=5;
+      var gets=gn.gets.slice(0,CAP),more=gn.gets.length-gets.length;
+      lines.push('<li><b>'+(d>0?'+ '+euro(d):'Gleicher Preis')+'</b> für <b>'+esc(p.design)+'</b>'+(gets.length?' — dafür: '+esc(gets.join(' · '))+(more>0?' <span class="vgl-twin__less">+ '+more+' weitere</span>':''):' — ohne technischen Mehrwert, reine Design-Entscheidung')+((d>0&&gn.less.length)?' <span class="vgl-twin__less">(ohne '+esc(gn.less.slice(0,3).join(', '))+')</span>':'')+'</li>');
     });
     return lines.join('');
   }
@@ -349,11 +481,15 @@
     var minPrice=Math.min.apply(null,items.map(function(p){return typeof p.price==='number'?p.price:Infinity;}));
     var addCol=items.length<MAX;                               /* Baymard: let users add from inside the comparison */
     diffN.textContent='('+an.diffs.length+')';
+    var guards=LENS.guards?LENS.guards(items):[];
+    var noDelta=guards.some(function(x){return x.noDelta;});
+    var samePrice=items.every(function(p){return p.price===items[0].price;});
+    view.className=view.className.replace(/\blens-\S+/g,'').replace(/\s+/g,' ').trim()+' lens-'+(window.MTZ_LENS||'sprechanlage');
 
     /* ---- Summary strip: similarity verdict + jump chips to the differing rows ---- */
     var sum='<div class="vgl-sum">';
     if(an.diffs.length===0){
-      sum+='<div class="vgl-sum__txt vgl-sum__txt--same">'+IC_OK+'<span>In allen <b>'+total+'</b> verglichenen Merkmalen identisch — entscheiden Sie nach Optik, Farbe und Namensschild.</span></div>';
+      sum+='<div class="vgl-sum__txt vgl-sum__txt--same">'+IC_OK+'<span>In allen <b>'+total+'</b> verglichenen Merkmalen identisch — '+LENS.twinHint+'.</span></div>';
     }else{
       var verdict;
       if(an.twin){
@@ -361,7 +497,7 @@
         var softLabels=an.diffs.slice().sort(function(a,b){return SOFT_ORDER.indexOf(a.row.key)-SOFT_ORDER.indexOf(b.row.key);}).map(function(d){return d.row.label;});
         verdict='<b>Technisch baugleich</b> — der Unterschied liegt in '+esc(softLabels.length>1?softLabels.slice(0,-1).join(', ')+' und '+softLabels.slice(-1):softLabels[0])+'.';
       }else if(an.ratio>=0.6){
-        verdict='Zu <b>'+Math.round(an.ratio*100)+'&nbsp;%</b> ähnlich — <b>'+an.diffs.length+'</b> Unterschied'+(an.diffs.length>1?'e':'')+' entscheide'+(an.diffs.length>1?'n':'t')+'.';
+        verdict='Zu <b>'+Math.round(an.ratio*100)+'&nbsp;%</b> ähnlich — <b>'+an.diffs.length+'</b> Unterschied'+(an.diffs.length>1?'e':'')+' entscheide'+(an.diffs.length>1?'n':'t')+'.'+(samePrice&&!noDelta?' <b>Gleicher Preis</b> — die Ausstattung entscheidet.':'');
       }else{
         verdict='<b>'+an.diffs.length+' von '+total+'</b> Merkmalen unterscheiden sich.';
       }
@@ -372,18 +508,19 @@
       if(chips.length>8)sum+='<span class="vgl-chip vgl-chip--more">+'+(chips.length-8)+' weitere</span>';
       sum+='</div>';
     }
+    guards.forEach(function(x){sum+='<div class="vgl-guard vgl-guard--'+x.type+'">'+(x.type==='warn'?IC_LIMIT:IC_INFO)+'<span>'+x.text+'</span></div>';});
     sum+='</div>';
 
-    /* ---- Twin state: technically identical → guide the real decision (design, nameplate, colours, price) ---- */
+    /* ---- Guidance: twin (technically identical) → value statement + alternatives; merely similar (≥60 %) → value statement only ---- */
     view.classList.toggle('is-twin',an.twin);
     var twin='';
-    if(an.twin){
-      var alts=alternatives(items);
-      twin='<div class="vgl-twin">'+
-        '<section class="vgl-twin__col"><h3 class="vgl-twin__h">Was der Aufpreis bringt</h3><ul class="vgl-twin__list">'+valueStatement(items)+'</ul>'+
-          '<p class="vgl-twin__note">Farbe, Namensschild und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest — die Technik ist bei allen Modellen identisch.</p></section>'+
+    if(an.diffs.length&&(an.twin||an.ratio>=0.6||samePrice)&&!noDelta){   /* equal price = "what do I get for it" matters most */
+      var alts=an.twin?alternatives(items):[];
+      twin='<div class="vgl-twin'+(alts.length?'':' vgl-twin--single')+'">'+
+        '<section class="vgl-twin__col"><h3 class="vgl-twin__h">'+(samePrice?'Gleicher Preis — das unterscheidet die Ausstattung':'Was der Aufpreis bringt')+'</h3><ul class="vgl-twin__list">'+valueStatement(items)+'</ul>'+
+          '<p class="vgl-twin__note">'+LENS.configNote+'</p></section>'+
         (alts.length?'<section class="vgl-twin__col vgl-twin__col--alt"><h3 class="vgl-twin__h">Alternativen mit echtem Unterschied</h3><ul class="vgl-alts">'+
-          alts.map(function(o){var nm=shortName(o.p);return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt=""></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(nm.main)+(o.p.design!=='–'?' <span>'+esc(o.p.design)+'</span>':'')+'</div><div class="vgl-alt__why">'+o.why.map(function(w){return '<span><em>'+esc(w.l)+':</em> '+esc(w.v)+'</span>';}).join('')+'</div><div class="vgl-alt__foot"><b>ab '+euro(o.p.price)+'</b><button type="button" class="vgl-alt__add" data-alt="'+o.p.id+'"'+(isFull()?' disabled':'')+'>'+IC_PLUS+'Zum Vergleich</button></div></div></li>';}).join('')+
+          alts.map(function(o){var nm=shortName(o.p);return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt=""></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(nm.main)+(o.p.design!=='–'&&o.p.design!==nm.main?' <span>'+esc(o.p.design)+'</span>':'')+'</div><div class="vgl-alt__why">'+o.why.map(function(w){return '<span><em>'+esc(w.l)+':</em> '+esc(w.v)+'</span>';}).join('')+'</div><div class="vgl-alt__foot"><b>ab '+euro(o.p.price)+'</b><button type="button" class="vgl-alt__add" data-alt="'+o.p.id+'"'+(isFull()?' disabled':'')+'>'+IC_PLUS+'Zum Vergleich</button></div></div></li>';}).join('')+
         '</ul></section>':'')+
       '</div>';
     }
@@ -399,7 +536,7 @@
         '<div class="vgl-ph__media"><button class="vgl-ph__rm" type="button" data-rm="'+p.id+'" aria-label="'+esc(p.name)+' entfernen">×</button><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"></div>'+
         '<div class="vgl-ph__name" title="'+esc(p.name)+'">'+esc(nm.main)+'</div>'+
         '<div class="vgl-ph__sub">'+(nm.sub?esc(nm.sub):'&nbsp;')+'</div>'+
-        '<div class="vgl-ph__price">ab '+euro(p.price)+'<small>'+(p.uvp?'UVP '+euro(p.uvp):'&nbsp;')+'</small></div>'+
+        '<div class="vgl-ph__price">ab '+euro(p.price)+(p.uvp?'<small class="uvp">UVP '+euro(p.uvp)+'</small>':'<small>&nbsp;</small>')+'</div>'+
         '<ul class="vgl-ph__hl" aria-label="Das zeichnet dieses Modell aus">'+
           (hl[i].length?hl[i].map(function(c){return '<li'+(c.best?' class="is-best"':'')+'>'+(c.l?'<span class="vgl-hl__k">'+esc(c.l)+'</span>':'')+esc(c.t)+'</li>';}).join(''):'<li class="none">Keine Alleinstellung in den Kernmerkmalen</li>')+
         '</ul>'+
@@ -426,8 +563,13 @@
             (cd.extra.length?' · <b>zusätzlich:</b> '+esc(cd.extra.join(', ')):'')+
             (cd.missing.length?' · <b>ohne:</b> '+esc(cd.missing.join(', ')):'')+'</span>';
         }
+        else if(row.set){
+          var sd=same?{extra:[],missing:[]}:setDiff(row,items,i),arr=v||[];
+          inner=(arr.length?'<ul class="vgl-setl">'+arr.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'<span class="vgl-no">Keine</span>')+
+            ((sd.extra.length||sd.missing.length)?'<span class="vgl-swn">'+(sd.extra.length?'<b>zusätzlich:</b> '+esc(sd.extra.join(', ')):'')+(sd.extra.length&&sd.missing.length?' · ':'')+(sd.missing.length?'<b>ohne:</b> '+esc(sd.missing.join(', ')):'')+'</span>':'');
+        }
         else if(row.bool){inner=v===true?'<span class="vgl-yes">'+CHK+'Ja</span>':(v===false?'<span class="vgl-no">Nein</span>':'<span class="vgl-no">–</span>');}
-        else if(row.key==='price'){inner=esc(t)+((typeof p.price==='number'&&p.price>minPrice&&!same)?'<span class="vgl-delta" title="Differenz zum günstigsten Modell im Vergleich">+ '+euro(p.price-minPrice)+'</span>':'');}
+        else if(row.key==='price'){inner=esc(t)+((typeof p.price==='number'&&p.price>minPrice&&!same&&!noDelta)?'<span class="vgl-delta" title="Differenz zum günstigsten Modell im Vergleich">+ '+euro(p.price-minPrice)+'</span>':'');}
         else inner=esc(t);
         if(isb)inner+='<span class="vgl-best">Bestwert</span>';
         tr+='<td class="vgl-val'+(na?' na':'')+(isb?' is-best':'')+'">'+inner+'</td>';});
@@ -437,7 +579,7 @@
     flush();
     if(onlyDiff&&!any)tbody+='<tr><th class="rh" scope="row">—</th><td class="vgl-val na" colspan="'+n+'">Alle ausgewählten Modelle sind in diesen Merkmalen identisch.</td></tr>';
     tbody+='</tbody>';
-    var table='<div class="vgl-wrap"><table class="vgl-t"><caption class="vgl-visually-hidden">Vergleich von '+items.length+' Türsprechanlagen</caption><colgroup>'+cols+'</colgroup>'+thead+tbody+'</table></div>';
+    var table='<div class="vgl-wrap"><table class="vgl-t"><caption class="vgl-visually-hidden">Vergleich von '+items.length+' '+LENS.label+'</caption><colgroup>'+cols+'</colgroup>'+thead+tbody+'</table></div>';
 
     /* ---- After table: details toggle + Gemeinsamkeiten ---- */
     var after='<div class="vgl-aftertable">';
@@ -466,13 +608,13 @@
   /* =========================================================
      Guided flow tour
      ========================================================= */
-  var TRIO=['kai1','colson1','sdm10x'];  // Audio · VDM10 · SDM10X (all on page 1)
+  var TRIO=LENS.trio;  // lens demo set (all on page 1): Sprechanlagen = Audio · VDM10 · SDM10X, Briefkästen = Siebert · Ebenhard · Hermann
   var coach,coachProg,coachStep,coachTitle,coachText,coachBack,coachNext,coachEnd,spotEl,cur=0;
   var STEPS=[
     {k:'Schritt 1 / 6',t:'Ruhezustand',x:'Zunächst ist der Vergleich reduziert: auf den Produktkarten sind <b>keine Auswahlfelder</b> sichtbar. In der Ergebnisleiste lädt die Schaltfläche „Vergleichen" dazu ein, den Vergleich zu starten.',target:function(){return barBtn;}},
     {k:'Schritt 2 / 6',t:'Vergleich starten',x:'Ein Klick auf „Vergleichen" aktiviert den Vergleichsmodus — <b>jetzt erscheint auf jeder Produktkarte ein „Vergleichen"-Feld</b>. Wählen Sie damit 2–4 Modelle.',target:function(){return cardToggle(TRIO[0])||barBtn;}},
     {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Modelle markiert sind, wird „Vergleich anzeigen (3)" <b>aktiv</b> (grün) — in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
-    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben das Fazit („x Unterschiede") mit Sprungmarken, je Modell <b>„Auf einen Blick"</b> mit dessen Alleinstellungen, darunter die Kernmerkmale in Gruppen. Erklärungen per (i), Bestwerte markiert, Audio-Modelle zeigen bei Kamera-Werten neutral „–".',target:function(){return null;}},
+    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben das Fazit („x Unterschiede") mit Sprungmarken, je Modell <b>„Auf einen Blick"</b> mit dessen Alleinstellungen, darunter die Kernmerkmale in Gruppen. Erklärungen per (i), Bestwerte markiert. '+LENS.step4,target:function(){return null;}},
     {k:'Schritt 5 / 6',t:'Nur Unterschiede',x:'Mit „Nur Unterschiede anzeigen" bleiben nur die abweichenden Merkmale sichtbar — ideal, um schnell zu entscheiden.',target:function(){return view.querySelector('.vgl-diff');}},
     {k:'Schritt 6 / 6',t:'Weiter im Kauf',x:'Aus dem Vergleich geht es direkt weiter: <b>Konfigurieren</b> bzw. <b>Zum Produkt</b> (kein Direktkauf, da individualisierbar), Artikel entfernen oder weitere hinzufügen. Das ist der komplette Ablauf.',target:function(){return null;},last:true}
   ];
@@ -530,7 +672,7 @@
   /* ---- Init ---- */
   function init(){
     if(!window.MTZ_PRODUCTS)return setTimeout(init,50);
-    if(!SRC.length){SRC=window.MTZ_PRODUCTS;SRC.forEach(function(p){if(!BY_ID[p.id])BY_ID[p.id]=enrich(p);});}
+    if(!SRC.length){SRC=window.MTZ_PRODUCTS;SRC.forEach(function(p){if(!BY_ID[p.id])BY_ID[p.id]=LENS.enrich(p);});}
     compareMode = selected.length>0;   /* restore mode if a selection persisted across reload */
     if(compareMode)document.body.classList.add('vgl-mode');
     buildChrome(); buildCoach(); injectBarButton();
