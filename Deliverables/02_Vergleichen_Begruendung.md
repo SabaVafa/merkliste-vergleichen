@@ -58,16 +58,38 @@ Installateure, Architekten, Hausverwaltungen (der /b2b-Pfad) vergleichen Spezifi
 
 ---
 
-## 3 · Der Ähnlichkeits-Einwand ist gestalterisch gelöst
+## 3 · Wie wir das Werkzeug gestalten & definieren (damit es hilft, auch wenn vieles gleich ist)
 
-Damit der Vergleich auch bei sehr ähnlichen Produkten **nicht leer oder peinlich** wirkt, ist die Oberfläche darauf ausgelegt:
+Das Risiko ist nicht die Ähnlichkeit selbst — sondern ein Werkzeug, das jedes Merkmal gleich behandelt und das Gemeinsame wiederholt. Die Antwort: den Vergleich **signalsuchend** machen — kuratieren, was verglichen wird, Unterschiede gewichten und Spec-Lücken in Beratung übersetzen. Konkret:
 
-- **Unterschiede zuerst.** Bei hoher Ähnlichkeit „Nur Unterschiede anzeigen" automatisch vorschlagen; identische Gruppen werden eingeklappt (bereits umgesetzt).
-- **„Gemeinsamkeiten (n)" statt Wiederholung.** Eine zusammengeklappte Zeile fasst das Gleiche einmal zusammen: *„Beide: 1 Fach · Zeitungsfach integriert · 37 × 37 × 10,5 cm · 7 Farben · 89,99 €."* — schafft Vertrauen statt Zeilen-Wüste.
-- **Ähnlichkeits-Hinweis.** Bei ≤ N Unterschieden: *„Diese Modelle sind sich sehr ähnlich. Hauptunterschiede: Namensschild (graviert vs. austauschbar), Gewicht."*
-- **Bild als vollwertiges Merkmal.** Bei design-getriebenen Kategorien (Briefkästen, Türklingeln, Hausnummern) ist die große Produktabbildung der wichtigste Unterschied — sie steht oben und prominent.
-- **Ehrliche Führung statt Pseudo-Spezifik.** Wenn nur Optik + Namensschild trennen, lautet die Empfehlung genau das: *„Gleich ausgestattet — wählen Sie nach Optik und Namensschild"* → weiter zu Produkt/Konfigurator.
-- **Leitplanke:** Echte Varianten desselben Modells (nur andere Farbe) gehören **nicht** in den Vergleich, sondern in die Varianten-Auswahl der PDP.
+**A. Pro Kategorie ein kuratiertes Vergleichs-Merkmalset — Signal statt Rauschen.**
+Nicht jedes Feld in die Tabelle kippen. Je Kategorie die Merkmale definieren, die (1) kaufrelevant sind *und* (2) im Sortiment tatsächlich variieren. Sortieren nach **Entscheidungsimpact × Varianz**; Konstanten weglassen oder abstufen (z. B. „Marke: Metzler" sagt niemandem etwas). Diese Kuratierung — nicht das UI — ist die eigentliche Definitionsarbeit (Phase 0), einmal je Kategorie.
+
+**B. Unterschiede zuerst — als Standard.**
+Erkennen, wie ähnlich die gewählten Modelle sind, und mit dem Trennenden führen: Zeilen ordnen nach „unterscheidet sich?" und dann nach Wichtigkeit, identische Gruppen einklappen, „Nur Unterschiede anzeigen" oberhalb einer Ähnlichkeitsschwelle automatisch aktivieren. Die Kundin sieht die entscheidenden 10 % sofort.
+
+**C. Das Gemeinsame einmal benennen — nicht wiederholen.**
+Eine zusammengeklappte **„Gemeinsamkeiten (n)"**-Zeile fasst alles Identische an einer Stelle zusammen — *„Beide: 1 Fach · Zeitungsfach integriert · 37 × 37 × 10,5 cm · 7 Farben · 89,99 €."* — Vertrauen statt Zeilen-Wüste.
+
+**D. Die wenigen Entscheider hervorheben — Spec-Lücke wird Beratung.**
+Ein kurzer **„Das unterscheidet sie"**-Block oben nennt die 2–4 abweichenden Merkmale in Klartext *und was sie für die Käuferin bedeuten*: *„Namensschild: graviert (dauerhaft, Premium) vs. austauschbar (Name später wechselbar)."* Ein Vergleich soll **beraten**, nicht nur tabellieren. Wo sinnvoll, „bester Wert je Zeile" markieren (z. B. größter Sichtwinkel), damit der Trade-off lesbar wird.
+
+**E. Kategorie-spezifische Sichten & Zeilen-Templates.**
+Gleiches Werkzeug, andere Brille. Sprechanlagen vergleichen über Kamera / Relais / App / Zutritt; Briefkästen über Namensschild-Typ / Design / Material / Norm. Jede Kategorie legt fest, **welche Zeilen erscheinen und in welcher Reihenfolge** — damit die gemeinsame Basis (Marke, Garantie, generische Maße) die echten Hebel nie verdrängt.
+
+**F. Bild & Design als eigenständige Vergleichsdimension.**
+Bei design-getriebenen Kategorien (Briefkästen, Türklingeln, Hausnummern) *ist* die große Produktabbildung der wichtigste Unterschied — sie bleibt oben in jeder Spalte, prominent, weil hier „Optik" jede Spec-Zeile schlägt.
+
+**G. Vergleichbarkeits-Regeln & Leitplanken.**
+Definieren, was verglichen werden darf: modellübergreifend innerhalb einer Kategorie — ja; **dasselbe Modell in anderer Farbe** — zur **Varianten-Auswahl** der PDP, nicht in den Vergleich; inkompatible Kategorien mischen — verhindern oder warnen. Deckelung bei **3–4 Modellen**. „Nicht zutreffend" neutral behandeln (Audio hat keine Kamera → „–", nie als Nachteil).
+
+**H. Progressive Offenlegung & lesbare Werte.**
+Zuerst die Kernzeilen zeigen, „alle technischen Details anzeigen" zum Ausklappen. Werte normalisieren und beschriften, damit ein Unterschied *bedeutsam* ist — 146° liest sich als „146° Ultraweitwinkel" neben 88°, mit einheitlichen Einheiten — sonst sagt eine Zahl-Differenz der Kundin nichts.
+
+**I. Kontextueller Einstieg & sinnvolle Alternativen.**
+Von der PDP aus **„mit ähnlichen vergleichen"** anbieten und die nächstliegenden Alternativen vorschlagen, damit die *richtige* Menge verglichen wird. Stellt sich Fast-Gleichheit heraus, **sagt** das Werkzeug es und führt zur echten Entscheidung (Optik, Namensschild) oder zum Konfigurator — eine ehrliche Sackgasse ist besser als eine Tabelle, die Spezifikation vortäuscht.
+
+> **In einem Satz:** Das Werkzeug wird definiert durch *was es zu vergleichen wählt und wie es Unterschiede gewichtet* — nicht durch die Zahl der Zeilen. Pro Kategorie kuratieren, mit Unterschieden führen, Gemeinsames zusammenfassen, Lücken in Beratung übersetzen.
 
 ---
 
