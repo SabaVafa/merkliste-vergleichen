@@ -100,16 +100,19 @@
   .swatch.more{font-size:.625rem;color:var(--color-graphite-600);width:auto;border:none;display:flex;align-items:center}
   .card__price{margin-top:auto;font-size:1.125rem;font-weight:700;color:var(--color-digital-black)}
   .card__price small{font-weight:400;font-size:.75rem;color:var(--color-graphite-600)}
-  .card__foot{display:flex;gap:.5rem;align-items:center;margin-top:.625rem}
+  /* one primary CTA, full width; compare is a quiet secondary toggle beneath it (not a second button) */
+  .card__foot{display:flex;flex-direction:column;align-items:stretch;gap:.375rem;margin-top:.75rem}
+  .card__foot .btn--primary{width:100%;flex:0 0 auto}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:2.5rem;padding:0 1rem;font:500 .875rem/1 var(--font-family);border:none;border-radius:var(--radius);cursor:pointer;white-space:nowrap;transition:background .14s,color .14s,border-color .14s}
   .btn--primary{background:var(--color-teal);color:#fff;flex:1}
   .btn--primary:hover{background:var(--color-teal-600)}
   .btn--ghost{background:transparent;color:var(--color-graphite-700);border:.0625rem solid var(--color-graphite-300)}
   .btn--ghost:hover{background:var(--color-paper);border-color:var(--color-graphite-400)}
   /* compare toggle on card */
-  .cmp-toggle{display:inline-flex;align-items:center;gap:.4375rem;font:600 .8125rem var(--font-family);color:var(--color-graphite-700);cursor:pointer;user-select:none;padding:.375rem .5rem;border-radius:var(--radius);border:.0625rem solid transparent}
+  .cmp-toggle{align-self:center;display:inline-flex;align-items:center;gap:.4375rem;font:500 .8125rem var(--font-family);color:var(--color-graphite-600);cursor:pointer;user-select:none;padding:.25rem .5rem;border-radius:var(--radius);border:none;transition:color .15s}
   .cmp-toggle:hover{color:var(--color-teal)}
-  .cmp-box{width:1.125rem;height:1.125rem;border:.125rem solid var(--color-graphite-400);border-radius:.1875rem;display:inline-flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s,border-color .15s}
+  .cmp-toggle:has(input:checked){color:var(--color-teal);font-weight:600}
+  .cmp-box{width:1rem;height:1rem;border:.125rem solid var(--color-graphite-400);border-radius:.1875rem;display:inline-flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s,border-color .15s}
   .cmp-toggle input{position:absolute;opacity:0;width:1px;height:1px}
   .cmp-toggle input:checked+.cmp-box{background:var(--color-teal);border-color:var(--color-teal)}
   .cmp-toggle input:checked+.cmp-box svg{opacity:1}
