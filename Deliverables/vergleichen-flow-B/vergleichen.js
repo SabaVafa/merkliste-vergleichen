@@ -209,7 +209,7 @@
 
     view=h('<div class="vgl-view" role="dialog" aria-modal="true" aria-labelledby="vglTitle" aria-hidden="true">'+
       '<div class="vgl-view__bar"><div class="vgl-view__bar-in">'+
-        '<span class="vgl-view__title" id="vglTitle">Vergleich <span data-vgl="count">(0)</span><span class="vgl-vb">Version B</span></span>'+
+        '<span class="vgl-view__title" id="vglTitle">Vergleich <span data-vgl="count">(0)</span></span>'+
         '<label class="vgl-diff"><input type="checkbox" data-vgl="diff"><span class="vgl-switch" aria-hidden="true"></span>Nur Unterschiede <span class="vgl-diff__n" data-vgl="diffn"></span></label>'+
         '<button class="vgl-link vgl-link--ic" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
         '<button class="vgl-link" type="button" data-vgl="clear">Alle entfernen</button>'+
