@@ -663,16 +663,36 @@
     setTimeout(function(){var el=s.target&&s.target();if(el)spot(el);},80);
   }
 
+  /* ---- Public hook for the Merkliste add-on (05_Merkliste §3.5) ----
+     compare(ids): replaces the selection with the valid ids of this lens (max 4), persists it,
+     enters compare mode (body.vgl-mode → card checkboxes appear, same gating as the toolbar
+     button), syncs bar/tray/cards and opens the comparison from 2 models. Returns the count. */
+  function setSelection(ids){
+    var valid=[];(ids||[]).forEach(function(id){id=String(id);if(BY_ID[id]&&valid.indexOf(id)<0&&valid.length<MAX)valid.push(id);});
+    if(!valid.length)return 0;
+    selected=valid;persist();
+    compareMode=true;document.body.classList.add('vgl-mode');
+    return selected.length;
+  }
+  window.MTZ_VGL={
+    compare:function(ids){var n=setSelection(ids);if(!n)return 0;syncAll();if(canCompare())openView();return n;},
+    enterMode:function(){if(!compareMode)enterMode();},
+    isMode:function(){return compareMode;}
+  };
+
   /* ---- Init ---- */
   function init(){
     if(!window.MTZ_PRODUCTS)return setTimeout(init,50);
     if(!SRC.length){SRC=window.MTZ_PRODUCTS;SRC.forEach(function(p){if(!BY_ID[p.id])BY_ID[p.id]=LENS.enrich(p);});}
+    /* ?vergleich=id,id (share link / Merkliste handover from the other PLP) → preselect + open */
+    var fromUrl=0;try{var qm=/[?&]vergleich=([^&#]+)/.exec(location.search);if(qm)fromUrl=setSelection(decodeURIComponent(qm[1]).split(','));}catch(e){}
     compareMode = selected.length>0;   /* restore mode if a selection persisted across reload */
     if(compareMode)document.body.classList.add('vgl-mode');
     buildChrome(); buildCoach(); injectBarButton();
     var grid=document.getElementById('productGrid');
     if(grid){scanCards();new MutationObserver(function(){scanCards();injectBarButton();}).observe(grid,{childList:true});}
     syncAll();
+    if(fromUrl>=MIN)openView();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
