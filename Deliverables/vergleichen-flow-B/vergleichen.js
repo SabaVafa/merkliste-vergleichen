@@ -240,8 +240,7 @@
     });
     diffCb.addEventListener('change',renderView);
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open'))closeView();});
-    /* compact product header once the user scrolls into the specs (Apple / Samsung compare pattern) */
-    scrollEl.addEventListener('scroll',function(){view.classList.toggle('is-compact',scrollEl.scrollTop>180);},{passive:true});
+    /* (sticky product header stays a stable size — no scroll-driven resize, which caused a layout jump) */
     /* keep keyboard focus inside the dialog */
     view.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=view.querySelectorAll('button:not([disabled]),input:not([disabled]),summary,[tabindex="0"]');if(!f.length)return;var first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
   }
@@ -557,12 +556,7 @@
       var bi=same?[]:bestIdx(row,vals,texts);
       var tr='<tr data-key="'+row.key+'" class="'+(same||onlyDiff?'':'is-diff')+'"><th class="rh" scope="row"><span class="rh__l">'+esc(row.label)+'</span>'+(row.hint?'<button class="vgl-i" type="button" aria-label="Erklärung: '+esc(row.label)+'" data-tip="'+esc(row.hint)+'">'+IC_INFO+'</button>':'')+'</th>';
       items.forEach(function(p,i){var v=vals[i],t=texts[i],na=(t==='–'),isb=bi.indexOf(i)>-1,inner;
-        if(row.swatches){
-          var cd=same?{extra:[],missing:[]}:colorDiff(items,i);
-          inner=swHTML(p.colors,10)+'<span class="vgl-swn">'+(p.colors||[]).length+' Farben'+
-            (cd.extra.length?' · <b>zusätzlich:</b> '+esc(cd.extra.join(', ')):'')+
-            (cd.missing.length?' · <b>ohne:</b> '+esc(cd.missing.join(', ')):'')+'</span>';
-        }
+        if(row.swatches){inner=swHTML(p.colors,10);}   /* swatches only — the colour difference is already named in the header highlights */
         else if(row.set){
           var sd=same?{extra:[],missing:[]}:setDiff(row,items,i),arr=v||[];
           inner=(arr.length?'<ul class="vgl-setl">'+arr.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'<span class="vgl-no">Keine</span>')+
