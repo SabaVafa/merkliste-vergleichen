@@ -1,14 +1,14 @@
 /* ============================================================
    Metzler — Merkliste add-on (Version B prototype)
    Spec: Deliverables/05_Merkliste_Flow_und_Interface.md
-     · heart on every PLP card (always visible, independent of compare mode)
+     · bookmark on every PLP card (always visible, independent of compare mode)
      · header control with count badge → right drawer (full-screen on mobile)
      · item rows: model-first name, price, Konfigurieren / Zum Produkt,
        "Vergleichen" checkbox, Entfernen + undo, Alle entfernen + confirm
      · "Auswahl vergleichen (n)" hands over to the compare overlay via
        window.MTZ_VGL.compare(ids) — same lens — or ?vergleich=id,id on the
        other PLP (cross-lens)
-     · heart in every compare-overlay column (decorated via MutationObserver)
+     · bookmark in every compare-overlay column (decorated via MutationObserver)
      · localStorage['mtz_merkliste'] = {v:1, updatedAt, items[]}, limit 50
    Decoupled layer: reads window.MTZ_PRODUCTS / window.MTZ_LENS, touches no
    PLP file, defines no vgl- class and changes nothing in vergleichen.js.
@@ -66,7 +66,7 @@
   /* ---- DOM helpers + icons ---- */
   function h(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  var HEART_PATH = 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z';
+  var HEART_PATH = 'M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z';   /* bookmark glyph (Merkliste = Lesezeichen) */
   var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + HEART_PATH + '"/></svg>';
   var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
   var IC_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -109,7 +109,7 @@
       '</div>' +
       '<div class="mkl-body">' +
         '<ul class="mkl-list" role="list"></ul>' +
-        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Herz-Symbol — sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">Zurück zu ' + esc(LENSES[LENS].label) + '</button></div>' +
+        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol — sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">Zurück zu ' + esc(LENSES[LENS].label) + '</button></div>' +
       '</div>' +
       '<div class="mkl-foot">' +
         '<span class="mkl-foot__hint">Wählen Sie mindestens 2 Modelle derselben Kategorie</span>' +
@@ -218,9 +218,9 @@
   function live(msg) { if (!liveEl) return; liveEl.textContent = ''; setTimeout(function () { liveEl.textContent = msg; }, 30); }
 
   /* ---- Hearts: PLP cards + compare overlay columns ---- */
-  function heartHTML(extra) { return '<button class="mkl-heart' + (extra || '') + '" type="button" aria-pressed="false"><span class="mkl-heart__disc">' + HEART + '</span></button>'; }
+  function heartHTML(extra) { return '<button class="mkl-mark' + (extra || '') + '" type="button" aria-pressed="false"><span class="mkl-mark__disc">' + HEART + '</span></button>'; }
   function injectCardHeart(cardEl) {
-    if (cardEl.querySelector('.mkl-heart')) return;
+    if (cardEl.querySelector('.mkl-mark')) return;
     var id = cardEl.dataset.id; if (!id || !BY_ID[id]) return;
     var media = cardEl.querySelector('.pcard__media') || cardEl;
     var btn = h(heartHTML('')); btn.setAttribute('data-mkl-id', id);
@@ -231,9 +231,9 @@
   function scanCards() { var grid = document.getElementById('productGrid'); if (!grid) return; grid.querySelectorAll('.pcard[data-id]').forEach(injectCardHeart); }
   function injectOverlayHearts() {
     document.querySelectorAll('.vgl-ph__media').forEach(function (media) {
-      if (media.querySelector('.mkl-heart')) return;
+      if (media.querySelector('.mkl-mark')) return;
       var rm = media.querySelector('[data-rm]'); var id = rm && rm.getAttribute('data-rm'); if (!id || !BY_ID[id]) return;
-      var btn = h(heartHTML(' mkl-heart--ov')); btn.setAttribute('data-mkl-id', id);
+      var btn = h(heartHTML(' mkl-mark--ov')); btn.setAttribute('data-mkl-id', id);
       btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); pressHeart(btn, id, null); });
       media.appendChild(btn);
       syncHeart(btn, id);
@@ -252,7 +252,7 @@
     btn.classList.toggle('is-limit', lim);
     if (lim) btn.setAttribute('aria-disabled', 'true'); else btn.removeAttribute('aria-disabled');
   }
-  function syncHearts() { document.querySelectorAll('.mkl-heart[data-mkl-id]').forEach(function (b) { syncHeart(b, b.getAttribute('data-mkl-id')); }); }
+  function syncHearts() { document.querySelectorAll('.mkl-mark[data-mkl-id]').forEach(function (b) { syncHeart(b, b.getAttribute('data-mkl-id')); }); }
   function syncHeader() {
     if (!hdrBtn) return;
     var n = items.length;
@@ -385,7 +385,7 @@
     indexProducts(); load(); buildChrome();
     var grid = document.getElementById('productGrid');
     if (grid) { scanCards(); new MutationObserver(scanCards).observe(grid, { childList: true }); }
-    /* compare overlay: decorate every product column with a heart whenever it (re)renders */
+    /* compare overlay: decorate every product column with a bookmark whenever it (re)renders */
     var tries = 0; (function watchOverlay() {
       var body = document.querySelector('[data-vgl="body"]');
       if (!body) { if (tries++ < 40) setTimeout(watchOverlay, 50); return; }

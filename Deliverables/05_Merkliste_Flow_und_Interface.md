@@ -12,7 +12,7 @@ UI wording: **Merkliste / Merken / Gemerkt** — never "Wishlist", "Wunschzettel
 
 **Principles.**
 - **One act, always visible.** Merken is a single click/tap on a control that is present at rest — on touch too. It never depends on compare mode.
-- **Two tools, two shapes.** Heart = keep for later (persistent, unlimited-ish). Checkbox = compare now (session, cap 4). They share tokens, not affordances.
+- **Two tools, two shapes.** Bookmark = keep for later (persistent, unlimited-ish). Checkbox = compare now (session, cap 4). They share tokens, not affordances.
 - **No cart from the list.** Every product is individualised on the PDP or in the configurator; CTAs are "Konfigurieren" / "Zum Produkt" only.
 - **Guest-first, merge later.** `localStorage` now; union into the account on login; never drop, never wall.
 - **Quiet premium feedback.** State change + counter + one toast with an action. No modal, no list naming, no confetti.
@@ -25,24 +25,24 @@ UI wording: **Merkliste / Merken / Gemerkt** — never "Wishlist", "Wunschzettel
 
 | Surface | Control | Placement (exact) |
 |---|---|---|
-| **PLP card** (`.pcard`, both lenses) | `button.mkl-heart` — 2.25 rem circular, white fill, hairline, heart glyph | Absolutely positioned **top-right of `.pcard__media`**, `top:0.75rem; right:0.75rem; z-index:3`. Price badge stays top-left, Red-Dot lockup bottom-left — no collision. Injected by `merkliste.js` after `.pcard[data-id]` render (same scan pattern as `injectToggle`). |
-| **PDP** | `button.mkl-heart.mkl-heart--label` — same heart + text "Merken"/"Gemerkt", 2.75 rem height | Directly beside the primary CTA ("Bitte Farbe wählen"/"In den Warenkorb"), same row as "Produkt teilen". Spec only (no PDP in the prototype). |
-| **Compare overlay** (`.vgl-ph` column) | `button.mkl-heart` 2 rem | **Top-left of `.vgl-ph__media`** (`top:0.375rem; left:0.375rem`), mirroring the existing remove "×" at top-right. Hidden while `.vgl-view.is-compact` (header is compacted; it returns on scroll-up). |
-| **Configurator** | Text button "Konfiguration merken" with heart glyph | Top bar, between "Teilen" and "PDF Export". Spec only. |
+| **PLP card** (`.pcard`, both lenses) | `button.mkl-mark` — 2.25 rem circular, white fill, hairline, bookmark glyph | Absolutely positioned **top-right of `.pcard__media`**, `top:0.75rem; right:0.75rem; z-index:3`. Price badge stays top-left, Red-Dot lockup bottom-left — no collision. Injected by `merkliste.js` after `.pcard[data-id]` render (same scan pattern as `injectToggle`). |
+| **PDP** | `button.mkl-mark.mkl-mark--label` — same bookmark + text "Merken"/"Gemerkt", 2.75 rem height | Directly beside the primary CTA ("Bitte Farbe wählen"/"In den Warenkorb"), same row as "Produkt teilen". Spec only (no PDP in the prototype). |
+| **Compare overlay** (`.vgl-ph` column) | `button.mkl-mark` 2 rem | **Top-left of `.vgl-ph__media`** (`top:0.375rem; left:0.375rem`), mirroring the existing remove "×" at top-right. Hidden while `.vgl-view.is-compact` (header is compacted; it returns on scroll-up). |
+| **Configurator** | Text button "Konfiguration merken" with bookmark glyph | Top bar, between "Teilen" and "PDF Export". Spec only. |
 | **Header** | `a.icon-btn.mkl-hdr` with `span.badge` count | In `.header__icons`, **between "Mein Konto" and "Warenkorb"** (the slot the live shop reserves for the hidden `compare-list-menu`). Opens the drawer; on JTL links to `/merkliste`. Badge hidden at 0. |
 
-**Card heart — states.**
+**Card bookmark — states.**
 
 | State | Glyph | Fill / border | Token |
 |---|---|---|---|
-| Rest | Outline heart, stroke 1.75 (SVG units) | White disc, hairline `--graphite-300` | glyph `--schwarz` (16:1 on white) |
-| Hover / focus-visible | Outline heart | Disc `--teal-100`, border `--teal`; focus ring `outline:0.1875rem solid var(--teal); outline-offset:0.125rem` | glyph `--teal` |
-| **Gemerkt** (`aria-pressed="true"`) | **Filled heart** | White disc, border `--teal` | fill `--teal` (9:1 on white) |
-| Gemerkt + hover | Filled heart | Disc `--teal-100` | fill `--teal` |
+| Rest | Outline bookmark, stroke 1.75 (SVG units) | White disc, hairline `--graphite-300` | glyph `--schwarz` (16:1 on white) |
+| Hover / focus-visible | Outline bookmark | Disc `--teal-100`, border `--teal`; focus ring `outline:0.1875rem solid var(--teal); outline-offset:0.125rem` | glyph `--teal` |
+| **Gemerkt** (`aria-pressed="true"`) | **Filled bookmark** | White disc, border `--teal` | fill `--teal` (9:1 on white) |
+| Gemerkt + hover | Filled bookmark | Disc `--teal-100` | fill `--teal` |
 | Pressed (120 ms) | Scale 0.9 → 1.0 | — | reduced-motion: no transform |
-| Limit reached (50) | Outline heart | Disc white, glyph `--graphite-500` | `aria-disabled="true"`, tooltip via toast |
+| Limit reached (50) | Outline bookmark | Disc white, glyph `--graphite-500` | `aria-disabled="true"`, tooltip via toast |
 
-**Colour decision: teal, not Metzler Rot.** Three reasons. (a) The DS reserves `--color-metzler-rot` for the logo M-square and sale badges only; a red heart on every card would dilute the one place red carries brand meaning and read as "Sale". (b) Red is the shop's error/remove colour (`--red-default` on the compare "×" hover, `--rot` on "Filter löschen"); "kept" should not share the hue of "danger". (c) Teal is already the shop's "selected/active" ink (compare checkbox, `.pcard.is-vgl` outline, header badge), so a teal heart says *selected for later* in the same language. Shape (heart vs. checkbox) and position (media corner vs. footer) keep the two tools distinguishable.
+**Colour decision: teal, not Metzler Rot.** Three reasons. (a) The DS reserves `--color-metzler-rot` for the logo M-square and sale badges only; a red bookmark on every card would dilute the one place red carries brand meaning and read as "Sale". (b) Red is the shop's error/remove colour (`--red-default` on the compare "×" hover, `--rot` on "Filter löschen"); "kept" should not share the hue of "danger". (c) Teal is already the shop's "selected/active" ink (compare checkbox, `.pcard.is-vgl` outline, header badge), so a teal bookmark says *selected for later* in the same language. Shape (bookmark vs. checkbox) and position (media corner vs. footer) keep the two tools distinguishable.
 
 **Toast after Merken** (see §6): "Gemerkt · Zur Merkliste" (action link) for 5 s; after Entfernen: "Aus der Merkliste entfernt · Rückgängig".
 
@@ -51,7 +51,7 @@ UI wording: **Merkliste / Merken / Gemerkt** — never "Wishlist", "Wunschzettel
 ## 3 · Flows
 
 ### 3.1 Merken from the PLP
-1. Customer taps the heart on a card. 2. `merkliste.js` reads the card's `data-id`, builds the item from `window.MTZ_PRODUCTS` (`id, name, img, price, konfig, lens`) and pushes it into `mtz_merkliste`. 3. Heart → gemerkt, header badge increments (0 → 1 shows the badge), live region announces "Gemerkt: {name}. Merkliste: n Artikel". 4. Toast "Gemerkt · Zur Merkliste". 5. Tap again → removed, toast with "Rückgängig" (5 s). No scroll, no reload, no compare-mode change.
+1. Customer taps the bookmark on a card. 2. `merkliste.js` reads the card's `data-id`, builds the item from `window.MTZ_PRODUCTS` (`id, name, img, price, konfig, lens`) and pushes it into `mtz_merkliste`. 3. Bookmark → gemerkt, header badge increments (0 → 1 shows the badge), live region announces "Gemerkt: {name}. Merkliste: n Artikel". 4. Toast "Gemerkt · Zur Merkliste". 5. Tap again → removed, toast with "Rückgängig" (5 s). No scroll, no reload, no compare-mode change.
 
 ### 3.2 Merken a configured build (configurator, spec)
 ```mermaid
@@ -112,9 +112,9 @@ On successful login the plugin posts `mtz_merkliste.items` to `/merkliste/merge`
 
 **Footer** (sticky): "Auswahl vergleichen (n)" (`.mkl-cta`, same visual grammar as `.vgl-tray__cta`: disabled grey until n ≥ 2, then light-teal fill / teal ink, solid teal on hover). Disabled helper text: "Wählen Sie mindestens 2 Modelle derselben Kategorie". P1 links "Link kopieren" · "Als PDF speichern" sit left of the CTA (desktop) or above it (mobile).
 
-**Empty state.** Outline heart 2.75 rem in `--graphite-300`, title "Ihre Merkliste ist leer", copy "Merken Sie Modelle mit dem Herz-Symbol — sie bleiben auf diesem Gerät gespeichert.", CTA "Zurück zu {Kategorie}" (`.btn--secondary`; category from `MTZ_LENS`: "Türsprechanlagen" / "Briefkästen").
+**Empty state.** Outline bookmark 2.75 rem in `--graphite-300`, title "Ihre Merkliste ist leer", copy "Merken Sie Modelle mit dem Lesezeichen-Symbol — sie bleiben auf diesem Gerät gespeichert.", CTA "Zurück zu {Kategorie}" (`.btn--secondary`; category from `MTZ_LENS`: "Türsprechanlagen" / "Briefkästen").
 
-**Item limit.** 50 items. At 50 every unselected heart becomes `aria-disabled`; tapping it toasts "Ihre Merkliste ist voll (50) — bitte zuerst einen Artikel entfernen" and opens nothing. Gemerkt hearts still toggle off. The drawer header shows "(50 / 50)".
+**Item limit.** 50 items. At 50 every unselected bookmark becomes `aria-disabled`; tapping it toasts "Ihre Merkliste ist voll (50) — bitte zuerst einen Artikel entfernen" and opens nothing. Gemerkt bookmarks still toggle off. The drawer header shows "(50 / 50)".
 
 **States & feedback.** Counter badge animates (scale 1 → 1.25 → 1, 180 ms; none under reduced motion). Toasts 5 s with one action, pause on hover/focus. Live region `#mkl-live` (`aria-live="polite"`, visually hidden) announces add/remove/limit/merge. When `localStorage` is unavailable: one-line notice in the drawer "Die Merkliste kann auf diesem Gerät nicht gespeichert werden (Cookies/Speicher blockiert)" and the list runs in-memory for the session.
 
@@ -123,8 +123,8 @@ On successful login the plugin posts `mtz_merkliste.items` to `/merkliste/merge`
 ## 5 · Interplay rules with Vergleichen
 
 1. **Independent sets.** A product can be gemerkt, in the compare set, both, or neither. `mtz_merkliste` (localStorage, persistent) and `mtz_vgl_flow` (sessionStorage, session) never write to each other.
-2. **Card gating unchanged.** The compare checkbox stays hidden until the toolbar "Vergleichen" button activates compare mode. The heart is always visible. Entering/leaving compare mode does not touch hearts.
-3. **Merken inside the comparison.** Each `.vgl-ph` column carries a heart (top-left of the media). It toggles the same item; the header badge updates behind the overlay; the toast appears above the overlay (z 970).
+2. **Card gating unchanged.** The compare checkbox stays hidden until the toolbar "Vergleichen" button activates compare mode. The bookmark is always visible. Entering/leaving compare mode does not touch bookmarks.
+3. **Merken inside the comparison.** Each `.vgl-ph` column carries a bookmark (top-left of the media). It toggles the same item; the header badge updates behind the overlay; the toast appears above the overlay (z 970).
 4. **Vergleichen from the Merkliste.** The only way the Merkliste reaches the comparison is the handover in §3.5 — it *enters* compare mode and reuses the overlay; it never renders its own table. If the compare set already holds models, the handover **replaces** it (the Merkliste selection is the explicit intent) and toasts "Vergleich mit n Modellen aus Ihrer Merkliste".
 5. **Tray.** After handover the standard tray shows the n slots, "Vergleich (n) / max. 4" and the ready hint — nothing Merkliste-specific. Removing a model from the tray does not remove it from the Merkliste.
 6. **Guardrail copy reuse.** Cap and category guards reuse the compare strings verbatim ("Maximal 4 Modelle gleichzeitig — bitte zuerst eines entfernen", "Mindestens zwei Modelle wählen"); the overlay's own guardrails (same design line, Kombi-Set) apply unchanged once open.
@@ -136,9 +136,9 @@ On successful login the plugin posts `mtz_merkliste.items` to `/merkliste/merge`
 
 | Key | String |
 |---|---|
-| heart.label.rest | `aria-label="{Modell} merken"` |
-| heart.label.on | `aria-label="{Modell} aus der Merkliste entfernen"` (+ `aria-pressed="true"`) |
-| heart.pdp.rest / on | "Merken" / "Gemerkt" |
+| bookmark.label.rest | `aria-label="{Modell} merken"` |
+| bookmark.label.on | `aria-label="{Modell} aus der Merkliste entfernen"` (+ `aria-pressed="true"`) |
+| bookmark.pdp.rest / on | "Merken" / "Gemerkt" |
 | konfigurator.save | "Konfiguration merken" |
 | header.label | `aria-label="Merkliste, {n} Artikel"` · visible tooltip "Merkliste" |
 | toast.added | "Gemerkt" · action "Zur Merkliste" |
@@ -163,7 +163,7 @@ On successful login the plugin posts `mtz_merkliste.items` to `/merkliste/merge`
 | footer.compare | "Auswahl vergleichen ({n})" |
 | footer.compare.hint | "Wählen Sie mindestens 2 Modelle derselben Kategorie" |
 | footer.share / pdf (P1) | "Link kopieren" / "Als PDF speichern" |
-| empty.title / body / cta | "Ihre Merkliste ist leer" / "Merken Sie Modelle mit dem Herz-Symbol — sie bleiben auf diesem Gerät gespeichert." / "Zurück zu {Kategorie}" |
+| empty.title / body / cta | "Ihre Merkliste ist leer" / "Merken Sie Modelle mit dem Lesezeichen-Symbol — sie bleiben auf diesem Gerät gespeichert." / "Zurück zu {Kategorie}" |
 | storage.unavailable | "Die Merkliste kann auf diesem Gerät nicht gespeichert werden (Cookies/Speicher blockiert)" |
 | live.added / removed | "Gemerkt: {Modell}. Merkliste: {n} Artikel" / "Entfernt: {Modell}. Merkliste: {n} Artikel" |
 
@@ -171,12 +171,12 @@ On successful login the plugin posts `mtz_merkliste.items` to `/merkliste/merge`
 
 ## 7 · Accessibility
 
-- **Roles.** Heart: `<button type="button" aria-pressed>`; never a link, never a checkbox. Drawer: `role="dialog" aria-modal="true" aria-labelledby="mklTitle"`; list: `<ul role="list">` with `<li><article>`; compare checkboxes: native `<input type="checkbox">` with visible label. Header control: `<a>` (page) in JTL, `<button>` in the prototype (opens the drawer).
+- **Roles.** Bookmark: `<button type="button" aria-pressed>`; never a link, never a checkbox. Drawer: `role="dialog" aria-modal="true" aria-labelledby="mklTitle"`; list: `<ul role="list">` with `<li><article>`; compare checkboxes: native `<input type="checkbox">` with visible label. Header control: `<a>` (page) in JTL, `<button>` in the prototype (opens the drawer).
 - **Focus order.** Drawer: title → "Alle entfernen" → close → rows (CTA → Vergleichen → Entfernen, DOM order) → footer CTA. Focus trap identical to the compare dialog (Tab/Shift+Tab wrap). Opening moves focus to the title (`tabindex="-1"`); closing returns it to the opener. Escape closes the drawer; if the compare overlay is open beneath, Escape closes the drawer only.
 - **Live regions.** `#mkl-live` polite for add/remove/limit/merge; toasts `role="status"`. Counter badge is `aria-hidden` (the header `aria-label` carries the number).
-- **Contrast.** Text ≥ 4.5:1 (`--schwarz` 16:1, `--text-muted` 5.4:1, white on `--teal` 9:1, `--teal-mint` link on `--schwarz` toast 10.5:1). Icons ≥ 3:1: heart glyph `--schwarz` or `--teal` on white (16:1 / 9:1); the hairline disc is decorative. Disabled hearts `--graphite-500` are exempt but still announced.
-- **Touch targets ≥ 2.75 rem.** Heart renders at 2.25 rem but its hit area is 2.75 rem (`::before` inset −0.25rem); close/remove/header buttons are 2.75 rem; compare checkbox label is a 2.75 rem row.
-- **Motion.** All transitions ≤ 220 ms; under `prefers-reduced-motion: reduce` the drawer appears without slide, the heart without scale, the badge without pulse, the row removal without fade.
+- **Contrast.** Text ≥ 4.5:1 (`--schwarz` 16:1, `--text-muted` 5.4:1, white on `--teal` 9:1, `--teal-mint` link on `--schwarz` toast 10.5:1). Icons ≥ 3:1: bookmark glyph `--schwarz` or `--teal` on white (16:1 / 9:1); the hairline disc is decorative. Disabled bookmarks `--graphite-500` are exempt but still announced.
+- **Touch targets ≥ 2.75 rem.** Bookmark renders at 2.25 rem but its hit area is 2.75 rem (`::before` inset −0.25rem); close/remove/header buttons are 2.75 rem; compare checkbox label is a 2.75 rem row.
+- **Motion.** All transitions ≤ 220 ms; under `prefers-reduced-motion: reduce` the drawer appears without slide, the bookmark without scale, the badge without pulse, the row removal without fade.
 - **Keyboard parity.** Everything reachable with Tab/Enter/Space; no hover-only affordance; tooltips not required (labels are explicit).
 
 ---
@@ -187,8 +187,8 @@ On successful login the plugin posts `mtz_merkliste.items` to `/merkliste/merge`
 
 | Class | Role | Tokens |
 |---|---|---|
-| `.mkl-heart` | card/overlay heart, 2.25 rem, `border-radius: var(--r-pill)` | bg `--white`, border `0.0625rem solid var(--graphite-300)`, glyph `--schwarz`; `.is-on` glyph+border `--teal` [`--color-teal`]; hover bg `--teal-100`; shadow `--shadow-sm`; focus `--teal` ring |
-| `.mkl-heart--label` | PDP variant with text | height 2.75 rem, `--r-m`, `--text-body-sm` 600 |
+| `.mkl-mark` | card/overlay bookmark, 2.25 rem, `border-radius: var(--r-pill)` | bg `--white`, border `0.0625rem solid var(--graphite-300)`, glyph `--schwarz`; `.is-on` glyph+border `--teal` [`--color-teal`]; hover bg `--teal-100`; shadow `--shadow-sm`; focus `--teal` ring |
+| `.mkl-mark--label` | PDP variant with text | height 2.75 rem, `--r-m`, `--text-body-sm` 600 |
 | `.mkl-hdr` + `.badge` | header control | reuses `.icon-btn` (52 px existing) and `.icon-btn .badge` (`--teal` / `--white`) unchanged |
 | `.mkl-scrim` | backdrop | `rgba(10,20,20,.45)` (same as `.vgl-scrim`) |
 | `.mkl-drawer` | panel | bg `--white`, `--shadow-xl`, width `min(28rem,100vw)`, `--r-xl` on the inner page card |
@@ -208,30 +208,30 @@ On successful login the plugin posts `mtz_merkliste.items` to `/merkliste/merge`
 | `.mkl-toast` | toast with action | bg `--schwarz`, text `--white`, action `--teal-mint`, `--r-l`, `--shadow-lg`, z 970, bottom offset `6.5rem` when the compare tray is open |
 | `.mkl-live` | SR-only live region | same clip pattern as `.vgl-visually-hidden` |
 
-**Responsive rules.** Base (mobile-first): drawer `inset:0`; rows stack (media left, text right, actions as a full-width row: CTA full width, Vergleichen + Entfernen beneath); footer sticky with safe-area padding; heart stays 2.25 rem. `@media (min-width: 48rem)`: drawer 28 rem right-anchored with scrim; row grid `4.5rem 1fr auto`; CTA 2.25 rem high inline. Header: on the mobile bar the Merkliste control replaces nothing — it sits left of the cart icon at 2 rem glyph / 2.75 rem hit area. Overlay heart: hidden in `.is-compact`, 2 rem otherwise; 1.75 rem below 48 rem.
+**Responsive rules.** Base (mobile-first): drawer `inset:0`; rows stack (media left, text right, actions as a full-width row: CTA full width, Vergleichen + Entfernen beneath); footer sticky with safe-area padding; bookmark stays 2.25 rem. `@media (min-width: 48rem)`: drawer 28 rem right-anchored with scrim; row grid `4.5rem 1fr auto`; CTA 2.25 rem high inline. Header: on the mobile bar the Merkliste control replaces nothing — it sits left of the cart icon at 2 rem glyph / 2.75 rem hit area. Overlay bookmark: hidden in `.is-compact`, 2 rem otherwise; 1.75 rem below 48 rem.
 
 **Acceptance checklist** (front-end, verifiable).
 
-1. Every `.pcard[data-id]` on both PLPs shows a heart at rest, top-right of `.pcard__media`, without compare mode active.
-2. Clicking the heart toggles `aria-pressed`, the filled state, the header badge count and writes `mtz_merkliste` (`v:1`, `items[]`, `updatedAt` ISO) to `localStorage`.
-3. Reloading the page restores hearts and badge from `localStorage`; opening a new tab shows the same list.
-4. Heart hit area measures ≥ 2.75 rem × 2.75 rem (DevTools box); visual disc 2.25 rem.
-5. Activating/cancelling compare mode changes no heart state; compare checkboxes remain hidden until the toolbar button is pressed.
+1. Every `.pcard[data-id]` on both PLPs shows a bookmark at rest, top-right of `.pcard__media`, without compare mode active.
+2. Clicking the bookmark toggles `aria-pressed`, the filled state, the header badge count and writes `mtz_merkliste` (`v:1`, `items[]`, `updatedAt` ISO) to `localStorage`.
+3. Reloading the page restores bookmarks and badge from `localStorage`; opening a new tab shows the same list.
+4. Bookmark hit area measures ≥ 2.75 rem × 2.75 rem (DevTools box); visual disc 2.25 rem.
+5. Activating/cancelling compare mode changes no bookmark state; compare checkboxes remain hidden until the toolbar button is pressed.
 6. Header control opens the drawer; focus lands on the title; Tab cycles inside; Escape closes and focus returns to the header control.
 7. Drawer rows show model-first name + qualifier, "ab"-price, and exactly one CTA reading "Konfigurieren" or "Zum Produkt"; the string "In den Warenkorb" does not occur in `merkliste.js`/`.css`.
 8. A configured item (seed one in the demo data) shows ≥ 1 config summary line, "Gesamt"-price and "Konfiguration öffnen" linking to `?configId=…`.
 9. "Auswahl vergleichen (n)" is disabled at n < 2 with the hint text; enabled at 2–4; a 5th checkbox is disabled and a toast shows the cap copy.
 10. Checking a row of another category disables the remaining rows of that category with the "nur innerhalb einer Kategorie" hint.
 11. Clicking "Auswahl vergleichen (3)" closes the drawer, adds `body.vgl-mode`, shows the tray with 3 slots and opens the compare overlay with those 3 columns; closing the overlay leaves the PLP in compare mode with the 3 cards marked.
-12. The overlay's product columns each show a heart whose state matches the PLP card; toggling it updates the header badge.
+12. The overlay's product columns each show a bookmark whose state matches the PLP card; toggling it updates the header badge.
 13. "Entfernen" shows a toast with "Rückgängig" for 5 s; undo restores the row at its previous position.
 14. "Alle entfernen" asks for confirmation inline, then clears the list and offers a single undo.
-15. At 50 items unselected hearts are `aria-disabled` and show the limit toast; gemerkt hearts still remove.
+15. At 50 items unselected bookmarks are `aria-disabled` and show the limit toast; gemerkt bookmarks still remove.
 16. Empty state shows icon, title, body and "Zurück zu {Kategorie}" matching `MTZ_LENS`.
 17. Mobile 375 px: drawer is full-screen, no horizontal page scroll (`document.documentElement.scrollWidth === clientWidth`), footer CTA visible without scrolling.
 18. With `prefers-reduced-motion: reduce` no transform/opacity animation runs (check computed `transition`/`animation` = none).
-19. Contrast (DevTools): heart glyph ≥ 3:1, all drawer text ≥ 4.5:1, disabled CTA text exempt but present.
-20. With `localStorage` blocked (Chrome "Block third-party/site data"), hearts still work for the session and the drawer shows the storage notice; no console error.
+19. Contrast (DevTools): bookmark glyph ≥ 3:1, all drawer text ≥ 4.5:1, disabled CTA text exempt but present.
+20. With `localStorage` blocked (Chrome "Block third-party/site data"), bookmarks still work for the session and the drawer shows the storage notice; no console error.
 21. No class starting with `vgl-` is added or changed by `merkliste.js`; the only change to `vergleichen.js` is the exported `window.MTZ_VGL.compare(ids)` hook plus the `?vergleich=` reader.
 
 ---
