@@ -28,7 +28,7 @@
   function familyOf(p){var n=p.name||'',s=(p.system||'').toLowerCase();if(/SDM10/i.test(n))return 'sdm';if(s==='bus'||/XDM10|2-Draht/i.test(n))return 'xdm';if(p.type==='audio'||/ADM10|Audio/i.test(n))return 'audio';return 'vdm';}
   function haushaltOf(p){if(p.klingel==='flex')return 'Skalierbar (1–500)';if(/Mehrfamilien/i.test(p.name))return 'Mehrfamilienhaus';if(p.klingel&&p.klingel!=='1')return 'Mehrfamilienhaus';return 'Einfamilienhaus';}
   function konfigOf(p){return !!p.briefkasten||p.klingel==='flex'||/SDM10|modular|Paketbox|Standbriefkast/i.test(p.name);}
-  function euro(n){return (typeof n==='number')?n.toFixed(2).replace('.',',')+' €':'—';}
+  function euro(n){return (typeof n==='number')?n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.').replace(/\.(\d{2})$/,',$1')+' €':'—';}
   function klingelLabel(k){return k==='flex'?'Flexibel (1–500)':k;}
 
   var SRC=(window.MTZ_PRODUCTS||[]), BY_ID={};
@@ -149,7 +149,7 @@
     var lines=[];items.forEach(function(p){if(lines.indexOf(p.design)<0)lines.push(p.design);});
     if(lines.length===1&&items.length>1){
       var aufDiff=items.some(function(p){return p.aufstellung.join()!==items[0].aufstellung.join();});
-      gs.push({type:'info',text:'Gleiche Design-Linie „'+lines[0]+'" — '+(aufDiff?'Wand- und Standvariante: der Ständer ist im Konfigurator wählbar.':'die Varianten unterscheiden sich nur in Front, Farbe oder Namensschild — wählen Sie diese auf der Produktseite.')});
+      gs.push({type:'info',text:'Gleiche Design-Linie „'+lines[0]+'" — '+(aufDiff?'Wand- und Standvariante: der Ständer ist im Konfigurator wählbar.':'die Varianten unterscheiden sich nur in Front, Farbe oder Namensschild — wählen Sie diese in der Konfiguration.')});
     }
     var sets=items.filter(function(p){return p.isSet;});
     if(sets.length&&sets.length<items.length)gs.push({type:'warn',noDelta:true,text:'Set vs. Einzelmodell: „'+sets.map(function(p){return p.design;}).join('", „')+'" enthält Klingel bzw. Sprechanlage — der Preis ist nicht direkt vergleichbar.'});
@@ -189,6 +189,9 @@
   var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,diffCb,diffN,scrollEl,toastEl,toastT,barBtn,cancelBtn,lastFocus;
   var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  var IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  var IC_BM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>';
+  var liveEl,fromMkl=false,lastCleared=null,chipsAll=false;
 
   function buildChrome(){
     tray=h('<div class="vgl-tray" role="region" aria-label="Vergleichsauswahl">'+
@@ -199,7 +202,7 @@
         '</div>'+
         '<div class="vgl-tray__slots"></div>'+
         '<div class="vgl-tray__actions">'+
-          '<button class="vgl-link" type="button" data-vgl="reset">Zurücksetzen</button>'+
+          '<button class="vgl-link" type="button" data-vgl="reset"><span class="vgl-m-hide">Vergleich leeren</span><span class="vgl-m-only">Leeren</span></button>'+
           '<button class="vgl-tray__cta" type="button" data-vgl="open" disabled>Vergleichen</button>'+
         '</div>'+
       '</div></div>');
@@ -209,14 +212,16 @@
 
     view=h('<div class="vgl-view" role="dialog" aria-modal="true" aria-labelledby="vglTitle" aria-hidden="true">'+
       '<div class="vgl-view__bar"><div class="vgl-view__bar-in">'+
-        '<span class="vgl-view__title" id="vglTitle">Vergleich <span data-vgl="count">(0)</span></span>'+
+        '<button class="vgl-back" type="button" data-vgl="back" hidden>'+IC_BM+'Merkliste</button>'+
+        '<h2 class="vgl-view__title" id="vglTitle" tabindex="-1">Vergleich <span data-vgl="count">(0)</span></h2>'+
         '<label class="vgl-diff"><input type="checkbox" data-vgl="diff"><span class="vgl-switch" aria-hidden="true"></span>Nur Unterschiede <span class="vgl-diff__n" data-vgl="diffn"></span></label>'+
         '<button class="vgl-link vgl-link--ic" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
-        '<button class="vgl-link" type="button" data-vgl="clear">Alle entfernen</button>'+
+        '<button class="vgl-link" type="button" data-vgl="clear">Vergleich leeren</button>'+
         '<button class="vgl-close" type="button" data-vgl="close" aria-label="Vergleich schließen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
       '</div></div>'+
-      '<div class="vgl-view__scroll"><div class="vgl-view__scroll-in" data-vgl="body"></div></div></div>');
-    document.body.appendChild(view);
+      '<div class="vgl-view__scroll"><div class="vgl-view__scroll-in" data-vgl="body"></div></div>'+
+      '<div class="vgl-visually-hidden" aria-live="polite" aria-atomic="true" data-vgl="live"></div></div>');
+    document.body.appendChild(view);liveEl=view.querySelector('[data-vgl="live"]');
     viewBody=view.querySelector('[data-vgl="body"]');viewCount=view.querySelector('[data-vgl="count"]');diffCb=view.querySelector('[data-vgl="diff"]');
     diffN=view.querySelector('[data-vgl="diffn"]');scrollEl=view.querySelector('.vgl-view__scroll');
 
@@ -228,37 +233,70 @@
       if(a&&a.getAttribute('data-vgl')==='body')a=null;   /* the body container carries data-vgl too — don't swallow chip/alt clicks */
       if(a){var k=a.getAttribute('data-vgl');
         if(k==='close')closeView();
-        if(k==='clear'){clearAll();closeView();}
-        if(k==='details'){detailsOpen=!detailsOpen;renderView();}
-        if(k==='add'){closeView();toast('Wählen Sie ein weiteres Modell über „Vergleichen" auf den Produktkarten — bis zu '+MAX+' gleichzeitig.','info');}
+        if(k==='clear')clearView();
+        if(k==='undo-clear')undoClear();
+        if(k==='details'){detailsOpen=!detailsOpen;renderView();focusIn('[data-vgl="details"]');}
+        if(k==='morechips'){chipsAll=!chipsAll;renderView();focusIn('[data-vgl="morechips"]');}
+        if(k==='add')addFromGrid();
+        if(k==='addmkl'){closeView();if(window.MTZ_MKL)window.MTZ_MKL.open();}
+        if(k==='back'){if(window.MTZ_MKL)window.MTZ_MKL.open();}
         if(k==='print'){printView();}
         return;}
+      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
       var j=e.target.closest('[data-jump]');if(j){jumpTo(j.getAttribute('data-jump'));return;}
-      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');if(toggle(aid,true)){toast(esc(shortName(BY_ID[aid]).main)+' zum Vergleich hinzugefügt','ok');scrollEl.scrollTop=0;}return;}
-      var rm=e.target.closest('[data-rm]');if(rm){toggle(rm.getAttribute('data-rm'),false);if(selected.length<1)closeView();return;}
+      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');if(toggle(aid,true)){var anm=shortName(BY_ID[aid]).main;toast(esc(anm)+' zum Vergleich hinzugefügt','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
+      var rm=e.target.closest('[data-rm]');if(rm){removeColumn(rm.getAttribute('data-rm'));return;}
       var go=e.target.closest('[data-go]');if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');
     });
+    view.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var tip=view.querySelector('.vgl-i.is-open');if(tip){e.stopPropagation();closeTip();tip.focus();}});
     diffCb.addEventListener('change',renderView);
-    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open'))closeView();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open')&&!view.querySelector('.vgl-i.is-open'))closeView();});
     /* (sticky product header stays a stable size — no scroll-driven resize, which caused a layout jump) */
     /* keep keyboard focus inside the dialog */
     view.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=view.querySelectorAll('button:not([disabled]),input:not([disabled]),summary,[tabindex="0"]');if(!f.length)return;var first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
   }
-  function printView(){var was=detailsOpen;detailsOpen=true;renderView();try{window.print();}catch(e){}detailsOpen=was;renderView();}
+  function printView(){var was=detailsOpen;detailsOpen=true;renderView();var det=viewBody.querySelector('.vgl-common');if(det)det.open=true;var d=new Date();view.querySelector('.vgl-view__bar-in').setAttribute('data-print','edelstahl-tuerklingel.de · '+LENS.label+' · '+d.toLocaleDateString('de-DE'));try{window.print();}catch(e){}detailsOpen=was;renderView();}
+  function announce(m){if(!liveEl)return;liveEl.textContent='';setTimeout(function(){liveEl.textContent=m;},30);}
+  function focusIn(sel){var el=view.querySelector(sel);(el||view.querySelector('#vglTitle')).focus();}
+  /* remove a column: focus moves to the next column's remove control (or the add tile); 2 → 1 keeps the dialog open with the empty state */
+  function removeColumn(id){
+    var i=selected.indexOf(id),nm=shortName(BY_ID[id]).main;
+    toggle(id,false);
+    announce(nm+' entfernt. Vergleich mit '+selected.length+' Modellen.');
+    if(selected.length<1){closeView();return;}
+    var next=selected[Math.min(i,selected.length-1)];
+    focusIn(selected.length>=MIN?'.vgl-ph__rm[data-rm="'+next+'"]':'[data-vgl="add"]');
+  }
+  /* "Vergleich leeren" inside the dialog: keeps the dialog open (empty state) and offers an inline undo */
+  function clearView(){lastCleared=selected.slice();clearAll();announce('Vergleich geleert.');focusIn('[data-vgl="undo-clear"]');}
+  function undoClear(){if(!lastCleared)return;var ids=lastCleared;lastCleared=null;setSelection(ids);syncAll();announce('Vergleich wiederhergestellt: '+selected.length+' Modelle.');focusIn('.vgl-ph__rm');}
+  /* "Modell hinzufügen": back to the grid, first free card field focused */
+  function addFromGrid(){
+    closeView();
+    var g=document.getElementById('productGrid');
+    if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}
+    var free=null;if(g)g.querySelectorAll('.vgl-toggle input').forEach(function(i){if(!free&&!i.checked)free=i;});
+    if(free)setTimeout(function(){free.focus({preventScroll:true});},350);
+    toast('Weiteres Modell auf einer Produktkarte markieren — noch '+(MAX-selected.length)+' möglich.','info');
+  }
+  /* (i) toggletip: click/Enter opens a real tooltip node (aria-describedby), Escape closes it first */
+  function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');}}
+  function mklCount(){try{if(!window.MTZ_MKL)return 0;return window.MTZ_MKL.items().filter(function(it){return it.lens===(window.MTZ_LENS||'sprechanlage')&&!it.configId&&BY_ID[it.articleId||it.id]&&selected.indexOf(it.articleId||it.id)<0;}).length;}catch(e){return 0;}}
   function jumpTo(key){
     var tr=viewBody.querySelector('tr[data-key="'+key+'"]');
     if(!tr&&!detailsOpen&&!diffCb.checked){detailsOpen=true;renderView();tr=viewBody.querySelector('tr[data-key="'+key+'"]');}
     if(!tr)return;
-    var top=tr.getBoundingClientRect().top-scrollEl.getBoundingClientRect().top+scrollEl.scrollTop-(view.classList.contains('is-compact')?150:300);
+    var top=tr.getBoundingClientRect().top-scrollEl.getBoundingClientRect().top+scrollEl.scrollTop-280;
     try{scrollEl.scrollTo({top:Math.max(0,top),behavior:'smooth'});}catch(e){scrollEl.scrollTop=Math.max(0,top);}
     tr.classList.remove('is-flash');void tr.offsetWidth;tr.classList.add('is-flash');
+    if(!view.contains(document.activeElement)||document.activeElement===view)tr.focus({preventScroll:true});
   }
 
   /* toolbar control — rest: "Vergleichen" (starts compare mode → card fields appear);
      in mode: "Vergleich anzeigen (n)", grey until ≥2, teal + opens comparison from 2. */
   function injectBarButton(){
     var bar=document.querySelector('.catalog__bar'); if(!bar||bar.querySelector('.vgl-barwrap'))return;
-    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt">0</span></button><button class="vgl-cancel" type="button">Abbrechen</button></div>');
+    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt">0</span></button><button class="vgl-cancel" type="button">Vergleich beenden</button></div>');
     barBtn=wrap.querySelector('.vgl-bar-btn');
     cancelBtn=wrap.querySelector('.vgl-cancel');
     barBtn.addEventListener('click',function(){if(!compareMode){enterMode();}else if(canCompare()){openView();}});
@@ -267,15 +305,20 @@
     syncBar();
   }
   function enterMode(){compareMode=true;document.body.classList.add('vgl-mode');syncBar();var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}toast('Vergleichsmodus aktiv — wählen Sie 2 bis 4 Modelle über „Vergleichen" auf den Karten.','info');}
-  function exitMode(){compareMode=false;document.body.classList.remove('vgl-mode');selected=[];persist();closeView();syncAll();}
+  function exitMode(){
+    var snap=selected.slice();
+    compareMode=false;document.body.classList.remove('vgl-mode');selected=[];persist();closeView();syncAll();
+    if(snap.length)toast('Vergleich beendet — '+snap.length+' Modell'+(snap.length>1?'e':'')+' verworfen','ok',{label:'Rückgängig',fn:function(){setSelection(snap);syncAll();if(barBtn)barBtn.focus();}});
+  }
 
-  function toast(m,type){
+  function toast(m,type,action){
     type=type||'ok';
     var ic=type==='limit'?IC_LIMIT:(type==='info'?IC_INFO:IC_OK);
-    toastEl.className='vgl-toast t-'+type;
-    toastEl.innerHTML=ic+'<span>'+m+'</span>';
+    toastEl.className='vgl-toast t-'+type+(action?' has-act':'')+(view.classList.contains('is-open')?' in-view':'');
+    toastEl.innerHTML=ic+'<span>'+m+'</span>'+(action?'<button class="vgl-toast__act" type="button">'+esc(action.label)+'</button>':'');
+    if(action)toastEl.querySelector('.vgl-toast__act').addEventListener('click',function(){toastEl.classList.remove('show');action.fn();});
     toastEl.classList.add('show');
-    clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},2600);
+    clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},action?5000:2600);
   }
 
   function injectToggle(cardEl){
@@ -293,7 +336,7 @@
   function toggle(id,on){var i=selected.indexOf(id);if(on&&i<0){if(isFull()){toast('Maximal '+MAX+' Modelle gleichzeitig — bitte zuerst eines entfernen.','limit');return false;}selected.push(id);}else if(!on&&i>-1){selected.splice(i,1);}persist();syncAll();return true;}
   function clearAll(){selected=[];persist();syncAll();}
 
-  function syncCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(function(c){var id=c.dataset.id,on=selected.indexOf(id)>-1,cb=c.querySelector('.vgl-toggle input'),lab=c.querySelector('.vgl-toggle');if(cb)cb.checked=on;c.classList.toggle('is-vgl',on);var dis=!on&&isFull();if(cb)cb.disabled=dis;if(lab)lab.classList.toggle('is-disabled',dis);});}
+  function syncCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(function(c){var id=c.dataset.id,on=selected.indexOf(id)>-1,cb=c.querySelector('.vgl-toggle input'),lab=c.querySelector('.vgl-toggle');if(cb)cb.checked=on;c.classList.toggle('is-vgl',on);var dis=!on&&isFull();if(cb){if(dis)cb.setAttribute('aria-disabled','true');else cb.removeAttribute('aria-disabled');}if(lab)lab.classList.toggle('is-disabled',dis);});}
   function syncBar(){
     if(!barBtn)return;
     var n=selected.length;
@@ -317,7 +360,6 @@
     var n=selected.length;
     trayLabel.innerHTML='Vergleich ('+n+') <span class="of">/ max. '+MAX+'</span>';
     tray.classList.toggle('is-open',n>0);
-    document.body.style.paddingBottom=n>0?'88px':'';
     trayCta.disabled=!canCompare();
     trayHint.className='vgl-tray__hint';
     if(!canCompare()){
@@ -334,11 +376,13 @@
     }
     traySlots.innerHTML='';
     selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));});
+    document.body.style.paddingBottom=n>0?((tray.offsetHeight||88)/16)+'rem':'';   /* measured after the slots exist — the mobile tray wraps to two rows */
   }
   function syncAll(){syncCards();syncBar();syncTray();if(view.classList.contains('is-open'))renderView();}
 
   function cellVal(p,row){return row.spec?p.specs[row.key]:(row.get?row.get(p):p[row.key]);}
   function disp(v,row){if(row.bool)return v===true?'ja':(v===false?'nein':'–');if(Array.isArray(v))return v.length?v.join(' · '):'Keine';if(v==null||v==='')return '–';return String(v);}
+  function canon(v,t){return Array.isArray(v)?v.slice().sort().join('|'):t;}   /* sets compare order-independently (Mehrfachauswahl, colours) */
   function numOf(t){var m=String(t).replace(/\.(?=\d{3}(\D|$))/g,'').match(/-?\d+(?:,\d+)?/);return m?parseFloat(m[0].replace(',','.')):null;}
   function bestIdx(row,vals,texts){
     if(!row.better)return [];
@@ -358,11 +402,27 @@
     return texts.join('  ·  ');
   }
   /* "Modell | Klingeltaster | Zusatz" → bold model line + muted qualifier line (scannable like Apple/Galaxus headers) */
+  var MODEL_RE=/^[A-Z]{2,4}\d{2}[A-Z0-9.]*(?:\s[\d.]+)?$/;   /* XDM10 · VDM10 2.0 · SDM10X · ADM10 — a trailing model segment moves to the front */
   function shortName(p){
     var parts=String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);
     if(LENS.designFirst&&parts.length>1)return {main:parts[parts.length-1],sub:parts.slice(0,-1).join(' · ')};   /* Briefkästen: the design line IS the product */
+    for(var i=1;i<parts.length;i++)if(MODEL_RE.test(parts[i])){var rest=parts.slice();rest.splice(i,1);return {main:parts[i]+' '+parts[0],sub:rest.slice(1).join(' · ')};}
     return {main:parts[0]||p.name,sub:parts.slice(1).join(' · ')};
   }
+  /* column labels: when two models share the same model line, the words that differ in the qualifier move up into the name */
+  function colLabels(items){
+    var out=items.map(function(p){var n=shortName(p);return {main:n.main,sub:n.sub,dx:''};});
+    var groups={};out.forEach(function(l,i){(groups[l.main]=groups[l.main]||[]).push(i);});
+    Object.keys(groups).forEach(function(k){
+      var g=groups[k];if(g.length<2)return;
+      var words=g.map(function(i){return out[i].sub.split(/\s+/).filter(Boolean);});
+      var c=0;while(words.every(function(w){return w.length>c&&w[c]===words[0][c];}))c++;
+      var keep=(c>0&&/^(mit|ohne|für|aus|und)$/i.test(words[0][c-1]))?c-1:c;
+      g.forEach(function(i,j){out[i].dx=words[j].slice(keep).join(' ');});
+    });
+    return out;
+  }
+  function colName(l){return l.main+(l.dx?' ('+l.dx+')':'');}
   function tokens(t){return String(t).split(' · ').map(function(s){return s.trim();}).filter(Boolean);}
   /* Per-product "Auf einen Blick": up to 3 differentiators that are unique to (or best for) this model.
      Replaces the unlabeled dot-chain panel — every value is mapped to its product. */
@@ -379,7 +439,7 @@
         var lab=row.label;
         if(row.key==='zutritt'||row.set){var mine=row.set?(d.vals[i]||[]):tokens(t),others=[];items.forEach(function(q,j){if(j!==i)others=others.concat(row.set?(d.vals[j]||[]):tokens(d.texts[j]));});var uniq=mine.filter(function(x){return others.indexOf(x)<0&&x!=='Standard';});if(!uniq.length)return;label=uniq.join(', ');if(row.set)lab='';}
         else if(row.bool){if(d.vals[i]!==true)return;label=row.label;lab='';}          /* "Nachtsicht" — not "Nachtsicht: Nachtsicht" */
-        else if(row.swatches){label=(p.colors||[]).length+' Farben';lab='';}
+        else if(row.swatches){var csd=setDiff(row,items,i);if(!csd.extra.length)return;label='+ '+csd.extra.length+' Farbe'+(csd.extra.length>1?'n':'')+' ('+csd.extra.join(', ')+')';lab='';}   /* only a real surplus of colours is a highlight */
         else if(row.better){if(!isBest)return;label=t;}                                 /* ranked rows: only the best value is a highlight, never a unique-but-weaker one */
         else{var unique=d.texts.every(function(x,j){return j===i||x!==t;});if(!unique)return;label=t;}
         out[i].push({k:row.key,t:label,l:lab,best:isBest});
@@ -393,7 +453,8 @@
       if(row.group)return;
       var vals=items.map(function(p){return cellVal(p,row);});
       var texts=vals.map(function(v){return disp(v,row);});
-      var same=texts.every(function(t){return t===texts[0];});
+      var keys=vals.map(function(v,i){return canon(v,texts[i]);});
+      var same=keys.every(function(t){return t===keys[0];});
       (same?sames:diffs).push({row:row,vals:vals,texts:texts});
     });
     var total=diffs.length+sames.length;
@@ -437,7 +498,7 @@
   /* "Für +X € erhalten Sie …" — turns the price delta into a value statement (twin state only) */
   /* What model p offers beyond model ref, phrased from the differing rows (generic over both lenses) */
   function gains(p,ref){
-    var gets=[],less=[];
+    var gets=[],less=[],neutral=[];
     ROWS.forEach(function(row){
       if(row.group||row.key==='price'||row.key==='design'||row.neutral)return;   /* identity and neutral facts (weight, size) are no "gain" */
       var a=cellVal(p,row),b=cellVal(ref,row);
@@ -449,12 +510,12 @@
       }
       var ta=disp(a,row),tb=disp(b,row); if(ta===tb||ta==='–'||tb==='–')return;   /* unknown on either side → no claim */
       if(row.bool){if(a===true)gets.push(row.label);else if(b===true)less.push(row.label);return;}
-      if(row.better){var bi=bestIdx(row,[a,b],[ta,tb]);if(bi.indexOf(0)>-1)gets.push(row.label+': '+ta);else if(bi.indexOf(1)>-1)less.push(row.label+': '+tb);else gets.push(row.label+': '+ta+' statt '+tb);return;}
-      gets.push(row.label+': '+ta+' statt '+tb);
+      if(row.better){var bi=bestIdx(row,[a,b],[ta,tb]);if(bi.indexOf(0)>-1)gets.push(row.label+': '+ta);else if(bi.indexOf(1)>-1)less.push(row.label+': '+tb);else neutral.push(row.label+': '+ta+' statt '+tb);return;}
+      neutral.push(row.label+': '+ta+' statt '+tb);   /* unranked facts are a difference, not a gain */
     });
-    return {gets:gets,less:less};
+    return {gets:gets,less:less,neutral:neutral};
   }
-  function valueStatement(items){
+  function valueStatement(items,labels){
     var cheap=items.reduce(function(a,b){return (b.price<a.price)?b:a;});
     var lines=[];
     items.forEach(function(p){
@@ -464,19 +525,33 @@
       if(p===cheap&&d!==0)return;                      /* cheapest vs pricier: shown from the pricier side */
       var gn=gains(p,ref),CAP=5;
       var gets=gn.gets.slice(0,CAP),more=gn.gets.length-gets.length;
-      lines.push('<li><b>'+(d>0?'+ '+euro(d):'Gleicher Preis')+'</b> für <b>'+esc(p.design)+'</b>'+(gets.length?' — dafür: '+esc(gets.join(' · '))+(more>0?' <span class="vgl-twin__less">+ '+more+' weitere</span>':''):' — ohne technischen Mehrwert, reine Design-Entscheidung')+((d>0&&gn.less.length)?' <span class="vgl-twin__less">(ohne '+esc(gn.less.slice(0,3).join(', '))+')</span>':'')+'</li>');
+      var who=labels?colName(labels[items.indexOf(p)]):p.design;
+      var tail=gets.length?' — dafür: '+esc(gets.join(' · '))+(more>0?' <span class="vgl-twin__less">+ '+more+' weitere</span>':''):(gn.neutral.length?'':' — technisch identisch; der Unterschied ist die Optik');
+      if(gn.neutral.length)tail+=' <span class="vgl-twin__less">'+(gets.length?'· ':'— ')+'Unterschied: '+esc(gn.neutral.slice(0,2).join(' · '))+'</span>';
+      lines.push('<li><b>'+(d>0?'+ '+euro(d):'Gleicher Preis')+'</b> für <b>'+esc(who)+'</b>'+tail+((d>0&&gn.less.length)?' <span class="vgl-twin__less">(ohne '+esc(gn.less.slice(0,3).join(', '))+')</span>':'')+'</li>');
     });
     return lines.join('');
+  }
+  function hlHTML(list){
+    return '<ul class="vgl-ph__hl" aria-label="Das zeichnet dieses Modell aus">'+
+      (list.length?list.map(function(c){return '<li'+(c.best?' class="is-best"':'')+'>'+(c.l?'<span class="vgl-hl__k">'+esc(c.l)+'</span> ':'')+esc(c.t)+'</li>';}).join(''):'<li class="none">Keine Besonderheit gegenüber den anderen Modellen</li>')+
+    '</ul>';
   }
   function renderView(){
     var items=selected.map(function(id){return BY_ID[id];});
     viewCount.textContent='('+items.length+')';
-    if(items.length<2){viewBody.innerHTML='<div class="vgl-empty">'+SCALE+'<b>Mindestens zwei Modelle wählen</b><span>Markieren Sie über „Vergleichen" auf den Produktkarten weitere Anlagen, um sie hier gegenüberzustellen.</span></div>';return;}
+    var back=view.querySelector('[data-vgl="back"]');if(back)back.hidden=!(fromMkl&&window.MTZ_MKL);
+    if(items.length<2){
+      viewBody.innerHTML='<div class="vgl-empty">'+SCALE+'<b>Mindestens zwei Modelle wählen</b><span>Markieren Sie über „Vergleichen" auf den Produktkarten weitere Modelle, um sie hier gegenüberzustellen.</span>'+
+        '<div class="vgl-empty__act">'+(lastCleared?'<button class="vgl-more" type="button" data-vgl="undo-clear">Vergleich wiederherstellen ('+lastCleared.length+')</button>':'')+'<button class="vgl-more" type="button" data-vgl="add">'+IC_PLUS+'Modell wählen</button>'+(mklCount()?'<button class="vgl-more" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste wählen ('+mklCount()+')</button>':'')+'</div></div>';
+      return;
+    }
     var onlyDiff=diffCb.checked;
     var an=analyze(items);
     var total=an.diffs.length+an.sames.length;
     var detailCount=ROWS.filter(function(r){return !r.group&&!r.imp;}).length;
     var hl=highlights(items,an);
+    var labels=colLabels(items);
     var minPrice=Math.min.apply(null,items.map(function(p){return typeof p.price==='number'?p.price:Infinity;}));
     var addCol=items.length<MAX;                               /* Baymard: let users add from inside the comparison */
     diffN.textContent='('+an.diffs.length+')';
@@ -488,7 +563,7 @@
     /* ---- Summary strip: similarity verdict + jump chips to the differing rows ---- */
     var sum='<div class="vgl-sum">';
     if(an.diffs.length===0){
-      sum+='<div class="vgl-sum__txt vgl-sum__txt--same">'+IC_OK+'<span>In allen <b>'+total+'</b> verglichenen Merkmalen identisch — '+LENS.twinHint+'.</span></div>';
+      sum+='<h3 class="vgl-sum__txt vgl-sum__txt--same">'+IC_OK+'<span>In allen <b>'+total+'</b> verglichenen Merkmalen identisch — '+LENS.twinHint+'.</span></h3>';
     }else{
       var verdict;
       if(an.twin){
@@ -500,11 +575,12 @@
       }else{
         verdict='<b>'+an.diffs.length+' von '+total+'</b> Merkmalen unterscheiden sich.';
       }
-      sum+='<div class="vgl-sum__txt">'+IC_INFO+'<span>'+verdict+'</span></div>';
+      sum+='<h3 class="vgl-sum__txt">'+IC_INFO+'<span>'+verdict+'</span></h3>';
       var chips=an.diffs.slice().sort(function(a,b){return an.twin?(['design','namensschild','colors','price'].indexOf(a.row.key)-['design','namensschild','colors','price'].indexOf(b.row.key)):((b.row.imp?1:0)-(a.row.imp?1:0));});
-      sum+='<div class="vgl-sum__chips" aria-label="Zu den Unterschieden springen">';
-      chips.slice(0,8).forEach(function(d){sum+='<button type="button" class="vgl-chip" data-jump="'+d.row.key+'">'+esc(d.row.label)+'</button>';});
-      if(chips.length>8)sum+='<span class="vgl-chip vgl-chip--more">+'+(chips.length-8)+' weitere</span>';
+      var LIM=8,shown=chipsAll?chips:chips.slice(0,LIM);
+      sum+='<div class="vgl-sum__chips" role="group" aria-label="Zu den Unterschieden springen">';
+      shown.forEach(function(d){sum+='<button type="button" class="vgl-chip" data-jump="'+d.row.key+'">'+esc(d.row.label)+'</button>';});
+      if(chips.length>LIM)sum+='<button type="button" class="vgl-chip vgl-chip--more" data-vgl="morechips" aria-expanded="'+chipsAll+'">'+(chipsAll?'Weniger':'+ '+(chips.length-LIM)+' weitere')+'</button>';
       sum+='</div>';
     }
     guards.forEach(function(x){sum+='<div class="vgl-guard vgl-guard--'+x.type+'">'+(x.type==='warn'?IC_LIMIT:IC_INFO)+'<span>'+x.text+'</span></div>';});
@@ -516,7 +592,7 @@
     if(an.diffs.length&&(an.twin||an.ratio>=0.6||samePrice)&&!noDelta){   /* equal price = "what do I get for it" matters most */
       var alts=an.twin?alternatives(items):[];
       twin='<div class="vgl-twin'+(alts.length?'':' vgl-twin--single')+'">'+
-        '<section class="vgl-twin__col"><h3 class="vgl-twin__h">'+(samePrice?'Gleicher Preis — das unterscheidet die Ausstattung':'Was der Aufpreis bringt')+'</h3><ul class="vgl-twin__list">'+valueStatement(items)+'</ul>'+
+        '<section class="vgl-twin__col"><h3 class="vgl-twin__h">'+(samePrice?'Gleicher Preis — das unterscheidet die Ausstattung':'Was der Aufpreis bringt')+'</h3><ul class="vgl-twin__list">'+valueStatement(items,labels)+'</ul>'+
           '<p class="vgl-twin__note">'+LENS.configNote+'</p></section>'+
         (alts.length?'<section class="vgl-twin__col vgl-twin__col--alt"><h3 class="vgl-twin__h">Alternativen mit echtem Unterschied</h3><ul class="vgl-alts">'+
           alts.map(function(o){var nm=shortName(o.p);return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt=""></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(nm.main)+(o.p.design!=='–'&&o.p.design!==nm.main?' <span>'+esc(o.p.design)+'</span>':'')+'</div><div class="vgl-alt__why">'+o.why.map(function(w){return '<span><em>'+esc(w.l)+':</em> '+esc(w.v)+'</span>';}).join('')+'</div><div class="vgl-alt__foot"><b>ab '+euro(o.p.price)+'</b><button type="button" class="vgl-alt__add" data-alt="'+o.p.id+'"'+(isFull()?' disabled':'')+'>'+IC_PLUS+'Zum Vergleich</button></div></div></li>';}).join('')+
@@ -530,40 +606,43 @@
     var emptyCells=items.map(function(){return '<td></td>';}).join('')+(addCol?'<td class="vgl-addcell"></td>':'');
     var thead='<thead><tr><th class="rh" scope="col"><span class="vgl-visually-hidden">Merkmal</span></th>';
     items.forEach(function(p,i){
-      var nm=shortName(p);
+      var nm=labels[i];
       thead+='<th class="vgl-ph" scope="col">'+
-        '<div class="vgl-ph__media"><button class="vgl-ph__rm" type="button" data-rm="'+p.id+'" aria-label="'+esc(p.name)+' entfernen">×</button><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"></div>'+
-        '<div class="vgl-ph__name" title="'+esc(p.name)+'">'+esc(nm.main)+'</div>'+
+        '<div class="vgl-ph__media"><button class="vgl-ph__rm" type="button" data-rm="'+p.id+'" aria-label="'+esc(colName(nm))+' aus dem Vergleich entfernen">'+IC_X+'</button><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"></div>'+
+        '<div class="vgl-ph__name" title="'+esc(p.name)+'">'+esc(nm.main)+(nm.dx?' <span class="vgl-ph__dx">'+esc(nm.dx)+'</span>':'')+'</div>'+
         '<div class="vgl-ph__sub">'+(nm.sub?esc(nm.sub):'&nbsp;')+'</div>'+
-        '<div class="vgl-ph__price">ab '+euro(p.price)+(p.uvp?'<small class="uvp">UVP '+euro(p.uvp)+'</small>':'<small>&nbsp;</small>')+'</div>'+
-        '<ul class="vgl-ph__hl" aria-label="Das zeichnet dieses Modell aus">'+
-          (hl[i].length?hl[i].map(function(c){return '<li'+(c.best?' class="is-best"':'')+'>'+(c.l?'<span class="vgl-hl__k">'+esc(c.l)+'</span>':'')+esc(c.t)+'</li>';}).join(''):'<li class="none">Keine Alleinstellung in den Kernmerkmalen</li>')+
-        '</ul>'+
+        '<div class="vgl-ph__price">ab '+euro(p.price)+(p.uvp?'<small class="uvp">UVP '+euro(p.uvp)+'</small>':'')+'</div>'+
         '<button class="btn btn--primary" type="button" data-go>'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</button></th>';
     });
-    if(addCol)thead+='<th class="vgl-ph vgl-ph--add" scope="col"><button class="vgl-add" type="button" data-vgl="add">'+IC_PLUS+'<b>Modell hinzufügen</b><small>bis zu '+MAX+' Modelle vergleichbar</small></button></th>';
+    var nMkl=addCol?mklCount():0;
+    if(addCol)thead+='<th class="vgl-ph vgl-ph--add" scope="col"><button class="vgl-add" type="button" data-vgl="add" title="Bis zu '+MAX+' Modelle vergleichbar">'+IC_PLUS+'<b>Modell hinzufügen</b><small>noch '+(MAX-items.length)+' möglich</small></button>'+(nMkl?'<button class="vgl-add__mkl" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+'</th>';
     thead+='</tr></thead>';
-    var tbody='<tbody>',curG=null,gRows='',any=false;
+    /* "Auf einen Blick" is the first row group of the body — the sticky header stays short (media · name · price · CTA) */
+    var tbody='<tbody><tr class="vgl-group"><th class="rh" scope="rowgroup">Auf einen Blick</th>'+emptyCells+'</tr>'+
+      '<tr class="vgl-glance" data-key="glance" tabindex="-1"><th class="rh" scope="row"><span class="rh__l">Das zeichnet das Modell aus</span></th>'+
+      items.map(function(p,i){return '<td class="vgl-val">'+hlHTML(hl[i])+'</td>';}).join('')+(addCol?'<td class="vgl-addcell"></td>':'')+'</tr>';
+    var curG=null,gRows='',any=false;
     function flush(){if(curG!==null&&gRows!==''){tbody+='<tr class="vgl-group"><th class="rh" scope="rowgroup">'+esc(curG)+'</th>'+emptyCells+'</tr>'+gRows;}gRows='';}
     ROWS.forEach(function(row){
       if(row.group){flush();curG=row.group;return;}
       var vals=items.map(function(p){return cellVal(p,row);});
       var texts=vals.map(function(v){return disp(v,row);});
-      var same=texts.every(function(t){return t===texts[0];});
+      var keys=vals.map(function(v,i){return canon(v,texts[i]);});
+      var same=keys.every(function(t){return t===keys[0];});
       var visible=onlyDiff?!same:(row.imp||detailsOpen);
       if(!visible)return;
       any=true;
       var bi=same?[]:bestIdx(row,vals,texts);
-      var tr='<tr data-key="'+row.key+'" class="'+(same||onlyDiff?'':'is-diff')+'"><th class="rh" scope="row"><span class="rh__l">'+esc(row.label)+'</span>'+(row.hint?'<button class="vgl-i" type="button" aria-label="Erklärung: '+esc(row.label)+'" data-tip="'+esc(row.hint)+'">'+IC_INFO+'</button>':'')+'</th>';
+      var tr='<tr data-key="'+row.key+'" tabindex="-1" class="'+(same||onlyDiff?'':'is-diff')+'"><th class="rh" scope="row"><span class="rh__l">'+esc(row.label)+'</span>'+(row.hint?'<button class="vgl-i" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'<span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+esc(row.hint)+'</span></button>':'')+'</th>';
       items.forEach(function(p,i){var v=vals[i],t=texts[i],na=(t==='–'),isb=bi.indexOf(i)>-1,inner;
-        if(row.swatches){inner=swHTML(p.colors,10);}   /* swatches only — the colour difference is already named in the header highlights */
+        if(row.swatches){inner=swHTML(p.colors,10)+'<span class="vgl-visually-hidden">'+esc((p.colors||[]).map(function(c){return SWL[c]||c;}).join(', ')||'Keine')+'</span>';}   /* swatches + text alternative — the colour difference is named in "Auf einen Blick" */
         else if(row.set){
           var sd=same?{extra:[],missing:[]}:setDiff(row,items,i),arr=v||[];
           inner=(arr.length?'<ul class="vgl-setl">'+arr.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'<span class="vgl-no">Keine</span>')+
             ((sd.extra.length||sd.missing.length)?'<span class="vgl-swn">'+(sd.extra.length?'<b>zusätzlich:</b> '+esc(sd.extra.join(', ')):'')+(sd.extra.length&&sd.missing.length?' · ':'')+(sd.missing.length?'<b>ohne:</b> '+esc(sd.missing.join(', ')):'')+'</span>':'');
         }
         else if(row.bool){inner=v===true?'<span class="vgl-yes">'+CHK+'Ja</span>':(v===false?'<span class="vgl-no">Nein</span>':'<span class="vgl-no">–</span>');}
-        else if(row.key==='price'){inner=esc(t)+((typeof p.price==='number'&&p.price>minPrice&&!same&&!noDelta)?'<span class="vgl-delta" title="Differenz zum günstigsten Modell im Vergleich">+ '+euro(p.price-minPrice)+'</span>':'');}
+        else if(row.key==='price'){inner=esc(t)+((typeof p.price==='number'&&p.price>minPrice&&!same&&!noDelta)?'<span class="vgl-delta" title="Differenz zum niedrigsten Preis im Vergleich">+ '+euro(p.price-minPrice)+'</span>':'');}
         else inner=esc(t);
         if(isb)inner+='<span class="vgl-best">Bestwert</span>';
         tr+='<td class="vgl-val'+(na?' na':'')+(isb?' is-best':'')+'">'+inner+'</td>';});
@@ -579,13 +658,14 @@
     var after='<div class="vgl-aftertable">';
     if(!onlyDiff&&detailCount)after+='<button class="vgl-more" type="button" data-vgl="details" aria-expanded="'+detailsOpen+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'+(detailsOpen?'Weniger anzeigen':'Alle technischen Details anzeigen ('+detailCount+')')+'</button>';
     if(an.sames.length){
-      after+='<details class="vgl-common"'+(onlyDiff?' open':'')+'><summary>Gemeinsamkeiten <span class="cnt">'+an.sames.length+'</span><span class="vgl-common__hint">gilt für alle '+items.length+' Modelle</span></summary><ul class="vgl-commonlist">';
+      after+='<details class="vgl-common"'+(onlyDiff?' open':'')+'><summary><h3 class="vgl-common__h">Gemeinsamkeiten <span class="cnt">'+an.sames.length+'</span></h3><span class="vgl-common__hint">gilt für alle '+items.length+' Modelle</span></summary><ul class="vgl-commonlist">';
       an.sames.forEach(function(s){after+='<li><span class="k">'+esc(s.row.label)+'</span><span class="v">'+esc(panelVal(s.row,[items[0]],[s.texts[0]]))+'</span></li>';});
       after+='</ul></details>';
     }
     after+='</div>';
 
-    viewBody.innerHTML=sum+table+twin+after;   /* products (the look) first, guidance after the short diff table */
+    /* twin: the guidance is the point of that state → directly under the verdict; otherwise products first, guidance after the table */
+    viewBody.innerHTML=sum+(an.twin?twin+table:table+twin)+after;
   }
   function openView(){
     if(selected.length<MIN)return;
@@ -593,11 +673,20 @@
     var an=analyze(selected.map(function(id){return BY_ID[id];}));
     diffCb.checked=(an.ratio>=0.6 && an.diffs.length>0);   /* auto difference-first when highly similar */
     detailsOpen=false;
+    chipsAll=false;lastCleared=null;
     renderView();
-    scrollEl.scrollTop=0;view.classList.remove('is-compact');
-    view.classList.add('is-open');view.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';view.querySelector('[data-vgl="close"]').focus();
+    scrollEl.scrollTop=0;
+    view.classList.add('is-open');view.setAttribute('aria-hidden','false');document.body.classList.add('vgl-overlay');document.body.style.overflow='hidden';view.querySelector('#vglTitle').focus();
   }
-  function closeView(){view.classList.remove('is-open');view.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus&&lastFocus.focus&&document.contains(lastFocus))lastFocus.focus();}
+  function closeView(){
+    if(!view.classList.contains('is-open'))return;
+    closeTip();view.classList.remove('is-open');view.setAttribute('aria-hidden','true');document.body.classList.remove('vgl-overlay');document.body.style.overflow='';
+    if(lastFocus&&lastFocus.focus&&document.contains(lastFocus)&&lastFocus!==document.body)lastFocus.focus();
+    else if(barBtn)barBtn.focus();
+    /* arrived from the Merkliste / a link: the grid is the natural landing, not the page top */
+    if(fromMkl&&compareMode){var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}}
+    fromMkl=false;
+  }
 
   /* =========================================================
      Guided flow tour
@@ -675,7 +764,7 @@
     return selected.length;
   }
   window.MTZ_VGL={
-    compare:function(ids){var n=setSelection(ids);if(!n)return 0;syncAll();if(canCompare())openView();return n;},
+    compare:function(ids){var n=setSelection(ids);if(!n)return 0;fromMkl=true;syncAll();if(canCompare())openView();return n;},
     enterMode:function(){if(!compareMode)enterMode();},
     isMode:function(){return compareMode;}
   };
@@ -685,7 +774,9 @@
     if(!window.MTZ_PRODUCTS)return setTimeout(init,50);
     if(!SRC.length){SRC=window.MTZ_PRODUCTS;SRC.forEach(function(p){if(!BY_ID[p.id])BY_ID[p.id]=LENS.enrich(p);});}
     /* ?vergleich=id,id (share link / Merkliste handover from the other PLP) → preselect + open */
-    var fromUrl=0;try{var qm=/[?&]vergleich=([^&#]+)/.exec(location.search);if(qm)fromUrl=setSelection(decodeURIComponent(qm[1]).split(','));}catch(e){}
+    var fromUrl=0,qm=null,wrongLens=false;
+    try{qm=/[?&]vergleich=([^&#]+)/.exec(location.search);if(qm){fromUrl=setSelection(decodeURIComponent(qm[1]).split(','));wrongLens=!fromUrl;fromMkl=/[?&]von=merkliste\b/.test(location.search);}}catch(e){}
+    if(qm){try{history.replaceState(null,'',location.pathname+(/[?&]merkliste=demo\b/.test(location.search)?'?merkliste=demo':'')+location.hash);}catch(e){}}   /* the session carries the state — a reload must not reopen or re-toast */
     compareMode = selected.length>0;   /* restore mode if a selection persisted across reload */
     if(compareMode)document.body.classList.add('vgl-mode');
     buildChrome(); buildCoach(); injectBarButton();
@@ -693,6 +784,7 @@
     if(grid){scanCards();new MutationObserver(function(){scanCards();injectBarButton();}).observe(grid,{childList:true});}
     syncAll();
     if(fromUrl>=MIN)openView();
+    else if(wrongLens){var other=(window.MTZ_LENS==='briefkasten')?{page:'index.html',label:'Türsprechanlagen'}:{page:'briefkasten.html',label:'Briefkästen'};setTimeout(function(){toast('Diese Modelle gehören zur Kategorie '+other.label+' — der Vergleich öffnet sich dort.','info',{label:'Dort öffnen',fn:function(){location.href=other.page+'?vergleich='+encodeURIComponent(decodeURIComponent(qm[1]))+(fromMkl?'&von=merkliste':'');}});},300);}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
