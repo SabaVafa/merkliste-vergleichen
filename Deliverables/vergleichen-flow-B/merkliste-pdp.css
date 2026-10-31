@@ -1,0 +1,91 @@
+/* ============================================================
+   Metzler — Merkliste on the product detail page (Version B prototype)
+   Spec: Deliverables/07a_PDP-Merkliste_Flow_UX.md (flow) +
+         Deliverables/07b_PDP-Merkliste_Interface_Design.md (interface)
+   Loads after merkliste.css on pdp/index.html only. Classes mkl-pdp-*.
+   ============================================================ */
+
+/* ---- Token aliases: the PDP's styles-v2 copy only defines --color-*; map the
+   short names used by merkliste.css to them (references, no raw values) ---- */
+:root{
+  --teal:var(--color-teal);--teal-600:var(--color-teal-600);--teal-100:var(--color-teal-100);
+  --teal-5:rgba(1,82,83,.05);--teal-10:rgba(1,82,83,.1);
+  --teal-mint:var(--color-mint);--schwarz:var(--color-digital-black);--white:var(--color-white);
+  --paper-white:var(--color-paper);--graphite-100:var(--color-graphite-100);--graphite-200:var(--color-graphite-200);
+  --graphite-300:var(--color-graphite-300);--graphite-500:var(--color-graphite-500);
+  --green:var(--color-green);--red-default:var(--color-red-600);
+  --text-muted:#6A6A6A;--sp-2:.5rem;--sp-3:.75rem;--sp-4:1rem;--sp-5:1.25rem;--r-s:.125rem;--r-m:.25rem;--r-l:.5rem;--r-pill:9999px;
+}
+
+/* ---- Secondary row directly under the buy row (#bCheckout stacks with gap 1.6rem → pull up to .75rem) ---- */
+.mkl-pdp-row{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-2) var(--sp-4);margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
+.mkl-pdp-row[hidden]{display:none}
+
+/* ---- Merken control: ghost button, bookmark glyph + label ---- */
+.mkl-pdp-save{position:relative;display:inline-flex;align-items:center;gap:var(--sp-2);height:2.75rem;min-height:2.75rem;padding:0 var(--sp-4) 0 var(--sp-3);border:.0625rem solid var(--graphite-300);border-radius:var(--r-m);background:var(--white);color:var(--schwarz);font-family:inherit;font-size:.875rem;font-weight:600;line-height:1;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s,color .15s}
+.mkl-pdp-save__glyph{display:flex;width:1.5rem;height:1.5rem;flex-shrink:0;transition:transform .12s}
+.mkl-pdp-save svg{width:1.5rem;height:1.5rem;display:block}
+.mkl-pdp-save svg path{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linejoin:round;transition:fill .15s}
+.mkl-pdp-save__label{min-width:3.5rem;text-align:left}
+.mkl-pdp-save:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-5)}
+.mkl-pdp-save:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem}
+.mkl-pdp-save.is-pressed .mkl-pdp-save__glyph{transform:scale(.9)}
+.mkl-pdp-save.is-on{border-color:var(--teal);color:var(--teal)}
+.mkl-pdp-save.is-on svg path{fill:currentColor}
+.mkl-pdp-save.is-on:hover{background:var(--teal-5)}
+.mkl-pdp-save.is-limit{color:var(--text-muted);border-color:var(--graphite-300);background:var(--white);opacity:.6;cursor:not-allowed}
+
+/* confirmation line next to the control (wraps under it on narrow widths) */
+.mkl-pdp-note{margin:0;flex:1 1 12rem;min-width:0;font-size:.75rem;line-height:1.45;color:var(--text-muted);opacity:0;transition:opacity .15s}
+.mkl-pdp-note:not([hidden]){opacity:1}
+.mkl-pdp-note[hidden]{display:none}
+.mkl-pdp-note a{display:inline-block;padding:.5rem 0;margin:-.5rem 0;color:var(--teal);font-weight:600;text-decoration:underline}
+.mkl-pdp-note a:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem;border-radius:var(--r-s)}
+/* "changed since bookmarking" caption (Z5) */
+.mkl-pdp-changed{flex-basis:100%;margin:0;font-size:.75rem;line-height:1.45;color:var(--text-muted)}
+.mkl-pdp-changed[hidden]{display:none}
+
+/* ---- On-arrival band: first child of .pdp-price--lead, explains the pre-filled price ---- */
+.mkl-pdp-band{align-self:stretch;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:var(--sp-3);margin:0 0 var(--sp-3);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-m);background:var(--teal-100);color:var(--schwarz);outline:none;transition:opacity .15s}
+.mkl-pdp-band.is-leaving{opacity:0}
+.mkl-pdp-band:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem}
+.mkl-pdp-band__glyph{display:flex;width:1.25rem;height:1.25rem;color:var(--teal)}
+.mkl-pdp-band__glyph svg{width:1.25rem;height:1.25rem}
+.mkl-pdp-band__glyph svg path{fill:currentColor;stroke:currentColor;stroke-width:1.75;stroke-linejoin:round}
+.mkl-pdp-band__text{display:flex;flex-direction:column;gap:.125rem;min-width:0}
+.mkl-pdp-band__title{font-size:.875rem;font-weight:700;line-height:1.35}
+.mkl-pdp-band__sub{font-size:.75rem;line-height:1.4;color:var(--text-muted);overflow-wrap:anywhere}
+.mkl-pdp-band__sub b{font-weight:600;color:var(--schwarz)}
+.mkl-pdp-band__act{min-height:2.75rem;margin:-.5rem 0;padding:0 var(--sp-2);border:0;background:none;color:var(--teal);font-family:inherit;font-size:.875rem;font-weight:600;text-decoration:underline;white-space:nowrap;cursor:pointer}
+.mkl-pdp-band__act:hover{color:var(--teal-600)}
+.mkl-pdp-band__act:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem;border-radius:var(--r-s)}
+.mkl-pdp-band__x{width:2.75rem;height:2.75rem;margin:-.5rem -.5rem -.5rem 0;border:0;background:none;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:var(--r-pill)}
+.mkl-pdp-band__x svg{width:1.125rem;height:1.125rem}
+.mkl-pdp-band__x:hover{color:var(--schwarz);background:rgba(1,82,83,.08)}
+.mkl-pdp-band__x:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem}
+@media(max-width:47.99rem){
+  .mkl-pdp-band{grid-template-columns:auto minmax(0,1fr) auto}
+  .mkl-pdp-band__act{grid-column:2;justify-self:start;margin:0 0 -.5rem -.5rem}
+}
+
+/* ---- Sticky-bar echo: icon-only 2.75rem square, label for screen readers ---- */
+.mkl-pdp-save--icon{width:2.75rem;padding:0;justify-content:center;gap:0}
+.mkl-pdp-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;min-width:0}
+#pdpStickyBar .mkl-pdp-bar{margin-left:auto;flex-shrink:0}
+#pdpStickyBar .pdp-stickybar__details{margin-left:0}
+@media(max-width:56.25rem){#pdpStickyBar .mkl-pdp-bar{margin-left:0}}
+@media(max-width:29.99rem){#pdpStickyBar .pdp-stickybar__thumb{display:none}}
+
+/* ---- Toast: above the sticky bar while it is visible (page level; inside the drawer the 06 rule applies) ---- */
+.mkl-toast{transition:opacity .2s,transform .2s,bottom .2s,visibility 0s linear .2s}
+.mkl-toast.is-pdp-bar{bottom:calc(var(--mkl-pdp-bar-h,4.625rem) + 1rem + env(safe-area-inset-bottom,0px))}
+
+/* ---- Swatch hint after "Neu konfigurieren" (teal halo, not the red validation animation) ---- */
+.pdp-swatches.mkl-pdp-hint{box-shadow:0 0 0 .1875rem var(--teal-100);border-radius:var(--r-m);transition:box-shadow .3s}
+
+/* ---- Reduced motion + print ---- */
+@media(prefers-reduced-motion:reduce){
+  .mkl-pdp-save,.mkl-pdp-save__glyph,.mkl-pdp-save svg path,.mkl-pdp-note,.mkl-pdp-band,.mkl-toast,.pdp-swatches.mkl-pdp-hint{transition:none !important;animation:none !important}
+  .mkl-pdp-save.is-pressed .mkl-pdp-save__glyph{transform:none}
+}
+@media print{.mkl-pdp-row,.mkl-pdp-bar{display:none !important}}

@@ -17,6 +17,10 @@
   'use strict';
   var KEY = 'mtz_merkliste', LIMIT = 50, CMP_MAX = 4, CMP_MIN = 2, TOAST_MS = 5000;
   var LENS = window.MTZ_LENS || 'sprechanlage';
+  var BASE = window.MTZ_MKL_BASE || '';                 /* '' on the PLPs, '../' on pdp/index.html — stored paths are relative to vergleichen-flow-B */
+  var PDP_URLS = { colson1: 'pdp/index.html' };         /* products that have a PDP in the prototype */
+  var PDP = (window.MTZ_PDP && window.MTZ_PDP_PRODUCT) ? window.MTZ_PDP_PRODUCT : null;   /* product detail page mode (07a/07b) */
+  function asset(u) { u = String(u || ''); return (/^(https?:|data:|\/|#)/.test(u) || !u) ? u : BASE + u; }
   var LENSES = {
     sprechanlage: { label: 'Türsprechanlagen', page: 'index.html', img: 'Product%20Image/Sprechanlage/video-station.png' },
     briefkasten:  { label: 'Briefkästen',      page: 'briefkasten.html', img: 'Product%20Image/einfamilien-briefkasten.png' }
@@ -43,6 +47,7 @@
   var BY_ID = {};
   function indexProducts() { (window.MTZ_PRODUCTS || []).forEach(function (p) { BY_ID[String(p.id)] = p; }); }
   function konfigOf(p) {
+    if (p.konfig === true) return true;
     var nm = String(p.name || '');
     if (LENS === 'briefkasten') return !/ohne Gravur|Basic/i.test(nm);
     return !!p.briefkasten || p.klingel === 'flex' || /SDM10|modular|Paketbox|Standbriefkast/i.test(nm);
@@ -53,7 +58,7 @@
     return p.img || LENSES[LENS].img;
   }
   function itemFrom(p, cardEl) {
-    return { id: String(p.id), articleId: String(p.id), lens: LENS, name: p.name, url: '#', img: imgOf(p, cardEl), priceFrom: (typeof p.price === 'number' ? p.price : null), uvp: (typeof p.uvp === 'number' ? p.uvp : null), konfig: konfigOf(p), addedAt: new Date().toISOString(), priceAtAdd: (typeof p.price === 'number' ? p.price : null) };
+    return { id: String(p.id), articleId: String(p.id), lens: LENS, name: p.name, url: (PDP_URLS[String(p.id)] || '#'), img: imgOf(p, cardEl), priceFrom: (typeof p.price === 'number' ? p.price : null), uvp: (typeof p.uvp === 'number' ? p.uvp : null), konfig: konfigOf(p), addedAt: new Date().toISOString(), priceAtAdd: (typeof p.price === 'number' ? p.price : null) };
   }
   /* "Modell | Klingeltaster | Zusatz" → bold model line + muted qualifier (mirrors the compare header; Briefkästen: design line first) */
   var MODEL_RE = /^[A-Z]{2,4}\d{2}[A-Z0-9.]*(?:\s[\d.]+)?$/;   /* XDM10 · VDM10 2.0 · SDM10X · ADM10 — a trailing model segment moves to the front */
@@ -111,7 +116,7 @@
       '</div>' +
       '<div class="mkl-body">' +
         '<ul class="mkl-list" role="list"></ul>' +
-        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol — sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">Zurück zu ' + esc(LENSES[LENS].label) + '</button></div>' +
+        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol — sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
       '</div>' +
       '<div class="mkl-foot">' +
         '<p class="mkl-hint">Auf diesem Gerät gespeichert · <a href="#" data-mkl="login">Anmelden</a>, um die Merkliste auf allen Geräten zu nutzen</p>' +
@@ -137,7 +142,16 @@
         if (k === 'login') { e.preventDefault(); toast('Anmelden ist im Prototyp nicht verfügbar — im Shop werden die Artikel nach dem Login zusammengeführt.', 'info'); return; }
       }
       var go = e.target.closest('.mkl-item__cta');
-      if (go) { e.preventDefault(); closeDrawer(); toast(/Konfiguration öffnen/.test(go.textContent) ? 'Gespeicherte Konfiguration öffnen (Prototyp)' : ('Weiter zur ' + (/Konfigurieren/.test(go.textContent) ? 'Konfiguration' : 'Produktseite') + ' — dort Farbe, Namensschild & Gravur wählen (Prototyp)'), 'info'); return; }
+      if (go) {
+        var href = go.getAttribute('href') || '#', row = go.closest('.mkl-item'), rid = row && row.getAttribute('data-id'), rit = rid && byId(rid);
+        if (PDP && rit && rit.articleId === PDP.id) {   /* this product's own entries: no navigation, act in place */
+          e.preventDefault(); closeDrawer();
+          if (rit.configId) { arrive(rit.configId); } else { var sw = document.getElementById('pdpSwatches'); if (sw) { sw.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); hintSwatches(); } }
+          return;
+        }
+        if (href.charAt(0) === '#') { e.preventDefault(); closeDrawer(); toast(/Konfiguration öffnen/.test(go.textContent) ? 'Gespeicherte Konfiguration öffnen (Prototyp)' : ('Weiter zur ' + (/Konfigurieren/.test(go.textContent) ? 'Konfiguration' : 'Produktseite') + ' — dort Farbe, Namensschild & Gravur wählen (Prototyp)'), 'info'); return; }
+        closeDrawer(); return;   /* a real page: let the link navigate */
+      }
       var rm = e.target.closest('.mkl-rm');
       if (rm) { removeFromRow(rm.getAttribute('data-id'), rm); return; }
       var cmp = e.target.closest('.mkl-cmp');
@@ -209,7 +223,7 @@
   function toast(msg, type, action) {
     type = type || 'ok';
     var vt = document.querySelector('.vgl-toast.show'); if (vt) vt.classList.remove('show');   /* a Merkliste toast replaces a compare toast (§5.7) */
-    toastEl.className = 'mkl-toast t-' + type + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : '')));
+    toastEl.className = 'mkl-toast t-' + type + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : ((pdpBarVisible && pdpBarVisible()) ? ' is-pdp-bar' : ''))));
     toastEl.innerHTML = (type === 'limit' ? IC_LIMIT : (type === 'info' ? IC_INFO : IC_OK)) + '<span class="mkl-toast__msg">' + esc(msg) + '</span>' + (action ? '<button class="mkl-toast__act" type="button">' + esc(action.label) + '</button>' : '');
     if (action) toastEl.querySelector('.mkl-toast__act').addEventListener('click', function () { hideToast(); action.fn(); });
     toastEl.classList.add('show');
@@ -266,7 +280,7 @@
     hdrBtn.setAttribute('aria-label', 'Merkliste, ' + n + ' Artikel');
   }
   function pulseBadge() { if (!hdrBadge || reduced()) return; hdrBadge.classList.remove('is-pulse'); void hdrBadge.offsetWidth; hdrBadge.classList.add('is-pulse'); setTimeout(function () { hdrBadge.classList.remove('is-pulse'); }, 220); }
-  function syncAll() { syncHearts(); syncHeader(); if (isOpen) render(); }
+  function syncAll() { syncHearts(); syncHeader(); if (isOpen) render(); if (PDP) syncPdpMarks(); }
 
   /* ---- Mutations ---- */
   function addItem(id, cardEl) {
@@ -281,7 +295,7 @@
     var i = indexOf(id); if (i < 0) return;
     var it = items[i]; items.splice(i, 1); cmpSel = cmpSel.filter(function (x) { return x !== id; }); save(); syncAll();
     live('Entfernt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
-    if (!silent) toast('Aus der Merkliste entfernt', 'ok', { label: 'Rückgängig', fn: function () { restore([{ item: it, index: i }]); } });
+    if (!silent) toast(it.configId ? 'Konfiguration aus der Merkliste entfernt' : 'Aus der Merkliste entfernt', 'ok', { label: 'Rückgängig', fn: function () { restore([{ item: it, index: i }]); } });
   }
   function removeFromRow(id, btn) {
     var row = btn.closest('.mkl-item'), li = row && row.parentNode, next = li && li.nextElementSibling;
@@ -294,6 +308,7 @@
     save(); syncAll(); pulseBadge();
     live('Wiederhergestellt: ' + (entries.length === 1 ? shortName(entries[0].item).main : entries.length + ' Artikel') + '. Merkliste: ' + items.length + ' Artikel');
     if (isOpen) { var b = entries.length === 1 && listEl.querySelector('.mkl-rm[data-id="' + entries[0].item.id.replace(/"/g, '') + '"]'); (b || titleEl).focus(); }
+    else if (PDP && pdpBtn) { var t = (pdpLast === pdpBar && pdpBarVisible && pdpBarVisible()) ? pdpBar : pdpBtn; t.focus({ preventScroll: true }); }
   }
   function clearAll() {
     var snap = items.map(function (it, i) { return { item: it, index: i }; }), n = items.length;
@@ -305,21 +320,22 @@
   /* ---- Drawer rendering ---- */
   function rowHTML(it) {
     var nm = shortName(it), cfg = !!it.configId, cmpId = it.articleId || it.id;
-    var price = (cfg && typeof it.configTotal === 'number') ? 'Gesamt ' + euro(it.configTotal) : (typeof it.priceFrom === 'number' ? 'ab ' + euro(it.priceFrom) : '');
+    var price = (cfg && typeof it.configTotal === 'number') ? 'Gesamt ' + euro(it.configTotal) + ((it.configQty || 1) > 1 ? ' · ' + it.configQty + ' Stück' : '') : (typeof it.priceFrom === 'number' ? 'ab ' + euro(it.priceFrom) : '');
     var uvp = (!cfg && typeof it.uvp === 'number' && it.uvp > (it.priceFrom || 0)) ? '<span class="mkl-item__uvp">UVP ' + euro(it.uvp) + '</span>' : '';
-    var ctaTxt = cfg ? 'Konfiguration öffnen' : (it.konfig ? 'Konfigurieren' : 'Zum Produkt');
-    var ctaHref = cfg ? '#konfigurator?configId=' + encodeURIComponent(it.configId) : (it.konfig ? '#konfigurator' : (it.url && it.url !== '#' ? it.url : '#produkt'));
+    var ctaTxt = cfg ? (it.configExpired ? 'Konfigurieren' : 'Konfiguration öffnen') : (it.konfig ? 'Konfigurieren' : 'Zum Produkt');
+    var ctaHref = cfg ? (it.url && it.url !== '#' ? asset(it.url) : '#konfigurator?configId=' + encodeURIComponent(it.configId)) : (it.url && it.url !== '#' ? asset(it.url) : (it.konfig ? '#konfigurator' : '#produkt'));
+    var openStep = cfg && !it.configExpired && it.configComplete === false ? cfgOpenStep(it.configState) : null;
     var cfgHtml = '';
     if (cfg) {
       var lines = (it.configSummary || []).slice(0, 3).map(function (l) { return esc(l.label) + ': ' + esc(l.value); });
       cfgHtml = (lines.length ? '<p class="mkl-item__cfg">' + lines.join(' · ') + '</p>' : '') +
-        (it.configExpired ? '<p class="mkl-item__expired">Konfiguration abgelaufen — Details siehe Zusammenfassung</p>' : '');
+        (it.configExpired ? '<p class="mkl-item__expired">Konfiguration abgelaufen — Details siehe Zusammenfassung</p>' : (openStep ? '<p class="mkl-item__expired">Noch nicht vollständig — ' + esc(openStep) + ' offen</p>' : ''));
     }
     var avail = it.availability ? '<span class="mkl-item__avail">' + esc(it.availability) + '</span>' : '';
     return '<li><article class="mkl-item' + (cfg ? ' mkl-item--cfg' : '') + '" data-id="' + esc(it.id) + '" data-lens="' + esc(it.lens) + '">' +
-      '<div class="mkl-item__media"><img src="' + esc(it.img) + '" alt=""></div>' +
+      '<div class="mkl-item__media"><img src="' + esc(asset(it.img)) + '" alt=""></div>' +
       '<div class="mkl-item__text">' +
-        (cfg ? '<span class="mkl-item__tag">Ihre Konfiguration' + (it.addedAt ? ' · ' + esc(fmtDate(it.addedAt)) : '') + '</span>' : '') +
+        (cfg ? '<span class="mkl-item__tag">Ihre Konfiguration' + (it.updatedAt ? ' · aktualisiert ' + esc(fmtDate(it.updatedAt)) : (it.addedAt ? ' · ' + esc(fmtDate(it.addedAt)) : '')) + '</span>' : '') +
         '<div class="mkl-item__name">' + esc(nm.main) + '</div>' +
         (nm.sub ? '<div class="mkl-item__sub">' + esc(nm.sub) + '</div>' : '') +
         (price ? '<div class="mkl-item__price">' + esc(price) + uvp + '</div>' : '') +
@@ -388,8 +404,154 @@
     } else {
       var page = (LENSES[lens] || LENSES[LENS]).page;
       live('Öffnet den Vergleich auf der Seite ' + (LENSES[lens] || LENSES[LENS]).label);
-      location.href = page + '?vergleich=' + encodeURIComponent(ids.join(',')) + '&von=merkliste';
+      location.href = BASE + page + '?vergleich=' + encodeURIComponent(ids.join(',')) + '&von=merkliste';
     }
+  }
+
+  /* =====================================================================
+     Product detail page (07a flow + 07b interface)
+     One toggle, two instances (ghost button under the buy row, icon echo
+     in the sticky bar). Below a chosen colour the page state is the
+     configuration: colour article + options + quantity + total. "Gemerkt"
+     = a saved build with the same hash exists; a changed build updates the
+     session's entry instead of duplicating; ?merkliste=<configId> restores
+     a saved build through the configurator's own controls and shows a band.
+     ===================================================================== */
+  var pdpRow, pdpBtn, pdpBar, pdpNote, pdpChanged, pdpBand, pdpLast = null, pdpBarVisible = null, bandCfgId = null;
+  var SKEY = 'mtz_mkl_pdp';
+  function cfgOfSession() { try { return JSON.parse(sessionStorage.getItem(SKEY) || '{}'); } catch (e) { return {}; } }
+  function setCfgOfSession(variant, id) { try { var m = cfgOfSession(); m[variant] = id; sessionStorage.setItem(SKEY, JSON.stringify(m)); } catch (e) {} }
+  function djb2(str) { var hh = 5381; for (var i = 0; i < str.length; i++) hh = ((hh << 5) + hh + str.charCodeAt(i)) | 0; return (hh >>> 0).toString(16); }
+  function cfgHash(sn) {
+    var innen = Object.keys(sn.innen || {}).sort().map(function (k) { return [k, sn.innen[k].qty || 1]; });
+    var extras = Object.keys(sn.extras || {}).sort().map(function (k) { return [k, sn.extras[k].qty || 1]; });
+    return djb2(JSON.stringify({ a: sn.article, r: sn.ral && sn.ral.code, an: sn.anschluss, g: sn.gravurOn ? [String(sn.gravurText || '').trim(), sn.font] : null, i: innen, s: sn.strom ? [sn.strom.name, sn.strom.qty || 1] : null, x: extras, q: sn.mainQty || 1 }));
+  }
+  function cfgOpenStep(st) { if (!st) return null; if (st.needsRal) return 'RAL-Ton'; if (!st.anschluss) return 'Anschluss'; if (st.gravurOn && !String(st.gravurText || '').trim()) return 'Gravurtext'; return null; }
+  function pdpSnap() { return window.MTZ_PDP.snapshot(); }
+  function pdpSummary(sn) {
+    var lines = window.MTZ_PDP.summary().map(function (l) { return { label: l.label, value: l.value }; });
+    if (sn.needsRal) lines.forEach(function (l) { if (l.label === 'Farbe') l.value = 'Wunschfarbe nach RAL · Ton noch zu wählen'; });
+    if (!sn.anschluss) lines.splice(1, 0, { label: 'Anschluss', value: 'noch zu wählen' });
+    return lines;
+  }
+  function pdpVariantImg() { var src = String(window.MTZ_PDP.image() || ''); return /^(https?:|data:|\/)/.test(src) ? src : 'pdp/' + encodeURI(src); }
+  function cfgItemFor(sn) {
+    return { articleId: PDP.id, variantArticleNo: sn.article, lens: LENS, name: PDP.name, img: pdpVariantImg(), priceFrom: PDP.price, uvp: PDP.uvp, konfig: true,
+      configSummary: pdpSummary(sn), configTotal: sn.total, configQty: sn.mainQty || 1, configState: sn, configHash: cfgHash(sn), configComplete: !!sn.complete, configExpired: false };
+  }
+  function findCfgByHash(hh) { for (var i = 0; i < items.length; i++) if (items[i].configId && items[i].configHash === hh && items[i].articleId === PDP.id && !items[i].configExpired) return items[i]; return null; }
+  /* Z-state of the page (07a §2) */
+  function pdpState() {
+    var sn = pdpSnap();
+    if (!sn.finish) return { s1: false, on: has(PDP.id), sn: sn, changed: false };
+    var hh = cfgHash(sn), hit = findCfgByHash(hh), sess = cfgOfSession()[sn.article] || null, sessItem = sess ? byId('cfg:' + sess) : null;
+    return { s1: true, on: !!hit, hit: hit, sn: sn, hash: hh, sessId: sessItem ? sess : null, changed: !hit && !!sessItem };
+  }
+  function pdpBtnHTML(extra, iconOnly) {
+    return '<button class="mkl-pdp-save' + (extra || '') + '" type="button" aria-pressed="false"><span class="mkl-pdp-save__glyph" aria-hidden="true">' + HEART + '</span><span class="mkl-pdp-save__label' + (iconOnly ? ' mkl-pdp-sr' : '') + '">Merken</span></button>';
+  }
+  function pressPdp(btn) {
+    pdpLast = btn;
+    if (!reduced()) { btn.classList.add('is-pressed'); setTimeout(function () { btn.classList.remove('is-pressed'); }, 120); }
+    var st = pdpState();
+    if (!st.s1) { if (st.on) removeItem(PDP.id); else addItem(PDP.id, null); return; }
+    if (st.on) { removeItem(st.hit.id); return; }
+    if (st.changed) updateConfig(st.sessId, st.sn); else addConfig(st.sn);
+  }
+  function addConfig(sn) {
+    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ') — bitte zuerst einen Artikel entfernen'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }); live(m); return; }
+    var it = cfgItemFor(sn), cid = 'c-' + (sn.article || 'x') + '-' + Math.random().toString(36).slice(2, 8);
+    it.id = 'cfg:' + cid; it.configId = cid; it.url = 'pdp/index.html?merkliste=' + cid; it.addedAt = new Date().toISOString(); it.priceAtAdd = sn.total;
+    var mi = indexOf(PDP.id); if (mi > -1) items.splice(mi + 1, 0, it); else items.push(it);   /* the build sits right behind its model row */
+    setCfgOfSession(sn.article, cid);
+    save(); syncAll(); pulseBadge();
+    live('Konfiguration gemerkt: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total) + '. Merkliste: ' + items.length + ' Artikel');
+    toast('Konfiguration gemerkt' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer });
+  }
+  function updateConfig(cid, sn) {
+    var it = byId('cfg:' + cid); if (!it) { addConfig(sn); return; }
+    var fresh = cfgItemFor(sn);
+    ['variantArticleNo', 'img', 'configSummary', 'configTotal', 'configQty', 'configState', 'configHash', 'configComplete'].forEach(function (k) { it[k] = fresh[k]; });
+    it.updatedAt = new Date().toISOString(); it.configExpired = false;
+    save(); syncAll();   /* no badge pulse: the count is unchanged */
+    live('Konfiguration aktualisiert: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total));
+    toast('Konfiguration aktualisiert' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer });
+  }
+  function syncPdpMarks() {
+    if (!PDP || !pdpBtn || !window.MTZ_PDP) return;
+    var st = pdpState(), nm = shortName({ name: PDP.name, lens: LENS }).main, colour = st.sn.finishText || '';
+    var label = st.s1 ? (st.on ? 'Konfiguration gemerkt' : 'Konfiguration merken') : (st.on ? 'Gemerkt' : 'Merken');
+    var aria = st.s1 ? (st.on ? 'Konfiguration aus der Merkliste entfernen: ' + nm + ', ' + colour : 'Konfiguration merken: ' + nm + ', ' + colour) : (st.on ? nm + ' aus der Merkliste entfernen' : nm + ' merken');
+    var title = st.on ? (st.s1 ? 'Konfiguration gemerkt — aus der Merkliste entfernen' : 'Gemerkt — aus der Merkliste entfernen') : (st.s1 ? 'Konfiguration merken' : 'Merken');
+    var lim = !st.on && !st.changed && isFull();
+    [pdpBtn, pdpBar].forEach(function (b) {
+      if (!b) return;
+      b.classList.toggle('is-on', st.on); b.setAttribute('aria-pressed', st.on ? 'true' : 'false'); b.setAttribute('aria-label', aria); b.setAttribute('title', title);
+      b.querySelector('.mkl-pdp-save__label').textContent = label;
+      b.classList.toggle('is-limit', lim); if (lim) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
+    });
+    pdpNote.hidden = !st.on; pdpNote.firstChild.nodeValue = (st.s1 ? 'Konfiguration gemerkt' : 'Gemerkt') + ' · ';
+    pdpChanged.hidden = !st.changed;
+    if (pdpBand && !(st.on && st.hit && st.hit.configId === bandCfgId)) removeBand();   /* the band describes the restored build; the first change turns it into the caption */
+  }
+  function hintSwatches() { var sw = document.getElementById('pdpSwatches'); if (!sw) return; sw.classList.add('mkl-pdp-hint'); setTimeout(function () { sw.classList.remove('mkl-pdp-hint'); }, 1400); }
+  function removeBand() { if (!pdpBand) return; var b = pdpBand; pdpBand = null; bandCfgId = null; if (reduced()) { b.remove(); } else { b.classList.add('is-leaving'); setTimeout(function () { b.remove(); }, 160); } }
+  function resetConfig() { removeBand(); window.MTZ_PDP.reset(); var sw = document.getElementById('pdpSwatches'); if (sw) sw.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); hintSwatches(); syncPdpMarks(); if (pdpBtn) pdpBtn.focus({ preventScroll: true }); }
+  /* arrival via ?merkliste=<configId> or "Konfiguration öffnen" in the drawer on this page */
+  function arrive(cid) {
+    try { var q = location.search.replace(/([?&])merkliste=[^&#]*(&|$)/, function (m0, a, b) { return b ? a : ''; }).replace(/[?&]$/, ''); history.replaceState(null, '', location.pathname + q + location.hash); } catch (e) {}
+    var it = byId('cfg:' + cid);
+    if (!it || !it.configState) { setTimeout(function () { toast('Diese Konfiguration ist auf diesem Gerät nicht gespeichert', 'info', { label: 'Zur Merkliste', fn: openDrawer }); }, 300); return; }
+    removeBand();
+    var missing = window.MTZ_PDP.restore(it.configState) || [];
+    var sn = pdpSnap(), colourGone = !!it.configState.article && sn.article !== it.configState.article;
+    if (colourGone) { it.configExpired = true; save(); } else { setCfgOfSession(sn.article, cid); it.configExpired = false; }
+    var lines = (it.configSummary || []).slice(0, 3).map(function (l) { return esc(l.label) + ': ' + esc(l.value); }), more = (it.configSummary || []).length - lines.length;
+    var notes = [];
+    if (colourGone) notes.push('Diese Farbe ist nicht mehr verfügbar — bitte wählen Sie eine Farbe.');
+    if (missing.length) notes.push('Nicht mehr verfügbar: ' + esc(missing.join(', ')) + ' — bitte neu wählen');
+    var open = colourGone ? null : window.MTZ_PDP.firstOpen(); if (open) notes.push('Noch offen: ' + esc(open));
+    if (!colourGone && typeof it.configTotal === 'number' && Math.abs(sn.total - it.configTotal) > 0.004) notes.push('Preis aktualisiert: ' + euro(it.configTotal) + ' → ' + euro(sn.total));
+    var title = colourGone ? 'Konfiguration abgelaufen — Zusammenfassung siehe Merkliste' : 'Gespeicherte Konfiguration vom ' + fmtDate(it.updatedAt || it.addedAt);
+    pdpBand = h('<div class="mkl-pdp-band" id="mklPdpBand" role="status" tabindex="-1">' +
+      '<span class="mkl-pdp-band__glyph" aria-hidden="true">' + HEART + '</span>' +
+      '<div class="mkl-pdp-band__text"><span class="mkl-pdp-band__title">' + title + '</span>' +
+        '<span class="mkl-pdp-band__sub"><b>Gesamt ' + euro(it.configTotal) + '</b>' + (lines.length ? ' · ' + lines.join(' · ') : '') + (more > 0 ? ' · + ' + more + ' weitere' : '') + '</span>' +
+        (notes.length ? '<span class="mkl-pdp-band__sub">' + notes.join(' · ') + '</span>' : '') + '</div>' +
+      '<button class="mkl-pdp-band__act" type="button" data-mkl="reconfigure">' + (colourGone ? 'Farbe wählen' : 'Neu konfigurieren') + '</button>' +
+      '<button class="mkl-pdp-band__x" type="button" aria-label="Hinweis schließen">' + IC_X + '</button></div>');
+    bandCfgId = colourGone ? null : cid;
+    var lead = document.querySelector('.pdp-price--lead') || document.querySelector('.pdp-buybox');
+    if (lead) { lead.insertBefore(pdpBand, lead.firstChild); lead.style.scrollMarginTop = '6rem'; }
+    pdpBand.querySelector('[data-mkl="reconfigure"]').addEventListener('click', function () { if (colourGone) { removeBand(); var sw = document.getElementById('pdpSwatches'); if (sw) { sw.scrollIntoView({ behavior: 'smooth', block: 'center' }); hintSwatches(); var f = sw.querySelector('.pdp-swatch'); if (f) f.focus({ preventScroll: true }); } } else resetConfig(); });
+    pdpBand.querySelector('.mkl-pdp-band__x').addEventListener('click', function () { removeBand(); if (pdpBtn) pdpBtn.focus({ preventScroll: true }); });
+    if (open && !colourGone) window.MTZ_PDP.openFirst();
+    syncPdpMarks();
+    setTimeout(function () { if (lead) try { window.scrollTo({ top: Math.max(0, lead.getBoundingClientRect().top + window.pageYOffset - 96), behavior: reduced() ? 'auto' : 'smooth' }); } catch (e) {} if (pdpBand) pdpBand.focus({ preventScroll: true }); }, 350);   /* after the configurator has unfolded */
+  }
+  function initPdp() {
+    var buy = document.querySelector('#bCheckout .cfgb-buyrow'); if (!buy) return;
+    pdpRow = h('<div class="mkl-pdp-row" id="mklPdpRow">' + pdpBtnHTML('', false) +
+      '<p class="mkl-pdp-note" id="mklPdpNote" hidden>Gemerkt · <a href="#merkliste">Zur Merkliste</a></p>' +
+      '<p class="mkl-pdp-changed" id="mklPdpChanged" hidden>Geändert seit dem Merken — erneut merken, um zu aktualisieren</p></div>');
+    buy.insertAdjacentElement('afterend', pdpRow);
+    pdpBtn = pdpRow.querySelector('.mkl-pdp-save'); pdpNote = pdpRow.querySelector('.mkl-pdp-note'); pdpChanged = pdpRow.querySelector('.mkl-pdp-changed');
+    pdpBtn.addEventListener('click', function () { pressPdp(pdpBtn); });
+    pdpNote.querySelector('a').addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
+    var details = document.getElementById('bStickyDetails');
+    if (details) { pdpBar = h(pdpBtnHTML(' mkl-pdp-save--icon mkl-pdp-bar', true)); details.insertAdjacentElement('beforebegin', pdpBar); pdpBar.addEventListener('click', function () { pressPdp(pdpBar); }); }
+    var bar = document.getElementById('pdpStickyBar');
+    if (bar) {
+      pdpBarVisible = function () { return bar.classList.contains('is-visible') && !document.body.classList.contains('cfg-sheet-open'); };
+      var updBar = function () { document.documentElement.style.setProperty('--mkl-pdp-bar-h', (bar.offsetHeight / 16) + 'rem'); if (toastEl.classList.contains('show') && !isOpen) toastEl.classList.toggle('is-pdp-bar', pdpBarVisible()); };
+      if (window.MutationObserver) new MutationObserver(updBar).observe(bar, { attributes: true, attributeFilter: ['class'] });
+      updBar();
+    }
+    document.addEventListener('mtz:pdp-change', syncPdpMarks);
+    var m = /[?&]merkliste=([^&#]+)/.exec(QS), cid = m && decodeURIComponent(m[1]);
+    syncPdpMarks();
+    if (cid && cid !== 'demo') setTimeout(function () { arrive(cid); }, 50);
   }
 
   /* ---- Demo seed: a configured build (spec §3.2 / checklist 8) via ?merkliste=demo or window.MTZ_MKL.seedDemoConfig() ---- */
@@ -404,6 +566,10 @@
 
   /* ---- Init ---- */
   function init() {
+    if (PDP && !window.MTZ_PRODUCTS) {   /* product detail page: one product, described by the page */
+      PDP.name = PDP.name || window.MTZ_PDP.name(); PDP.img = PDP.img || ('pdp/' + encodeURI(window.MTZ_PDP.image() || '')); PDP.lens = PDP.lens || LENS;
+      window.MTZ_PRODUCTS = [{ id: PDP.id, name: PDP.name, price: PDP.price, uvp: PDP.uvp, img: PDP.img, konfig: true }];
+    }
     if (!window.MTZ_PRODUCTS) return setTimeout(init, 50);
     indexProducts(); load(); buildChrome();
     var grid = document.getElementById('productGrid');
@@ -419,10 +585,11 @@
     window.addEventListener('storage', function (e) { if (e.key === KEY) { load(); syncAll(); live('Merkliste in einem anderen Tab geändert: ' + items.length + ' Artikel'); } });
     if (/[?&]merkliste=demo\b/.test(QS)) seedDemoConfig();
     syncAll();
+    if (PDP) initPdp();
     /* arrived from the other PLP's Merkliste with ?vergleich=…&von=merkliste */
     var m = /[?&]vergleich=([^&#]+)/.exec(QS);
     if (m && /[?&]von=merkliste\b/.test(QS)) { var n = decodeURIComponent(m[1]).split(',').filter(function (id) { return BY_ID[id]; }).length; if (n >= CMP_MIN) setTimeout(function () { toast('Vergleich mit ' + n + ' Modellen aus Ihrer Merkliste', 'ok'); }, 300); }
   }
-  window.MTZ_MKL = { open: function () { openDrawer(); }, close: closeDrawer, items: function () { return items.slice(); }, has: has, seedDemoConfig: seedDemoConfig };
+  window.MTZ_MKL = { open: function () { openDrawer(); }, close: closeDrawer, items: function () { return items.slice(); }, has: has, seedDemoConfig: seedDemoConfig, reload: function () { load(); syncAll(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
