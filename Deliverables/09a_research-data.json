@@ -1,0 +1,1338 @@
+{
+  "meta": {
+    "title": "09a Wettbewerb Merken & Vergleichen – Research-Datensatz",
+    "createdOn": "2026-10-31",
+    "project": "METZLER edelstahl-tuerklingel.de (JTL-Shop)",
+    "report": "09a_Wettbewerb_Merken-Vergleichen_Research.md",
+    "method": "Gast-Durchlauf im integrierten Browser (1366×900 / 375×812), nicht notwendige Cookies abgelehnt, keine Anmeldung/Formulare/Käufe; ergänzt um Desk-Research (Baymard, NN/g, Hilfeseiten).",
+    "evidenceLegend": {
+      "observed": "selbst beobachtet am observedOn unter sources[0..]",
+      "reported": "aus Quelle berichtet",
+      "observed+reported": "gemischt; Einzelfakten mit Präfix [R] sind berichtet"
+    },
+    "ratingScale": "1–5 (5 = Referenz); null = Funktion nicht vorhanden",
+    "nullMeans": "nicht beobachtet bzw. nicht zutreffend"
+  },
+  "shops": [
+    {
+      "observedOn": "2026-10-31",
+      "name": "Galaxus",
+      "url": "https://www.galaxus.de",
+      "segment": "compare-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 4,
+        "vergleichen": 5
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "card",
+          "pdp",
+          "header",
+          "compare-column-mobile"
+        ],
+        "cardPosition": "Icon-Buttons unten rechts (Vergleichen, Merken, Warenkorb); Desktop nur bei Hover",
+        "pdpPosition": "Sekundär-Button unter vollbreitem Primär-CTA 'In den Warenkorb', 50/50 mit 'Vergleichen'",
+        "icon": "pin",
+        "label": "Merken",
+        "states": {
+          "default": "Outline-Pin + Label 'Merken'",
+          "saved": "Label unverändert, kein aria-pressed; Header-Icon mit Punkt",
+          "hover": "Button-Hintergrund grau"
+        },
+        "feedback": "Header-Marker; Merkliste-Flyout am Header-Icon",
+        "guest": "ja – Liste wird automatisch angelegt ('Neue Merkliste (31.10.2026)')",
+        "loginPrompt": "Banner: 'Melde dich an, um deine Listen dauerhaft in deinem Kundenkonto zu speichern.'",
+        "listSurface": "Header-Flyout rechts + Seite /de/lists (Tabs Merklisten | Vergleichslisten)",
+        "itemAnatomy": [
+          "Bild",
+          "Name",
+          "Variantenzeile",
+          "Mengen-Dropdown",
+          "Preis",
+          "In den Warenkorb",
+          "Papierkorb"
+        ],
+        "sorting": null,
+        "actions": [
+          "entfernen",
+          "menge",
+          "in-den-warenkorb",
+          "alles-in-den-warenkorb",
+          "total",
+          "teilen",
+          "umbenennen",
+          "löschen",
+          "grösser-anzeigen",
+          "neue-liste"
+        ],
+        "multipleLists": true,
+        "autoNaming": "Neue Merkliste (Datum)",
+        "variantHandling": "Variantenzeile unter dem Namen",
+        "priceAvailabilityMessaging": "[R] E-Mail bei Preissenkung/Verfügbarkeit nur mit Login",
+        "emptyState": null,
+        "undo": false,
+        "mobile": "Pin + Warenkorb je Vergleichsspalte"
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Icon auf Karte (Hover) + PDP-Button 'Vergleichen'",
+        "visibility": "hover (Desktop)",
+        "cap": null,
+        "cardSelectedState": false,
+        "tray": "kein Bodentray; Flyout am Header-Icon mit '✓ Zur Vergleichsliste hinzugefügt' + 'n Produkte vergleichen'",
+        "toTable": "eigene Seite /de/comparison/<id>-<id>-<id>",
+        "shareUrl": true,
+        "tableLayout": {
+          "stickyHeader": true,
+          "stickyFirstColumn": false,
+          "grouping": "einklappbare Gruppen; erste Gruppe 'Die wichtigsten Unterschiede'",
+          "zebra": null
+        },
+        "differences": {
+          "type": "hide",
+          "label": "Identische Eigenschaften verbergen",
+          "default": "off"
+        },
+        "highlightBest": false,
+        "explanations": "(i) je Wert",
+        "addRemoveReorder": [
+          "entfernen je Spalte",
+          "Drag 'Ziehen zum Sortieren'",
+          "Sortieren nach (Manuell, Bestseller, Günstigste, Teuerste, Bewertung, Liefertermin, Neu, Rabatt)"
+        ],
+        "variantInColumn": false,
+        "uniqueData": [
+          "Gewährleistungsfallquote",
+          "Rückgabequote",
+          "Verkaufsrang"
+        ],
+        "mobile": "≈2,2 Spalten, horizontal wischen, Label in jeder Zelle, Drag/Papierkorb/Pin/Warenkorb je Spalte, Gruppen einklappbar",
+        "crossCategory": "automatische Vergleichslisten je Produkttyp",
+        "merklisteLink": "gemeinsamer Listen-Hub /de/lists",
+        "persistence": "serverseitig/Liste (Gast)",
+        "print": null
+      },
+      "copy": {
+        "merken": "Merken",
+        "list": "Merklisten / Neue Merkliste (31.10.2026)",
+        "compareAdd": "Vergleichsliste hinzufügen",
+        "compareAdded": "Zur Vergleichsliste hinzugefügt",
+        "compareCta": "3 Produkte vergleichen",
+        "diffToggle": "Identische Eigenschaften verbergen",
+        "firstGroup": "Die wichtigsten Unterschiede",
+        "login": "Melde dich an, um deine Listen dauerhaft in deinem Kundenkonto zu speichern."
+      },
+      "strengths": [
+        "Listen-Hub Merk- + Vergleichslisten",
+        "Unterschiede-zuerst-Gruppe",
+        "teilbare Vergleichs-URL",
+        "eigene beratende Daten (Rückgabequote)",
+        "Projektlisten mit Menge/Total/Teilen",
+        "Kategorie-Auto-Gruppierung"
+      ],
+      "weaknesses": [
+        "kein Gemerkt-/Ausgewählt-Zustand an PDP-Button und Karte",
+        "Karten-Aktionen nur bei Hover",
+        "kein Bodentray"
+      ],
+      "sources": [
+        "https://www.galaxus.de/de/s4/producttype/klingel-tuersprechanlage-1929",
+        "https://www.galaxus.de/de/lists",
+        "https://www.galaxus.de/de/comparison/68868885-24496828-52568625",
+        "https://www.galaxus.de/de/page/produkt-zu-teuer-oder-nicht-verfuegbar-abwarten-und-benachrichtigen-lassen-16603"
+      ],
+      "assets": [
+        "09_assets/01_galaxus_pdp_merken-vergleichen.png",
+        "09_assets/02_galaxus_vergleich-flyout.png",
+        "09_assets/03_galaxus_merkliste-flyout.png",
+        "09_assets/04_galaxus_vergleich_mobile.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "MediaMarkt",
+      "url": "https://www.mediamarkt.de",
+      "segment": "compare-leader",
+      "evidence": "observed+reported",
+      "ratings": {
+        "merken": 2,
+        "vergleichen": 3
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "card",
+          "pdp[R]"
+        ],
+        "cardPosition": "Herz-Icon-Button rechts neben 'In den Warenkorb'",
+        "pdpPosition": "[R] Herz neben Warenkorb-Button",
+        "icon": "heart",
+        "label": null,
+        "states": null,
+        "feedback": "Umleitung auf Login",
+        "guest": "nein – Umleitung /de/myaccount/auth/login?redirectURL=…addToWishlist=<id> (Absicht bleibt erhalten)",
+        "loginPrompt": "Login-Seite 'Einloggen'",
+        "listSurface": "[R] Kontoseite 'Meine Wunschliste'",
+        "itemAnatomy": null,
+        "sorting": null,
+        "actions": null,
+        "multipleLists": false,
+        "variantHandling": null,
+        "priceAvailabilityMessaging": "[R] Preisalarm in der App",
+        "emptyState": null,
+        "undo": null,
+        "mobile": null
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Checkbox 'Vergleichen' unten links auf der Karte",
+        "visibility": "always",
+        "cap": null,
+        "cardSelectedState": "[R] 'Im Vergleich'",
+        "consentGate": "bei abgelehnten Cookies Seitenpanel 'Wir respektieren Ihre Privatsphäre' – Einwilligung für lokale Speicherung (Abbrechen/Zulassen)",
+        "tray": "[R] Bodenleiste 'Jetzt vergleichen'",
+        "toTable": "[R] Seite",
+        "shareUrl": null,
+        "tableLayout": null,
+        "differences": {
+          "type": "hide",
+          "label": "[R] alle / nur Unterschiede / nur Gemeinsamkeiten; Saturn 'Zeige nur Unterschiede'",
+          "default": null
+        },
+        "highlightBest": null,
+        "explanations": null,
+        "addRemoveReorder": null,
+        "variantInColumn": null,
+        "mobile": null,
+        "crossCategory": null,
+        "merklisteLink": null,
+        "persistence": "lokaler Browser-Speicher (einwilligungspflichtig)",
+        "print": null
+      },
+      "copy": {
+        "compareCheckbox": "Vergleichen",
+        "consentTitle": "Wir respektieren Ihre Privatsphäre",
+        "wishlist": "Meine Wunschliste [R]"
+      },
+      "strengths": [
+        "Vergleichs-Checkbox immer sichtbar",
+        "Merk-Absicht überlebt Login (addToWishlist)"
+      ],
+      "weaknesses": [
+        "Login-Wand beim Merken",
+        "Vergleich hinter Speicher-Einwilligung"
+      ],
+      "sources": [
+        "https://www.mediamarkt.de/de/category/fernseher-203.html",
+        "https://faq.mediamarkt.de/app/answers/detail/a_id/16206",
+        "https://faq.mediamarkt.de/app/answers/detail/a_id/19733",
+        "https://hilfe.saturn.de/app/answers/detail/a_id/11079"
+      ],
+      "assets": [
+        "09_assets/05_mediamarkt_karte.png",
+        "09_assets/06_mediamarkt_vergleich-consent.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Apple",
+      "url": "https://www.apple.com/de",
+      "segment": "compare-leader",
+      "evidence": "observed+reported",
+      "ratings": {
+        "merken": 2,
+        "vergleichen": 4
+      },
+      "merken": {
+        "present": "account-only",
+        "entryPoints": [
+          "bag[R]",
+          "account-menu[R]"
+        ],
+        "guest": "nein [R] – Saved Items / gespeicherte Tasche nur mit Apple Account",
+        "variantHandling": "[R] konfigurierter Mac nur über gespeicherte Tasche (unverifiziert DE)"
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "eigene Seite 'Mac Modelle vergleichen' mit 3 Dropdown-Selektoren (vorbefüllt)",
+        "visibility": "page",
+        "cap": "3 Desktop / 2 Mobile",
+        "tray": null,
+        "toTable": "Seite /de/mac/compare/",
+        "shareUrl": true,
+        "shareUrlPattern": "?modelList=A,B,C; Seitentitel 'X vs Y vs Z'",
+        "tableLayout": {
+          "stickyHeader": "Selektor-Zeile sticky",
+          "stickyFirstColumn": false,
+          "grouping": "Abschnitte mit Hero-Werten",
+          "zebra": false
+        },
+        "differences": null,
+        "highlightBest": false,
+        "explanations": "Bildunterschrift je Hero-Wert; 'Ab'-Präfix für konfigurierbare Minima",
+        "addRemoveReorder": [
+          "Modell per Dropdown je Slot tauschen"
+        ],
+        "variantInColumn": "Farb-Swatches je Spalte",
+        "mobile": "2 Selektoren (2 Spalten)",
+        "crossCategory": "nur innerhalb Mac",
+        "merklisteLink": null,
+        "persistence": "URL",
+        "print": null
+      },
+      "copy": {
+        "title": "Mac Modelle vergleichen",
+        "valuePrefix": "Ab",
+        "cta": "Kaufen"
+      },
+      "strengths": [
+        "teilbare, SEO-fähige URL",
+        "'Ab'-Werte für konfigurierbare Spezifikationen",
+        "konsequent 2 Spalten auf Mobile"
+      ],
+      "weaknesses": [
+        "kein Unterschiede-Filter",
+        "Merken nur mit Konto",
+        "keine Auswahl aus dem Katalog"
+      ],
+      "sources": [
+        "https://www.apple.com/de/mac/compare/",
+        "https://apple.com/ca/shop/help/shopping_experience"
+      ],
+      "assets": [
+        "09_assets/07_apple_mac-compare.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Samsung",
+      "url": "https://www.samsung.com/de",
+      "segment": "compare-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": null,
+        "vergleichen": 4
+      },
+      "merken": {
+        "present": false,
+        "note": "für Gäste im Katalog nicht beobachtet"
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Checkbox 'Vergleichen' unter den Karten-CTAs (Kaufen / Mehr erfahren)",
+        "visibility": "always",
+        "cap": 3,
+        "capMessage": "Modal: 'Du hast 3 Produkte zum Vergleich ausgewählt.'",
+        "tray": "oben angedockt unter sticky Filterleiste: 3 Slots (Thumbnail + ×, '+'-Platzhalter), CTA 'Vergleichen', Schließen-×",
+        "toTable": "Modal-Layer 'Modelle vergleichen'",
+        "shareUrl": false,
+        "tableLayout": {
+          "stickyHeader": null,
+          "stickyFirstColumn": false,
+          "grouping": "keine (≈60 Zeilen flach)",
+          "zebra": null
+        },
+        "differences": {
+          "type": "hide",
+          "label": "Nur die Unterschiede anzeigen",
+          "default": "off"
+        },
+        "highlightBest": false,
+        "explanations": null,
+        "naValue": "literal 'none'",
+        "addRemoveReorder": [
+          "× im Tray"
+        ],
+        "variantInColumn": "Farbe + Speicher als Selektor je Spalte, Preis aktualisiert",
+        "mobile": null,
+        "crossCategory": null,
+        "merklisteLink": null,
+        "persistence": null,
+        "print": null
+      },
+      "copy": {
+        "compareCheckbox": "Vergleichen",
+        "modalTitle": "Modelle vergleichen",
+        "modalSub": "Vergleiche Funktionen, die für dich am wichtigsten sind.",
+        "diffToggle": "Nur die Unterschiede anzeigen",
+        "cap": "Du hast 3 Produkte zum Vergleich ausgewählt."
+      },
+      "strengths": [
+        "Variantenwahl in der Vergleichsspalte",
+        "Leer-Slot '+' zeigt Restkapazität"
+      ],
+      "weaknesses": [
+        "Cap-Hinweis als Modal",
+        "'none' für nicht zutreffend",
+        "keine Gruppen",
+        "Modal ohne URL"
+      ],
+      "sources": [
+        "https://www.samsung.com/de/smartphones/all-smartphones/"
+      ],
+      "assets": [
+        "09_assets/08_samsung_compare-bar-top.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Bosch Hausgeräte",
+      "url": "https://www.bosch-home.com/de",
+      "segment": "compare-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": null,
+        "vergleichen": 4
+      },
+      "merken": {
+        "present": false
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Checkbox 'Produktvergleich' unten rechts auf der Karte (aria 'Produkt <Nr> vergleichen')",
+        "visibility": "always",
+        "cap": 3,
+        "tray": "eingeklappter Tab unten rechts '2 zu vergleichende Produkte ⌃'; aufgeklappt: Liste mit Nr., 'Zurücksetzen', 'Produktvergleich'",
+        "toTable": "Seite /de/de/comparison?products=A,B",
+        "shareUrl": true,
+        "tableLayout": {
+          "stickyHeader": null,
+          "stickyFirstColumn": null,
+          "grouping": "Akkordeons: Allgemein, Programme, Zuschaltbare Optionen, Komfort, Sicherheit, Nachhaltigkeit und Energieeffizienz, Größe und Gewicht",
+          "zebra": null
+        },
+        "differences": {
+          "type": "hide",
+          "label": "Nur Unterschiede anzeigen",
+          "default": "off"
+        },
+        "highlightBest": false,
+        "explanations": null,
+        "addRemoveReorder": [
+          "× je Spalte",
+          "Slot 'Produkt über Produktliste hinzufügen'",
+          "Eingabe 'Oder über Produkt-Nr.' (z.B. WGB2560X0)"
+        ],
+        "variantInColumn": false,
+        "extras": [
+          "Ähnliche Produkte",
+          "Händler-Shop + In den Warenkorb je Spalte"
+        ],
+        "mobile": null,
+        "crossCategory": null,
+        "merklisteLink": null,
+        "persistence": "URL + Sitzung",
+        "print": null
+      },
+      "copy": {
+        "cardCheckbox": "Produktvergleich",
+        "dock": "2 zu vergleichende Produkte",
+        "dockInfo": "Du hast 2 Produkte zum Vergleich ausgewählt.",
+        "title": "Vergleiche deine Produkte",
+        "selection": "Deine Auswahl",
+        "diffToggle": "Nur Unterschiede anzeigen",
+        "addByNumber": "Oder über Produkt-Nr."
+      },
+      "strengths": [
+        "Hinzufügen per Produktnummer",
+        "teilbare URL",
+        "unaufdringliches Dock",
+        "Akkordeon-Gruppen"
+      ],
+      "weaknesses": [
+        "keine Merkliste",
+        "aufgeklapptes Dock verdeckt Inhalte"
+      ],
+      "sources": [
+        "https://www.bosch-home.com/de/de/category/waschen-trocknen/waschmaschinen",
+        "https://www.bosch-home.com/de/de/comparison?products=WGN256MR40%2CWUU28T71"
+      ],
+      "assets": [
+        "09_assets/09_bosch_karte-dock.png",
+        "09_assets/10_bosch_vergleich.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "notebooksbilliger",
+      "url": "https://www.notebooksbilliger.de",
+      "segment": "compare-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 4,
+        "vergleichen": 3
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "card",
+          "header",
+          "compare-column"
+        ],
+        "cardPosition": "Herz-Icon-Button rechts neben CTA 'Zum Produkt'",
+        "pdpPosition": null,
+        "icon": "heart",
+        "label": "Produkt merken (aria)",
+        "states": {
+          "default": "Outline-Herz, aria 'Produkt merken'",
+          "saved": "gefülltes Herz, aria-pressed=true, aria 'Von deinem Merkzettel entfernen'"
+        },
+        "feedback": "Zustandswechsel + Header-Herz mit Zahl",
+        "guest": "ja",
+        "listSurface": "Merkzettel-Seite",
+        "undo": null
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Checkbox 'Vergleichen' unter dem Bild",
+        "visibility": "always",
+        "cap": null,
+        "tray": "schwebender Button am rechten Rand mit Zähler (title '2 Produkte vergleichen'); Toast oben 'Produkt wurde zum Vergleich hinzugefügt.'",
+        "toTable": "Seite /produkt+vergleich/show/<id>,<id>",
+        "shareUrl": true,
+        "tableLayout": {
+          "stickyHeader": null,
+          "stickyFirstColumn": "sticky Zellen",
+          "grouping": "Abschnitte (Produkteigenschaften, Display …)",
+          "zebra": null
+        },
+        "differences": {
+          "type": "highlight",
+          "label": "Unterschiede hervorheben",
+          "default": "off"
+        },
+        "highlightBest": false,
+        "explanations": "Mehr Informationen",
+        "addRemoveReorder": [
+          "× je Spalte",
+          "Alle entfernen",
+          "Pfeile zum Blättern"
+        ],
+        "variantInColumn": false,
+        "mobile": null,
+        "crossCategory": null,
+        "merklisteLink": "Herz je Spalte",
+        "persistence": "URL",
+        "print": true
+      },
+      "copy": {
+        "merkenAria": "Produkt merken",
+        "merkenOnAria": "Von deinem Merkzettel entfernen",
+        "compareToast": "Produkt wurde zum Vergleich hinzugefügt.",
+        "diffToggle": "Unterschiede hervorheben",
+        "clear": "Alle entfernen"
+      },
+      "strengths": [
+        "sauberes aria-pressed",
+        "Merken in der Vergleichsspalte",
+        "teilbare URL",
+        "Drucken"
+      ],
+      "weaknesses": [
+        "Unterschiede nur hervorgehoben",
+        "dichte, wenig gegliederte Tabelle"
+      ],
+      "sources": [
+        "https://www.notebooksbilliger.de/notebooks",
+        "https://www.notebooksbilliger.de/produkt+vergleich/show/906505%2C909202"
+      ],
+      "assets": [
+        "09_assets/15_nbb_vergleich.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Thomann",
+      "url": "https://www.thomann.de",
+      "segment": "compare-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 5,
+        "vergleichen": 3
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "list-row",
+          "header",
+          "compare-column"
+        ],
+        "cardPosition": "Icon-Buttons unten rechts der Listenzeile (Vergleich, Herz, Warenkorb)",
+        "pdpPosition": null,
+        "icon": "heart",
+        "label": null,
+        "states": {
+          "saved": "Herz lila gefüllt; Header-Herz mit Punkt"
+        },
+        "feedback": "nur Zustandswechsel, kein Toast",
+        "guest": "ja – automatisch benannt 'Meine Wunschliste vom 31.10.2026'",
+        "loginPrompt": "Banner: 'Bitte anmelden, um Ihre Wunschlisten zu speichern – und von allen Geräten …'",
+        "listSurface": "Seite /de/wishlist.html",
+        "itemAnatomy": [
+          "Drag-Griff",
+          "Bild",
+          "Name",
+          "Bewertung",
+          "Lieferstatus",
+          "Preis",
+          "Papierkorb",
+          "Stift",
+          "Menge 1–10+",
+          "Warenkorb"
+        ],
+        "sorting": [
+          "Eigene Sortierung (Drag)",
+          "Beliebtheit",
+          "Preis"
+        ],
+        "actions": [
+          "Alle vergleichen",
+          "Teilen",
+          "Bearbeiten",
+          "Alle in den Warenkorb",
+          "+ Neu"
+        ],
+        "multipleLists": true,
+        "autoNaming": "Meine Wunschliste vom <Datum>",
+        "variantHandling": null,
+        "emptyState": null,
+        "undo": null,
+        "mobile": "Herz und Vergleich in der Listenzeile ausgeblendet"
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Icon in der Listenzeile (lila bei Auswahl)",
+        "visibility": "always (Desktop), hidden (Mobile-Liste)",
+        "cap": null,
+        "tray": "unten mittig ≈440px: Thumbnails mit Papierkorb, Pill 'Vergleichen' mit Zähler-Badge (deaktiviert bis 2), 'Alle löschen', ×; Mobile: Bottom-Sheet mit Griff",
+        "toTable": "Seite /de/compare.html",
+        "shareUrl": false,
+        "tableLayout": {
+          "stickyHeader": false,
+          "stickyFirstColumn": false,
+          "grouping": "Allgemeine Infos / Features",
+          "zebra": null
+        },
+        "differences": null,
+        "highlightBest": false,
+        "explanations": null,
+        "addRemoveReorder": [
+          "Eingabe 'Artikelnummer/n hinzufügen'"
+        ],
+        "variantInColumn": false,
+        "mobile": "Tray als Bottom-Sheet (≈1/3 Höhe)",
+        "crossCategory": null,
+        "merklisteLink": "'Alle vergleichen' auf der Wunschliste; Herz je Vergleichsspalte (synchron)",
+        "persistence": "über Seitenwechsel und Reload",
+        "print": null
+      },
+      "copy": {
+        "list": "Meine Wunschliste vom 31.10.2026",
+        "new": "Neu",
+        "compareAll": "Alle vergleichen",
+        "trayCta": "Vergleichen",
+        "clear": "Alle löschen",
+        "addByNumber": "Artikelnummer/n hinzufügen",
+        "login": "Bitte anmelden, um Ihre Wunschlisten zu speichern"
+      },
+      "strengths": [
+        "vollständige Gast-Liste (mehrere Listen, Teilen, Sortieren, Menge)",
+        "Vergleich aus der Liste",
+        "Artikelnummer-Eingabe",
+        "persistenter Tray"
+      ],
+      "weaknesses": [
+        "Vergleich ohne URL-Zustand",
+        "kein Unterschiede-Filter",
+        "Mobile-Liste ohne Merken/Vergleichen",
+        "Wording 'Wunschliste'"
+      ],
+      "sources": [
+        "https://www.thomann.de/de/st-modelle.html",
+        "https://www.thomann.de/de/compare.html",
+        "https://www.thomann.de/de/wishlist.html"
+      ],
+      "assets": [
+        "09_assets/11_thomann_tray.png",
+        "09_assets/12_thomann_vergleich.png",
+        "09_assets/13_thomann_wunschliste-gast.png",
+        "09_assets/14_thomann_tray_mobile.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "OTTO",
+      "url": "https://www.otto.de",
+      "segment": "bookmark-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 4,
+        "vergleichen": null
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "card",
+          "pdp",
+          "header"
+        ],
+        "cardPosition": "Herz oben rechts im Produktbild, immer sichtbar",
+        "pdpPosition": "Herz oben rechts in der Bildergalerie (nicht am CTA)",
+        "icon": "heart",
+        "label": null,
+        "states": {
+          "saved": "Herz rot gefüllt; Header 'Merkzettel' mit Zahl"
+        },
+        "feedback": "Zustandswechsel + Header-Zähler",
+        "guest": "ja – Speicherdauer zwei Wochen offen kommuniziert",
+        "loginPrompt": "'Du möchtest deine gemerkten Artikel länger als zwei Wochen speichern …' + 'Jetzt anmelden'",
+        "listSurface": "Seite /wishlist-view/ 'Mein Merkzettel (n)'",
+        "itemAnatomy": [
+          "Bild",
+          "Marke",
+          "Name",
+          "Bewertung",
+          "Produktdatenblatt",
+          "Lieferzeit",
+          "Verkäufer",
+          "Preis + UVP + %",
+          "Entfernen",
+          "In den Warenkorb"
+        ],
+        "sorting": null,
+        "actions": [
+          "entfernen",
+          "in-den-warenkorb"
+        ],
+        "multipleLists": false,
+        "variantHandling": null,
+        "priceAvailabilityMessaging": "Live-Preis mit UVP/Rabatt; Preisalarm + Wiederverfügbarkeit nur in der App",
+        "emptyState": "'Du hast noch keine Artikel auf dem Merkzettel.' · 'Lass dich inspirieren' · 'Melde dich an, um bereits gemerkte Artikel zu sehen.'",
+        "undo": false,
+        "mobile": null
+      },
+      "vergleichen": {
+        "present": false
+      },
+      "copy": {
+        "header": "Merkzettel",
+        "list": "Mein Merkzettel (1)",
+        "guestRetention": "länger als zwei Wochen speichern",
+        "empty": "Du hast noch keine Artikel auf dem Merkzettel.",
+        "cta": "In den Warenkorb",
+        "remove": "Entfernen"
+      },
+      "strengths": [
+        "transparente Gast-Speicherdauer",
+        "Leerzustand mit Brücke zum Konto",
+        "Herz auf Karte immer sichtbar"
+      ],
+      "weaknesses": [
+        "kein Undo",
+        "Alarme nur per App",
+        "PDP-Merken fern vom CTA"
+      ],
+      "sources": [
+        "https://www.otto.de/haushalt/waschmaschinen/",
+        "https://www.otto.de/wishlist-view/"
+      ],
+      "assets": [
+        "09_assets/16_otto_merkzettel-gast.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Zalando",
+      "url": "https://www.zalando.de",
+      "segment": "bookmark-leader",
+      "evidence": "observed+reported",
+      "ratings": {
+        "merken": 2,
+        "vergleichen": null
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "card",
+          "pdp",
+          "header"
+        ],
+        "cardPosition": "Herz oben rechts",
+        "icon": "heart",
+        "guest": "nein – Klick leitet auf accounts.zalando.com 'Einloggen oder registrieren'",
+        "priceAvailabilityMessaging": "[R] Glocke bei ausverkaufter Größe (E-Mail)",
+        "undo": null
+      },
+      "vergleichen": {
+        "present": false
+      },
+      "copy": {
+        "header": "Wunschzettel",
+        "login": "Einloggen oder registrieren"
+      },
+      "strengths": [
+        "Herz immer sichtbar auf Karte"
+      ],
+      "weaknesses": [
+        "harte Login-Wand beim ersten Herz-Klick",
+        "Wording 'Wunschzettel'"
+      ],
+      "sources": [
+        "https://www.zalando.de/herrenschuhe-sneaker/",
+        "https://www.zalando.de/faq/Mein-Kundenkonto/Mein-Wunschzettel.html"
+      ],
+      "assets": [
+        "09_assets/17_zalando_loginwall.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "IKEA",
+      "url": "https://www.ikea.com/de/de",
+      "segment": "bookmark-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 5,
+        "vergleichen": null
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "card",
+          "pdp",
+          "header"
+        ],
+        "cardPosition": "Herz unter dem Bild rechts, neben rundem Warenkorb-Button",
+        "icon": "heart",
+        "states": {
+          "default": "aria '<Name> zum Merkzettel hinzufügen'",
+          "saved": "gefüllt, aria '<Name> vom Merkzettel entfernen'"
+        },
+        "feedback": "dunkler Toast oben rechts: '<Name> wurde in Meine Liste gespeichert. Behalte deine Listen mit IKEA Family …' + Link 'Kostenlos Mitglied werden oder anmelden' + ×",
+        "guest": "ja – 'Meine Liste' unter /favourites/<uuid>/",
+        "listSurface": "Seite 'Meine Liste' + Übersicht 'Merkzettel'",
+        "itemAnatomy": [
+          "Checkbox 'Wähle'",
+          "Name",
+          "Beschreibung inkl. Maße/Gewicht",
+          "Preis/Vorheriger Preis",
+          "Bewertung",
+          "Mengen-Stepper",
+          "Warenkorb",
+          "Papierkorb",
+          "Verfügbarkeit prüfen",
+          "Enthaltene Teile anzeigen",
+          "Mehr Optionen"
+        ],
+        "sorting": [
+          "Kürzlich hinzugefügt",
+          "Name",
+          "Preis aufsteigend",
+          "Preis absteigend"
+        ],
+        "actions": [
+          "Teilen",
+          "Einkaufsliste drucken",
+          "Einstellungen",
+          "Listen-/Rasteransicht",
+          "Alles zum Warenkorb hinzu",
+          "Merkzettel erstellen"
+        ],
+        "multipleLists": true,
+        "autoNaming": "Meine Liste",
+        "variantHandling": "vorkonfigurierte Kombination (PAX/BERGSBO) als ein Eintrag mit 'Enthaltene Teile anzeigen'",
+        "priceAvailabilityMessaging": "Family-Preis vs. regulär; Verfügbarkeit prüfen",
+        "emptyState": null,
+        "undo": null,
+        "mobile": null
+      },
+      "vergleichen": {
+        "present": false
+      },
+      "copy": {
+        "toast": "wurde in Meine Liste gespeichert",
+        "toastAccount": "Kostenlos Mitglied werden oder anmelden",
+        "parts": "Enthaltene Teile anzeigen",
+        "print": "Einkaufsliste drucken",
+        "addAll": "Alles zum Warenkorb hinzu",
+        "share": "Teilen"
+      },
+      "strengths": [
+        "Konfiguration als ein Eintrag mit Stückliste",
+        "Konto-Nutzen im Toast",
+        "Teilen/Drucken für Gäste",
+        "Sortierung, Menge, Summe"
+      ],
+      "weaknesses": [
+        "uneinheitliche Begriffe (Merkzettel / Meine Liste / Lieblingsprodukte)"
+      ],
+      "sources": [
+        "https://www.ikea.com/de/de/cat/pax-system-19086/",
+        "https://www.ikea.com/de/de/favourites/",
+        "https://www.ikea.com/de/en/customer-service/knowledge/articles/5ee95be1-7bg9-4bc9-bd94-055733e108ec.html"
+      ],
+      "assets": [
+        "09_assets/18_ikea_toast.png",
+        "09_assets/19_ikea_liste.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "HORNBACH",
+      "url": "https://www.hornbach.de",
+      "segment": "bookmark-leader",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 4,
+        "vergleichen": 3
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "card",
+          "header"
+        ],
+        "cardPosition": "Herz oben rechts im Bild, darunter Vergleichs-Icon; immer sichtbar",
+        "icon": "heart",
+        "states": {
+          "saved": "Herz gefüllt"
+        },
+        "feedback": "Zustandswechsel (+ Snackbar)",
+        "guest": "ja – 'Merkliste ID: <Code>' mit 'Merklisten-ID kopieren'",
+        "loginPrompt": "'Nutze die Vorteile eines Kundenkontos! Erstelle mehrere Merklisten, organisiere Projekte …'",
+        "listSurface": "Seite /wishlist/",
+        "itemAnatomy": [
+          "Name",
+          "Art.-Nr.",
+          "Preis/Einheit",
+          "Verkäufer",
+          "Menge",
+          "Online bestellen",
+          "Lieferzeit",
+          "Reservierungsstatus",
+          "Vergleichs-Schalter",
+          "Artikel löschen"
+        ],
+        "actions": [
+          "Merklisten-ID kopieren",
+          "Liste verwalten",
+          "Liste drucken",
+          "Liste leeren",
+          "Gesamtsumme"
+        ],
+        "multipleLists": "nur mit Konto",
+        "variantHandling": null,
+        "undo": null
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Icon auf Karte (wird ✓)",
+        "visibility": "always",
+        "cap": null,
+        "tray": "kein Tray; grüne Snackbar 'Erfolgreich hinzugefügt! ZUM ARTIKELVERGLEICH'; Header 'Artikelvergleich n'",
+        "toTable": "Seite /comparison/",
+        "shareUrl": false,
+        "tableLayout": {
+          "stickyHeader": null,
+          "stickyFirstColumn": true,
+          "grouping": "keine (flache Merkmalsliste)",
+          "zebra": null
+        },
+        "differences": null,
+        "highlightBest": false,
+        "explanations": null,
+        "addRemoveReorder": [
+          "× je Spalte",
+          "Leeren"
+        ],
+        "variantInColumn": false,
+        "mobile": null,
+        "crossCategory": null,
+        "merklisteLink": "Vergleichs-Schalter je Merklisten-Zeile",
+        "persistence": "Sitzung/Cookie",
+        "print": true
+      },
+      "copy": {
+        "header": "Meine Merklisten",
+        "listId": "Merkliste ID",
+        "copyId": "Merklisten-ID kopieren",
+        "snackbar": "Erfolgreich hinzugefügt! ZUM ARTIKELVERGLEICH",
+        "compare": "Artikelvergleich",
+        "print": "Drucken",
+        "clear": "Leeren"
+      },
+      "strengths": [
+        "kontofreier Merklisten-Code",
+        "Projekt-Denke (Summe, Menge, Drucken)",
+        "Vergleich aus der Merkliste",
+        "Kategorie Briefkästen direkt vergleichbar"
+      ],
+      "weaknesses": [
+        "Vergleich ohne Unterschiede-Filter und Gruppen",
+        "keine teilbare Vergleichs-URL"
+      ],
+      "sources": [
+        "https://www.hornbach.de/c/eisenwaren/briefkaesten/S23225/",
+        "https://www.hornbach.de/comparison/",
+        "https://www.hornbach.de/wishlist/",
+        "https://www.hornbach.at/services/hilfe-kontakt-haeufige-fragen/"
+      ],
+      "assets": [
+        "09_assets/20_hornbach_snackbar.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Manufactum",
+      "url": "https://www.manufactum.de",
+      "segment": "bookmark-leader (premium)",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 4,
+        "vergleichen": null
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "pdp",
+          "header"
+        ],
+        "pdpPosition": "vollbreiter Outline-Button '♡ Merken' unter dem Preis; ersetzt bei 'Zur Zeit nicht lieferbar' den Kauf-CTA",
+        "icon": "heart",
+        "label": "Merken",
+        "states": {
+          "saved": "Button-Label bleibt 'Merken'; Header-Herz wird gefüllte grüne Scheibe"
+        },
+        "feedback": "grüne Inline-Bestätigung direkt unter dem Button: '<Name> wurde zur Merkliste hinzugefügt.' + 'Zur Merkliste'",
+        "guest": "ja",
+        "loginPrompt": "'Ihre Merkliste wird durch Anmeldung oder Registrierung dauerhaft gespeichert.' + 'Merkliste am Konto speichern'",
+        "listSurface": "Seite /merkliste 'Ihre Merkliste'",
+        "itemAnatomy": [
+          "Marke",
+          "Name",
+          "Einzelpreis",
+          "Art.-Nr.",
+          "Farbe",
+          "Lieferstatus",
+          "Entfernen",
+          "In den Warenkorb"
+        ],
+        "actions": [
+          "Merkliste mit anderen teilen",
+          "Merkliste am Konto speichern"
+        ],
+        "multipleLists": false,
+        "variantHandling": "Variante als Zeile ('Farbe: Weiß')",
+        "undo": null
+      },
+      "vergleichen": {
+        "present": false
+      },
+      "copy": {
+        "merken": "Merken",
+        "confirm": "wurde zur Merkliste hinzugefügt.",
+        "link": "Zur Merkliste",
+        "share": "Merkliste mit anderen teilen",
+        "persist": "Merkliste am Konto speichern"
+      },
+      "strengths": [
+        "Bestätigung am Ort des Klicks",
+        "Merken ersetzt CTA bei Nichtverfügbarkeit",
+        "Variante + Artikelnummer in der Liste",
+        "Teilen für Gäste"
+      ],
+      "weaknesses": [
+        "kein Gemerkt-Zustand am Button"
+      ],
+      "sources": [
+        "https://www.manufactum.de/herrnhuter-stern-a1e-13-cm-a204804/",
+        "https://www.manufactum.de/merkliste"
+      ],
+      "assets": [
+        "09_assets/21_manufactum_inline-bestaetigung.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Miele",
+      "url": "https://www.miele.de",
+      "segment": "premium-peer",
+      "evidence": "observed+reported",
+      "ratings": {
+        "merken": null,
+        "vergleichen": 4
+      },
+      "merken": {
+        "present": false,
+        "note": "[R] Miele Professional: Merkzettel mit Vergleich bis 4 und Broschüren-Export"
+      },
+      "vergleichen": {
+        "present": true,
+        "entry": "Checkbox 'Vergleichen' auf der Kachel",
+        "visibility": "always",
+        "cap": 3,
+        "tray": "Bodentray vollbreit: '⌃ Vergleichen' (einklappbar), 'Alles löschen', CTA 'VERGLEICHEN'; 3 Slots mit Bild, Modellcode, ×, leer 'Kein Gerät ausgewählt'",
+        "toTable": "Seite /e/compare/<id>,<id>",
+        "shareUrl": true,
+        "tableLayout": {
+          "stickyHeader": null,
+          "stickyFirstColumn": false,
+          "grouping": "Akkordeon 'Schnellübersicht' (Kategorie, Preis, Energieeffizienz, Datenblatt), dann 'Alle Merkmale' in Gruppen",
+          "zebra": null
+        },
+        "differences": {
+          "type": "hide",
+          "label": "Nur Unterschiede anzeigen",
+          "default": "off"
+        },
+        "highlightBest": false,
+        "explanations": "Fußnoten",
+        "addRemoveReorder": [
+          "× je Spalte",
+          "Slot 'Neues Modell hinzufügen'"
+        ],
+        "variantInColumn": false,
+        "mobile": null,
+        "crossCategory": null,
+        "merklisteLink": null,
+        "persistence": "URL",
+        "print": null
+      },
+      "copy": {
+        "title": "Modelle vergleichen",
+        "capInfo": "Sie können bis zu 3 Produkte vergleichen",
+        "empty": "Kein Gerät ausgewählt",
+        "add": "Neues Modell hinzufügen",
+        "diffToggle": "Nur Unterschiede anzeigen",
+        "quick": "Schnellübersicht",
+        "clear": "Alles löschen"
+      },
+      "strengths": [
+        "klarer Tray mit Leer-Slots",
+        "Schnellübersicht vor Detail",
+        "teilbare URL",
+        "Cap im Titel erklärt"
+      ],
+      "weaknesses": [
+        "kein Merken für Endkunden",
+        "ungefragter KI-Assistent-Drawer überlagert"
+      ],
+      "sources": [
+        "https://www.miele.de/category/1015696/waschmaschinen",
+        "https://www.miele.de/e/compare/000000000012703540,000000000012703660",
+        "https://www.miele.de/professional/merkzettel-8.htm"
+      ],
+      "assets": [
+        "09_assets/22_miele_tray.png",
+        "09_assets/23_miele_vergleich.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "DoorBird Konfigurator",
+      "url": "https://configurator.doorbird.com",
+      "segment": "configurable-peer (door intercom)",
+      "evidence": "observed",
+      "ratings": {
+        "merken": 2,
+        "vergleichen": null
+      },
+      "merken": {
+        "present": "config-save",
+        "entryPoints": [
+          "configurator-footer"
+        ],
+        "label": "Speichern",
+        "guest": "nur gegen Kontaktdaten – Speicherformular (DOM) verlangt E-Mail*, Wiederholung*, Telefon*, Anmerkungen",
+        "incompleteState": "nicht speicherbar: 'Eine Konfiguration ohne elektronische Haupteinheit ist nicht möglich.'",
+        "restore": "'Projekt laden' per Projekt-ID ('Ihr aktuelles Projekt wird dabei überschrieben.')",
+        "variantHandling": "vollständige 3D-Konfiguration (Maße, Material/Farbe, Module, Ruftasten/Namensschilder, Lichttaster, Gravuren)",
+        "priceAvailabilityMessaging": "Live-Preis Netto / UVP",
+        "extras": [
+          "Vorlagen",
+          "Neues Projekt",
+          "Augmented Reality",
+          "In den Warenkorb"
+        ]
+      },
+      "vergleichen": {
+        "present": false
+      },
+      "copy": {
+        "load": "Projekt laden",
+        "templates": "Vorlagen",
+        "save": "Speichern",
+        "loadHint": "Bitte geben Sie eine Ihnen bekannte Projekt-ID ein.",
+        "incomplete": "Eine Konfiguration ohne elektronische Haupteinheit ist nicht möglich."
+      },
+      "strengths": [
+        "Projekt-ID zum Wiederaufrufen",
+        "Vorlagen",
+        "Live-Preis",
+        "AR"
+      ],
+      "weaknesses": [
+        "Speichern = Lead-Erfassung (E-Mail + Telefon Pflicht)",
+        "unvollständiger Stand nicht speicherbar"
+      ],
+      "sources": [
+        "https://configurator.doorbird.com/",
+        "https://www.doorbird.com/downloads/datasheet/datasheet_konfigurator_de.pdf"
+      ],
+      "assets": [
+        "09_assets/24_doorbird_konfigurator.png"
+      ]
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Siedle",
+      "url": "https://www.siedle.de",
+      "segment": "configurable-peer (door intercom)",
+      "evidence": "observed+reported",
+      "ratings": {
+        "merken": null,
+        "vergleichen": null
+      },
+      "merken": {
+        "present": false,
+        "note": "/konfigurator leitet auf 'Preisbeispiele und Service': Siedle IQ 'Anlage planen' (IQ Config), Preisbeispiele zum Download, Anfragen an den Online-Service. [R] alter Konfigurator abgeschaltet; Profimodus speicherte Anlagen unter Konfigurationsnummer."
+      },
+      "vergleichen": {
+        "present": false
+      },
+      "copy": {
+        "plan": "Anlage planen",
+        "page": "Preisbeispiele und Service"
+      },
+      "strengths": [
+        "Anfrage-/Angebotsbrücke für komplexe Anlagen"
+      ],
+      "weaknesses": [
+        "kein Shop-Merken/-Vergleich",
+        "Konfigurator für Gäste nicht erreichbar"
+      ],
+      "sources": [
+        "https://www.siedle.de/konfigurator",
+        "https://www.siedle.de/xs_db/DOKUMENT_DB/www/Bedienungsanleitungen/Konfigurator/Anleitung_Konfigurator_Profimodus.pdf"
+      ],
+      "assets": []
+    },
+    {
+      "observedOn": "2026-10-31",
+      "name": "Ring",
+      "url": "https://ring.com/de/de",
+      "segment": "configurable-peer (doorbell)",
+      "evidence": "observed",
+      "ratings": {
+        "merken": null,
+        "vergleichen": 1
+      },
+      "merken": {
+        "present": false
+      },
+      "vergleichen": {
+        "present": "editorial",
+        "entry": "Kollektion nach Stromversorgung gruppiert (akkubetrieben / verdrahtet / PoE) mit Anker-Navigation; FAQ 'Was sind die Unterschiede zwischen den einzelnen Ring Videotürklingeln?' als Fließtext; 'Abonnements vergleichen' nur für Tarife",
+        "cap": null,
+        "shareUrl": null
+      },
+      "copy": {
+        "faq": "Was sind die Unterschiede zwischen den einzelnen Ring Videotürklingeln?"
+      },
+      "strengths": [
+        "kuratierte Segmentierung nach Hauptunterschied (Strom)"
+      ],
+      "weaknesses": [
+        "kein Vergleichswerkzeug",
+        "Unterschiede nur als Fließtext"
+      ],
+      "sources": [
+        "https://ring.com/de/de/collections/video-doorbell-cameras"
+      ],
+      "assets": []
+    },
+    {
+      "observedOn": null,
+      "name": "Amazon",
+      "url": "https://www.amazon.de",
+      "segment": "bookmark-leader",
+      "evidence": "reported",
+      "ratings": {
+        "merken": 3,
+        "vergleichen": 2
+      },
+      "merken": {
+        "present": true,
+        "entryPoints": [
+          "pdp (Dropdown unter 'In den Einkaufswagen')",
+          "cart ('Auf die Merkliste' / 'Für später speichern')"
+        ],
+        "guest": "Listen nur mit Konto",
+        "multipleLists": true,
+        "actions": [
+          "teilen per Link/Einladung",
+          "Notizen",
+          "Priorität"
+        ]
+      },
+      "vergleichen": {
+        "present": "unverified",
+        "entry": "'Mit ähnlichen Artikeln vergleichen' (unverifiziert)"
+      },
+      "copy": {
+        "wishlist": "Auf den Wunschzettel",
+        "saveForLater": "Auf die Merkliste"
+      },
+      "strengths": [
+        "Save-for-later im Warenkorb",
+        "beliebig viele, teilbare Listen"
+      ],
+      "weaknesses": [
+        "Listen nur mit Konto"
+      ],
+      "sources": [
+        "https://www.amazon.de/gp/help/customer/display.html?nodeId=GHCGC7B7SQ222YMD",
+        "https://www.heise.de/tipps-tricks/Amazon-Wunschliste-teilen-so-geht-s-10509978.html"
+      ],
+      "assets": []
+    },
+    {
+      "observedOn": null,
+      "name": "Porsche Car Configurator",
+      "url": "https://configurator.porsche.com",
+      "segment": "configurator-reference",
+      "evidence": "reported",
+      "ratings": {
+        "merken": 4,
+        "vergleichen": null
+      },
+      "merken": {
+        "present": "config-save",
+        "restore": "Porsche Code (8-stellig, alphanumerisch) + Link – ohne Konto ladbar und teilbar",
+        "account": "'In meinem Profil speichern' mit Porsche ID",
+        "comparable": "VW-Konfigurationscode, max. 3 Monate gültig"
+      },
+      "vergleichen": {
+        "present": false
+      },
+      "copy": {
+        "code": "Porsche Code erstellen",
+        "save": "In meinem Profil speichern"
+      },
+      "strengths": [
+        "Code vor Konto",
+        "teilbar ohne Login"
+      ],
+      "weaknesses": [
+        "Gültigkeit/Lebensdauer des Codes je Marke unterschiedlich"
+      ],
+      "sources": [
+        "https://configurator.porsche.com/porsche-code/de-DE",
+        "https://www.volkswagen.de/de/modelle/konfiguration-laden.html"
+      ],
+      "assets": []
+    }
+  ]
+}
