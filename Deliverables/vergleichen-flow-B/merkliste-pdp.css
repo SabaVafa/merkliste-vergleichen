@@ -79,6 +79,17 @@
   #pdpStickyBar .mkl-pdp-bar .mkl-pdp-sr{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto;min-width:3.5rem}
 }
 
+/* ---- Gallery corner (desktop ≥ 64rem only): bare bookmark glyph top-right of the stage, same anatomy as the PLP card .mkl-mark.
+   The gallery column is sticky on desktop, so the shortcut stays in view while configuring; phones keep header + buy-box button only ---- */
+.mkl-pdp-media{display:none}
+@media(min-width:64rem){
+  .pdp-media__stage .mkl-pdp-media{display:flex;position:absolute;top:.5rem;right:.5rem;z-index:3;width:2.75rem;height:2.75rem;min-height:2.75rem;padding:0;border:0;border-radius:var(--r-pill);background:transparent;color:var(--schwarz)}
+  .pdp-media__stage .mkl-pdp-media:hover{border:0;background:transparent;color:var(--teal)}
+  .pdp-media__stage .mkl-pdp-media.is-on{color:var(--teal)}
+  .pdp-media__stage .mkl-pdp-media.is-on:hover{background:transparent}
+  .pdp-media__stage .mkl-pdp-media.is-limit{color:var(--text-muted);opacity:.6;background:transparent}
+}
+
 /* ---- Toast: above the sticky bar while it is visible (page level; inside the drawer the 06 rule applies) ---- */
 .mkl-toast{transition:opacity .2s,transform .2s,bottom .2s,visibility 0s linear .2s}
 .mkl-toast.is-pdp-bar{bottom:calc(var(--mkl-pdp-bar-h,4.625rem) + 1rem + env(safe-area-inset-bottom,0px))}
@@ -91,7 +102,7 @@
   .mkl-pdp-save,.mkl-pdp-save__glyph,.mkl-pdp-save svg path,.mkl-pdp-band,.mkl-toast,.pdp-swatches.mkl-pdp-hint{transition:none !important;animation:none !important}
   .mkl-pdp-save.is-pressed .mkl-pdp-save__glyph{transform:none}
 }
-@media print{.mkl-pdp-row,.mkl-pdp-bar{display:none !important}}
+@media print{.mkl-pdp-row,.mkl-pdp-bar,.mkl-pdp-media{display:none !important}}
 
 /* ---- 09b P0-10: "Zurück zum Vergleich" in the breadcrumb row (only when the visitor came from a comparison) ---- */
 .crumb .container.mkl-has-return{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}

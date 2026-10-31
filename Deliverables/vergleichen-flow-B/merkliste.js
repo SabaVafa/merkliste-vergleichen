@@ -381,7 +381,7 @@
     save(); syncAll(); pulseBadge();
     live('Wiederhergestellt: ' + (entries.length === 1 ? shortName(entries[0].item).main : entries.length + ' Artikel') + '. Merkliste: ' + items.length + ' Artikel');
     if (isOpen) { var b = entries.length === 1 && listEl.querySelector('.mkl-rm[data-id="' + entries[0].item.id.replace(/"/g, '') + '"]'); (b || titleEl).focus(); }
-    else if (PDP && pdpBtn) { var t = (pdpLast === pdpBar && pdpBarVisible && pdpBarVisible()) ? pdpBar : pdpBtn; t.focus({ preventScroll: true }); }
+    else if (PDP && pdpBtn) { var t = (pdpLast === pdpBar && pdpBarVisible && pdpBarVisible()) ? pdpBar : ((pdpLast === pdpMedia && pdpMedia && pdpMedia.offsetParent) ? pdpMedia : pdpBtn); t.focus({ preventScroll: true }); }
   }
   function clearAll() {
     var snap = items.map(function (it, i) { return { item: it, index: i }; }), n = items.length;
@@ -712,7 +712,7 @@
      session's entry instead of duplicating; ?merkliste=<configId> restores
      a saved build through the configurator's own controls and shows a band.
      ===================================================================== */
-  var pdpRow, pdpBtn, pdpBar, pdpChanged, pdpBand, pdpLast = null, pdpBarVisible = null, bandCfgId = null, bandHash = null;
+  var pdpRow, pdpBtn, pdpBar, pdpMedia, pdpChanged, pdpBand, pdpLast = null, pdpBarVisible = null, bandCfgId = null, bandHash = null;
   var SKEY = 'mtz_mkl_pdp';
   function cfgOfSession() { try { return JSON.parse(sessionStorage.getItem(SKEY) || '{}'); } catch (e) { return {}; } }
   function setCfgOfSession(variant, id) { try { var m = cfgOfSession(); m[variant] = id; sessionStorage.setItem(SKEY, JSON.stringify(m)); } catch (e) {} }
@@ -780,7 +780,7 @@
     var aria = st.s1 ? (st.on ? 'Konfiguration aus der Merkliste entfernen: ' + nm + ', ' + colour : 'Konfiguration merken: ' + nm + ', ' + colour) : (st.on ? nm + ' aus der Merkliste entfernen' : nm + ' merken');
     var title = st.on ? (st.s1 ? 'Konfiguration gemerkt — aus der Merkliste entfernen' : 'Gemerkt — aus der Merkliste entfernen') : (st.s1 ? 'Konfiguration merken' : 'Merken');
     var lim = !st.on && !st.changed && isFull();
-    [pdpBtn, pdpBar].forEach(function (b) {
+    [pdpBtn, pdpBar, pdpMedia].forEach(function (b) {
       if (!b) return;
       b.classList.toggle('is-on', st.on); b.setAttribute('aria-pressed', st.on ? 'true' : 'false'); b.setAttribute('aria-label', aria); b.setAttribute('title', title);
       b.querySelector('.mkl-pdp-save__label').textContent = label;
@@ -832,6 +832,9 @@
     buy.insertAdjacentElement('afterend', pdpRow);
     pdpBtn = pdpRow.querySelector('.mkl-pdp-save'); pdpChanged = pdpRow.querySelector('.mkl-pdp-changed');
     pdpBtn.addEventListener('click', function () { pressPdp(pdpBtn); });
+    /* desktop shortcut on the gallery (≥ 64rem, CSS): bare glyph like the PLP card; the labelled button below stays the primary control */
+    var stage = document.querySelector('.pdp-media__stage');
+    if (stage) { pdpMedia = h(pdpBtnHTML(' mkl-pdp-save--icon mkl-pdp-media', true)); stage.appendChild(pdpMedia); pdpMedia.addEventListener('click', function () { pressPdp(pdpMedia); }); }
     var details = document.getElementById('bStickyDetails');
     if (details) { pdpBar = h(pdpBtnHTML(' mkl-pdp-save--icon mkl-pdp-bar', true)); details.insertAdjacentElement('beforebegin', pdpBar); pdpBar.addEventListener('click', function () { pressPdp(pdpBar); }); }
     var bar = document.getElementById('pdpStickyBar');
