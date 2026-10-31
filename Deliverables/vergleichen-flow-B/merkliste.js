@@ -712,7 +712,7 @@
      session's entry instead of duplicating; ?merkliste=<configId> restores
      a saved build through the configurator's own controls and shows a band.
      ===================================================================== */
-  var pdpRow, pdpBtn, pdpBar, pdpNote, pdpChanged, pdpBand, pdpLast = null, pdpBarVisible = null, bandCfgId = null, bandHash = null;
+  var pdpRow, pdpBtn, pdpBar, pdpChanged, pdpBand, pdpLast = null, pdpBarVisible = null, bandCfgId = null, bandHash = null;
   var SKEY = 'mtz_mkl_pdp';
   function cfgOfSession() { try { return JSON.parse(sessionStorage.getItem(SKEY) || '{}'); } catch (e) { return {}; } }
   function setCfgOfSession(variant, id) { try { var m = cfgOfSession(); m[variant] = id; sessionStorage.setItem(SKEY, JSON.stringify(m)); } catch (e) {} }
@@ -786,7 +786,6 @@
       b.querySelector('.mkl-pdp-save__label').textContent = label;
       b.classList.toggle('is-limit', lim); if (lim) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
     });
-    pdpNote.hidden = !st.on; pdpNote.firstChild.nodeValue = (st.s1 ? 'Konfiguration gemerkt' : 'Gemerkt') + ' · ';
     pdpChanged.hidden = !st.changed;
     if (pdpBand && !(st.on && st.hit && st.hit.configId === bandCfgId) && !(bandHash && st.hash === bandHash)) removeBand();   /* the band describes the restored build; the first change turns it into the caption */
   }
@@ -829,12 +828,10 @@
   function initPdp() {
     var buy = document.querySelector('#bCheckout .cfgb-buyrow'); if (!buy) return;
     pdpRow = h('<div class="mkl-pdp-row" id="mklPdpRow">' + pdpBtnHTML('', false) +
-      '<p class="mkl-pdp-note" id="mklPdpNote" hidden>Gemerkt · <a href="#merkliste">Zur Merkliste</a></p>' +
       '<p class="mkl-pdp-changed" id="mklPdpChanged" hidden>Geändert seit dem Merken — erneut merken, um zu aktualisieren</p></div>');
     buy.insertAdjacentElement('afterend', pdpRow);
-    pdpBtn = pdpRow.querySelector('.mkl-pdp-save'); pdpNote = pdpRow.querySelector('.mkl-pdp-note'); pdpChanged = pdpRow.querySelector('.mkl-pdp-changed');
+    pdpBtn = pdpRow.querySelector('.mkl-pdp-save'); pdpChanged = pdpRow.querySelector('.mkl-pdp-changed');
     pdpBtn.addEventListener('click', function () { pressPdp(pdpBtn); });
-    pdpNote.querySelector('a').addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
     var details = document.getElementById('bStickyDetails');
     if (details) { pdpBar = h(pdpBtnHTML(' mkl-pdp-save--icon mkl-pdp-bar', true)); details.insertAdjacentElement('beforebegin', pdpBar); pdpBar.addEventListener('click', function () { pressPdp(pdpBar); }); }
     var bar = document.getElementById('pdpStickyBar');

@@ -17,8 +17,12 @@
   --text-muted:#6A6A6A;--sp-2:.5rem;--sp-3:.75rem;--sp-4:1rem;--sp-5:1.25rem;--r-s:.125rem;--r-m:.25rem;--r-l:.5rem;--r-pill:9999px;
 }
 
-/* ---- Secondary row directly under the buy row (#bCheckout stacks with gap 1.6rem → pull up to .75rem) ---- */
-.mkl-pdp-row{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-2) var(--sp-4);margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
+/* ---- Secondary action directly under the buy row (#bCheckout stacks with gap 1.6rem → pull up to .75rem).
+   Full width of the buy row, same height as the CTA, centred label: one aligned action block; the label itself carries the state
+   (no separate "Gemerkt · Zur Merkliste" line — the toast and the header badge lead to the list) ---- */
+.mkl-pdp-row{display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-2);margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
+.mkl-pdp-row .mkl-pdp-save{width:100%;height:3rem;min-height:3rem;justify-content:center;padding:0 var(--sp-4)}
+.mkl-pdp-row .mkl-pdp-save__label{min-width:0;text-align:center}
 .mkl-pdp-row[hidden]{display:none}
 
 /* ---- Merken control: ghost button, bookmark glyph + label ---- */
@@ -35,14 +39,8 @@
 .mkl-pdp-save.is-on:hover{background:var(--teal-5)}
 .mkl-pdp-save.is-limit{color:var(--text-muted);border-color:var(--graphite-300);background:var(--white);opacity:.6;cursor:not-allowed}
 
-/* confirmation line next to the control (wraps under it on narrow widths) */
-.mkl-pdp-note{margin:0;flex:1 1 12rem;min-width:0;font-size:.75rem;line-height:1.45;color:var(--text-muted);opacity:0;transition:opacity .15s}
-.mkl-pdp-note:not([hidden]){opacity:1}
-.mkl-pdp-note[hidden]{display:none}
-.mkl-pdp-note a{display:inline-block;padding:.5rem 0;margin:-.5rem 0;color:var(--teal);font-weight:600;text-decoration:underline}
-.mkl-pdp-note a:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem;border-radius:var(--r-s)}
 /* "changed since bookmarking" caption (Z5) */
-.mkl-pdp-changed{flex-basis:100%;margin:0;font-size:.75rem;line-height:1.45;color:var(--text-muted)}
+.mkl-pdp-changed{margin:0;text-align:center;font-size:.75rem;line-height:1.45;color:var(--text-muted)}
 .mkl-pdp-changed[hidden]{display:none}
 
 /* ---- On-arrival band: first child of .pdp-price--lead, explains the pre-filled price ---- */
@@ -90,7 +88,7 @@
 
 /* ---- Reduced motion + print ---- */
 @media(prefers-reduced-motion:reduce){
-  .mkl-pdp-save,.mkl-pdp-save__glyph,.mkl-pdp-save svg path,.mkl-pdp-note,.mkl-pdp-band,.mkl-toast,.pdp-swatches.mkl-pdp-hint{transition:none !important;animation:none !important}
+  .mkl-pdp-save,.mkl-pdp-save__glyph,.mkl-pdp-save svg path,.mkl-pdp-band,.mkl-toast,.pdp-swatches.mkl-pdp-hint{transition:none !important;animation:none !important}
   .mkl-pdp-save.is-pressed .mkl-pdp-save__glyph{transform:none}
 }
 @media print{.mkl-pdp-row,.mkl-pdp-bar{display:none !important}}
