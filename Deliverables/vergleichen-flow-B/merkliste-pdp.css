@@ -75,6 +75,11 @@
 #pdpStickyBar .pdp-stickybar__details{margin-left:0}
 @media(max-width:56.25rem){#pdpStickyBar .mkl-pdp-bar{margin-left:0}}
 @media(max-width:29.99rem){#pdpStickyBar .pdp-stickybar__thumb{display:none}}
+/* 08: from 64rem the echo carries the same visible label as the buy-box control (room in the bar: 518px @1440, 138px @1024) */
+@media(min-width:64rem){
+  #pdpStickyBar .mkl-pdp-bar{width:auto;padding:0 var(--sp-4) 0 var(--sp-3);gap:var(--sp-2)}
+  #pdpStickyBar .mkl-pdp-bar .mkl-pdp-sr{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto;min-width:3.5rem}
+}
 
 /* ---- Toast: above the sticky bar while it is visible (page level; inside the drawer the 06 rule applies) ---- */
 .mkl-toast{transition:opacity .2s,transform .2s,bottom .2s,visibility 0s linear .2s}
