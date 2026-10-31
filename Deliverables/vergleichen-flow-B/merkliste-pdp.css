@@ -80,9 +80,10 @@
 /* ---- Sticky-bar echo: icon-only 2.75rem square, label for screen readers ---- */
 .mkl-pdp-save--icon{width:2.75rem;padding:0;justify-content:center;gap:0}
 .mkl-pdp-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;min-width:0}
-#pdpStickyBar .mkl-pdp-bar{margin-left:auto;flex-shrink:0}
-#pdpStickyBar .pdp-stickybar__details{margin-left:0}
-@media(max-width:56.25rem){#pdpStickyBar .mkl-pdp-bar{margin-left:0}}
+/* the echo only exists below 56.25rem (hidden on the two-column layout above) — there it sits left of the CTA;
+   on desktop the bar keeps its own layout (Details + CTA pushed right by the PDP's margin-left:auto) */
+#pdpStickyBar .mkl-pdp-bar{flex-shrink:0}
+@media(max-width:56.24rem){#pdpStickyBar .mkl-pdp-bar,#pdpStickyBar .pdp-stickybar__details{margin-left:0}}
 @media(max-width:29.99rem){#pdpStickyBar .pdp-stickybar__thumb{display:none}}
 
 /* ---- Toast: above the sticky bar while it is visible (page level; inside the drawer the 06 rule applies) ---- */
