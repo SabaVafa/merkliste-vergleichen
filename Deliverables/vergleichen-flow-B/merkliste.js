@@ -827,9 +827,10 @@
   }
   function initPdp() {
     var buy = document.querySelector('#bCheckout .cfgb-buyrow'); if (!buy) return;
-    /* one Merken control, a square right next to the CTA in the buy row (client decision 2026-11-01); state via glyph + aria-label/title */
-    pdpBtn = h(pdpBtnHTML(' mkl-pdp-save--icon mkl-pdp-buy', true));
-    buy.appendChild(pdpBtn);
+    /* one Merken control on the gallery, opposite the "Fotos | 3D" switch (client decision 2026-11-01, desktop + mobile); state via glyph + aria-label/title */
+    var stage = document.querySelector('.pdp-media__stage');
+    pdpBtn = h(pdpBtnHTML(' mkl-pdp-save--icon mkl-pdp-media', true));
+    if (stage) stage.appendChild(pdpBtn); else buy.appendChild(pdpBtn);
     pdpBtn.addEventListener('click', function () { pressPdp(pdpBtn); });
     pdpRow = h('<div class="mkl-pdp-row" id="mklPdpRow" hidden><p class="mkl-pdp-changed" id="mklPdpChanged" hidden>Geändert seit dem Merken — erneut merken, um zu aktualisieren</p></div>');
     buy.insertAdjacentElement('afterend', pdpRow);

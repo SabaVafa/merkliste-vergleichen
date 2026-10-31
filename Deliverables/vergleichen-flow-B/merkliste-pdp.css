@@ -17,18 +17,22 @@
   --text-muted:#6A6A6A;--sp-2:.5rem;--sp-3:.75rem;--sp-4:1rem;--sp-5:1.25rem;--r-s:.125rem;--r-m:.25rem;--r-l:.5rem;--r-pill:9999px;
 }
 
-/* ---- Merken next to the CTA: a 3rem square at the end of .cfgb-buyrow (same height as the CTA, outlined → the CTA stays primary).
-   The caption row under the buy row appears only for "Geändert seit dem Merken" (#bCheckout stacks with gap 1.6rem → pull up to .75rem) ---- */
-.cfgb-buyrow .mkl-pdp-buy{flex:0 0 3rem;width:3rem;height:3rem;min-height:3rem}
-/* phones: stepper + CTA + square don't fit in one line without breaking the CTA label →
-   the stepper takes its own line, CTA and square stay side by side (before a colour is chosen the stepper is hidden anyway) */
-.cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-cta{white-space:nowrap}
-@media(max-width:29.99rem){
-  .cfgb-buyrow:has(.mkl-pdp-buy){display:grid;grid-template-columns:minmax(0,1fr) 3rem;gap:var(--sp-3) .6rem}
-  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-buyrow__qty{grid-column:1 / -1;justify-self:stretch;display:flex}   /* full-width stepper: both lines share the same edges */
-  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-buyrow__qty>span{flex:1 1 auto}
-  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-cta{padding-inline:var(--sp-3);min-width:0}
+/* ---- Merken on the gallery, opposite the "Fotos | 3D" switch (desktop + mobile).
+   A framed control in the switch's own language (white, graphite-300 hairline, same radius and height),
+   so it reads as part of the media toolbar and doesn't float; 2.75rem hit area via ::before ---- */
+.pdp-media__stage .mkl-pdp-media{position:absolute;top:.75rem;right:0;z-index:3;width:2.1875rem;height:2.1875rem;min-height:0;padding:0;border:.0625rem solid var(--graphite-300);border-radius:var(--radius-lg,.5rem);background:var(--white);color:var(--color-graphite-700,#4A4A4A)}
+.pdp-media__stage .mkl-pdp-media::before{content:'';position:absolute;inset:-.25rem}
+.pdp-media__stage .mkl-pdp-media .mkl-pdp-save__glyph,.pdp-media__stage .mkl-pdp-media svg{width:1.125rem;height:1.125rem}
+.pdp-media__stage .mkl-pdp-media:hover{border-color:var(--teal);color:var(--teal);background:var(--white)}
+.pdp-media__stage .mkl-pdp-media.is-on{border-color:var(--teal);color:var(--teal);background:var(--white)}
+.pdp-media__stage .mkl-pdp-media.is-on:hover{background:var(--teal-5)}
+.pdp-media__stage .mkl-pdp-media.is-limit{color:var(--text-muted);opacity:.6;background:var(--white)}
+/* phones (the PDP stacks the switch as a single chip above the photo): same row, right edge, chip height and radius */
+@media(max-width:560px){
+  .pdp-media__stage .mkl-pdp-media{top:0;right:0;width:2.25rem;height:2.25rem;border-radius:var(--radius,.25rem)}
 }
+/* two-column layout: the gallery column is sticky, so the control stays in view — the sticky-bar echo would only duplicate it */
+@media(min-width:56.25rem){#pdpStickyBar .mkl-pdp-bar{display:none}}
 .mkl-pdp-row{margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
 .mkl-pdp-row[hidden]{display:none}
 
@@ -80,11 +84,6 @@
 #pdpStickyBar .pdp-stickybar__details{margin-left:0}
 @media(max-width:56.25rem){#pdpStickyBar .mkl-pdp-bar{margin-left:0}}
 @media(max-width:29.99rem){#pdpStickyBar .pdp-stickybar__thumb{display:none}}
-/* 08: from 64rem the echo carries the same visible label as the buy-box control (room in the bar: 518px @1440, 138px @1024) */
-@media(min-width:64rem){
-  #pdpStickyBar .mkl-pdp-bar{width:auto;padding:0 var(--sp-4) 0 var(--sp-3);gap:var(--sp-2)}
-  #pdpStickyBar .mkl-pdp-bar .mkl-pdp-sr{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto;min-width:3.5rem}
-}
 
 /* ---- Toast: above the sticky bar while it is visible (page level; inside the drawer the 06 rule applies) ---- */
 .mkl-toast{transition:opacity .2s,transform .2s,bottom .2s,visibility 0s linear .2s}
@@ -98,7 +97,7 @@
   .mkl-pdp-save,.mkl-pdp-save__glyph,.mkl-pdp-save svg path,.mkl-pdp-band,.mkl-toast,.pdp-swatches.mkl-pdp-hint{transition:none !important;animation:none !important}
   .mkl-pdp-save.is-pressed .mkl-pdp-save__glyph{transform:none}
 }
-@media print{.mkl-pdp-row,.mkl-pdp-bar,.mkl-pdp-buy{display:none !important}}
+@media print{.mkl-pdp-row,.mkl-pdp-bar,.mkl-pdp-media{display:none !important}}
 
 /* ---- 09b P0-10: "Zurück zum Vergleich" in the breadcrumb row (only when the visitor came from a comparison) ---- */
 .crumb .container.mkl-has-return{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}
