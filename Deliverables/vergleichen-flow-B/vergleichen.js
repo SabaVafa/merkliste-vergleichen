@@ -11,7 +11,11 @@
    ============================================================ */
 (function () {
   'use strict';
-  var MAX = 4, MIN = 2, KEY = 'mtz_vgl_flow';
+  var MAX = 4, MIN = 2;
+  /* 09b P0-1: one slot per category in localStorage (survives tabs/sessions, 30 days); compare MODE stays per session (cards stay hidden until "Vergleichen") */
+  var KEY = 'mtz_vgl', OLDKEY = 'mtz_vgl_flow', MODEKEY = 'mtz_vgl_mode', TTL = 30 * 864e5, LENSKEY = window.MTZ_LENS || 'sprechanlage';
+  var PAGES = { sprechanlage: 'index.html', briefkasten: 'briefkasten.html' };
+  var PDP_URLS = { colson1: 'pdp/index.html' };   /* models with a product page in the prototype (same map as merkliste.js) */
 
   var SW = {anthrazit:'#383E42',braun:'#5A3B29',edelstahl:'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)',eisenglimmer:'linear-gradient(135deg,#3a3d40,#23262a)',grau:'#B9BCC0',schwarz:'#1A171B',weiss:'#FFFFFF',wunschfarbe:'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)'};
   var SWL = {anthrazit:'Anthrazit',braun:'Braun',edelstahl:'Edelstahl',eisenglimmer:'Eisenglimmer',grau:'Grau',schwarz:'Schwarz',weiss:'Weiß',wunschfarbe:'Wunschfarbe'};
@@ -172,8 +176,27 @@
   var selected=[];
   var compareMode=false;   /* card compare fields are hidden until the user starts a comparison */
   var detailsOpen=false;   /* progressive disclosure of non-key rows (Version B) */
-  try{var raw=sessionStorage.getItem(KEY);if(raw)selected=JSON.parse(raw).filter(function(id){return BY_ID[id];});}catch(e){}
-  function persist(){try{sessionStorage.setItem(KEY,JSON.stringify(selected));}catch(e){}}
+  var mem=null;   /* in-memory fallback when localStorage is blocked */
+  function readStore(){
+    var s=mem;try{var raw=localStorage.getItem(KEY);s=raw?JSON.parse(raw):mem;}catch(e){}
+    if(!s||s.v!==2||!s.lenses||typeof s.lenses!=='object')s={v:2,lenses:{}};
+    var now=Date.now();Object.keys(s.lenses).forEach(function(k){var sl=s.lenses[k];if(!sl||!Array.isArray(sl.ids)||!(now-Date.parse(sl.updatedAt)<TTL))delete s.lenses[k];});
+    return s;
+  }
+  function ownIds(){var sl=readStore().lenses[LENSKEY];return (sl?sl.ids:[]).filter(function(id){return BY_ID[id];}).slice(0,MAX);}
+  function loadSel(){
+    selected=ownIds();
+    var old=null;try{old=JSON.parse(sessionStorage.getItem(OLDKEY)||'null');}catch(e){}
+    if(Array.isArray(old)){   /* migration from the session-only v1 key */
+      try{sessionStorage.removeItem(OLDKEY);}catch(e){}
+      if(!selected.length){selected=old.filter(function(id){return BY_ID[id];}).slice(0,MAX);if(selected.length){persist();storeMode(true);}}
+    }
+  }
+  /* writes only this category's slot — read fresh first so a parallel tab of the other category is kept */
+  function persist(){var s=readStore();if(selected.length)s.lenses[LENSKEY]={ids:selected.slice(),updatedAt:new Date().toISOString()};else delete s.lenses[LENSKEY];mem=s;try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
+  function modeStored(){try{return !!(JSON.parse(sessionStorage.getItem(MODEKEY)||'{}')||{})[LENSKEY];}catch(e){return false;}}
+  function storeMode(on){try{var m=JSON.parse(sessionStorage.getItem(MODEKEY)||'{}')||{};if(on)m[LENSKEY]=1;else delete m[LENSKEY];sessionStorage.setItem(MODEKEY,JSON.stringify(m));}catch(e){}}
+  function setMode(on){compareMode=!!on;document.body.classList.toggle('vgl-mode',compareMode);storeMode(compareMode);}
   function isFull(){return selected.length>=MAX;}
   function canCompare(){return selected.length>=MIN;}
 
@@ -191,7 +214,9 @@
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   var IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   var IC_BM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>';
-  var liveEl,fromMkl=false,lastCleared=null,chipsAll=false;
+  var IC_LINK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg>';
+  var IC_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.2" y2="16.2"/></svg>';
+  var liveEl,shareBtn,fromMkl=false,lastCleared=null,chipsAll=false,prevTitle=null;
 
   function buildChrome(){
     tray=h('<div class="vgl-tray" role="region" aria-label="Vergleichsauswahl">'+
@@ -215,13 +240,14 @@
         '<button class="vgl-back" type="button" data-vgl="back" hidden>'+IC_BM+'Merkliste</button>'+
         '<h2 class="vgl-view__title" id="vglTitle" tabindex="-1">Vergleich <span data-vgl="count">(0)</span></h2>'+
         '<label class="vgl-diff"><input type="checkbox" data-vgl="diff"><span class="vgl-switch" aria-hidden="true"></span>Nur Unterschiede <span class="vgl-diff__n" data-vgl="diffn"></span></label>'+
+        '<button class="vgl-link vgl-link--share" type="button" data-vgl="share" title="Link zu diesem Vergleich kopieren">'+IC_LINK+'<span class="vgl-share__l"><span class="vgl-m-hide">Link kopieren</span><span class="vgl-m-only">Teilen</span></span></button>'+
         '<button class="vgl-link vgl-link--ic" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
-        '<button class="vgl-link" type="button" data-vgl="clear">Vergleich leeren</button>'+
+        '<button class="vgl-link" type="button" data-vgl="clear"><span class="vgl-m-hide">Vergleich leeren</span><span class="vgl-m-only">Leeren</span></button>'+
         '<button class="vgl-close" type="button" data-vgl="close" aria-label="Vergleich schließen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
       '</div></div>'+
       '<div class="vgl-view__scroll"><div class="vgl-view__scroll-in" data-vgl="body"></div></div>'+
       '<div class="vgl-visually-hidden" aria-live="polite" aria-atomic="true" data-vgl="live"></div></div>');
-    document.body.appendChild(view);liveEl=view.querySelector('[data-vgl="live"]');
+    document.body.appendChild(view);liveEl=view.querySelector('[data-vgl="live"]');shareBtn=view.querySelector('[data-vgl="share"]');
     viewBody=view.querySelector('[data-vgl="body"]');viewCount=view.querySelector('[data-vgl="count"]');diffCb=view.querySelector('[data-vgl="diff"]');
     diffN=view.querySelector('[data-vgl="diffn"]');scrollEl=view.querySelector('.vgl-view__scroll');
 
@@ -229,6 +255,9 @@
 
     tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm)toggle(rm.getAttribute('data-rm'),false);});
     view.addEventListener('click',function(e){
+      if(addPanel&&!addPanel.contains(e.target)&&!(addAnchor&&addAnchor.contains(e.target)))closeAdd(false);   /* outside click closes the search */
+      var pop=view.querySelector('.vgl-sharepop');if(pop&&!pop.contains(e.target)&&!e.target.closest('[data-vgl="share"]'))pop.remove();
+      var opt=e.target.closest('[data-addid]');if(opt){chooseAdd(opt.getAttribute('data-addid'));return;}
       var a=e.target.closest('[data-vgl]');
       if(a&&a.getAttribute('data-vgl')==='body')a=null;   /* the body container carries data-vgl too — don't swallow chip/alt clicks */
       if(a){var k=a.getAttribute('data-vgl');
@@ -237,8 +266,12 @@
         if(k==='undo-clear')undoClear();
         if(k==='details'){detailsOpen=!detailsOpen;renderView();focusIn('[data-vgl="details"]');}
         if(k==='morechips'){chipsAll=!chipsAll;renderView();focusIn('[data-vgl="morechips"]');}
-        if(k==='add')addFromGrid();
-        if(k==='addmkl'){closeView();if(window.MTZ_MKL)window.MTZ_MKL.open();}
+        if(k==='add'){if(addPanel&&addAnchor===a)closeAdd(true);else openAddSearch(a);}
+        if(k==='addgrid'){closeAdd(false);addFromGrid();}
+        if(k==='addclose')closeAdd(true);
+        if(k==='share')shareView(a);
+        if(k==='sharepop-close'){var sp=view.querySelector('.vgl-sharepop');if(sp)sp.remove();if(shareBtn)shareBtn.focus();}
+        if(k==='addmkl'){closeAdd(false);closeView();if(window.MTZ_MKL)window.MTZ_MKL.open();}
         if(k==='back'){if(window.MTZ_MKL)window.MTZ_MKL.open();}
         if(k==='print'){printView();}
         return;}
@@ -246,16 +279,159 @@
       var j=e.target.closest('[data-jump]');if(j){jumpTo(j.getAttribute('data-jump'));return;}
       var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');if(toggle(aid,true)){var anm=shortName(BY_ID[aid]).main;toast(esc(anm)+' zum Vergleich hinzugefügt','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
       var rm=e.target.closest('[data-rm]');if(rm){removeColumn(rm.getAttribute('data-rm'));return;}
-      var go=e.target.closest('[data-go]');if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');
+      var go=e.target.closest('[data-go]');
+      if(go&&go.tagName==='A'){   /* real product page: remember the way back (P0-10), then navigate normally */
+        try{sessionStorage.setItem('mtz_return',JSON.stringify({type:'vergleich',href:(PAGES[LENSKEY]||'index.html')+'?vergleich='+selected.map(encodeURIComponent).join(','),n:selected.length,lens:LENSKEY,t:Date.now()}));}catch(err){}
+        return;
+      }
+      if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');
     });
-    view.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var tip=view.querySelector('.vgl-i.is-open');if(tip){e.stopPropagation();closeTip();tip.focus();}});
+    view.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
+      if(addPanel){e.stopPropagation();closeAdd(true);return;}
+      var pop=view.querySelector('.vgl-sharepop');if(pop){e.stopPropagation();pop.remove();if(shareBtn)shareBtn.focus();return;}
+      var tip=view.querySelector('.vgl-i.is-open');if(tip){e.stopPropagation();closeTip();tip.focus();}});
     diffCb.addEventListener('change',renderView);
-    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open')&&!view.querySelector('.vgl-i.is-open'))closeView();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open')&&!view.querySelector('.vgl-i.is-open')&&!addPanel&&!view.querySelector('.vgl-sharepop'))closeView();});
     /* (sticky product header stays a stable size — no scroll-driven resize, which caused a layout jump) */
     /* keep keyboard focus inside the dialog */
     view.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=view.querySelectorAll('button:not([disabled]),input:not([disabled]),summary,[tabindex="0"]');if(!f.length)return;var first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
   }
-  function printView(){var was=detailsOpen;detailsOpen=true;renderView();var det=viewBody.querySelector('.vgl-common');if(det)det.open=true;var d=new Date();view.querySelector('.vgl-view__bar-in').setAttribute('data-print','edelstahl-tuerklingel.de · '+LENS.label+' · '+d.toLocaleDateString('de-DE'));try{window.print();}catch(e){}detailsOpen=was;renderView();}
+  function printView(){
+    var was=detailsOpen;detailsOpen=true;renderView();var det=viewBody.querySelector('.vgl-common');if(det)det.open=true;var d=new Date();view.querySelector('.vgl-view__bar-in').setAttribute('data-print','edelstahl-tuerklingel.de · '+LENS.label+' · '+d.toLocaleDateString('de-DE'));
+    /* print rules apply only while the comparison is being printed (a plain PLP print stays the page) */
+    var done=function(){document.body.classList.remove('vgl-printing');window.removeEventListener('afterprint',done);};
+    document.body.classList.add('vgl-printing');window.addEventListener('afterprint',done);
+    try{window.print();}catch(e){}
+    setTimeout(done,1000);
+    detailsOpen=was;renderView();
+  }
+  /* ---- P0-2: the comparison has an address (?vergleich=a,b,c) ---- */
+  function pageUrl(ids){
+    var q=location.search.replace(/^\?/,'').split('&').filter(function(kv){return kv&&!/^(vergleich|von)=/.test(kv);});
+    if(ids&&ids.length>=MIN)q.push('vergleich='+ids.map(encodeURIComponent).join(','));
+    return location.pathname+(q.length?'?'+q.join('&'):'')+location.hash;
+  }
+  function shareUrl(){return location.origin+location.pathname+'?vergleich='+selected.map(encodeURIComponent).join(',');}
+  function setTitle(){
+    if(prevTitle===null)prevTitle=document.title;
+    var items=selected.map(function(id){return BY_ID[id];}).filter(Boolean);
+    document.title=items.length>=MIN?'Vergleich: '+colLabels(items).map(function(l){return l.main;}).join(' vs. ')+' | Metzler':prevTitle;
+  }
+  function syncUrl(){if(!view.classList.contains('is-open'))return;try{history.replaceState(history.state,'',pageUrl(selected));}catch(e){}setTitle();}
+  function shareView(btn){
+    var url=shareUrl(),mobile=!!(window.matchMedia&&window.matchMedia('(max-width:47.99rem)').matches);
+    if(mobile&&navigator.share){navigator.share({title:document.title,url:url}).catch(function(err){if(err&&err.name==='AbortError')return;copyLink(url,btn);});return;}
+    copyLink(url,btn);
+  }
+  function copyLink(url,btn){
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){shareDone(btn);},function(){sharePop(url,btn);});
+    else sharePop(url,btn);
+  }
+  function shareDone(btn){
+    var l=btn.querySelector('.vgl-share__l'),ic=btn.querySelector('svg'),oldL=l.innerHTML,oldIc=ic.outerHTML;
+    btn.classList.add('is-done');l.textContent='Link kopiert';ic.outerHTML=IC_OK;
+    clearTimeout(btn._t);btn._t=setTimeout(function(){btn.classList.remove('is-done');l.innerHTML=oldL;var c=btn.querySelector('svg');if(c)c.outerHTML=oldIc;},2000);
+    announce('Link zum Vergleich kopiert.');
+    toast('Link kopiert — wer ihn öffnet, sieht diesen Vergleich.','ok');
+  }
+  /* no clipboard API: a read-only field to copy by hand */
+  function sharePop(url,btn){
+    var old=view.querySelector('.vgl-sharepop');if(old)old.remove();
+    var pop=h('<div class="vgl-sharepop" role="group" aria-label="Link zum Vergleich"><label for="vglShareUrl">Link zum Vergleich</label><input id="vglShareUrl" type="text" readonly value="'+esc(url)+'"><button class="vgl-link" type="button" data-vgl="sharepop-close">Schließen</button></div>');
+    btn.parentNode.insertBefore(pop,btn.nextSibling);
+    var inp=pop.querySelector('input');inp.focus();inp.select();
+  }
+  /* ---- P0-9: add a model by search, without leaving the comparison ---- */
+  var addPanel=null,addAnchor=null,addActive=-1;
+  function norm(s){return String(s||'').toLowerCase().replace(/ä/g,'a').replace(/ö/g,'o').replace(/ü/g,'u').replace(/ß/g,'ss');}
+  function reviewsOf(id){for(var i=0;i<SRC.length;i++)if(SRC[i].id===id)return SRC[i].reviews||0;return 0;}
+  function mklIdsHere(){try{return window.MTZ_MKL?window.MTZ_MKL.items().filter(function(it){return it.lens===LENSKEY&&!it.configId;}).map(function(it){return it.articleId||it.id;}):[];}catch(e){return [];}}
+  function addGroups(q){
+    var pool=Object.keys(BY_ID).map(function(id){return BY_ID[id];}).filter(function(p){return selected.indexOf(p.id)<0;});
+    q=norm(q).trim();
+    if(q){
+      var toks=q.split(/\s+/);
+      return [{h:null,list:pool.filter(function(p){var hay=norm([p.name,p.design,shortName(p).main,p.artNr||''].join(' '));return toks.every(function(t){return hay.indexOf(t)>-1;});}).slice(0,6)}];
+    }
+    var seen={},n=0,mk=[],sug=[];
+    function take(p,arr){if(!p||seen[p.id]||selected.indexOf(p.id)>-1||n>=6)return;seen[p.id]=1;n++;arr.push(p);}
+    mklIdsHere().forEach(function(id){take(BY_ID[id],mk);});
+    var items=selected.map(function(id){return BY_ID[id];});
+    if(items.length>=MIN&&analyze(items).twin)alternatives(items).forEach(function(o){take(o.p,sug);});
+    pool.slice().sort(function(a,b){return reviewsOf(b.id)-reviewsOf(a.id);}).forEach(function(p){take(p,sug);});
+    var g=[];if(mk.length)g.push({h:'Aus Ihrer Merkliste',list:mk});if(sug.length)g.push({h:'Vorschläge',list:sug});
+    return g;
+  }
+  function renderAddList(){
+    var inp=addPanel.querySelector('input'),ul=addPanel.querySelector('ul'),st=addPanel.querySelector('.vgl-addsearch__empty');
+    var groups=addGroups(inp.value),html='',any=false;
+    groups.forEach(function(g){
+      if(g.h&&g.list.length)html+='<li class="vgl-addsearch__h" role="presentation">'+esc(g.h)+'</li>';
+      g.list.forEach(function(p){any=true;var nm=shortName(p);html+='<li class="vgl-addopt" role="option" id="vglOpt-'+esc(p.id)+'" data-addid="'+esc(p.id)+'" aria-selected="false"><span class="vgl-addopt__img"><img src="'+esc(p.img)+'" alt=""></span><span class="vgl-addopt__t"><b>'+esc(nm.main)+'</b>'+(nm.sub?'<small>'+esc(nm.sub)+'</small>':'')+'<span class="vgl-addopt__p">ab '+euro(p.price)+'</span></span></li>';});
+    });
+    ul.innerHTML=html;addActive=-1;inp.removeAttribute('aria-activedescendant');
+    inp.setAttribute('aria-expanded',String(any));
+    st.textContent=any?'':'Kein passendes Modell bei '+LENS.label+' gefunden.';
+    st.hidden=any;
+  }
+  function moveActive(d){
+    var opts=addPanel.querySelectorAll('.vgl-addopt');if(!opts.length)return;
+    if(addActive>-1)opts[addActive].setAttribute('aria-selected','false'),opts[addActive].classList.remove('is-active');
+    addActive=(addActive+d+opts.length)%opts.length;
+    var o=opts[addActive];o.setAttribute('aria-selected','true');o.classList.add('is-active');
+    addPanel.querySelector('input').setAttribute('aria-activedescendant',o.id);
+    try{o.scrollIntoView({block:'nearest'});}catch(e){}
+  }
+  function openAddSearch(anchor){
+    closeAdd(false);
+    addAnchor=anchor;
+    var mobile=!!(window.matchMedia&&window.matchMedia('(max-width:47.99rem)').matches);
+    var nM=mklCount();
+    addPanel=h('<div class="vgl-addsearch'+(mobile?' is-sheet':'')+'" role="dialog" aria-label="Modell zum Vergleich hinzufügen">'+
+      '<div class="vgl-addsearch__head"><label for="vglAddQ">Modell suchen</label><button class="vgl-addsearch__x" type="button" data-vgl="addclose" aria-label="Suche schließen">'+IC_X+'</button></div>'+
+      '<div class="vgl-addsearch__field">'+IC_SEARCH+'<input id="vglAddQ" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="vglAddList" autocomplete="off" placeholder="'+(LENSKEY==='briefkasten'?'z. B. Siebert, Ebenhard':'z. B. VDM10, Colson')+'"></div>'+
+      '<ul class="vgl-addsearch__list" id="vglAddList" role="listbox" aria-label="'+esc(LENS.label)+'"></ul>'+
+      '<p class="vgl-addsearch__empty" role="status" hidden></p>'+
+      '<div class="vgl-addsearch__foot"><button class="vgl-link" type="button" data-vgl="addgrid">Auf der Produktliste wählen</button>'+(nM?'<button class="vgl-link" type="button" data-vgl="addmkl">Aus der Merkliste ('+nM+')</button>':'')+'</div>'+
+    '</div>');
+    if(mobile){var scrim=h('<div class="vgl-addsearch__scrim" aria-hidden="true"></div>');view.appendChild(scrim);addPanel._scrim=scrim;}
+    view.appendChild(addPanel);
+    if(!mobile){   /* anchored to the add tile, kept inside the viewport */
+      var r=anchor.getBoundingClientRect(),w=addPanel.offsetWidth,ht=addPanel.offsetHeight;
+      var left=Math.max(16,Math.min(r.right-w,window.innerWidth-w-16)),top=Math.max(16,Math.min(r.top,window.innerHeight-ht-16));
+      addPanel.style.left=left+'px';addPanel.style.top=top+'px';
+    }
+    var inp=addPanel.querySelector('input');
+    inp.addEventListener('input',renderAddList);
+    inp.addEventListener('keydown',function(e){
+      if(e.key==='ArrowDown'){e.preventDefault();moveActive(1);}
+      else if(e.key==='ArrowUp'){e.preventDefault();moveActive(-1);}
+      else if(e.key==='Enter'){e.preventDefault();var opts=addPanel.querySelectorAll('.vgl-addopt');var o=opts[addActive>-1?addActive:0];if(o)chooseAdd(o.getAttribute('data-addid'));}
+    });
+    renderAddList();
+    inp.focus();
+  }
+  function closeAdd(refocus){
+    if(!addPanel)return;
+    if(addPanel._scrim)addPanel._scrim.remove();
+    addPanel.remove();addPanel=null;
+    var a=addAnchor;addAnchor=null;
+    if(refocus&&a&&document.contains(a))a.focus();
+  }
+  function chooseAdd(id){
+    var keep=selected.length+1<MIN;   /* first model of an empty comparison: keep searching for the second */
+    var anchorSel=addAnchor&&addAnchor.getAttribute('data-vgl');
+    if(!keep)closeAdd(false);
+    if(!toggle(id,true))return;
+    var nm=shortName(BY_ID[id]).main;
+    if(keep){
+      announce(nm+' hinzugefügt. Wählen Sie ein weiteres Modell.');
+      var a2=view.querySelector('[data-vgl="'+anchorSel+'"]');if(addPanel){addPanel.querySelector('input').value='';renderAddList();addPanel.querySelector('input').focus();}if(a2)addAnchor=a2;
+      return;
+    }
+    announce(nm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');
+    focusIn('.vgl-ph__rm[data-rm="'+id+'"]');
+  }
   function announce(m){if(!liveEl)return;liveEl.textContent='';setTimeout(function(){liveEl.textContent=m;},30);}
   function focusIn(sel){var el=view.querySelector(sel);(el||view.querySelector('#vglTitle')).focus();}
   /* remove a column: focus moves to the next column's remove control (or the add tile); 2 → 1 keeps the dialog open with the empty state */
@@ -296,7 +472,7 @@
      in mode: "Vergleich anzeigen (n)", grey until ≥2, teal + opens comparison from 2. */
   function injectBarButton(){
     var bar=document.querySelector('.catalog__bar'); if(!bar||bar.querySelector('.vgl-barwrap'))return;
-    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt">0</span></button><button class="vgl-cancel" type="button">Vergleich beenden</button></div>');
+    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt" aria-hidden="true">0</span></button><button class="vgl-cancel" type="button">Vergleich beenden</button></div>');
     barBtn=wrap.querySelector('.vgl-bar-btn');
     cancelBtn=wrap.querySelector('.vgl-cancel');
     barBtn.addEventListener('click',function(){if(!compareMode){enterMode();}else if(canCompare()){openView();}});
@@ -304,10 +480,15 @@
     bar.appendChild(wrap);
     syncBar();
   }
-  function enterMode(){compareMode=true;document.body.classList.add('vgl-mode');syncBar();var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}toast('Vergleichsmodus aktiv — wählen Sie 2 bis 4 Modelle über „Vergleichen" auf den Karten.','info');}
+  function enterMode(){
+    setMode(true);syncAll();var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}
+    var n=selected.length;
+    if(n)toast('Ihre letzte Auswahl ist wieder da — '+(n>1?n+' Modelle':'1 Modell')+'. Wählen Sie bis zu '+MAX+' Modelle über „Vergleichen" auf den Karten.','info',{label:'Vergleich leeren',fn:function(){clearAll();if(barBtn)barBtn.focus();}});
+    else toast('Vergleichsmodus aktiv — wählen Sie 2 bis 4 Modelle über „Vergleichen" auf den Karten.','info');
+  }
   function exitMode(){
     var snap=selected.slice();
-    compareMode=false;document.body.classList.remove('vgl-mode');selected=[];persist();closeView();syncAll();
+    setMode(false);selected=[];persist();closeView();syncAll();
     if(snap.length)toast('Vergleich beendet — '+snap.length+' Modell'+(snap.length>1?'e':'')+' verworfen','ok',{label:'Rückgängig',fn:function(){setSelection(snap);syncAll();if(barBtn)barBtn.focus();}});
   }
 
@@ -345,10 +526,12 @@
     if(!compareMode){
       lbl.textContent='Vergleichen';
       barBtn.classList.remove('is-active','is-wait');
-      barBtn.setAttribute('aria-label','Vergleich starten');
+      barBtn.classList.toggle('has-saved',n>0);
+      barBtn.setAttribute('aria-label',n?'Vergleichen, '+(n>1?n+' Modelle':'1 Modell')+' aus Ihrer letzten Auswahl':'Vergleich starten');
       barBtn.removeAttribute('aria-disabled');
     }else{
       lbl.textContent='Vergleich anzeigen';
+      barBtn.classList.remove('has-saved');
       barBtn.classList.toggle('is-active',canCompare());
       barBtn.classList.toggle('is-wait',!canCompare());
       barBtn.setAttribute('aria-label',canCompare()?'Vergleich anzeigen':'Mindestens zwei Modelle wählen');
@@ -359,7 +542,8 @@
   function syncTray(){
     var n=selected.length;
     trayLabel.innerHTML='Vergleich ('+n+') <span class="of">/ max. '+MAX+'</span>';
-    tray.classList.toggle('is-open',n>0);
+    var shown=n>0&&compareMode;   /* a stored selection waits behind the toolbar button until the mode is started */
+    tray.classList.toggle('is-open',shown);
     trayCta.disabled=!canCompare();
     trayHint.className='vgl-tray__hint';
     if(!canCompare()){
@@ -376,7 +560,7 @@
     }
     traySlots.innerHTML='';
     selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));});
-    document.body.style.paddingBottom=n>0?((tray.offsetHeight||88)/16)+'rem':'';   /* measured after the slots exist — the mobile tray wraps to two rows */
+    document.body.style.paddingBottom=shown?((tray.offsetHeight||88)/16)+'rem':'';   /* measured after the slots exist — the mobile tray wraps to two rows */
   }
   function syncAll(){syncCards();syncBar();syncTray();if(view.classList.contains('is-open'))renderView();}
 
@@ -541,6 +725,8 @@
     var items=selected.map(function(id){return BY_ID[id];});
     viewCount.textContent='('+items.length+')';
     var back=view.querySelector('[data-vgl="back"]');if(back)back.hidden=!(fromMkl&&window.MTZ_MKL);
+    if(shareBtn)shareBtn.hidden=items.length<MIN;
+    syncUrl();
     if(items.length<2){
       viewBody.innerHTML='<div class="vgl-empty">'+SCALE+'<b>Mindestens zwei Modelle wählen</b><span>Markieren Sie über „Vergleichen" auf den Produktkarten weitere Modelle, um sie hier gegenüberzustellen.</span>'+
         '<div class="vgl-empty__act">'+(lastCleared?'<button class="vgl-more" type="button" data-vgl="undo-clear">Vergleich wiederherstellen ('+lastCleared.length+')</button>':'')+'<button class="vgl-more" type="button" data-vgl="add">'+IC_PLUS+'Modell wählen</button>'+(mklCount()?'<button class="vgl-more" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste wählen ('+mklCount()+')</button>':'')+'</div></div>';
@@ -612,7 +798,7 @@
         '<div class="vgl-ph__name" title="'+esc(p.name)+'">'+esc(nm.main)+(nm.dx?' <span class="vgl-ph__dx">'+esc(nm.dx)+'</span>':'')+'</div>'+
         '<div class="vgl-ph__sub">'+(nm.sub?esc(nm.sub):'&nbsp;')+'</div>'+
         '<div class="vgl-ph__price">ab '+euro(p.price)+(p.uvp?'<small class="uvp">UVP '+euro(p.uvp)+'</small>':'')+'</div>'+
-        '<button class="btn btn--primary" type="button" data-go>'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</button></th>';
+        (PDP_URLS[p.id]?'<a class="btn btn--primary" href="'+esc(PDP_URLS[p.id])+'" data-go="'+esc(p.id)+'">'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</a>':'<button class="btn btn--primary" type="button" data-go>'+(p.konfig?'Konfigurieren':'Zum Produkt')+'</button>')+'</th>';
     });
     var nMkl=addCol?mklCount():0;
     if(addCol)thead+='<th class="vgl-ph vgl-ph--add" scope="col"><button class="vgl-add" type="button" data-vgl="add" title="Bis zu '+MAX+' Modelle vergleichbar">'+IC_PLUS+'<b>Modell hinzufügen</b><small>noch '+(MAX-items.length)+' möglich</small></button>'+(nMkl?'<button class="vgl-add__mkl" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+'</th>';
@@ -667,7 +853,8 @@
     /* twin: the guidance is the point of that state → directly under the verdict; otherwise products first, guidance after the table */
     viewBody.innerHTML=sum+(an.twin?twin+table:table+twin)+after;
   }
-  function openView(){
+  function openView(opt){
+    opt=opt||{};
     if(selected.length<MIN)return;
     lastFocus=document.activeElement;
     var an=analyze(selected.map(function(id){return BY_ID[id];}));
@@ -677,15 +864,27 @@
     renderView();
     scrollEl.scrollTop=0;
     view.classList.add('is-open');view.setAttribute('aria-hidden','false');document.body.classList.add('vgl-overlay');document.body.style.overflow='hidden';view.querySelector('#vglTitle').focus();
+    /* opening pushes a history entry → the browser's Back closes the comparison; arriving by link replaces it (a reload reopens) */
+    var url=pageUrl(selected);
+    try{
+      if(opt.arrived)history.replaceState({mtzVgl:1,arrived:1},'',url);
+      else if(opt.push!==false&&!(history.state&&history.state.mtzVgl))history.pushState({mtzVgl:1},'',url);
+      else history.replaceState(history.state,'',url);
+    }catch(e){}
+    setTitle();
   }
-  function closeView(){
+  function closeView(fromPop){
     if(!view.classList.contains('is-open'))return;
+    closeAdd(false);var sp=view.querySelector('.vgl-sharepop');if(sp)sp.remove();
     closeTip();view.classList.remove('is-open');view.setAttribute('aria-hidden','true');document.body.classList.remove('vgl-overlay');document.body.style.overflow='';
     if(lastFocus&&lastFocus.focus&&document.contains(lastFocus)&&lastFocus!==document.body)lastFocus.focus();
     else if(barBtn)barBtn.focus();
     /* arrived from the Merkliste / a link: the grid is the natural landing, not the page top */
     if(fromMkl&&compareMode){var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}}
     fromMkl=false;
+    if(prevTitle!==null){document.title=prevTitle;prevTitle=null;}
+    try{sessionStorage.removeItem('mtz_return');}catch(e){}   /* the PDP "Zurück zum Vergleich" link ends with the comparison */
+    if(fromPop!==true){try{var st=history.state;if(st&&st.mtzVgl&&!st.arrived)history.back();else history.replaceState(null,'',pageUrl([]));}catch(e){}}
   }
 
   /* =========================================================
@@ -707,8 +906,7 @@
 
   function applyState(step){
     closeView();
-    compareMode = step>=1;                     /* step 1+ = compare mode on → card fields visible */
-    document.body.classList.toggle('vgl-mode',compareMode);
+    setMode(step>=1);                          /* step 1+ = compare mode on → card fields visible */
     selected = step>=2 ? TRIO.slice() : [];    /* models get marked from step 3 (index 2) */
     selected = selected.filter(function(id){return BY_ID[id];});
     persist(); syncAll();
@@ -760,31 +958,68 @@
     var valid=[];(ids||[]).forEach(function(id){id=String(id);if(BY_ID[id]&&valid.indexOf(id)<0&&valid.length<MAX)valid.push(id);});
     if(!valid.length)return 0;
     selected=valid;persist();
-    compareMode=true;document.body.classList.add('vgl-mode');
+    setMode(true);
     return selected.length;
   }
   window.MTZ_VGL={
     compare:function(ids){var n=setSelection(ids);if(!n)return 0;fromMkl=true;syncAll();if(canCompare())openView();return n;},
     enterMode:function(){if(!compareMode)enterMode();},
-    isMode:function(){return compareMode;}
+    isMode:function(){return compareMode;},
+    selected:function(){return selected.slice();}
   };
 
   /* ---- Init ---- */
   function init(){
     if(!window.MTZ_PRODUCTS)return setTimeout(init,50);
     if(!SRC.length){SRC=window.MTZ_PRODUCTS;SRC.forEach(function(p){if(!BY_ID[p.id])BY_ID[p.id]=LENS.enrich(p);});}
-    /* ?vergleich=id,id (share link / Merkliste handover from the other PLP) → preselect + open */
-    var fromUrl=0,qm=null,wrongLens=false;
-    try{qm=/[?&]vergleich=([^&#]+)/.exec(location.search);if(qm){fromUrl=setSelection(decodeURIComponent(qm[1]).split(','));wrongLens=!fromUrl;fromMkl=/[?&]von=merkliste\b/.test(location.search);}}catch(e){}
-    if(qm){try{history.replaceState(null,'',location.pathname+(/[?&]merkliste=demo\b/.test(location.search)?'?merkliste=demo':'')+location.hash);}catch(e){}}   /* the session carries the state — a reload must not reopen or re-toast */
-    compareMode = selected.length>0;   /* restore mode if a selection persisted across reload */
-    if(compareMode)document.body.classList.add('vgl-mode');
+    loadSel();
+    compareMode=modeStored();   /* the mode survives a reload in this session only */
+    document.body.classList.toggle('vgl-mode',compareMode);
+    /* ?vergleich=id,id (shared link, reload, Merkliste handover) */
+    var arr=null;
+    try{var qm=/[?&]vergleich=([^&#]+)/.exec(location.search);if(qm)arr={raw:decodeURIComponent(qm[1]).split(',').map(function(x){return x.trim();}).filter(Boolean),fromMkl:/[?&]von=merkliste\b/.test(location.search)};}catch(e){}
     buildChrome(); buildCoach(); injectBarButton();
     var grid=document.getElementById('productGrid');
     if(grid){scanCards();new MutationObserver(function(){scanCards();injectBarButton();}).observe(grid,{childList:true});}
     syncAll();
-    if(fromUrl>=MIN)openView();
-    else if(wrongLens){var other=(window.MTZ_LENS==='briefkasten')?{page:'index.html',label:'Türsprechanlagen'}:{page:'briefkasten.html',label:'Briefkästen'};setTimeout(function(){toast('Diese Modelle gehören zur Kategorie '+other.label+' — der Vergleich öffnet sich dort.','info',{label:'Dort öffnen',fn:function(){location.href=other.page+'?vergleich='+encodeURIComponent(decodeURIComponent(qm[1]))+(fromMkl?'&von=merkliste':'');}});},300);}
+    if(arr)arrive(arr);
+    window.addEventListener('popstate',function(e){
+      var st=e.state,open=view.classList.contains('is-open');
+      if(open&&!(st&&st.mtzVgl)){closeView(true);return;}
+      if(!open&&st&&st.mtzVgl){var m=/[?&]vergleich=([^&#]+)/.exec(location.search);if(m&&setSelection(decodeURIComponent(m[1]).split(','))>=MIN){syncAll();openView({push:false});}}
+    });
+    /* another tab changed this category's selection */
+    window.addEventListener('storage',function(e){if(e.key!==KEY)return;selected=ownIds();syncAll();});
+  }
+  function arrive(arr){
+    var uniq=[];arr.raw.forEach(function(id){if(uniq.indexOf(id)<0)uniq.push(id);});
+    var valid=uniq.filter(function(id){return BY_ID[id];}),bad=uniq.length-valid.length,over=valid.length>MAX;
+    valid=valid.slice(0,MAX);fromMkl=arr.fromMkl;
+    if(valid.length>=MIN){
+      var prev=selected.slice(),differs=!arr.fromMkl&&prev.length>0&&prev.slice().sort().join()!==valid.slice().sort().join();
+      if(differs)try{sessionStorage.setItem('mtz_vgl_prev',JSON.stringify(prev));}catch(e){}
+      setSelection(valid);syncAll();openView({arrived:true});
+      var msg=null,act=null;
+      if(differs){msg='Geteilter Vergleich geöffnet.';act={label:'Meine Auswahl ('+prev.length+') wiederherstellen',fn:function(){setSelection(prev);syncAll();if(!view.classList.contains('is-open')&&selected.length>=MIN)openView({push:false});}};}
+      else if(over)msg='Es werden die ersten '+MAX+' Modelle verglichen.';
+      else if(bad)msg=(bad>1?bad+' Modelle':'1 Modell')+' aus dem Link '+(bad>1?'sind':'ist')+' nicht mehr verfügbar.';
+      if(msg)setTimeout(function(){toast(msg,'info',act);},300);
+      return;
+    }
+    try{history.replaceState(null,'',pageUrl([]));}catch(e){}
+    if(valid.length===1){
+      var prev1=selected.slice(),keep1=!arr.fromMkl&&prev1.length>0&&prev1.join()!==valid.join();   /* never drop the visitor's own selection silently */
+      setSelection(valid);syncAll();
+      setTimeout(function(){toast('Aus dem Link ist nur noch ein Modell verfügbar — wählen Sie ein weiteres zum Vergleich.','info',keep1?{label:'Meine Auswahl ('+prev1.length+') wiederherstellen',fn:function(){setSelection(prev1);syncAll();}}:null);},300);
+      return;
+    }
+    /* none of this category: a handover from the other category's Merkliste (or ids of the other category) opens there.
+       Prototype heuristic — on JTL the server resolves the category of each id. */
+    var bkIds=Object.keys(BK_SEED),otherLens=arr.fromMkl||(LENSKEY==='briefkasten'?uniq.some(function(id){return bkIds.indexOf(id)<0;}):uniq.some(function(id){return bkIds.indexOf(id)>-1;}));
+    if(otherLens){
+      var other=(LENSKEY==='briefkasten')?{page:'index.html',label:'Türsprechanlagen'}:{page:'briefkasten.html',label:'Briefkästen'};
+      setTimeout(function(){toast('Diese Modelle gehören zur Kategorie '+other.label+' — der Vergleich öffnet sich dort.','info',{label:'Dort öffnen',fn:function(){location.href=other.page+'?vergleich='+encodeURIComponent(uniq.join(','))+(arr.fromMkl?'&von=merkliste':'');}});},300);
+    }else setTimeout(function(){toast('Dieser Vergleichs-Link ist nicht mehr gültig.','limit');},300);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

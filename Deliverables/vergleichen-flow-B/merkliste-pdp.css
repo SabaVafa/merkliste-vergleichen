@@ -94,3 +94,13 @@
   .mkl-pdp-save.is-pressed .mkl-pdp-save__glyph{transform:none}
 }
 @media print{.mkl-pdp-row,.mkl-pdp-bar{display:none !important}}
+
+/* ---- 09b P0-10: "Zurück zum Vergleich" in the breadcrumb row (only when the visitor came from a comparison) ---- */
+.crumb .container.mkl-has-return{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}
+.crumb .container.mkl-has-return>ol{flex:1 1 auto;min-width:0}
+.crumb .mkl-return{display:inline-flex;align-items:center;gap:var(--sp-1);min-height:2.75rem;flex:0 0 auto;color:var(--teal);font-size:var(--text-body-sm);font-weight:600;text-decoration:none;white-space:nowrap}
+.crumb .mkl-return svg{width:1rem;height:1rem}
+.crumb .mkl-return:hover{color:var(--teal);text-decoration:underline}
+.crumb .mkl-return:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem;border-radius:var(--r-s)}
+.mkl-return__s{display:none}
+@media(max-width:29.99rem){.mkl-return__l{display:none}.mkl-return__s{display:inline}}

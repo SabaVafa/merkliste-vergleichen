@@ -503,20 +503,93 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 
 /* ---- reduced motion: no slide, fade, flash or pulse in the compare layer ---- */
 @media(prefers-reduced-motion:reduce){
-  .vgl-tray,.vgl-view,.vgl-toast,.vgl-coach,.vgl-scrim,.vgl-chip,.vgl-add,.vgl-more svg,.vgl-switch,.vgl-switch::after,.vgl-box,.vgl-box svg,.vgl-toggle,.vgl-tip,.vgl-bar-btn,.vgl-tray__cta,.vgl-ph__rm,.vgl-alt__add,.vgl-coach__prog,.vgl-cancel,tr.is-flash td.vgl-val,.vgl-spot{transition:none !important;animation:none !important}
+  .vgl-tray,.vgl-view,.vgl-toast,.vgl-coach,.vgl-scrim,.vgl-chip,.vgl-add,.vgl-more svg,.vgl-switch,.vgl-switch::after,.vgl-box,.vgl-box svg,.vgl-toggle,.vgl-tip,.vgl-bar-btn,.vgl-tray__cta,.vgl-ph__rm,.vgl-alt__add,.vgl-coach__prog,.vgl-cancel,tr.is-flash td.vgl-val,.vgl-spot,.vgl-link--share{transition:none !important;animation:none !important}
   tr.is-flash td.vgl-val{background:var(--teal-100,#E6EEEE)}
   .vgl-spot{box-shadow:0 0 0 .375rem rgba(92,219,211,.35)}
 }
 
+/* ============================================================
+   09b · Adaption Merken/Vergleichen (P0-1, P0-2, P0-8, P0-9, P0-10)
+   ============================================================ */
+/* P0-1: a stored selection from an earlier visit shows as a count on the resting toolbar button */
+.vgl-bar-btn.has-saved .cnt{display:inline-flex;background:var(--teal,#015253);color:var(--white,#fff)}
+.vgl-bar-btn.has-saved:hover .cnt{background:rgba(255,255,255,.24)}
+
+/* P0-2: "Link kopieren" (mobile "Teilen") in the overlay bar */
+.vgl-link--share{display:inline-flex;align-items:center;gap:var(--sp-2,.5rem);min-height:2.75rem;color:var(--teal,#015253);font-size:var(--text-body-sm,.875rem);font-weight:600;text-decoration:none}
+.vgl-link--share svg{width:1.125rem;height:1.125rem;flex-shrink:0}
+.vgl-link--share:hover{color:var(--teal,#015253);text-decoration:underline}
+.vgl-link--share:active{color:var(--teal-600,#014A4B)}
+.vgl-link--share[hidden]{display:none}
+.vgl-link--share.is-done{text-decoration:none}
+.vgl-link:focus-visible,.vgl-addsearch__x:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem;border-radius:var(--r-s,.125rem)}
+.vgl-view__bar-in{position:relative}
+.vgl-sharepop{position:absolute;top:calc(100% + .25rem);right:clamp(1.5rem,4vw,3.5rem);z-index:20;width:min(26rem,calc(100vw - 2rem));display:grid;grid-template-columns:1fr auto;gap:var(--sp-2,.5rem) var(--sp-3,.75rem);align-items:center;padding:var(--sp-4,1rem);background:var(--white,#fff);border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-l,.5rem);box-shadow:var(--shadow-lg,0 .75rem 2rem rgba(0,0,0,.12))}
+.vgl-sharepop label{grid-column:1 / -1;font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--schwarz,#1A171B)}
+.vgl-sharepop input{height:2.75rem;min-width:0;padding:0 var(--sp-3,.75rem);border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-m,.25rem);font-family:inherit;font-size:var(--text-body-sm,.875rem);color:var(--schwarz,#1A171B);background:var(--white,#fff)}
+.vgl-sharepop input:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
+
+/* P0-10: the column CTA is a real link where a product page exists */
+.vgl-ph a.btn{text-decoration:none}
+
+/* P0-9: add a model by search — popover on desktop, bottom sheet on phones */
+.vgl-addsearch{position:fixed;z-index:30;width:20rem;max-height:min(30rem,calc(100vh - 2rem));display:flex;flex-direction:column;gap:var(--sp-3,.75rem);padding:var(--sp-4,1rem);background:var(--white,#fff);border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-l,.5rem);box-shadow:var(--shadow-lg,0 .75rem 2rem rgba(0,0,0,.12));text-align:left}
+.vgl-addsearch__head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2,.5rem);margin:-.5rem -.5rem 0 0}
+.vgl-addsearch__head label{font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--schwarz,#1A171B)}
+.vgl-addsearch__x{width:2.75rem;height:2.75rem;border:0;background:none;color:var(--text-muted,#6A6A6A);border-radius:var(--r-pill,9999px);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.vgl-addsearch__x svg{width:1.125rem;height:1.125rem}
+.vgl-addsearch__x:hover{color:var(--schwarz,#1A171B);background:var(--graphite-100,#F0F0F0)}
+.vgl-addsearch__field{position:relative}
+.vgl-addsearch__field svg{position:absolute;left:.75rem;top:50%;width:1.125rem;height:1.125rem;transform:translateY(-50%);color:var(--text-muted,#6A6A6A);pointer-events:none}
+.vgl-addsearch__field input{width:100%;height:2.75rem;padding:0 var(--sp-3,.75rem) 0 2.5rem;border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-m,.25rem);background:var(--white,#fff);font-family:inherit;font-size:1rem;color:var(--schwarz,#1A171B)}
+.vgl-addsearch__field input:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem;border-color:var(--teal,#015253)}
+.vgl-addsearch__list{list-style:none;margin:0;padding:0;overflow-y:auto;min-height:0;flex:1 1 auto}
+.vgl-addsearch__h{padding:var(--sp-2,.5rem) 0 var(--sp-1,.25rem);font-size:var(--text-caption,.75rem);font-weight:600;color:var(--text-muted,#6A6A6A);text-transform:none}
+.vgl-addopt{display:grid;grid-template-columns:2.5rem minmax(0,1fr);align-items:center;gap:var(--sp-3,.75rem);min-height:3.25rem;padding:var(--sp-1,.25rem) var(--sp-2,.5rem);border-radius:var(--r-m,.25rem);cursor:pointer}
+.vgl-addopt:hover,.vgl-addopt.is-active{background:var(--teal-5,rgba(1,82,83,.05))}
+.vgl-addopt.is-active{outline:.125rem solid var(--teal,#015253);outline-offset:-.125rem}
+.vgl-addopt__img{width:2.5rem;height:2.5rem;border-radius:var(--r-s,.125rem);background:var(--white,#fff);border:.0625rem solid var(--graphite-200,#E6E6E8);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.vgl-addopt__img img{max-width:100%;max-height:100%;object-fit:contain}
+.vgl-addopt__t{display:flex;flex-direction:column;gap:.125rem;min-width:0}
+.vgl-addopt__t b{font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--schwarz,#1A171B);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vgl-addopt__t small{font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vgl-addopt__p{font-size:var(--text-caption,.75rem);font-weight:600;color:var(--schwarz,#1A171B);white-space:nowrap;margin-top:.125rem}
+.vgl-addsearch__empty{margin:0;font-size:var(--text-body-sm,.875rem);color:var(--text-muted,#6A6A6A)}
+.vgl-addsearch__empty[hidden]{display:none}
+.vgl-addsearch__foot{display:flex;flex-wrap:wrap;gap:0 var(--sp-3,.75rem);border-top:.0625rem solid var(--graphite-200,#E6E6E8);padding-top:var(--sp-2,.5rem);margin-bottom:-.5rem}
+.vgl-addsearch__foot .vgl-link{padding:0;color:var(--teal,#015253);font-size:var(--text-body-sm,.875rem);font-weight:600}
+.vgl-addsearch.is-sheet{left:0;right:0;bottom:0;top:auto;width:auto;max-height:70vh;border-radius:var(--r-xl,.75rem) var(--r-xl,.75rem) 0 0;border-width:.0625rem 0 0;padding:var(--sp-4,1rem) var(--sp-4,1rem) calc(var(--sp-4,1rem) + env(safe-area-inset-bottom,0px))}
+.vgl-addsearch__scrim{position:fixed;inset:0;z-index:29;background:var(--white-50,rgba(255,255,255,.5))}
+
+/* P0-8: phones — two full product columns, the third cut off as a swipe cue */
+@media(max-width:47.99rem){
+  .vgl-view__scroll-in{padding-inline:.75rem}
+  table.vgl-t col.rl{width:5.5rem}
+  table.vgl-t col.pc{width:calc((100vw - 8rem) / 2)}          /* .75 rem gutter + 5.5 rem labels + 1.75 rem of the 3rd column */
+  .vgl-view__bar-in{gap:0 .5rem}                               /* switch · Teilen · Leeren stay on one second row at 375 px */
+  .vgl-view__bar-in .vgl-link{padding-inline:.25rem}
+  .vgl-link--share{gap:.375rem}
+  table.vgl-t col.pc--add{width:6rem}
+  table.vgl-t th,table.vgl-t td{padding:.5rem .5rem}
+  table.vgl-t tbody .rh{font-size:.75rem;line-height:1.3;hyphens:auto;overflow-wrap:anywhere}
+  table.vgl-t thead th.vgl-ph{padding:.5rem .5rem 3.25rem}
+  .vgl-ph__name{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .vgl-ph__price{font-size:var(--text-body-sm,.875rem)}
+  .vgl-ph .btn{left:.5rem;right:.5rem;bottom:.5rem;font-size:.8125rem;padding:0 .5rem}
+  .vgl-view__scroll,.vgl-wrap{scroll-snap-type:x proximity;scroll-padding-inline-start:6.25rem}
+  table.vgl-t thead th.vgl-ph{scroll-snap-align:start}
+}
+
 /* ---- Print: the comparison only, expanded, no chrome ---- */
-@media print{
-  body>*:not(.vgl-view){display:none !important}
-  .vgl-view{position:static;opacity:1;visibility:visible;background:#fff}
-  .vgl-view__scroll{overflow:visible}
-  .vgl-view__bar{border-bottom:.125rem solid #000}
-  .vgl-diff,.vgl-link,.vgl-close,.vgl-ph__rm,.vgl-ph--add,.vgl-addcell,.vgl-more,.vgl-ph .btn,.vgl-sum__chips,.vgl-i,.vgl-vb,.vgl-back,.vgl-add__mkl,.vgl-empty__act,.vgl-toast{display:none !important}
-  .vgl-view__bar-in::after{content:attr(data-print);margin-left:auto;font-size:.8125rem;color:#333}
-  table.vgl-t thead th,table.vgl-t .rh{position:static;box-shadow:none}
-  .vgl-common{break-inside:avoid}
-  .vgl-common>summary::before{display:none}
+@media print{   /* 09b P0-2: only while printView() runs (body.vgl-printing) — a plain PLP print shows the page */
+  body.vgl-printing>*:not(.vgl-view){display:none !important}
+  body.vgl-printing .vgl-view{position:static;opacity:1;visibility:visible;background:#fff}
+  body.vgl-printing .vgl-view__scroll{overflow:visible}
+  body.vgl-printing .vgl-view__bar{border-bottom:.125rem solid #000}
+  body.vgl-printing .vgl-diff,body.vgl-printing .vgl-link,body.vgl-printing .vgl-close,body.vgl-printing .vgl-ph__rm,body.vgl-printing .vgl-ph--add,body.vgl-printing .vgl-addcell,body.vgl-printing .vgl-more,body.vgl-printing .vgl-ph .btn,body.vgl-printing .vgl-sum__chips,body.vgl-printing .vgl-i,body.vgl-printing .vgl-vb,body.vgl-printing .vgl-back,body.vgl-printing .vgl-add__mkl,body.vgl-printing .vgl-empty__act,body.vgl-printing .vgl-toast,body.vgl-printing .vgl-addsearch,body.vgl-printing .vgl-sharepop{display:none !important}
+  body.vgl-printing .vgl-view__bar-in::after{content:attr(data-print);margin-left:auto;font-size:.8125rem;color:#333}
+  body.vgl-printing table.vgl-t thead th,body.vgl-printing table.vgl-t .rh{position:static;box-shadow:none}
+  body.vgl-printing .vgl-common{break-inside:avoid}
+  body.vgl-printing .vgl-common>summary::before{display:none}
+  body:not(.vgl-printing) .vgl-view,body:not(.vgl-printing) .vgl-tray,body:not(.vgl-printing) .vgl-toast,body:not(.vgl-printing) .vgl-tourfab{display:none !important}
 }
