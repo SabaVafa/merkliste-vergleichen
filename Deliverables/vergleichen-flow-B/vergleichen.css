@@ -593,3 +593,11 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
   body.vgl-printing .vgl-common>summary::before{display:none}
   body:not(.vgl-printing) .vgl-view,body:not(.vgl-printing) .vgl-tray,body:not(.vgl-printing) .vgl-toast,body:not(.vgl-printing) .vgl-tourfab{display:none !important}
 }
+
+/* ---- Toast, calm variant (same as the Merkliste toast): white surface, hairline border, teal glyph + action ---- */
+.vgl-toast{background:var(--white,#fff);color:var(--schwarz,#1A171B);border:.0625rem solid var(--graphite-200,#E6E6E8);box-shadow:var(--shadow-md,0 .25rem .75rem rgba(0,0,0,.08))}
+.vgl-toast.t-add svg,.vgl-toast.t-ok svg,.vgl-toast.t-info svg{color:var(--teal,#015253)}
+.vgl-toast.t-limit svg{color:var(--graphite-500,#A1A1A1)}
+.vgl-toast__act{color:var(--teal,#015253);font-weight:600;text-underline-offset:.1875rem}
+.vgl-toast__act:hover{color:var(--teal-600,#014A4B)}
+.vgl-toast__act:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}

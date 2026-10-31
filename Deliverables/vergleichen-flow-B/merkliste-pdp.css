@@ -17,12 +17,17 @@
   --text-muted:#6A6A6A;--sp-2:.5rem;--sp-3:.75rem;--sp-4:1rem;--sp-5:1.25rem;--r-s:.125rem;--r-m:.25rem;--r-l:.5rem;--r-pill:9999px;
 }
 
-/* ---- Secondary action directly under the buy row (#bCheckout stacks with gap 1.6rem → pull up to .75rem).
-   Full width of the buy row, same height as the CTA, centred label: one aligned action block; the label itself carries the state
-   (no separate "Gemerkt · Zur Merkliste" line — the toast and the header badge lead to the list) ---- */
-.mkl-pdp-row{display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-2);margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
-.mkl-pdp-row .mkl-pdp-save{width:100%;height:3rem;min-height:3rem;justify-content:center;padding:0 var(--sp-4)}
-.mkl-pdp-row .mkl-pdp-save__label{min-width:0;text-align:center}
+/* ---- Merken next to the CTA: a 3rem square at the end of .cfgb-buyrow (same height as the CTA, outlined → the CTA stays primary).
+   The caption row under the buy row appears only for "Geändert seit dem Merken" (#bCheckout stacks with gap 1.6rem → pull up to .75rem) ---- */
+.cfgb-buyrow .mkl-pdp-buy{flex:0 0 3rem;width:3rem;height:3rem;min-height:3rem}
+/* phones: stepper + CTA + square don't fit in one line without breaking the CTA label →
+   the stepper takes its own line, CTA and square stay side by side (before a colour is chosen the stepper is hidden anyway) */
+.cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-cta{white-space:nowrap}
+@media(max-width:29.99rem){
+  .cfgb-buyrow:has(.mkl-pdp-buy){display:grid;grid-template-columns:minmax(0,1fr) 3rem;gap:var(--sp-3) .6rem}
+  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-buyrow__qty{grid-column:1 / -1;justify-self:start}
+}
+.mkl-pdp-row{margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
 .mkl-pdp-row[hidden]{display:none}
 
 /* ---- Merken control: ghost button, bookmark glyph + label ---- */
@@ -79,17 +84,6 @@
   #pdpStickyBar .mkl-pdp-bar .mkl-pdp-sr{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto;min-width:3.5rem}
 }
 
-/* ---- Gallery corner (desktop ≥ 64rem only): bare bookmark glyph top-right of the stage, same anatomy as the PLP card .mkl-mark.
-   The gallery column is sticky on desktop, so the shortcut stays in view while configuring; phones keep header + buy-box button only ---- */
-.mkl-pdp-media{display:none}
-@media(min-width:64rem){
-  .pdp-media__stage .mkl-pdp-media{display:flex;position:absolute;top:.5rem;right:.5rem;z-index:3;width:2.75rem;height:2.75rem;min-height:2.75rem;padding:0;border:0;border-radius:var(--r-pill);background:transparent;color:var(--schwarz)}
-  .pdp-media__stage .mkl-pdp-media:hover{border:0;background:transparent;color:var(--teal)}
-  .pdp-media__stage .mkl-pdp-media.is-on{color:var(--teal)}
-  .pdp-media__stage .mkl-pdp-media.is-on:hover{background:transparent}
-  .pdp-media__stage .mkl-pdp-media.is-limit{color:var(--text-muted);opacity:.6;background:transparent}
-}
-
 /* ---- Toast: above the sticky bar while it is visible (page level; inside the drawer the 06 rule applies) ---- */
 .mkl-toast{transition:opacity .2s,transform .2s,bottom .2s,visibility 0s linear .2s}
 .mkl-toast.is-pdp-bar{bottom:calc(var(--mkl-pdp-bar-h,4.625rem) + 1rem + env(safe-area-inset-bottom,0px))}
@@ -102,7 +96,7 @@
   .mkl-pdp-save,.mkl-pdp-save__glyph,.mkl-pdp-save svg path,.mkl-pdp-band,.mkl-toast,.pdp-swatches.mkl-pdp-hint{transition:none !important;animation:none !important}
   .mkl-pdp-save.is-pressed .mkl-pdp-save__glyph{transform:none}
 }
-@media print{.mkl-pdp-row,.mkl-pdp-bar,.mkl-pdp-media{display:none !important}}
+@media print{.mkl-pdp-row,.mkl-pdp-bar,.mkl-pdp-buy{display:none !important}}
 
 /* ---- 09b P0-10: "Zurück zum Vergleich" in the breadcrumb row (only when the visitor came from a comparison) ---- */
 .crumb .container.mkl-has-return{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}

@@ -283,3 +283,15 @@
   .mkl-printdoc__foot{margin-top:1rem;font-size:var(--text-caption,.75rem)}
 }
 @media(prefers-reduced-motion:reduce){.mkl-item__more svg{transition:none !important}}
+
+/* ---- Toast, calm variant (client feedback 2026-11-01: the black bar with mint link was too loud).
+   White surface, hairline border, soft shadow; teal glyph and action; the message carries the weight ---- */
+.mkl-toast{background:var(--white,#fff);color:var(--schwarz,#1A171B);border:.0625rem solid var(--graphite-200,#E6E6E8);box-shadow:var(--shadow-md,0 .25rem .75rem rgba(0,0,0,.08));font-weight:500}
+.mkl-toast>svg{color:var(--teal,#015253)}
+.mkl-toast.t-limit>svg{color:var(--graphite-500,#A1A1A1)}
+.mkl-toast__act{color:var(--teal,#015253);font-weight:600;text-underline-offset:.1875rem}
+.mkl-toast__act:hover{color:var(--teal-600,#014A4B)}
+.mkl-toast__act:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
+/* the status glyphs use circle/line/polyline too — outline them like the path (a bare <circle> rendered as a solid dot) */
+.mkl-toast>svg circle,.mkl-toast>svg line,.mkl-toast>svg polyline{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mkl-toast>svg circle[r="0.6"]{fill:currentColor}
