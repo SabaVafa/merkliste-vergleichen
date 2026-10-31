@@ -25,7 +25,9 @@
 .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-cta{white-space:nowrap}
 @media(max-width:29.99rem){
   .cfgb-buyrow:has(.mkl-pdp-buy){display:grid;grid-template-columns:minmax(0,1fr) 3rem;gap:var(--sp-3) .6rem}
-  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-buyrow__qty{grid-column:1 / -1;justify-self:start}
+  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-buyrow__qty{grid-column:1 / -1;justify-self:stretch;display:flex}   /* full-width stepper: both lines share the same edges */
+  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-buyrow__qty>span{flex:1 1 auto}
+  .cfgb-buyrow:has(.mkl-pdp-buy) .cfgb-cta{padding-inline:var(--sp-3);min-width:0}
 }
 .mkl-pdp-row{margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
 .mkl-pdp-row[hidden]{display:none}
