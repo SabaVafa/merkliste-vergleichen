@@ -618,3 +618,7 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 .vgl-toast.in-view{bottom:calc(1.5rem + env(safe-area-inset-bottom,0px))}
 .vgl-toast.has-act{pointer-events:auto}
 .vgl-toast.t-add>svg,.vgl-toast.t-ok>svg,.vgl-toast.t-info>svg{color:var(--teal,#015253)}
+
+/* ---- Alert on light teal (client request 2026-11-02): --teal-100 surface, --teal-10 hairline; divider graphite-300 so it stays visible on the tint ---- */
+.vgl-toast{background:var(--teal-100,#E6EEEE);border-color:var(--teal-10,rgba(1,82,83,.1));box-shadow:var(--shadow-md,0 .25rem .75rem rgba(0,0,0,.08))}
+.vgl-toast__act::before{background:var(--graphite-300,#DADADA)}

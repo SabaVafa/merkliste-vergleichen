@@ -111,3 +111,5 @@ Es gibt **eine** Merken-Instanz auf der Seite: oben rechts auf der Galerie-Bühn
 - **PDP-Galerie:** Das Control folgt der Grammatik der Umschaltung: nicht gemerkt wie das „3D“-Segment (weiß, Graphit-Glyph), gemerkt wie das aktive „Fotos“-Segment (Teal-Fläche, weißes Glyph).
 
 **Assets:** `merkliste.js?v=11`, `merkliste.css?v=10`, `merkliste-pdp.css?v=12`, `vergleichen.js?v=22`, `vergleichen.css?v=24`.
+
+**Hinweise auf hellem Teal (Kundenwunsch, 2026-11-02):** Die Fläche ist jetzt `--teal-100` (wie der Kaufberater-Block „Finden statt Suchen“), die Haarlinie `--teal-10`, der Schatten `--shadow-md`. Der Trenner vor der Aktion ist `--graphite-300`, damit er auf der Tönung sichtbar bleibt. Kontraste auf `--teal-100`: Text `--schwarz` ≈ 15:1, Aktion `--teal` ≈ 8,5:1. Assets: `merkliste.css?v=11`, `vergleichen.css?v=25`.
