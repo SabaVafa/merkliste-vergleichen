@@ -12,27 +12,11 @@
   --teal-5:rgba(1,82,83,.05);--teal-10:rgba(1,82,83,.1);
   --teal-mint:var(--color-mint);--schwarz:var(--color-digital-black);--white:var(--color-white);
   --paper-white:var(--color-paper);--graphite-100:var(--color-graphite-100);--graphite-200:var(--color-graphite-200);
-  --graphite-300:var(--color-graphite-300);--graphite-500:var(--color-graphite-500);
+  --graphite-300:var(--color-graphite-300);--graphite-500:var(--color-graphite-500);--graphite-700:var(--color-graphite-700);
   --green:var(--color-green);--red-default:var(--color-red-600);
   --text-muted:#6A6A6A;--sp-2:.5rem;--sp-3:.75rem;--sp-4:1rem;--sp-5:1.25rem;--r-s:.125rem;--r-m:.25rem;--r-l:.5rem;--r-pill:9999px;
 }
 
-/* ---- Merken on the gallery, opposite the "Fotos | 3D" switch (desktop + mobile).
-   A framed control in the switch's own language (white, graphite-300 hairline, same radius and height),
-   so it reads as part of the media toolbar and doesn't float; 2.75rem hit area via ::before ---- */
-.pdp-media__stage .mkl-pdp-media{position:absolute;top:.75rem;right:0;z-index:3;width:2.1875rem;height:2.1875rem;min-height:0;padding:0;border:.0625rem solid var(--graphite-300);border-radius:var(--radius-lg,.5rem);background:var(--white);color:var(--color-graphite-700,#4A4A4A)}
-.pdp-media__stage .mkl-pdp-media::before{content:'';position:absolute;inset:-.25rem}
-.pdp-media__stage .mkl-pdp-media .mkl-pdp-save__glyph,.pdp-media__stage .mkl-pdp-media svg{width:1.125rem;height:1.125rem}
-/* states follow the switch's grammar: idle = like the "3D" segment (white, graphite glyph); saved = like the active "Fotos" segment (teal, white glyph) */
-.pdp-media__stage .mkl-pdp-media:hover{border-color:var(--teal);color:var(--teal);background:var(--white)}
-.pdp-media__stage .mkl-pdp-media.is-on{border-color:var(--teal);color:var(--white);background:var(--teal)}
-.pdp-media__stage .mkl-pdp-media.is-on:hover{border-color:var(--teal-600);color:var(--white);background:var(--teal-600)}
-.pdp-media__stage .mkl-pdp-media svg path{stroke-width:1.6}
-.pdp-media__stage .mkl-pdp-media.is-limit{color:var(--text-muted);opacity:.6;background:var(--white)}
-/* phones (the PDP stacks the switch as a single chip above the photo): same row, right edge, chip height and radius */
-@media(max-width:560px){
-  .pdp-media__stage .mkl-pdp-media{top:0;right:0;width:2.25rem;height:2.25rem;border-radius:var(--radius,.25rem)}
-}
 /* two-column layout: the gallery column is sticky, so the control stays in view — the sticky-bar echo would only duplicate it */
 @media(min-width:56.25rem){#pdpStickyBar .mkl-pdp-bar{display:none}}
 .mkl-pdp-row{margin-top:calc(var(--sp-3) - 1.6rem);min-width:0}
@@ -116,34 +100,42 @@
    becoming saved fills with a short pop — scale .86 → 1.06 → 1 in 220ms; none under reduced motion ---- */
 @keyframes mkl-bm-pop{0%{transform:scale(.86)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
 .mkl-pdp-save svg path{stroke-width:1.6}
-.mkl-pdp-save.is-on .mkl-pdp-save__glyph{animation:mkl-bm-pop .22s cubic-bezier(.2,.8,.2,1)}
+.mkl-pdp-save.is-just-saved .mkl-pdp-save__glyph{animation:mkl-bm-pop .22s cubic-bezier(.2,.8,.2,1)}
 @media(prefers-reduced-motion:reduce){.mkl-pdp-save .mkl-pdp-save__glyph{animation:none !important}}
 
 /* ---- Bookmark glyph = design-system icon family (2026-11-02): same 27×26 canvas, 1.4 line weight, round caps/joins and ≈1-unit corners as Home/ICONS/profile.svg and cart.svg; header size from .icon-btn (28px / 22px) ---- */
 .mkl-pdp-save svg path,.pdp-media__stage .mkl-pdp-media svg path{stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 .mkl-pdp-band__glyph svg path{stroke-width:1.4}
 
-/* ---- Gallery bookmark = a one-segment twin of the "Fotos | 3D" switch (lead PD pass 2026-11-02) ----
-   Same frame (white, 1px graphite-300, --radius-lg, .2rem inner padding) and the same 27.6px segment
-   (--radius) inside, so outer height, inner rhythm and corner radii match the switch exactly.
-   Glyph .95rem like the 3D cube, line ≈1.1px like the switch icons (stroke 2 on the 27-unit canvas).
-   Idle = the "3D" segment (graphite ink, teal on hover); saved = the active "Fotos" segment (teal segment, white glyph);
-   the frame never changes colour. Phones mirror the single "3D" chip instead (≤560px). */
-.pdp-media__stage .mkl-pdp-media{width:auto;height:auto;min-height:0;padding:.2rem;border:1px solid var(--color-graphite-300,#DADADA);border-radius:var(--radius-lg,.5rem);background:var(--white);color:var(--color-graphite-700,#54545C)}
-.pdp-media__stage .mkl-pdp-media .mkl-pdp-save__glyph{width:1.725rem;height:1.725rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius,.25rem);transition:background .16s,color .16s}
-.pdp-media__stage .mkl-pdp-media svg{width:.95rem;height:.95rem}
-.pdp-media__stage .mkl-pdp-media svg path{stroke-width:2}
-.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{border-color:var(--color-graphite-300,#DADADA);background:var(--white)}
-.pdp-media__stage .mkl-pdp-media:hover .mkl-pdp-save__glyph{color:var(--teal)}
-.pdp-media__stage .mkl-pdp-media.is-on .mkl-pdp-save__glyph{background:var(--teal);color:var(--white)}
-.pdp-media__stage .mkl-pdp-media.is-on:hover .mkl-pdp-save__glyph{background:var(--teal-600);color:var(--white)}
-.pdp-media__stage .mkl-pdp-media.is-limit{opacity:.6}
-.pdp-media__stage .mkl-pdp-media::before{inset:-.25rem}   /* ≥ 2.75rem hit area */
+/* ==== 10 · Galerie-Merken: beschrifteter Ein-Segment-Zwilling von „Fotos | 3D“ (Spec 10) ==== */
+.pdp-media__stage .mkl-pdp-media{position:absolute;top:.75rem;right:0;z-index:3;display:inline-flex;width:auto;height:auto;min-height:0;padding:.2rem;border:1px solid var(--graphite-300);border-radius:var(--radius-lg);background:var(--white);color:var(--graphite-700);font-size:.75rem;font-weight:700;line-height:1;transition:none}
+.pdp-media__stage .mkl-pdp-media::before{content:'';position:absolute;inset:-.375rem}   /* ≥ 2.75rem hit area */
+.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{border-color:var(--graphite-300);background:var(--white)}
+.mkl-pdp-media__seg{display:inline-flex;align-items:center;gap:.3rem;height:1.725rem;padding:0 .6rem;border-radius:var(--radius);transition:background-color .16s ease,color .16s ease}
+.mkl-pdp-media .mkl-pdp-save__glyph{position:relative;width:.95rem;height:.95rem}
+.mkl-pdp-media .mkl-pdp-save__glyph svg{width:.95rem;height:.95rem}
+.pdp-media__stage .mkl-pdp-media svg path{stroke-width:2}   /* must follow the shared 1.4 rule (same specificity) */
+.mkl-pdp-media .mkl-pdp-save__label,.mkl-pdp-media .mkl-pdp-save__short{display:inline-block;min-width:0;text-align:left}
+.mkl-pdp-media .mkl-pdp-save__label::after,.mkl-pdp-media .mkl-pdp-save__short::after{content:attr(data-alt);display:block;height:0;overflow:hidden;visibility:hidden}
+.mkl-pdp-media .mkl-pdp-save__short{display:none}
+.mkl-pdp-media:hover .mkl-pdp-media__seg{color:var(--teal)}
+.mkl-pdp-media:active .mkl-pdp-media__seg{background:var(--teal-5)}
+.mkl-pdp-media.is-on .mkl-pdp-media__seg{background:var(--teal);color:var(--white)}
+.mkl-pdp-media.is-on:hover .mkl-pdp-media__seg,.mkl-pdp-media.is-on:active .mkl-pdp-media__seg{background:var(--teal-600);color:var(--white)}
+.mkl-pdp-media.is-limit{opacity:.6;cursor:not-allowed}
+.mkl-pdp-media.is-limit .mkl-pdp-media__seg{color:var(--graphite-700);background:none}
+/* "changed since bookmarking" dot (idle look + dot) — also on the echo */
+.mkl-pdp-save__dot{position:absolute;top:-.125rem;right:-.1875rem;width:.375rem;height:.375rem;border-radius:50%;background:var(--teal);box-shadow:0 0 0 .125rem var(--white);opacity:0;transition:opacity .16s ease;pointer-events:none}
+.mkl-pdp-save.is-changed .mkl-pdp-save__dot{opacity:1}
+.mkl-pdp-save .mkl-pdp-save__glyph{position:relative}
 @media(max-width:560px){
-  /* the switch collapses to one chip (padding .5rem .9rem, --radius, graphite-300 border; "3D" in teal accent) — the bookmark becomes the same chip, square */
-  .pdp-media__stage .mkl-pdp-media{top:0;padding:0;border-radius:var(--radius,.25rem)}
-  .pdp-media__stage .mkl-pdp-media .mkl-pdp-save__glyph{width:2.15rem;height:2.15rem;border-radius:calc(var(--radius,.25rem) - 1px)}
-  .pdp-media__stage .mkl-pdp-media.is-on{border-color:var(--teal);background:var(--color-teal-50,#F2F6F6)}
-  .pdp-media__stage .mkl-pdp-media.is-on .mkl-pdp-save__glyph{background:transparent;color:var(--teal)}
-  .pdp-media__stage .mkl-pdp-media.is-on:hover .mkl-pdp-save__glyph{background:transparent;color:var(--teal-600)}
+  .pdp-media__stage .mkl-pdp-media{top:0;padding:0;border-radius:var(--radius)}
+  .pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{border-color:var(--teal)}
+  .mkl-pdp-media__seg{height:2.125rem;padding:0 .9rem;border-radius:calc(var(--radius) - 1px)}
+  .mkl-pdp-media .mkl-pdp-save__label{display:none}
+  .mkl-pdp-media .mkl-pdp-save__short{display:inline-block}
 }
+/* sticky echo: saved = secondary teal (next to the filled CTA); hidden while the gallery chip is in view */
+#pdpStickyBar .mkl-pdp-bar.is-on{border-color:var(--teal);background:var(--color-teal-50);color:var(--teal)}
+#pdpStickyBar .mkl-pdp-bar.is-dup{display:none}
+@media(prefers-reduced-motion:reduce){.mkl-pdp-media__seg,.mkl-pdp-save__dot{transition:none !important}.mkl-pdp-save .mkl-pdp-save__glyph{animation:none !important;transform:none !important}}

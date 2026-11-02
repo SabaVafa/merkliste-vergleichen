@@ -293,8 +293,9 @@
 
   /* ---- Toast (one element, one action, 5 s, pause on hover/focus) ---- */
   var toastLeft = 0, toastStart = 0, toastPaused = false;
-  function toast(msg, type, action) {
+  function toast(msg, type, action, quiet) {
     type = type || 'ok';
+    toastEl.setAttribute('aria-live', quiet ? 'off' : 'polite');   /* spec 10 §4.4: announced once — the live region already spoke */
     var vt = document.querySelector('.vgl-toast.show'); if (vt) vt.classList.remove('show');   /* a Merkliste toast replaces a compare toast (§5.7) */
     toastEl.className = 'mkl-toast t-' + type + (action ? ' has-act' : '') + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : ((pdpBarVisible && pdpBarVisible()) ? ' is-pdp-bar' : ''))));
     toastEl.innerHTML = (type === 'limit' ? IC_LIMIT : (type === 'info' ? IC_INFO : IC_OK)) + '<span class="mkl-toast__msg">' + esc(msg) + '</span>' + (action ? '<button class="mkl-toast__act" type="button">' + esc(action.label) + '</button>' : '');
@@ -358,17 +359,17 @@
   /* ---- Mutations ---- */
   function addItem(id, cardEl) {
     var p = BY_ID[id]; if (!p) return false;
-    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }); live(m); return false; }
+    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }, true); live(m); return false; }
     var it = itemFrom(p, cardEl); items.push(it); save(); syncAll(); pulseBadge();
     live('Gemerkt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Gemerkt', 'ok', { label: 'Zur Merkliste', fn: openDrawer });
+    toast('Gemerkt', 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
     return true;
   }
   function removeItem(id, silent) {
     var i = indexOf(id); if (i < 0) return;
     var it = items[i]; items.splice(i, 1); cmpSel = cmpSel.filter(function (x) { return x !== id; }); save(); syncAll();
     live('Entfernt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
-    if (!silent) toast(it.configId ? 'Konfiguration aus der Merkliste entfernt' : 'Aus der Merkliste entfernt', 'ok', { label: 'Rückgängig', fn: function () { restore([{ item: it, index: i }]); } });
+    if (!silent) toast(it.configId ? 'Konfiguration aus der Merkliste entfernt' : 'Aus der Merkliste entfernt', 'ok', { label: 'Rückgängig', fn: function () { restore([{ item: it, index: i }]); } }, true);
   }
   function removeFromRow(id, btn) {
     var row = btn.closest('.mkl-item'), li = row && row.parentNode, next = li && li.nextElementSibling;
@@ -744,25 +745,36 @@
     return { s1: true, on: !!hit, hit: hit, sn: sn, hash: hh, sessId: sessItem ? sess : null, changed: !hit && !!sessItem };
   }
   function pdpBtnHTML(extra, iconOnly) {
-    return '<button class="mkl-pdp-save' + (extra || '') + '" type="button" aria-pressed="false"><span class="mkl-pdp-save__glyph" aria-hidden="true">' + HEART + '</span><span class="mkl-pdp-save__label' + (iconOnly ? ' mkl-pdp-sr' : '') + '">Merken</span></button>';
+    var glyph = '<span class="mkl-pdp-save__glyph" aria-hidden="true">' + HEART + '<i class="mkl-pdp-save__dot"></i></span>';
+    var label = '<span class="mkl-pdp-save__label' + (iconOnly ? ' mkl-pdp-sr' : '') + '" data-alt="Gemerkt">Merken</span>';
+    if (/\bmkl-pdp-media\b/.test(extra || ''))   /* gallery control (spec 10): one segment like "Fotos | 3D"; long label ≥ 561px, short label on phones */
+      return '<button class="mkl-pdp-save' + extra + '" type="button" aria-pressed="false"><span class="mkl-pdp-media__seg">' + glyph + label + '<span class="mkl-pdp-save__short" data-alt="Gemerkt" aria-hidden="true">Merken</span></span></button>';
+    return '<button class="mkl-pdp-save' + (extra || '') + '" type="button" aria-pressed="false">' + glyph + label + '</button>';
+  }
+  /* saved "stamp" — only after a click, never on load or sync (spec 10 §4.3) */
+  function stampPdp() {
+    if (reduced()) return;
+    [pdpBtn, pdpBar].forEach(function (b) { if (!b) return; b.classList.remove('is-just-saved'); void b.offsetWidth; b.classList.add('is-just-saved'); setTimeout(function () { b.classList.remove('is-just-saved'); }, 260); });
   }
   function pressPdp(btn) {
     pdpLast = btn;
     if (!reduced()) { btn.classList.add('is-pressed'); setTimeout(function () { btn.classList.remove('is-pressed'); }, 120); }
-    var st = pdpState();
-    if (!st.s1) { if (st.on) removeItem(PDP.id); else addItem(PDP.id, null); return; }
-    if (st.on) { removeItem(st.hit.id); return; }
-    if (st.changed) updateConfig(st.sessId, st.sn); else addConfig(st.sn);
+    var st = pdpState(), was = st.on;
+    if (!st.s1) { if (st.on) removeItem(PDP.id); else addItem(PDP.id, null); }
+    else if (st.on) removeItem(st.hit.id);
+    else if (st.changed) updateConfig(st.sessId, st.sn);
+    else addConfig(st.sn);
+    if (!was && btn.classList.contains('is-on')) stampPdp();
   }
   function addConfig(sn) {
-    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }); live(m); return; }
+    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }, true); live(m); return; }
     var it = cfgItemFor(sn), cid = 'c-' + (sn.article || 'x') + '-' + Math.random().toString(36).slice(2, 8);
     it.id = 'cfg:' + cid; it.configId = cid; it.url = 'pdp/index.html?merkliste=' + cid; it.addedAt = new Date().toISOString(); it.priceAtAdd = sn.total;
     var mi = indexOf(PDP.id); if (mi > -1) items.splice(mi + 1, 0, it); else items.push(it);   /* the build sits right behind its model row */
     setCfgOfSession(sn.article, cid);
     save(); syncAll(); pulseBadge();
     live('Konfiguration gemerkt: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total) + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Konfiguration gemerkt' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer });
+    toast('Konfiguration gemerkt' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
   }
   function updateConfig(cid, sn) {
     var it = byId('cfg:' + cid); if (!it) { addConfig(sn); return; }
@@ -771,19 +783,24 @@
     it.updatedAt = new Date().toISOString(); it.configExpired = false; delete cfgLive[cid];
     save(); syncAll();   /* no badge pulse: the count is unchanged */
     live('Konfiguration aktualisiert: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total));
-    toast('Konfiguration aktualisiert' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer });
+    toast('Konfiguration aktualisiert' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
   }
   function syncPdpMarks() {
     if (!PDP || !pdpBtn || !window.MTZ_PDP) return;
     var st = pdpState(), nm = shortName({ name: PDP.name, lens: LENS }).main, colour = st.sn.finishText || '';
     var label = st.s1 ? (st.on ? 'Konfiguration gemerkt' : 'Konfiguration merken') : (st.on ? 'Gemerkt' : 'Merken');
-    var aria = st.s1 ? (st.on ? 'Konfiguration aus der Merkliste entfernen: ' + nm + ', ' + colour : 'Konfiguration merken: ' + nm + ', ' + colour) : (st.on ? nm + ' aus der Merkliste entfernen' : nm + ' merken');
-    var title = st.on ? (st.s1 ? 'Konfiguration gemerkt — aus der Merkliste entfernen' : 'Gemerkt — aus der Merkliste entfernen') : (st.s1 ? 'Konfiguration merken' : 'Merken');
+    var alt = st.s1 ? (st.on ? 'Konfiguration merken' : 'Konfiguration gemerkt') : (st.on ? 'Merken' : 'Gemerkt');
+    var shortL = st.on ? 'Gemerkt' : 'Merken', shortAlt = st.on ? 'Merken' : 'Gemerkt';
+    var aria = label + ': ' + nm + (st.s1 && colour ? ', ' + colour : '');   /* starts with the visible label (WCAG 2.5.3) */
     var lim = !st.on && !st.changed && isFull();
+    var extraTitle = lim ? 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).' : (st.changed ? 'Geändert seit dem Merken — erneut merken, um zu aktualisieren' : (st.on ? 'Aus der Merkliste entfernen' : ''));
     [pdpBtn, pdpBar].forEach(function (b) {
       if (!b) return;
-      b.classList.toggle('is-on', st.on); b.setAttribute('aria-pressed', st.on ? 'true' : 'false'); b.setAttribute('aria-label', aria); b.setAttribute('title', title);
-      b.querySelector('.mkl-pdp-save__label').textContent = label;
+      b.classList.toggle('is-on', st.on); b.setAttribute('aria-pressed', st.on ? 'true' : 'false'); b.setAttribute('aria-label', aria);
+      var t = extraTitle || (b === pdpBar ? label : ''); if (t) b.setAttribute('title', t); else b.removeAttribute('title');
+      var l = b.querySelector('.mkl-pdp-save__label'); l.textContent = label; l.setAttribute('data-alt', alt);
+      var s = b.querySelector('.mkl-pdp-save__short'); if (s) { s.textContent = shortL; s.setAttribute('data-alt', shortAlt); }
+      b.classList.toggle('is-changed', !!st.changed); if (st.changed) b.setAttribute('aria-describedby', 'mklPdpChanged'); else b.removeAttribute('aria-describedby');
       b.classList.toggle('is-limit', lim); if (lim) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
     });
     pdpChanged.hidden = !st.changed; pdpRow.hidden = !st.changed;   /* the caption row only exists while it has something to say (no empty gap in the checkout stack) */
@@ -829,7 +846,7 @@
     var buy = document.querySelector('#bCheckout .cfgb-buyrow'); if (!buy) return;
     /* one Merken control on the gallery, opposite the "Fotos | 3D" switch (client decision 2026-11-01, desktop + mobile); state via glyph + aria-label/title */
     var stage = document.querySelector('.pdp-media__stage');
-    pdpBtn = h(pdpBtnHTML(' mkl-pdp-save--icon mkl-pdp-media', true));
+    pdpBtn = h(pdpBtnHTML(' mkl-pdp-media', false));
     if (stage) stage.appendChild(pdpBtn); else buy.appendChild(pdpBtn);
     pdpBtn.addEventListener('click', function () { pressPdp(pdpBtn); });
     pdpRow = h('<div class="mkl-pdp-row" id="mklPdpRow" hidden><p class="mkl-pdp-changed" id="mklPdpChanged" hidden>Geändert seit dem Merken — erneut merken, um zu aktualisieren</p></div>');
@@ -840,7 +857,11 @@
     var bar = document.getElementById('pdpStickyBar');
     if (bar) {
       pdpBarVisible = function () { return bar.classList.contains('is-visible') && !document.body.classList.contains('cfg-sheet-open'); };
-      var updBar = function () { document.documentElement.style.setProperty('--mkl-pdp-bar-h', (bar.offsetHeight / 16) + 'rem'); if (toastEl.classList.contains('show') && !isOpen) toastEl.classList.toggle('is-pdp-bar', pdpBarVisible()); };
+      /* one instance at a time: the echo steps back while the gallery control is on screen (spec 10, M6) */
+      var dupCheck = function () { if (!pdpBar || !pdpBtn) return; var r = pdpBtn.getBoundingClientRect(); pdpBar.classList.toggle('is-dup', r.width > 0 && r.bottom > 0 && r.top < window.innerHeight); };
+      var dupT = 0, dupSoon = function () { if (dupT) return; dupT = setTimeout(function () { dupT = 0; dupCheck(); }, 60); };   /* throttled; a timer also runs in background tabs */
+      window.addEventListener('scroll', dupSoon, { passive: true }); window.addEventListener('resize', dupSoon);
+      var updBar = function () { document.documentElement.style.setProperty('--mkl-pdp-bar-h', (bar.offsetHeight / 16) + 'rem'); if (toastEl.classList.contains('show') && !isOpen) toastEl.classList.toggle('is-pdp-bar', pdpBarVisible()); dupCheck(); };
       if (window.MutationObserver) new MutationObserver(updBar).observe(bar, { attributes: true, attributeFilter: ['class'] });
       updBar();
     }

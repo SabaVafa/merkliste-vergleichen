@@ -127,3 +127,20 @@ Es gibt **eine** Merken-Instanz auf der Seite: oben rechts auf der Galerie-Bühn
 - **Desktop – Zustände:** nicht gemerkt wie das „3D“-Segment (Graphit, Hover Teal); gemerkt wie das aktive „Fotos“-Segment (Teal-Segment, weißes Glyph). Der Rahmen bleibt immer neutral.
 - **Mobil (≤ 560 px):** Die Umschaltung ist dort ein einzelner Chip; das Lesezeichen ist derselbe Chip quadratisch (36 px, `--radius`, gleiche Oberkante 347,4). Gemerkt erscheint es im Teal-Akzent des „3D“-Chips (Teal-Rand, `--color-teal-50`, Teal-Glyph).
 - **Asset:** `merkliste-pdp.css?v=15`.
+
+## 10 · PDP-Merken nach Benchmark (Spec `10_PDP-Merken-Icon_Benchmark-und-Spec.md`, umgesetzt 2026-11-02)
+
+- **Beschriftet:** Das Galerie-Control ist ein Ein-Segment-Zwilling von „Fotos | 3D“ mit Wort. Desktop zeigt „Merken / Gemerkt“, nach der Farbwahl „Konfiguration merken / gemerkt“; mobil das kurze Label. Die Breite bleibt beim Umschalten stabil, weil das Alternativ-Wort reserviert ist.
+- **Gemerkt:** Teal-Segment mit weißem Wort und gefülltem Glyph, auch mobil.
+- **Stempel:** Die Animation läuft nur nach einem Klick (`.is-just-saved`, 220 ms), nie beim Laden.
+- **Geändert:** Nach einer Änderung der gemerkten Konfiguration erscheint ein Teal-Punkt am Glyph, mit `aria-describedby="mklPdpChanged"` und erklärendem `title`. Ein Klick aktualisiert denselben Eintrag.
+- **Zugänglichkeit:**
+  - `aria-label` beginnt mit dem sichtbaren Label.
+  - Jeder Speichervorgang wird nur einmal angesagt: Der Hinweis setzt `aria-live="off"`, wenn die Live-Region schon spricht.
+  - Die Trefferfläche hat 6 px Rand (48 px).
+- **Eine Instanz:** Das Sticky-Echo ist mobil ausgeblendet (`.is-dup`), solange das Galerie-Control im Viewport ist. Gedrosselt wird per Timer, weil `requestAnimationFrame` in Hintergrund-Tabs pausiert.
+- **Gemessen:**
+  - Desktop: Rahmen 36 px an derselben Oberkante wie die Umschaltung, rechte Kante = Bühnenkante; Segment 27,6 px wie „Fotos“; Glyph 15,2 px wie der Würfel.
+  - Mobil: 36 px in der Zeile des „3D“-Chips.
+  - Keine Konsolenfehler.
+- **Assets:** `merkliste.js?v=15`, `merkliste-pdp.css?v=17`.
