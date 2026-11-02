@@ -152,3 +152,5 @@ Feedback: der gerahmte weiße Kasten mit teal gefülltem Innensegment wirkte alt
 - **Merken** (`merkliste-pdp.css` §11): randlose Tonal-Fläche `--graphite-100`, `--radius-lg`, Höhe 2,25rem (36 px = Höhe des Umschalters, gleiche Oberkante). Nicht gemerkt = Graphit-Schrift; gemerkt = weißer Thumb mit `--shadow-sm`, teal Schrift + gefülltes Lesezeichen. Kein Rahmen, keine teal Fläche.
 - **Phones (≤ 560 px):** Tonal-Chip 2,25rem in der Zeile des „3D"-Chips; gemerkt = `--color-teal-75`.
 - Nur DS-Tokens; keine Konsolenfehler.
+
+**11b · Merken umrandet statt gefüllt (2026-11-02):** weißer Grund + 1px Haarlinie `--graphite-300` (wie der Rahmen von „Fotos | 3D"), Graphit-Schrift, Umriss-Lesezeichen. Gemerkt = teal Haarlinie, teal „Gemerkt", gefülltes Lesezeichen; kein Flächen-Fill in keinem Zustand. 36 px hoch, gleiche Oberkante wie der Umschalter (Desktop und Mobile geprüft). „Fotos | 3D" unverändert.

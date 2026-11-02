@@ -155,3 +155,16 @@
   .mkl-pdp-media.is-on .mkl-pdp-media__seg,.mkl-pdp-media.is-on:active .mkl-pdp-media__seg,.mkl-pdp-media.is-on:hover .mkl-pdp-media__seg{background:var(--color-teal-75);box-shadow:none}
   .mkl-pdp-media.is-on .mkl-pdp-save__dot{box-shadow:0 0 0 .125rem var(--color-teal-75)}
 }
+/* ==== 11b · Merken is OUTLINED, never filled: white ground + 1px hairline (same as the Fotos|3D frame);
+   saved = teal hairline + teal word + filled glyph. 36px tall like the switch. ==== */
+.pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{padding:calc(.25rem - 1px);border:1px solid var(--graphite-300);background:var(--white)}
+.pdp-media__stage .mkl-pdp-media:hover{border-color:var(--teal)}
+.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{border-color:var(--teal)}
+.mkl-pdp-media .mkl-pdp-media__seg,.mkl-pdp-media:active .mkl-pdp-media__seg,.mkl-pdp-media.is-on .mkl-pdp-media__seg,.mkl-pdp-media.is-on:active .mkl-pdp-media__seg,.mkl-pdp-media.is-on:hover .mkl-pdp-media__seg{background:none;box-shadow:none}
+.mkl-pdp-media.is-on .mkl-pdp-media__seg{color:var(--teal)}
+.mkl-pdp-media.is-on:hover .mkl-pdp-media__seg{color:var(--teal-600)}
+.mkl-pdp-media .mkl-pdp-save__dot,.mkl-pdp-media.is-on .mkl-pdp-save__dot{box-shadow:0 0 0 .125rem var(--white)}
+@media(max-width:560px){
+  .pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{padding:0}
+  .mkl-pdp-media .mkl-pdp-media__seg{height:calc(2.25rem - 2px)}
+}
