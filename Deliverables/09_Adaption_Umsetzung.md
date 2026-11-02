@@ -119,3 +119,11 @@ Es gibt **eine** Merken-Instanz auf der Seite: oben rechts auf der Galerie-Bühn
 - **Größe:** Im Header rendert es über `.icon-btn` in derselben Größe (28 px Desktop / 22 px mobil) neben Konto und Warenkorb.
 - **Einsatz:** Karte, Leerzustand, Vergleich und PDP nutzen dasselbe Glyph. Gemerkt ist es gefüllt in Teal.
 - **Assets:** `merkliste.js?v=13`, `merkliste.css?v=12`, `merkliste-pdp.css?v=13`, `vergleichen.js?v=24`.
+
+**PDP-Galerie-Lesezeichen im Rhythmus der Umschaltung (Lead-PD-Pass, 2026-11-02):** gemessen an „Fotos | 3D“ und als Ein-Segment-Zwilling neu gebaut.
+- **Desktop – Rahmen:** weiß, 1 px `graphite-300`, `--radius-lg`, 0,2 rem Innenabstand. Darin ein Segment von 27,6 px mit `--radius`.
+- **Desktop – Glyph:** 0,95 rem wie der 3D-Würfel, Linie ≈ 1,1 px wie die Umschalter-Icons.
+- **Desktop – Maße:** Außenhöhe 35,6 px und Oberkante y 283,6 identisch mit der Umschaltung; Segment-Oberkante 287,6 identisch; Glyph-Oberkante 293,8 identisch mit dem Würfel.
+- **Desktop – Zustände:** nicht gemerkt wie das „3D“-Segment (Graphit, Hover Teal); gemerkt wie das aktive „Fotos“-Segment (Teal-Segment, weißes Glyph). Der Rahmen bleibt immer neutral.
+- **Mobil (≤ 560 px):** Die Umschaltung ist dort ein einzelner Chip; das Lesezeichen ist derselbe Chip quadratisch (36 px, `--radius`, gleiche Oberkante 347,4). Gemerkt erscheint es im Teal-Akzent des „3D“-Chips (Teal-Rand, `--color-teal-50`, Teal-Glyph).
+- **Asset:** `merkliste-pdp.css?v=15`.

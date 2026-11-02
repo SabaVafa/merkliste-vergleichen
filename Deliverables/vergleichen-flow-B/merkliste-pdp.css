@@ -122,3 +122,28 @@
 /* ---- Bookmark glyph = design-system icon family (2026-11-02): same 27×26 canvas, 1.4 line weight, round caps/joins and ≈1-unit corners as Home/ICONS/profile.svg and cart.svg; header size from .icon-btn (28px / 22px) ---- */
 .mkl-pdp-save svg path,.pdp-media__stage .mkl-pdp-media svg path{stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 .mkl-pdp-band__glyph svg path{stroke-width:1.4}
+
+/* ---- Gallery bookmark = a one-segment twin of the "Fotos | 3D" switch (lead PD pass 2026-11-02) ----
+   Same frame (white, 1px graphite-300, --radius-lg, .2rem inner padding) and the same 27.6px segment
+   (--radius) inside, so outer height, inner rhythm and corner radii match the switch exactly.
+   Glyph .95rem like the 3D cube, line ≈1.1px like the switch icons (stroke 2 on the 27-unit canvas).
+   Idle = the "3D" segment (graphite ink, teal on hover); saved = the active "Fotos" segment (teal segment, white glyph);
+   the frame never changes colour. Phones mirror the single "3D" chip instead (≤560px). */
+.pdp-media__stage .mkl-pdp-media{width:auto;height:auto;min-height:0;padding:.2rem;border:1px solid var(--color-graphite-300,#DADADA);border-radius:var(--radius-lg,.5rem);background:var(--white);color:var(--color-graphite-700,#54545C)}
+.pdp-media__stage .mkl-pdp-media .mkl-pdp-save__glyph{width:1.725rem;height:1.725rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius,.25rem);transition:background .16s,color .16s}
+.pdp-media__stage .mkl-pdp-media svg{width:.95rem;height:.95rem}
+.pdp-media__stage .mkl-pdp-media svg path{stroke-width:2}
+.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{border-color:var(--color-graphite-300,#DADADA);background:var(--white)}
+.pdp-media__stage .mkl-pdp-media:hover .mkl-pdp-save__glyph{color:var(--teal)}
+.pdp-media__stage .mkl-pdp-media.is-on .mkl-pdp-save__glyph{background:var(--teal);color:var(--white)}
+.pdp-media__stage .mkl-pdp-media.is-on:hover .mkl-pdp-save__glyph{background:var(--teal-600);color:var(--white)}
+.pdp-media__stage .mkl-pdp-media.is-limit{opacity:.6}
+.pdp-media__stage .mkl-pdp-media::before{inset:-.25rem}   /* ≥ 2.75rem hit area */
+@media(max-width:560px){
+  /* the switch collapses to one chip (padding .5rem .9rem, --radius, graphite-300 border; "3D" in teal accent) — the bookmark becomes the same chip, square */
+  .pdp-media__stage .mkl-pdp-media{top:0;padding:0;border-radius:var(--radius,.25rem)}
+  .pdp-media__stage .mkl-pdp-media .mkl-pdp-save__glyph{width:2.15rem;height:2.15rem;border-radius:calc(var(--radius,.25rem) - 1px)}
+  .pdp-media__stage .mkl-pdp-media.is-on{border-color:var(--teal);background:var(--color-teal-50,#F2F6F6)}
+  .pdp-media__stage .mkl-pdp-media.is-on .mkl-pdp-save__glyph{background:transparent;color:var(--teal)}
+  .pdp-media__stage .mkl-pdp-media.is-on:hover .mkl-pdp-save__glyph{background:transparent;color:var(--teal-600)}
+}
