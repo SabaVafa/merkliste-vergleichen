@@ -299,6 +299,7 @@ td.vgl-val.is-best{font-weight:700}
 .vgl-twin__list li::before{content:'';position:absolute;left:0;top:.55em;width:.375rem;height:.375rem;border-radius:50%;background:var(--teal,#015253)}
 .vgl-twin__less{color:var(--text-muted,#6A6A6A)}
 .vgl-twin__note{margin:.75rem 0 0;padding-top:.625rem;border-top:.0625rem solid var(--graphite-100,#F0F0F0);font-size:var(--text-caption,.75rem);line-height:1.45;color:var(--text-muted,#6A6A6A)}
+.vgl-src{margin:0;font-size:var(--text-caption,.75rem);line-height:1.45;color:var(--text-muted,#6A6A6A)}   /* data provenance line under the comparison (11_Vergleich-Datenqualitaet) */
 .vgl-alts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
 .vgl-alt{display:flex;gap:.75rem;align-items:stretch;padding:.5rem;border:.0625rem solid var(--graphite-100,#F0F0F0);border-radius:var(--r-m,.25rem);background:var(--paper-white,#F5F6FA)}
 .vgl-alt__media{flex:0 0 3.25rem;height:4rem;background:var(--white,#fff);border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-s,.1875rem);display:flex;align-items:center;justify-content:center;padding:.25rem}
