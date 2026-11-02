@@ -318,3 +318,28 @@
 
 /* ---- Bookmark glyph = design-system icon family (2026-11-02): same 27×26 canvas, 1.4 line weight, round caps/joins and ≈1-unit corners as Home/ICONS/profile.svg and cart.svg; header size from .icon-btn (28px / 22px) ---- */
 .mkl-mark svg path,.mkl-hdr svg path,.mkl-empty svg path{stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* ==== 12 · Responsive audit (2026-11-02) — fixes only, the look stays ==== */
+/* short viewports / enlarged text (JS fitDrawer → .is-flow): head, list and footer scroll as one column
+   instead of the pinned head + footer leaving no room for the list; the alert then sits at the viewport bottom */
+.mkl-drawer.is-flow{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.mkl-drawer.is-flow .mkl-body{flex:none;min-height:auto;overflow:visible}
+.mkl-drawer.is-flow .mkl-toast{position:fixed;bottom:calc(.75rem + env(safe-area-inset-bottom,0px))}
+@media(min-width:48rem){.mkl-drawer.is-flow .mkl-toast{left:auto;right:1rem;width:calc(min(28rem,100vw) - 2rem)}}
+/* compare CTA wraps instead of overflowing the drawer with enlarged text (unchanged at normal size) */
+.mkl-cta{max-width:100%;height:auto;min-height:2.75rem;padding-block:.375rem;white-space:normal;line-height:1.2}
+
+/* ==== 13 · Icon hover = design system (2026-11-02) ====
+   Every icon-only button behaves like the header icons (.header-icon-btn / .icon-btn):
+   transparent at rest, a --color-paper circle on hover, glyph colour unchanged, background .14s.
+   No teal/red/grey-100 colour shifts. */
+.mkl-mark:hover,.mkl-mark:focus-visible{color:var(--schwarz,#1A171B)}
+.mkl-mark.is-on,.mkl-mark.is-on:hover,.mkl-mark.is-on:focus-visible{color:var(--teal,#015253)}
+.mkl-mark__disc{border-radius:var(--r-pill,9999px);transition:background-color .14s,transform .12s}
+.mkl-mark:not(.is-limit):hover .mkl-mark__disc{background:var(--paper-white,#F5F6FA)}
+.mkl-close,.mkl-rm,.mkl-pdp-band__x{background:transparent;transition:background-color .14s}
+.mkl-close:hover,.mkl-rm:hover,.mkl-pdp-band__x:hover{background:var(--paper-white,#F5F6FA)}
+.mkl-close:hover{color:var(--schwarz,#1A171B)}
+.mkl-rm:hover,.mkl-pdp-band__x:hover{color:var(--text-muted,#6A6A6A)}
+/* rows already turn paper on hover — the circle steps up to white there so it stays visible */
+.mkl-item:hover .mkl-rm:hover{background:var(--white,#fff)}

@@ -622,3 +622,33 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 /* ---- Alert on light teal (client request 2026-11-02): --teal-100 surface, --teal-10 hairline; divider graphite-300 so it stays visible on the tint ---- */
 .vgl-toast{background:var(--teal-100,#E6EEEE);border-color:var(--teal-10,rgba(1,82,83,.1));box-shadow:var(--shadow-md,0 .25rem .75rem rgba(0,0,0,.08))}
 .vgl-toast__act::before{background:var(--graphite-300,#DADADA)}
+
+/* ==== 12 · Responsive audit (2026-11-02) — fixes only, the look stays ==== */
+/* alert: with left:50% the shrink-to-fit width was capped at half the viewport (one word per line on phones);
+   size to the content, capped by the existing max-width */
+.vgl-toast{width:max-content}
+/* product header: pinned unless it would cover > 60 % of the scroll area (JS fitHeader → .is-unpinned:
+   landscape phones, 320 px, enlarged text); the label column stays frozen to the left */
+.vgl-view.is-unpinned table.vgl-t thead th{top:auto}
+/* desktop bar: wraps (JS → .is-barwrap, only when its row would overflow) instead of pushing "Schließen" off-screen with enlarged text */
+@media(min-width:48rem){.vgl-view.is-barwrap .vgl-view__bar-in{height:auto;min-height:3.75rem;padding-block:.5rem;flex-wrap:wrap;row-gap:.375rem}}
+/* toolbar on phones: the control group wraps instead of overflowing at 320 px / enlarged text; left edge aligned with "Filter" */
+@media(max-width:47.99rem){
+  .vgl-barwrap{margin-left:0;flex-wrap:wrap;max-width:100%;row-gap:.5rem}
+  .vgl-bar-btn{max-width:100%;height:auto;min-height:2.75rem;white-space:normal;line-height:1.2}   /* label wraps only when it no longer fits (enlarged text) */
+}
+/* ≤ 359 px: tray status gets its own row (it was squeezed to 5.5rem: label in three, hint in four lines);
+   the column × target no longer overlaps the bookmark target in the 6rem product columns */
+@media(max-width:22.49rem){
+  .vgl-tray__status{flex:1 1 100%}
+  .vgl-tray__actions{margin-left:auto}
+  .vgl-ph__rm{right:-.5rem}
+}
+/* touch: header CTA (2.25–2.375rem) gets a 2.75rem hit area without changing its size */
+@media(pointer:coarse){.vgl-ph .btn::after{content:'';position:absolute;inset:-.25rem 0}}
+
+/* ==== 13 · Icon hover = design system (2026-11-02) — see merkliste.css §13 ==== */
+.vgl-close,.vgl-ph__rm,.vgl-addsearch__x{background:transparent;transition:background-color .14s}
+.vgl-close:hover,.vgl-ph__rm:hover,.vgl-addsearch__x:hover{background:var(--paper-white,#F5F6FA);border-color:transparent}
+.vgl-close:hover{color:var(--schwarz,#1A171B)}
+.vgl-ph__rm:hover,.vgl-addsearch__x:hover{color:var(--text-muted,#6A6A6A)}

@@ -3315,3 +3315,9 @@ body.is-scrolled #quickbar {
   .colorwin__sw { width: 4.75rem; height: 4.75rem; }
   .colorwin__name { font-size: 1.0625rem; }
 }
+
+/* ==== 12 · Responsive audit (2026-11-02) ====
+   The visually-hidden "Verifizierter Kauf" label (.rvw-vlabel) is position:absolute; inside the review carousel it had no
+   positioned ancestor below the scroller, escaped the overflow clip and widened the page → horizontal page scroll at every
+   width (scrollWidth 857–1777 px). Anchoring it to its seal keeps it inside the card; nothing visible changes. */
+.rvw-verified { position: relative; }

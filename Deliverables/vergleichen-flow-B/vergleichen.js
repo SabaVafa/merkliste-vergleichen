@@ -396,11 +396,6 @@
     '</div>');
     if(mobile){var scrim=h('<div class="vgl-addsearch__scrim" aria-hidden="true"></div>');view.appendChild(scrim);addPanel._scrim=scrim;}
     view.appendChild(addPanel);
-    if(!mobile){   /* anchored to the add tile, kept inside the viewport */
-      var r=anchor.getBoundingClientRect(),w=addPanel.offsetWidth,ht=addPanel.offsetHeight;
-      var left=Math.max(16,Math.min(r.right-w,window.innerWidth-w-16)),top=Math.max(16,Math.min(r.top,window.innerHeight-ht-16));
-      addPanel.style.left=left+'px';addPanel.style.top=top+'px';
-    }
     var inp=addPanel.querySelector('input');
     inp.addEventListener('input',renderAddList);
     inp.addEventListener('keydown',function(e){
@@ -409,6 +404,11 @@
       else if(e.key==='Enter'){e.preventDefault();var opts=addPanel.querySelectorAll('.vgl-addopt');var o=opts[addActive>-1?addActive:0];if(o)chooseAdd(o.getAttribute('data-addid'));}
     });
     renderAddList();
+    if(!mobile){   /* anchored to the add tile, kept inside the viewport — measured AFTER the list is filled (it was measured empty and overflowed short viewports) */
+      var r=anchor.getBoundingClientRect(),w=addPanel.offsetWidth,ht=addPanel.offsetHeight;
+      var left=Math.max(16,Math.min(r.right-w,window.innerWidth-w-16)),top=Math.max(16,Math.min(r.top,window.innerHeight-ht-16));
+      addPanel.style.left=left+'px';addPanel.style.top=top+'px';
+    }
     inp.focus();
   }
   function closeAdd(refocus){
@@ -462,7 +462,8 @@
     var tr=viewBody.querySelector('tr[data-key="'+key+'"]');
     if(!tr&&!detailsOpen&&!diffCb.checked){detailsOpen=true;renderView();tr=viewBody.querySelector('tr[data-key="'+key+'"]');}
     if(!tr)return;
-    var top=tr.getBoundingClientRect().top-scrollEl.getBoundingClientRect().top+scrollEl.scrollTop-280;
+    var hd=viewBody.querySelector('table.vgl-t thead'),off=(hd&&!view.classList.contains('is-unpinned')?hd.offsetHeight:0)+16;   /* land below the pinned header at every width (was a fixed 280 px) */
+    var top=tr.getBoundingClientRect().top-scrollEl.getBoundingClientRect().top+scrollEl.scrollTop-off;
     try{scrollEl.scrollTo({top:Math.max(0,top),behavior:'smooth'});}catch(e){scrollEl.scrollTop=Math.max(0,top);}
     tr.classList.remove('is-flash');void tr.offsetWidth;tr.classList.add('is-flash');
     if(!view.contains(document.activeElement)||document.activeElement===view)tr.focus({preventScroll:true});
@@ -854,6 +855,15 @@
 
     /* twin: the guidance is the point of that state → directly under the verdict; otherwise products first, guidance after the table */
     viewBody.innerHTML=sum+(an.twin?twin+table:table+twin)+after;
+    fitHeader();
+  }
+  /* Responsive audit (2026-11-02): the view bar wraps only when its row would overflow; the fixed-height product header stays pinned unless it would cover more than
+     60 % of the scroll area (landscape phones, 320 px, enlarged text) — then it scrolls with the table */
+  function fitHeader(){
+    var bi=view.querySelector('.vgl-view__bar-in'),th=viewBody.querySelector('table.vgl-t thead');
+    view.classList.remove('is-barwrap','is-unpinned');
+    if(bi&&bi.scrollWidth>bi.clientWidth+1)view.classList.add('is-barwrap');   /* bar would overflow (enlarged text): let it wrap */
+    if(th&&scrollEl.clientHeight&&th.offsetHeight>scrollEl.clientHeight*0.6)view.classList.add('is-unpinned');
   }
   function openView(opt){
     opt=opt||{};
@@ -990,6 +1000,7 @@
       if(open&&!(st&&st.mtzVgl)){closeView(true);return;}
       if(!open&&st&&st.mtzVgl){var m=/[?&]vergleich=([^&#]+)/.exec(location.search);if(m&&setSelection(decodeURIComponent(m[1]).split(','))>=MIN){syncAll();openView({push:false});}}
     });
+    window.addEventListener('resize',function(){if(view.classList.contains('is-open'))fitHeader();});   /* rotation / window resize re-checks the pinned header */
     /* another tab changed this category's selection */
     window.addEventListener('storage',function(e){if(e.key!==KEY)return;selected=ownIds();syncAll();});
   }

@@ -154,3 +154,15 @@ Feedback: der gerahmte weiße Kasten mit teal gefülltem Innensegment wirkte alt
 - Nur DS-Tokens; keine Konsolenfehler.
 
 **11b · Merken umrandet statt gefüllt (2026-11-02):** weißer Grund + 1px Haarlinie `--graphite-300` (wie der Rahmen von „Fotos | 3D"), Graphit-Schrift, Umriss-Lesezeichen. Gemerkt = teal Haarlinie, teal „Gemerkt", gefülltes Lesezeichen; kein Flächen-Fill in keinem Zustand. 36 px hoch, gleiche Oberkante wie der Umschalter (Desktop und Mobile geprüft). „Fotos | 3D" unverändert.
+
+## 12 · Responsive-Audit (Lead Full-Stack, 2026-11-02)
+
+Geprüft: 320–1920 px (18 Breiten), Querformat 844×390 / 740×360 / 440×390, Schrift 125 % und 200 %. Behoben (je in Block „12 · Responsive audit"):
+- **Vergleich:** Alert ein Wort pro Zeile < 900 px (`width:max-content`); horizontales Scrollen im Vergleichsmodus bei 320 px (Toolbar umbricht); Tray-Status bei 320 px; überlappende Trefferflächen (× / Lesezeichen) bei 320–347 px; Sticky-Produktkopf verdeckte die Tabelle auf flachen Screens → `fitHeader()` löst ihn ab > 60 % Höhe; Sprung-Chips landeten unter dem Kopf (gemessener statt fixer Versatz); „Modell hinzufügen"-Popover ragte aus dem Viewport; Leiste schob „Schließen" bei 200 % aus dem Bild.
+- **Merkliste:** Liste auf flachen Screens/200 % unbenutzbar → `fitDrawer()` lässt den Dialog als eine Spalte scrollen; Vergleichs-Button darf bei 200 % umbrechen.
+- **PDP:** horizontales Scrollen auf jeder Breite (verstecktes „Verifizierter Kauf"-Label entkam dem Karussell → `.rvw-verified{position:relative}`); Merken mittig zum 44 px hohen Umschalter bei 561–767 px; Überlappung Umschalter/Merken bei 200 % (Container-Query); Preis in der Sticky-Bar bei 320–359 px abgeschnitten. „Fotos | 3D" unverändert.
+- Offen (Basis-PLP/PDP, nicht Add-on): Filter-Button 34 px, `.pcard__more`, FAQ/Footer bei 200 %; 200 % auf Phones braucht eine Design-Entscheidung; echtes Gerät: iOS-Safari-Toolbar vs. Kopf-Schwelle.
+
+## 13 · Icon-Hover = Design-System (2026-11-02)
+
+Alle Icon-only-Buttons verhalten sich wie die Header-Icons (`.header-icon-btn`): ruhend transparent, beim Hover ein `--color-paper`-Kreis, Glyph-Farbe unverändert, 0,14 s. Betrifft Karten-Lesezeichen, Merkliste schließen/entfernen, PDP-Hinweis-×, Vergleich schließen/entfernen, ×-Button der Modellsuche (vorher teal, rot oder graphite-100). Umrandetes Merken auf der PDP = `.btn--ghost` (Paper + graphite-400), gemerkt = `.btn--secondary` (teal-50); gleich für das Sticky-Bar-Echo. Per Hover-Simulation geprüft (Header und Karte identisch: transparent → #F5F6FA, Glyph unverändert).

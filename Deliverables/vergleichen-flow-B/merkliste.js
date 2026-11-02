@@ -456,6 +456,15 @@
     cmpSel = cmpSel.filter(function (id) { return valid[id]; });
     syncCmp();
     if (keep) { var kb = listEl.querySelector(keep); if (kb) kb.focus(); }   /* re-render keeps the keyboard where it was */
+    fitDrawer();
+  }
+  /* Responsive audit (2026-11-02): on short viewports (landscape phones) or with enlarged text the pinned head +
+     footer left no room for the list (65px at 844×390, 2px at 200 % text) — then the dialog scrolls as one column */
+  function fitDrawer() {
+    if (!isOpen) return;
+    var st = drawer.scrollTop, b = drawer.querySelector('.mkl-body');
+    drawer.classList.remove('is-flow');
+    if (b && !listEl.hidden && b.clientHeight < drawer.clientHeight * 0.35) { drawer.classList.add('is-flow'); drawer.scrollTop = st; }   /* re-measuring keeps the reading position */
   }
   function lensOfCmp(id) { var l = viewItems(); for (var i = 0; i < l.length; i++) if ((l[i].articleId || l[i].id) === id) return l[i].lens; return null; }
   /* 09b P0-7: model ids of one category in the visible list (configurations compare on model level via their base model) */
@@ -496,6 +505,7 @@
     if (n >= CMP_MIN && lock && lock !== LENS) footHint.hidden = false, footHint.textContent = 'Öffnet den Vergleich auf der Seite ' + (LENSES[lock] || LENSES[LENS]).label;
     else if (n < CMP_MIN) footHint.textContent = 'Wählen Sie mindestens 2 Modelle derselben Kategorie';
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
+    fitDrawer();
   }
 
   /* =====================================================================
@@ -909,6 +919,7 @@
       injectOverlayHearts();
       new MutationObserver(injectOverlayHearts).observe(body, { childList: true, subtree: true });
     })();
+    window.addEventListener('resize', function () { if (isOpen) fitDrawer(); });   /* rotation re-checks the drawer layout */
     /* cross-tab: another tab changed the list */
     window.addEventListener('storage', function (e) { if (e.key === KEY) { load(); refreshPrices(); syncAll(); live('Merkliste in einem anderen Tab geändert: ' + items.length + ' Artikel'); } });
     if (/[?&]merkliste=demo\b/.test(QS)) seedDemoConfig();

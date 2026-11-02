@@ -168,3 +168,34 @@
   .pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{padding:0}
   .mkl-pdp-media .mkl-pdp-media__seg{height:calc(2.25rem - 2px)}
 }
+
+/* ==== 12 · Responsive audit (2026-11-02) — fixes only; the Fotos | 3D switch is untouched ==== */
+/* 561px–47.9375rem: the PDP's own touch rule makes the switch 2.75rem tall; the 36px Merken is centred on it (was top-aligned) */
+@media(min-width:35.0625rem) and (max-width:47.9375rem){   /* 561px = 35.0625rem, the step after the 560px rules above */
+  .pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{top:1rem}
+}
+/* phones with enlarged text (≈ 200 %): the stage is too narrow for switch + Merken side by side and they overlapped —
+   Merken then steps below the switch (container query in rem follows the text size; never triggers at 100–125 %) */
+@media(max-width:35rem){.pdp-media__stage{container:mkl-stage / inline-size}}
+@container mkl-stage (max-width:11rem){
+  .pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{top:3rem}
+}
+/* sticky bar on phones: with the Merken echo in the row the CTA left 31px for name + price at 320px ("ab 69…");
+   name/price keep 4.75rem, the CTA label may wrap to two lines instead (unchanged wherever it fits) */
+@media(max-width:47.9375rem){
+  #pdpStickyBar .pdp-stickybar__info{flex:1 1 0;min-width:4.75rem}   /* basis 0: the CTA only gives way once name + price are down to 4.75rem */
+  #pdpStickyBar .pdp-stickybar__cta{flex:0 1 auto;min-width:0;height:auto;min-height:2.75rem;padding-block:.25rem;line-height:1.15;text-align:center;justify-content:center;hyphens:auto;overflow-wrap:anywhere}   /* words break only at ~200 % text */
+}
+
+/* ==== 13 · Hover = design system (2026-11-02): the outlined Merken behaves like .btn--ghost
+   (paper fill + graphite-400 border, ink unchanged); saved (teal outline) like .btn--secondary
+   (teal-50 fill). Same for the sticky-bar echo. ==== */
+.pdp-media__stage .mkl-pdp-media{transition:background-color .14s,border-color .14s}
+.pdp-media__stage .mkl-pdp-media:hover{background:var(--color-paper);border-color:var(--color-graphite-400)}
+.mkl-pdp-media:hover .mkl-pdp-media__seg{color:var(--graphite-700)}
+.pdp-media__stage .mkl-pdp-media.is-on:hover{background:var(--color-teal-50);border-color:var(--teal)}
+.mkl-pdp-media.is-on:hover .mkl-pdp-media__seg{color:var(--teal)}
+.mkl-pdp-save:not(.mkl-pdp-media):hover{background:var(--color-paper);border-color:var(--color-graphite-400);color:var(--schwarz)}
+.mkl-pdp-save.is-on:not(.mkl-pdp-media):hover,#pdpStickyBar .mkl-pdp-bar.is-on:hover{background:var(--color-teal-50);border-color:var(--teal);color:var(--teal)}
+.mkl-pdp-save.is-limit:hover{background:var(--white);border-color:var(--graphite-300)}
+@media(prefers-reduced-motion:reduce){.pdp-media__stage .mkl-pdp-media,.mkl-mark__disc{transition:none !important}}
