@@ -343,3 +343,22 @@
 .mkl-rm:hover,.mkl-pdp-band__x:hover{color:var(--text-muted,#6A6A6A)}
 /* rows already turn paper on hover — the circle steps up to white there so it stays visible */
 .mkl-item:hover .mkl-rm:hover{background:var(--white,#fff)}
+
+/* ==== 14 · Row CTA as a text link (2026-11-02) ====
+   "Konfigurieren" / "Zum Produkt" / "Konfiguration öffnen" are navigation, not actions on the list,
+   so they read as DS links (teal, underlined) with a trailing chevron — the outlined button competed
+   with the price and repeated three times per category. Same row as "Vergleichen" on every width;
+   the hit area stays 44 px tall. */
+.mkl-item__cta{order:2;display:inline-flex;align-items:center;gap:.25rem;min-height:2.75rem;margin-left:auto;padding:0 .25rem;
+  color:var(--teal,#015253);font-family:inherit;font-size:var(--text-body-sm,.875rem);font-weight:600;line-height:1.25;white-space:nowrap;
+  text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem;border-radius:.125rem;transition:text-decoration-thickness .14s}
+.mkl-item__cta svg{flex:none;width:1rem;height:1rem;transition:transform .14s}
+.mkl-item__cta:hover{color:var(--teal,#015253);text-decoration-thickness:.125rem}
+.mkl-item__cta:hover svg{transform:translateX(.125rem)}
+.mkl-item__cta:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
+@media(max-width:47.99rem){
+  .mkl-item__actions{flex-direction:row;align-items:center}
+  .mkl-item__sec{order:1;justify-content:flex-start}
+  .mkl-item__cta{order:2}
+}
+@media(prefers-reduced-motion:reduce){.mkl-item__cta,.mkl-item__cta svg{transition:none !important}}

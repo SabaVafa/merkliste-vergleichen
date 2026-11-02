@@ -166,3 +166,11 @@ Geprüft: 320–1920 px (18 Breiten), Querformat 844×390 / 740×360 / 440×390,
 ## 13 · Icon-Hover = Design-System (2026-11-02)
 
 Alle Icon-only-Buttons verhalten sich wie die Header-Icons (`.header-icon-btn`): ruhend transparent, beim Hover ein `--color-paper`-Kreis, Glyph-Farbe unverändert, 0,14 s. Betrifft Karten-Lesezeichen, Merkliste schließen/entfernen, PDP-Hinweis-×, Vergleich schließen/entfernen, ×-Button der Modellsuche (vorher teal, rot oder graphite-100). Umrandetes Merken auf der PDP = `.btn--ghost` (Paper + graphite-400), gemerkt = `.btn--secondary` (teal-50); gleich für das Sticky-Bar-Echo. Per Hover-Simulation geprüft (Header und Karte identisch: transparent → #F5F6FA, Glyph unverändert).
+
+## 14 · Merkliste: Zeilen-CTA als Textlink (02.11.2026)
+
+- „Konfigurieren“ / „Zum Produkt“ / „Konfiguration öffnen“ in den Merkliste-Zeilen sind jetzt **Textlinks** statt umrandeter Buttons: Teal, unterstrichen (DS-Linkregel), Schriftgewicht 600, mit Chevron rechts.
+- Begründung: Es handelt sich um Navigation, nicht um eine Aktion auf der Liste. Drei umrandete Buttons pro Kategorie konkurrierten mit Preis und Produktname.
+- Hover: Unterstreichung 1 → 2 px, Chevron rückt 2 px nach rechts (.14s; ohne Bewegung bei reduzierter Bewegung). Fokus: 3 px Teal-Outline.
+- „Vergleichen“ links, Link rechts — auf allen Breiten in einer Zeile (auf Mobil kein gestapelter Vollbreiten-Button mehr). Trefferfläche bleibt 44 px hoch.
+- Dateien: `merkliste.js` (v=17), `merkliste.css` §14 (v=15).
