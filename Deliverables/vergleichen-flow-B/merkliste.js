@@ -112,8 +112,8 @@
   /* ---- DOM helpers + icons ---- */
   function h(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  var HEART_PATH = 'M8 3h8a2 2 0 0 1 2 2v15.2a.6.6 0 0 1-.95.49L12 17l-5.05 3.69A.6.6 0 0 1 6 20.2V5a2 2 0 0 1 2-2z';   /* bookmark glyph (Merkliste = Lesezeichen) */
-  var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + HEART_PATH + '"/></svg>';
+  var HEART_PATH = 'M4.5 1.7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v22.9a.6.6 0 0 1-.97.47L13.5 19.4l-8.03 5.67a.6.6 0 0 1-.97-.47V1.7z';   /* bookmark glyph (Merkliste = Lesezeichen) — drawn on the DS icon canvas 27×26 like profile.svg / cart.svg: 1.4 line, round joins, ≈1-unit corner radius */
+  var HEART = '<svg viewBox="0 0 27 26" aria-hidden="true"><path d="' + HEART_PATH + '"/></svg>';
   var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
   var IC_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   var IC_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>';

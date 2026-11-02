@@ -315,3 +315,6 @@
 /* ---- Alert on light teal (client request 2026-11-02): --teal-100 surface, --teal-10 hairline; divider graphite-300 so it stays visible on the tint ---- */
 .mkl-toast{background:var(--teal-100,#E6EEEE);border-color:var(--teal-10,rgba(1,82,83,.1));box-shadow:var(--shadow-md,0 .25rem .75rem rgba(0,0,0,.08))}
 .mkl-toast__act::before{background:var(--graphite-300,#DADADA)}
+
+/* ---- Bookmark glyph = design-system icon family (2026-11-02): same 27×26 canvas, 1.4 line weight, round caps/joins and ≈1-unit corners as Home/ICONS/profile.svg and cart.svg; header size from .icon-btn (28px / 22px) ---- */
+.mkl-mark svg path,.mkl-hdr svg path,.mkl-empty svg path{stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}

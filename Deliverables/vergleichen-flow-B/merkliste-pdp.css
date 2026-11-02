@@ -118,3 +118,7 @@
 .mkl-pdp-save svg path{stroke-width:1.6}
 .mkl-pdp-save.is-on .mkl-pdp-save__glyph{animation:mkl-bm-pop .22s cubic-bezier(.2,.8,.2,1)}
 @media(prefers-reduced-motion:reduce){.mkl-pdp-save .mkl-pdp-save__glyph{animation:none !important}}
+
+/* ---- Bookmark glyph = design-system icon family (2026-11-02): same 27×26 canvas, 1.4 line weight, round caps/joins and ≈1-unit corners as Home/ICONS/profile.svg and cart.svg; header size from .icon-btn (28px / 22px) ---- */
+.mkl-pdp-save svg path,.pdp-media__stage .mkl-pdp-media svg path{stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.mkl-pdp-band__glyph svg path{stroke-width:1.4}

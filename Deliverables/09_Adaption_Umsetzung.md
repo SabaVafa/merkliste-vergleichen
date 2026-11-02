@@ -113,3 +113,9 @@ Es gibt **eine** Merken-Instanz auf der Seite: oben rechts auf der Galerie-Bühn
 **Assets:** `merkliste.js?v=11`, `merkliste.css?v=10`, `merkliste-pdp.css?v=12`, `vergleichen.js?v=22`, `vergleichen.css?v=24`.
 
 **Hinweise auf hellem Teal (Kundenwunsch, 2026-11-02):** Die Fläche ist jetzt `--teal-100` (wie der Kaufberater-Block „Finden statt Suchen“), die Haarlinie `--teal-10`, der Schatten `--shadow-md`. Der Trenner vor der Aktion ist `--graphite-300`, damit er auf der Tönung sichtbar bleibt. Kontraste auf `--teal-100`: Text `--schwarz` ≈ 15:1, Aktion `--teal` ≈ 8,5:1. Assets: `merkliste.css?v=11`, `vergleichen.css?v=25`.
+
+**Lesezeichen = Icon-Familie des Design Systems (2026-11-02):** Das Glyph ist jetzt auf derselben Zeichenfläche gebaut wie `Home/ICONS/profile.svg` und `cart.svg`.
+- **Geometrie:** 27 × 26, Linie 1,4, runde Enden und Ecken, Eckradius ≈ 1 Einheit, Höhe 0,7–25,3 wie die Tasche, Breite 18 Einheiten für dieselbe optische Masse.
+- **Größe:** Im Header rendert es über `.icon-btn` in derselben Größe (28 px Desktop / 22 px mobil) neben Konto und Warenkorb.
+- **Einsatz:** Karte, Leerzustand, Vergleich und PDP nutzen dasselbe Glyph. Gemerkt ist es gefüllt in Teal.
+- **Assets:** `merkliste.js?v=13`, `merkliste.css?v=12`, `merkliste-pdp.css?v=13`, `vergleichen.js?v=24`.
