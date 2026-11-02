@@ -23,9 +23,11 @@
 .pdp-media__stage .mkl-pdp-media{position:absolute;top:.75rem;right:0;z-index:3;width:2.1875rem;height:2.1875rem;min-height:0;padding:0;border:.0625rem solid var(--graphite-300);border-radius:var(--radius-lg,.5rem);background:var(--white);color:var(--color-graphite-700,#4A4A4A)}
 .pdp-media__stage .mkl-pdp-media::before{content:'';position:absolute;inset:-.25rem}
 .pdp-media__stage .mkl-pdp-media .mkl-pdp-save__glyph,.pdp-media__stage .mkl-pdp-media svg{width:1.125rem;height:1.125rem}
+/* states follow the switch's grammar: idle = like the "3D" segment (white, graphite glyph); saved = like the active "Fotos" segment (teal, white glyph) */
 .pdp-media__stage .mkl-pdp-media:hover{border-color:var(--teal);color:var(--teal);background:var(--white)}
-.pdp-media__stage .mkl-pdp-media.is-on{border-color:var(--teal);color:var(--teal);background:var(--white)}
-.pdp-media__stage .mkl-pdp-media.is-on:hover{background:var(--teal-5)}
+.pdp-media__stage .mkl-pdp-media.is-on{border-color:var(--teal);color:var(--white);background:var(--teal)}
+.pdp-media__stage .mkl-pdp-media.is-on:hover{border-color:var(--teal-600);color:var(--white);background:var(--teal-600)}
+.pdp-media__stage .mkl-pdp-media svg path{stroke-width:1.6}
 .pdp-media__stage .mkl-pdp-media.is-limit{color:var(--text-muted);opacity:.6;background:var(--white)}
 /* phones (the PDP stacks the switch as a single chip above the photo): same row, right edge, chip height and radius */
 @media(max-width:560px){
@@ -109,3 +111,10 @@
 .crumb .mkl-return:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem;border-radius:var(--r-s)}
 .mkl-return__s{display:none}
 @media(max-width:29.99rem){.mkl-return__l{display:none}.mkl-return__s{display:inline}}
+
+/* ---- Bookmark glyph (lead design pass 2026-11-02): slimmer 2:3 outline with rounded tips (path in merkliste.js);
+   becoming saved fills with a short pop — scale .86 → 1.06 → 1 in 220ms; none under reduced motion ---- */
+@keyframes mkl-bm-pop{0%{transform:scale(.86)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+.mkl-pdp-save svg path{stroke-width:1.6}
+.mkl-pdp-save.is-on .mkl-pdp-save__glyph{animation:mkl-bm-pop .22s cubic-bezier(.2,.8,.2,1)}
+@media(prefers-reduced-motion:reduce){.mkl-pdp-save .mkl-pdp-save__glyph{animation:none !important}}

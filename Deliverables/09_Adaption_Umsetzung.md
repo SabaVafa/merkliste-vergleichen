@@ -95,3 +95,19 @@ Es gibt **eine** Merken-Instanz auf der Seite: oben rechts auf der Galerie-Bühn
 - **Assets:** `merkliste.js?v=10`, `merkliste-pdp.css?v=10`.
 
 **Sticky-Bar korrigiert (2026-11-01):** Nach dem Ausblenden des Echos auf dem Desktop rückten „Details“ und der CTA zur Mitte, weil das Add-on deren `margin-left:auto` auf 0 gesetzt hatte. Die Überschreibung gilt jetzt nur noch unter 56,25 rem, wo das Echo sichtbar ist. Auf dem Desktop hat die Bar wieder ihr Originallayout (CTA-Rechtskante 1325 px = Inhaltskante). Asset: `merkliste-pdp.css?v=11`.
+
+## 9 · Lead-Design-Pass: Hinweise (Alerts) und Lesezeichen-Glyph (2026-11-02)
+
+**Hinweise:** eine Anatomie für Merkliste und Vergleich (`.mkl-toast` / `.vgl-toast`, identische Werte).
+- **Position:** unten mittig, 1,5 rem über dem Rand. Angehoben wird der Hinweis nur über eine *sichtbare* Leiste: Vergleichs-Tray (gemessene Höhe `--vgl-tray-h`) bzw. PDP-Sticky-Bar. Vorher stand der Vergleichs-Hinweis immer 6,5 rem hoch und schwebte über dem Produktraster.
+- **Karte:** weiße Fläche, Haarlinie `--graphite-200`, `--shadow-lg`, `--r-l`, Höhe 3,125 rem mit und ohne Aktion. Glyph 1,125 rem in Teal (Limit: `--text-muted`).
+- **Aktion:** hinter einer Haarlinie, Teal 600, Unterstreichung nur bei Hover, Trefferfläche 2,75 rem.
+- **Bewegung:** 180 ms Einblenden mit 0,5 rem Anstieg. Anzeigedauer 4 s, mit Aktion 6 s.
+- **Copy:** ein Satz, meist einzeilig, z. B. „Wählen Sie 2 bis 4 Modelle zum Vergleich.“, „Vergleich beendet.“ · Rückgängig, „Link zum Vergleich kopiert.“, „Maximal 4 Modelle. Bitte entfernen Sie zuerst eines.“, „Ihre Merkliste ist voll (50 Artikel).“, „Zu viele Artikel für einen Link.“ · Drucken / PDF.
+
+**Lesezeichen-Glyph** (überall: Karte, Header, Leerzustand, Vergleichsspalte, PDP, Band):
+- **Form:** schlanker 2:3-Umriss (12 × 18 im 24er-Raster) statt 14 × 18, weich gerundete obere Ecken, abgerundete Spitzen an der Kerbe, Strich 1,6.
+- **Pop beim Merken:** Füllen mit kurzem Pop (0,86 → 1,06 → 1, 220 ms; reduzierte Bewegung: keiner).
+- **PDP-Galerie:** Das Control folgt der Grammatik der Umschaltung: nicht gemerkt wie das „3D“-Segment (weiß, Graphit-Glyph), gemerkt wie das aktive „Fotos“-Segment (Teal-Fläche, weißes Glyph).
+
+**Assets:** `merkliste.js?v=11`, `merkliste.css?v=10`, `merkliste-pdp.css?v=12`, `vergleichen.js?v=22`, `vergleichen.css?v=24`.

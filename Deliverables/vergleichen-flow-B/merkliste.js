@@ -112,7 +112,7 @@
   /* ---- DOM helpers + icons ---- */
   function h(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  var HEART_PATH = 'M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z';   /* bookmark glyph (Merkliste = Lesezeichen) */
+  var HEART_PATH = 'M8 3h8a2 2 0 0 1 2 2v15.2a.6.6 0 0 1-.95.49L12 17l-5.05 3.69A.6.6 0 0 1 6 20.2V5a2 2 0 0 1 2-2z';   /* bookmark glyph (Merkliste = Lesezeichen) */
   var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + HEART_PATH + '"/></svg>';
   var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
   var IC_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -199,7 +199,7 @@
         if (k === 'clear-no') { confirmEl.hidden = true; clearBtn.focus(); return; }
         if (k === 'clear-yes') { clearAll(); return; }
         if (k === 'compare') { startCompare(); return; }
-        if (k === 'login') { e.preventDefault(); toast('Anmelden ist im Prototyp nicht verfügbar — im Shop werden die Artikel nach dem Login zusammengeführt.', 'info'); return; }
+        if (k === 'login') { e.preventDefault(); toast('Anmelden ist im Prototyp nicht verfügbar.', 'info'); return; }
         if (k === 'share') { askOrShare(); return; }
         if (k === 'share-plain' || k === 'share-full') { askEl.hidden = true; shareList(k === 'share-full'); shareBtn.focus(); return; }
         if (k === 'share-no') { askEl.hidden = true; shareBtn.focus(); return; }
@@ -222,18 +222,18 @@
           if (rit.configId) { arrive(rit.configId); } else { var sw = document.getElementById('pdpSwatches'); if (sw) { sw.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); hintSwatches(); } }
           return;
         }
-        if (href.charAt(0) === '#') { e.preventDefault(); closeDrawer(); toast(/Konfiguration öffnen/.test(go.textContent) ? 'Gespeicherte Konfiguration öffnen (Prototyp)' : ('Weiter zur ' + (/Konfigurieren/.test(go.textContent) ? 'Konfiguration' : 'Produktseite') + ' — dort Farbe, Namensschild & Gravur wählen (Prototyp)'), 'info'); return; }
+        if (href.charAt(0) === '#') { e.preventDefault(); closeDrawer(); toast(/Konfiguration öffnen/.test(go.textContent) ? 'Gespeicherte Konfiguration öffnen (Prototyp)' : ('Weiter zur ' + (/Konfigurieren/.test(go.textContent) ? 'Konfiguration' : 'Produktseite') + ' (Prototyp)'), 'info'); return; }
         closeDrawer(); return;   /* a real page: let the link navigate */
       }
       var rm = e.target.closest('.mkl-rm');
       if (rm) { removeFromRow(rm.getAttribute('data-id'), rm); return; }
       var cmp = e.target.closest('.mkl-cmp');
-      if (cmp) { var inp = cmp.querySelector('input'); if (inp.disabled) { e.preventDefault(); if (cmp.classList.contains('is-lens')) toast('Vergleich nur innerhalb einer Kategorie', 'info'); else toast('Maximal ' + CMP_MAX + ' Modelle gleichzeitig — bitte zuerst eines entfernen.', 'limit'); } }
+      if (cmp) { var inp = cmp.querySelector('input'); if (inp.disabled) { e.preventDefault(); if (cmp.classList.contains('is-lens')) toast('Vergleich nur innerhalb einer Kategorie', 'info'); else toast('Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); } }
     });
     drawer.addEventListener('change', function (e) {
       var inp = e.target.closest('.mkl-cmp input'); if (!inp) return;
       var id = inp.getAttribute('data-id'), i = cmpSel.indexOf(id);
-      if (inp.checked && i < 0) { if (cmpSel.length >= CMP_MAX) { inp.checked = false; toast('Maximal ' + CMP_MAX + ' Modelle gleichzeitig — bitte zuerst eines entfernen.', 'limit'); return; } cmpSel.push(id); }
+      if (inp.checked && i < 0) { if (cmpSel.length >= CMP_MAX) { inp.checked = false; toast('Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); return; } cmpSel.push(id); }
       else if (!inp.checked && i > -1) cmpSel.splice(i, 1);
       syncCmp();
     });
@@ -296,7 +296,7 @@
   function toast(msg, type, action) {
     type = type || 'ok';
     var vt = document.querySelector('.vgl-toast.show'); if (vt) vt.classList.remove('show');   /* a Merkliste toast replaces a compare toast (§5.7) */
-    toastEl.className = 'mkl-toast t-' + type + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : ((pdpBarVisible && pdpBarVisible()) ? ' is-pdp-bar' : ''))));
+    toastEl.className = 'mkl-toast t-' + type + (action ? ' has-act' : '') + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : ((pdpBarVisible && pdpBarVisible()) ? ' is-pdp-bar' : ''))));
     toastEl.innerHTML = (type === 'limit' ? IC_LIMIT : (type === 'info' ? IC_INFO : IC_OK)) + '<span class="mkl-toast__msg">' + esc(msg) + '</span>' + (action ? '<button class="mkl-toast__act" type="button">' + esc(action.label) + '</button>' : '');
     if (action) toastEl.querySelector('.mkl-toast__act').addEventListener('click', function () { hideToast(); action.fn(); });
     toastEl.classList.add('show');
@@ -358,7 +358,7 @@
   /* ---- Mutations ---- */
   function addItem(id, cardEl) {
     var p = BY_ID[id]; if (!p) return false;
-    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ') — bitte zuerst einen Artikel entfernen'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }); live(m); return false; }
+    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }); live(m); return false; }
     var it = itemFrom(p, cardEl); items.push(it); save(); syncAll(); pulseBadge();
     live('Gemerkt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
     toast('Gemerkt', 'ok', { label: 'Zur Merkliste', fn: openDrawer });
@@ -582,14 +582,14 @@
     var obj = { v: 1, t: new Date().toISOString().slice(0, 10), i: items.map(function (it) { return packItem(it, withGravur); }) };
     encodeList(obj).then(function (payload) {
       var url = rootUrl() + LENSES[LENS].page + '#liste=' + payload;
-      if (url.length > 7000) { toast('Ihre Merkliste ist für einen Link zu umfangreich — bitte nutzen Sie „Drucken / PDF".', 'limit', { label: 'Drucken / PDF', fn: printList }); return; }
+      if (url.length > 7000) { toast('Zu viele Artikel für einen Link.', 'limit', { label: 'Drucken / PDF', fn: printList }); return; }
       var mobile = false; try { mobile = window.matchMedia('(max-width:47.99rem)').matches; } catch (e) {}
       if (mobile && navigator.share) { navigator.share({ title: 'Meine Merkliste | Metzler', text: n + ' Artikel', url: url }).catch(function (err) { if (!err || err.name !== 'AbortError') copyLink(url, n); }); return; }
       copyLink(url, n);
     });
   }
   function copyLink(url, n) {
-    var ok = function () { toast('Link kopiert — wer ihn öffnet, sieht Ihre Merkliste (' + n + ' Artikel) und kann sie übernehmen.', 'ok'); live('Link zur Merkliste kopiert.'); };
+    var ok = function () { toast('Link zur Merkliste kopiert.', 'ok'); live('Link zur Merkliste kopiert.'); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, function () { showSharePop(url); });
     else showSharePop(url);
   }
@@ -624,7 +624,7 @@
     var sit = viewById(id); if (!sit) return;
     var own = ownFor(sit), nm = shortName(sit).main;
     if (own) { removeItem(own.id); return; }   /* removeItem renders and offers undo */
-    if (isFull()) { toast('Ihre Merkliste ist voll (' + LIMIT + ') — bitte zuerst einen Artikel entfernen', 'limit'); return; }
+    if (isFull()) { toast('Ihre Merkliste ist voll (' + LIMIT + ' Artikel).', 'limit'); return; }
     var it = copyShared(sit); if (!it) return;
     items.push(it); save(); syncAll(); pulseBadge();
     live('Übernommen: ' + nm + '. Merkliste: ' + items.length + ' Artikel');
@@ -637,7 +637,7 @@
     sharedList = null; sharedMode = false; storeShared();
     save(); syncAll(); if (added.length) pulseBadge(); titleEl.focus();
     if (!todo.length) { toast('Alle Artikel sind bereits in Ihrer Merkliste', 'info'); return; }
-    if (added.length < todo.length) { toast(added.length + ' von ' + todo.length + ' Artikeln übernommen — Ihre Merkliste ist voll (' + LIMIT + ').', 'limit'); return; }
+    if (added.length < todo.length) { toast(added.length + ' von ' + todo.length + ' übernommen. Ihre Merkliste ist voll.', 'limit'); return; }
     live(added.length + ' Artikel übernommen. Merkliste: ' + items.length + ' Artikel');
     toast(added.length + ' Artikel in Ihre Merkliste übernommen', 'ok', { label: 'Rückgängig', fn: function () { items = items.filter(function (it) { return added.indexOf(it.id) < 0; }); save(); syncAll(); titleEl.focus(); } });
   }
@@ -649,7 +649,7 @@
       clean(); sharedList = res; storeShared(); sharedMode = true;
       openDrawer(); sharedEl.focus();
       live('Geteilte Merkliste mit ' + res.items.length + ' Artikeln geöffnet.');
-    }).catch(function () { clean(); toast('Dieser Merklisten-Link ist unvollständig oder beschädigt.', 'limit'); });
+    }).catch(function () { clean(); toast('Dieser Link ist unvollständig.', 'limit'); });
   }
   function sharedCfg(cid) { loadShared(); if (!sharedList) return null; for (var i = 0; i < sharedList.items.length; i++) if (sharedList.items[i].configId === cid) return sharedList.items[i]; return null; }
 
@@ -755,7 +755,7 @@
     if (st.changed) updateConfig(st.sessId, st.sn); else addConfig(st.sn);
   }
   function addConfig(sn) {
-    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ') — bitte zuerst einen Artikel entfernen'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }); live(m); return; }
+    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }); live(m); return; }
     var it = cfgItemFor(sn), cid = 'c-' + (sn.article || 'x') + '-' + Math.random().toString(36).slice(2, 8);
     it.id = 'cfg:' + cid; it.configId = cid; it.url = 'pdp/index.html?merkliste=' + cid; it.addedAt = new Date().toISOString(); it.priceAtAdd = sn.total;
     var mi = indexOf(PDP.id); if (mi > -1) items.splice(mi + 1, 0, it); else items.push(it);   /* the build sits right behind its model row */
@@ -797,7 +797,7 @@
     try { var q = location.search.replace(/([?&])merkliste=[^&#]*(&|$)/, function (m0, a, b) { return b ? a : ''; }).replace(/[?&]$/, ''); history.replaceState(null, '', location.pathname + q + location.hash); } catch (e) {}
     var it = byId('cfg:' + cid), fromShare = false;
     if (!it || !it.configState) { var sit = sharedCfg(cid); if (sit && sit.configState) { it = sit; fromShare = true; } }   /* 09b: a configuration from a shared list */
-    if (!it || !it.configState) { setTimeout(function () { toast('Diese Konfiguration ist auf diesem Gerät nicht gespeichert', 'info', { label: 'Zur Merkliste', fn: openDrawer }); }, 300); return; }
+    if (!it || !it.configState) { setTimeout(function () { toast('Diese Konfiguration ist hier nicht gespeichert.', 'info', { label: 'Zur Merkliste', fn: openDrawer }); }, 300); return; }
     removeBand();
     var missing = window.MTZ_PDP.restore(it.configState) || [];
     var sn = pdpSnap(), colourGone = !!it.configState.article && sn.article !== it.configState.article;

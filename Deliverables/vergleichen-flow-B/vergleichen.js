@@ -213,7 +213,7 @@
   var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   var IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-  var IC_BM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>';
+  var IC_BM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8a2 2 0 0 1 2 2v15.2a.6.6 0 0 1-.95.49L12 17l-5.05 3.69A.6.6 0 0 1 6 20.2V5a2 2 0 0 1 2-2z"/></svg>';
   var IC_LINK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg>';
   var IC_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.2" y2="16.2"/></svg>';
   var liveEl,shareBtn,fromMkl=false,lastCleared=null,chipsAll=false,prevTitle=null;
@@ -277,14 +277,14 @@
         return;}
       var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
       var j=e.target.closest('[data-jump]');if(j){jumpTo(j.getAttribute('data-jump'));return;}
-      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');if(toggle(aid,true)){var anm=shortName(BY_ID[aid]).main;toast(esc(anm)+' zum Vergleich hinzugefügt','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
+      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');if(toggle(aid,true)){var anm=shortName(BY_ID[aid]).main;toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
       var rm=e.target.closest('[data-rm]');if(rm){removeColumn(rm.getAttribute('data-rm'));return;}
       var go=e.target.closest('[data-go]');
       if(go&&go.tagName==='A'){   /* real product page: remember the way back (P0-10), then navigate normally */
         try{sessionStorage.setItem('mtz_return',JSON.stringify({type:'vergleich',href:(PAGES[LENSKEY]||'index.html')+'?vergleich='+selected.map(encodeURIComponent).join(','),n:selected.length,lens:LENSKEY,t:Date.now()}));}catch(err){}
         return;
       }
-      if(go)toast('Weiter zur '+(/Konfigurieren/.test(go.textContent)?'Konfiguration':'Produktseite')+' — dort Farbe, Namensschild & Gravur wählen (Prototyp)','info');
+      if(go)toast('Im Prototyp ohne '+(/Konfigurieren/.test(go.textContent)?'Konfigurator':'Produktseite')+'.','info');
     });
     view.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
       if(addPanel){e.stopPropagation();closeAdd(true);return;}
@@ -332,7 +332,7 @@
     btn.classList.add('is-done');l.textContent='Link kopiert';ic.outerHTML=IC_OK;
     clearTimeout(btn._t);btn._t=setTimeout(function(){btn.classList.remove('is-done');l.innerHTML=oldL;var c=btn.querySelector('svg');if(c)c.outerHTML=oldIc;},2000);
     announce('Link zum Vergleich kopiert.');
-    toast('Link kopiert — wer ihn öffnet, sieht diesen Vergleich.','ok');
+    toast('Link zum Vergleich kopiert.','ok');
   }
   /* no clipboard API: a read-only field to copy by hand */
   function sharePop(url,btn){
@@ -453,7 +453,7 @@
     if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}
     var free=null;if(g)g.querySelectorAll('.vgl-toggle input').forEach(function(i){if(!free&&!i.checked)free=i;});
     if(free)setTimeout(function(){free.focus({preventScroll:true});},350);
-    toast('Weiteres Modell auf einer Produktkarte markieren — noch '+(MAX-selected.length)+' möglich.','info');
+    toast('Wählen Sie ein weiteres Modell auf den Karten.','info');
   }
   /* (i) toggletip: click/Enter opens a real tooltip node (aria-describedby), Escape closes it first */
   function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');}}
@@ -483,23 +483,24 @@
   function enterMode(){
     setMode(true);syncAll();var g=document.getElementById('productGrid');if(g)try{g.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}
     var n=selected.length;
-    if(n)toast('Ihre letzte Auswahl ist wieder da — '+(n>1?n+' Modelle':'1 Modell')+'. Wählen Sie bis zu '+MAX+' Modelle über „Vergleichen" auf den Karten.','info',{label:'Vergleich leeren',fn:function(){clearAll();if(barBtn)barBtn.focus();}});
-    else toast('Vergleichsmodus aktiv — wählen Sie 2 bis 4 Modelle über „Vergleichen" auf den Karten.','info');
+    if(n)toast('Ihre letzte Auswahl ist wieder da ('+(n>1?n+' Modelle':'1 Modell')+').','info',{label:'Leeren',fn:function(){clearAll();if(barBtn)barBtn.focus();}});
+    else toast('Wählen Sie 2 bis 4 Modelle zum Vergleich.','info');
   }
   function exitMode(){
     var snap=selected.slice();
     setMode(false);selected=[];persist();closeView();syncAll();
-    if(snap.length)toast('Vergleich beendet — '+snap.length+' Modell'+(snap.length>1?'e':'')+' verworfen','ok',{label:'Rückgängig',fn:function(){setSelection(snap);syncAll();if(barBtn)barBtn.focus();}});
+    if(snap.length)toast('Vergleich beendet.','ok',{label:'Rückgängig',fn:function(){setSelection(snap);syncAll();if(barBtn)barBtn.focus();}});
   }
 
   function toast(m,type,action){
     type=type||'ok';
     var ic=type==='limit'?IC_LIMIT:(type==='info'?IC_INFO:IC_OK);
-    toastEl.className='vgl-toast t-'+type+(action?' has-act':'')+(view.classList.contains('is-open')?' in-view':'');
+    var inView=view.classList.contains('is-open');
+    toastEl.className='vgl-toast t-'+type+(action?' has-act':'')+(inView?' in-view':(tray.classList.contains('is-open')?' is-raised':''));
     toastEl.innerHTML=ic+'<span>'+m+'</span>'+(action?'<button class="vgl-toast__act" type="button">'+esc(action.label)+'</button>':'');
     if(action)toastEl.querySelector('.vgl-toast__act').addEventListener('click',function(){toastEl.classList.remove('show');action.fn();});
     toastEl.classList.add('show');
-    clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},action?5000:2600);
+    clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},action?6000:4000);
   }
 
   function injectToggle(cardEl){
@@ -514,7 +515,7 @@
   }
   function scanCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(injectToggle);syncCards();}
 
-  function toggle(id,on){var i=selected.indexOf(id);if(on&&i<0){if(isFull()){toast('Maximal '+MAX+' Modelle gleichzeitig — bitte zuerst eines entfernen.','limit');return false;}selected.push(id);}else if(!on&&i>-1){selected.splice(i,1);}persist();syncAll();return true;}
+  function toggle(id,on){var i=selected.indexOf(id);if(on&&i<0){if(isFull()){toast('Maximal '+MAX+' Modelle. Bitte entfernen Sie zuerst eines.','limit');return false;}selected.push(id);}else if(!on&&i>-1){selected.splice(i,1);}persist();syncAll();return true;}
   function clearAll(){selected=[];persist();syncAll();}
 
   function syncCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(function(c){var id=c.dataset.id,on=selected.indexOf(id)>-1,cb=c.querySelector('.vgl-toggle input'),lab=c.querySelector('.vgl-toggle');if(cb)cb.checked=on;c.classList.toggle('is-vgl',on);var dis=!on&&isFull();if(cb){if(dis)cb.setAttribute('aria-disabled','true');else cb.removeAttribute('aria-disabled');}if(lab)lab.classList.toggle('is-disabled',dis);});}
@@ -560,7 +561,8 @@
     }
     traySlots.innerHTML='';
     selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));});
-    document.body.style.paddingBottom=shown?((tray.offsetHeight||88)/16)+'rem':'';   /* measured after the slots exist — the mobile tray wraps to two rows */
+    document.body.style.paddingBottom=shown?((tray.offsetHeight||88)/16)+'rem':'';
+    document.documentElement.style.setProperty('--vgl-tray-h',((tray.offsetHeight||88)/16)+'rem');   /* alerts lift exactly above the tray */   /* measured after the slots exist — the mobile tray wraps to two rows */
   }
   function syncAll(){syncCards();syncBar();syncTray();if(view.classList.contains('is-open'))renderView();}
 
@@ -1010,7 +1012,7 @@
     if(valid.length===1){
       var prev1=selected.slice(),keep1=!arr.fromMkl&&prev1.length>0&&prev1.join()!==valid.join();   /* never drop the visitor's own selection silently */
       setSelection(valid);syncAll();
-      setTimeout(function(){toast('Aus dem Link ist nur noch ein Modell verfügbar — wählen Sie ein weiteres zum Vergleich.','info',keep1?{label:'Meine Auswahl ('+prev1.length+') wiederherstellen',fn:function(){setSelection(prev1);syncAll();}}:null);},300);
+      setTimeout(function(){toast('Aus dem Link ist nur ein Modell verfügbar.','info',keep1?{label:'Meine Auswahl ('+prev1.length+') wiederherstellen',fn:function(){setSelection(prev1);syncAll();}}:null);},300);
       return;
     }
     /* none of this category: a handover from the other category's Merkliste (or ids of the other category) opens there.
@@ -1018,7 +1020,7 @@
     var bkIds=Object.keys(BK_SEED),otherLens=arr.fromMkl||(LENSKEY==='briefkasten'?uniq.some(function(id){return bkIds.indexOf(id)<0;}):uniq.some(function(id){return bkIds.indexOf(id)>-1;}));
     if(otherLens){
       var other=(LENSKEY==='briefkasten')?{page:'index.html',label:'Türsprechanlagen'}:{page:'briefkasten.html',label:'Briefkästen'};
-      setTimeout(function(){toast('Diese Modelle gehören zur Kategorie '+other.label+' — der Vergleich öffnet sich dort.','info',{label:'Dort öffnen',fn:function(){location.href=other.page+'?vergleich='+encodeURIComponent(uniq.join(','))+(arr.fromMkl?'&von=merkliste':'');}});},300);
+      setTimeout(function(){toast('Diese Modelle gehören zu '+other.label+'.','info',{label:'Dort öffnen',fn:function(){location.href=other.page+'?vergleich='+encodeURIComponent(uniq.join(','))+(arr.fromMkl?'&von=merkliste':'');}});},300);
     }else setTimeout(function(){toast('Dieser Vergleichs-Link ist nicht mehr gültig.','limit');},300);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

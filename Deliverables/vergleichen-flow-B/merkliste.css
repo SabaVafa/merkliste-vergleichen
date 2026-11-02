@@ -284,14 +284,30 @@
 }
 @media(prefers-reduced-motion:reduce){.mkl-item__more svg{transition:none !important}}
 
-/* ---- Toast, calm variant (client feedback 2026-11-01: the black bar with mint link was too loud).
-   White surface, hairline border, soft shadow; teal glyph and action; the message carries the weight ---- */
-.mkl-toast{background:var(--white,#fff);color:var(--schwarz,#1A171B);border:.0625rem solid var(--graphite-200,#E6E6E8);box-shadow:var(--shadow-md,0 .25rem .75rem rgba(0,0,0,.08));font-weight:500}
-.mkl-toast>svg{color:var(--teal,#015253)}
-.mkl-toast.t-limit>svg{color:var(--graphite-500,#A1A1A1)}
-.mkl-toast__act{color:var(--teal,#015253);font-weight:600;text-underline-offset:.1875rem}
-.mkl-toast__act:hover{color:var(--teal-600,#014A4B)}
-.mkl-toast__act:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
-/* the status glyphs use circle/line/polyline too — outline them like the path (a bare <circle> rendered as a solid dot) */
-.mkl-toast>svg circle,.mkl-toast>svg line,.mkl-toast>svg polyline{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* ============================================================
+   Hinweis / Alert — one anatomy for .mkl-toast and its twin in the other add-on (lead PD pass, 2026-11-02)
+   · bottom-centre, 1.5rem from the edge; lifts only above a VISIBLE bottom bar (compare tray / PDP sticky bar)
+   · white card, graphite-200 hairline, --shadow-lg, --r-l; one sentence, ≤ 2 lines
+   · 1.125rem status glyph (teal; limit = text-muted); action behind a hairline divider, teal 600, underline on hover only
+   · motion: fade + .5rem rise, 180ms; none under reduced motion
+   ============================================================ */
+.mkl-toast{gap:.75rem;min-height:3.125rem;max-width:min(calc(100vw - 2rem),28rem);padding:.5rem 1rem;border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,.5rem);background:var(--white,#fff);color:var(--schwarz,#1A171B);font-size:var(--text-body-sm,.875rem);font-weight:500;line-height:1.45;box-shadow:var(--shadow-lg,0 .75rem 2rem rgba(0,0,0,.12));transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s linear .18s}
+.mkl-toast.has-act{padding-block:.375rem;padding-right:.25rem}
+.mkl-toast>svg{width:1.125rem;height:1.125rem;flex-shrink:0;color:var(--teal,#015253)}
+.mkl-toast>svg path,.mkl-toast>svg circle,.mkl-toast>svg line,.mkl-toast>svg polyline{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mkl-toast>svg circle[r="0.6"]{fill:currentColor}
+.mkl-toast.t-limit>svg{color:var(--text-muted,#6A6A6A)}
+.mkl-toast__msg{padding:.25rem 0}
+.mkl-toast__act{position:relative;flex-shrink:0;min-height:2.25rem;margin-left:.25rem;padding:0 .75rem;border:0;background:none;color:var(--teal,#015253);font-family:inherit;font-size:var(--text-body-sm,.875rem);font-weight:600;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer}
+.mkl-toast__act::after{content:'';position:absolute;inset:-.25rem 0}   /* 2.75rem hit area */
+.mkl-toast__act::before{content:'';position:absolute;left:0;top:50%;width:.0625rem;height:1.25rem;background:var(--graphite-200,#E6E6E8);transform:translateY(-50%)}
+.mkl-toast__act:hover{color:var(--teal-600,#014A4B);text-decoration:underline;text-underline-offset:.1875rem}
+.mkl-toast__act:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:-.1875rem;border-radius:var(--r-m,.25rem)}
+.mkl-toast.is-raised{bottom:calc(var(--vgl-tray-h,5.5rem) + .75rem + env(safe-area-inset-bottom,0px))}   /* compare tray open underneath: measured height */
+
+/* ---- Bookmark glyph (lead design pass 2026-11-02): slimmer 2:3 outline with rounded tips (path in merkliste.js);
+   becoming saved fills with a short pop — scale .86 → 1.06 → 1 in 220ms; none under reduced motion ---- */
+@keyframes mkl-bm-pop{0%{transform:scale(.86)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+.mkl-mark svg path{stroke-width:1.6}
+.mkl-mark.is-on .mkl-mark__disc{animation:mkl-bm-pop .22s cubic-bezier(.2,.8,.2,1)}
+@media(prefers-reduced-motion:reduce){.mkl-mark .mkl-mark__disc{animation:none !important}}
