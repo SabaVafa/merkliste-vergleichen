@@ -144,3 +144,12 @@ Es gibt **eine** Merken-Instanz auf der Seite: oben rechts auf der Galerie-Bühn
   - Mobil: 36 px in der Zeile des „3D“-Chips.
   - Keine Konsolenfehler.
 - **Assets:** `merkliste.js?v=15`, `merkliste-pdp.css?v=17`.
+
+## 11 · Lead-Design-Pass: Galerie-Steuerung als ruhige Tonal-Controls (2026-11-02)
+
+Feedback: der gerahmte weiße Kasten mit teal gefülltem Innensegment wirkte altmodisch (Rahmen-im-Rahmen, schwere Füllung).
+
+- **„Fotos | 3D"** (`pdp/pdp-b.css` §11): randlose Tonal-Spur `--color-graphite-100`, aktive Ansicht = weißer „Thumb" mit `--shadow-sm` und teal Schrift (statt teal Block). Segmente 1,75rem, Spur 2,125rem (34 px), `--radius-lg`/`--radius`.
+- **Merken** (`merkliste-pdp.css` §11): derselbe Baukasten. Nicht gemerkt = graue Tonal-Chip mit Graphit-Schrift (wie ein inaktives Segment); gemerkt = weißer Thumb, teal Schrift + gefülltes Lesezeichen (wie die aktive Ansicht). Kein Rahmen, keine teal Fläche.
+- **Phones (≤ 560 px):** beide als einzelne Tonal-Chips, 2,25rem (36 px), gleiche Zeile; „3D" teal Schrift auf Graphit-100; Merken gemerkt = `--color-teal-75`.
+- Geprüft: Desktop beide 34 px, gleiche Oberkante, rechte Kante = Bühne; Mobile beide 36 px; keine Konsolenfehler. Nur DS-Tokens.

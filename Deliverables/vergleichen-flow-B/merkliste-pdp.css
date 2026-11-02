@@ -139,3 +139,19 @@
 #pdpStickyBar .mkl-pdp-bar.is-on{border-color:var(--teal);background:var(--color-teal-50);color:var(--teal)}
 #pdpStickyBar .mkl-pdp-bar.is-dup{display:none}
 @media(prefers-reduced-motion:reduce){.mkl-pdp-media__seg,.mkl-pdp-save__dot{transition:none !important}.mkl-pdp-save .mkl-pdp-save__glyph{animation:none !important;transform:none !important}}
+/* ==== 11 · Lead design pass: Merken as the tonal twin of „Fotos | 3D" ====
+   idle  = a grey tonal chip (like an inactive segment), graphite ink
+   saved = the white "thumb" inside the tonal track (like the active view), teal ink + filled glyph
+   No frame, no teal block. Phones: one tonal chip; saved = teal-75 tone. */
+.pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{padding:.1875rem;border:0;border-radius:var(--radius-lg);background:var(--graphite-100);font-weight:600}
+.mkl-pdp-media__seg{height:1.75rem;padding:0 .7rem;border-radius:var(--radius);transition:background-color .16s ease,color .16s ease,box-shadow .16s ease}
+.mkl-pdp-media:active .mkl-pdp-media__seg{background:var(--graphite-200)}
+.mkl-pdp-media.is-on .mkl-pdp-media__seg,.mkl-pdp-media.is-on:active .mkl-pdp-media__seg{background:var(--white);color:var(--teal);box-shadow:var(--shadow-sm)}
+.mkl-pdp-media.is-on:hover .mkl-pdp-media__seg{background:var(--white);color:var(--teal-600)}
+.mkl-pdp-media .mkl-pdp-save__dot{box-shadow:0 0 0 .125rem var(--graphite-100)}
+@media(max-width:560px){
+  .pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{top:0;padding:0}
+  .mkl-pdp-media__seg{height:2.25rem;padding:0 .9rem;border-radius:var(--radius-lg)}
+  .mkl-pdp-media.is-on .mkl-pdp-media__seg,.mkl-pdp-media.is-on:active .mkl-pdp-media__seg,.mkl-pdp-media.is-on:hover .mkl-pdp-media__seg{background:var(--color-teal-75);box-shadow:none}
+  .mkl-pdp-media.is-on .mkl-pdp-save__dot{box-shadow:0 0 0 .125rem var(--color-teal-75)}
+}

@@ -3315,3 +3315,34 @@ body.is-scrolled #quickbar {
   .colorwin__sw { width: 4.75rem; height: 4.75rem; }
   .colorwin__name { font-size: 1.0625rem; }
 }
+
+/* ── 11 · Lead design pass (2026-11-02): media controls as QUIET TONAL controls ──────────
+   The framed white box with a teal-filled inner segment read as dated (frame-in-frame,
+   heavy fill). Modern product pages (Apple, Vitra, COS, SSENSE) use a borderless tonal
+   track with a white "thumb" for the active view. Same grammar is reused by the
+   Merken control opposite (merkliste-pdp.css §11), so both read as one family. */
+.pdp-b .pdp-media__toggle {
+  gap: 0.125rem; padding: 0.1875rem; border: 0; border-radius: var(--radius-lg);
+  background: var(--color-graphite-100);
+}
+.pdp-b .pdp-media__toggle button {
+  height: 1.75rem; padding: 0 0.7rem; border-radius: var(--radius);
+  font-weight: 600; color: var(--color-graphite-700);
+  transition: background-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+.pdp-b .pdp-media__toggle button:hover { background: none; color: var(--color-teal); }
+.pdp-b .pdp-media__toggle button[aria-pressed="true"],
+.pdp-b .pdp-media__toggle button[aria-pressed="true"]:hover {
+  background: var(--color-white); color: var(--color-teal); box-shadow: var(--shadow-sm);
+}
+.pdp-b .pdp-media__toggle button:focus-visible { outline: 0.1875rem solid var(--color-teal); outline-offset: 0.125rem; }
+@media (max-width: 560px) {
+  /* phones: the single alternative-view chip becomes a tonal chip, same height as Merken */
+  .pdp-b .pdp-media__toggle { background: none; padding: 0; }
+  .pdp-b .pdp-media__toggle button,
+  .pdp-b .pdp-media__toggle button:last-child {
+    height: 2.25rem; min-height: 2.25rem; padding: 0 0.9rem; border: 0; border-radius: var(--radius-lg);
+    background: var(--color-graphite-100); box-shadow: none; font-weight: 600;
+  }
+  .pdp-b .pdp-media__toggle button:last-child { color: var(--color-teal); }
+}
