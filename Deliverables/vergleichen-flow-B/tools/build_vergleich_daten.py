@@ -26,25 +26,30 @@ B_DIR = os.path.dirname(HERE)                                   # vergleichen-fl
 ROOT = os.path.dirname(os.path.dirname(B_DIR))                  # Bookmark & Comparing
 DEF_SRC = os.path.join(ROOT, 'Catalogue merkmale', 'vergleich-briefkasten-sprechanlagen-2026-11-02.json')
 DEF_OUT = os.path.join(B_DIR, 'vergleich-daten.js')
+DEF_IMG = os.path.join(HERE, 'shop-bilder.json')   # Hauptbild je Artikel (aus den Shop-Produktseiten, der Export hat keine Bilder)
+IMG_BASE = 'https://edelstahl-tuerklingel.de/media/image/product/'
 
 # ---------------------------------------------------------------------------
 # 1) Zuordnung Prototyp-Artikel -> Shop-Artikel (id), Sicherheit, Anmerkung
 #    variant = Artikelnummer einer Variante, wenn der Prototyp genau eine Ausfuehrung zeigt.
+#    Reihenfolge und Umfang = Live-Kategorien /tuersprechanlagen (41 Artikel) und /briefkasten (79 Artikel),
+#    Stand 05.11.2026 (Deliverables/13_PLP_Live-Abgleich.md). Bestehende Prototyp-IDs bleiben (Deep-Links,
+#    gespeicherte Merklisten, Vergleichs-Tour); neue Artikel sind per Shop-ID zugeordnet ("hoch").
 # ---------------------------------------------------------------------------
 MAP = {
     'sprechanlage': {
-        'dominik1': (45248, 'hoch', 'Name identisch (XDM10 · Maxior · 1 Taster); die Prototyp-ID „dominik1" ist irreführend'),
         'sdm10x': (40132, 'hoch', ''),
         'colson1': (31101, 'hoch', ''),
+        'dominik1': (45248, 'hoch', 'Name identisch (XDM10 · Maxior · 1 Taster); die Prototyp-ID „dominik1" ist irreführend'),
         'horizon': (36478, 'hoch', ''),
         'sdm10h': (42955, 'hoch', ''),
         'kian1': (31086, 'hoch', ''),
         'niko1': (40484, 'hoch', ''),
         'neo1': (40373, 'hoch', 'Einzelgerät, nicht das Komplettset VDM10-NEO-1T-Set'),
         'sdm10s': (44643, 'hoch', ''),
+        'domaudio1': (41096, 'hoch', ''),
         'colson2': (31122, 'hoch', ''),
         'kai1': (42899, 'hoch', ''),
-        'domaudio1': (41096, 'hoch', ''),
         'kian2': (31315, 'hoch', ''),
         'niko2': (40492, 'hoch', ''),
         'neo2': (40380, 'hoch', ''),
@@ -57,42 +62,104 @@ MAP = {
         'kai3': (42918, 'hoch', ''),
         'maxior3': (45263, 'hoch', ''),
         'colson4': (38941, 'hoch', ''),
-        'colson5': (38947, 'hoch', ''),
-        'colson6': (38953, 'hoch', ''),
-        'colson7': (38959, 'hoch', ''),
+        'neo4': (40394, 'hoch', ''),
         'kai4': (42891, 'hoch', ''),
+        'colson5': (38947, 'hoch', ''),
+        'neo5': (40411, 'hoch', ''),
         'kai5': (42892, 'hoch', ''),
+        'colson6': (38953, 'hoch', ''),
+        'neo6': (40418, 'hoch', ''),
         'kai6': (42893, 'hoch', ''),
+        'colson7': (38959, 'hoch', ''),
+        'vdm10-bk1': (39718, 'hoch', ''),
+        'bispo2-lan': (45465, 'hoch', ''),
+        'zivo2-bus': (45564, 'hoch', ''),
+        'zivo2-lan': (45337, 'hoch', ''),
         'vdm10-pb': (37175, 'hoch', 'Artikelnummer VDM10-PBOX'),
-        'vdm10-zf-bk': (42274, 'hoch', 'Artikelnummer SK212-VDM-2x'),
-        'vdm10-anlage-bk': (None, 'keine', 'Kein entsprechender Artikel im Export (modulare Standbriefkastenanlage)'),
+        'siebert-vdm10': (36045, 'hoch', ''),
+        'siebert-vdm10-stand': (36050, 'hoch', ''),
+        'vdm10-siebert-set': (36299, 'hoch', ''),
     },
     'briefkasten': {
         'siebert': (36621, 'hoch', ''),
         'ebenhard': (36620, 'hoch', ''),
-        'ebenhard-v2a': (36620, 'mittel', 'Variante ebenhard19-VA (Edelstahlfront, Gravur); „V2A" steht nicht im Export', 'ebenhard19-VA'),
         'hermann': (36619, 'hoch', ''),
-        'moris': (35830, 'hoch', 'Artikelnummer Modell01'),
-        'lessing': (41645, 'niedrig', '„Lessing" gibt es nicht; nächster Artikel: Standbriefkasten mit Zeitungsfach Alves'),
-        'gienger': (36039, 'mittel', '„Gienger" gibt es nicht; Briefkasten Design Modell-G'),
-        'schneider': (43529, 'mittel', '„Schneider" gibt es nicht; Durchwurfbriefkasten Nora'),
         'lepo': (28374, 'hoch', 'Lepo 2'),
         'zaun': (43530, 'mittel', 'Zaunbriefkasten Emma (Emma 2 hat identische Daten)'),
+        'emma2': (43542, 'hoch', ''),
+        'moris': (35830, 'hoch', 'Artikelnummer Modell01'),
+        'schneider': (43529, 'mittel', '„Schneider" gibt es nicht; Durchwurfbriefkasten Nora'),
+        'gienger': (36039, 'mittel', '„Gienger" gibt es nicht; Briefkasten Design Modell-G'),
         'flora': (42093, 'mittel', '„Flora" gibt es nicht; Briefkasten mit Blumenkasten = Siebert Frame J'),
-        'castor': (36683, 'mittel', '„Castor" gibt es nicht; Kartenbild zeigt Unterputz-Briefkasten Hugo'),
-        'trias': (40524, 'niedrig', '„Trias" gibt es nicht; Briefkastenanlage freistehend 3 Parteien — ohne Klingel/Sprechanlage/Paketfach'),
-        'vossberg': (39718, 'niedrig', '„Vossberg" gibt es nicht; Briefkasten mit VDM10 2.0 (BK212-VDM10)'),
-        'duo': (36869, 'niedrig', '„Duo" gibt es nicht; Zweifach-Briefkasten BK212 horizontal'),
-        'bk212': (36617, 'hoch', ''),
-        'cube': (31307, 'hoch', 'Standbriefkasten Mehrfamilienhaus Cube, 2 Fächer'),
-        'stencil2': (36521, 'hoch', ''),
-        'hoffmann-edelstahl': (29247, 'mittel', 'Standbriefkasten Mehrfamilienhaus Hoffmann; „gebürstete Edelstahl-Front" steht nicht im Export'),
-        'vdm10-zf': (42274, 'hoch', 'Artikelnummer SK212-VDM-2x'),
-        'klar': (None, 'keine', '„Klar" (Acrylglas-Front) nicht im Export'),
+        'stencil2-wand': (42078, 'hoch', ''),
+        'lepo1': (42875, 'hoch', ''),
+        'bk212-zf': (37027, 'hoch', ''),
+        'albrecht': (41964, 'hoch', ''),
+        'lepo3': (28375, 'hoch', ''),
+        'hermann-funk': (40158, 'hoch', ''),
+        'siebert-sf': (42010, 'hoch', ''),
         'anton2': (37809, 'hoch', 'Anton 2'),
-        'nordkap': (None, 'keine', '„Nordkap" (V4A, Küste) nicht im Export'),
-        'kompakt': (None, 'keine', '„Kompakt / Basic" nicht im Export'),
-        'quartett': (40526, 'niedrig', '„Quartett" gibt es nicht; Briefkastenanlage 4 Parteien (Aufputz) — ohne Klingel/Paketfach'),
+        'nora2': (43531, 'hoch', ''),
+        'alves3': (44100, 'hoch', ''),
+        'alves2': (41648, 'hoch', ''),
+        'siebert-stand': (37259, 'hoch', ''),
+        'lessing': (41645, 'niedrig', '„Lessing" gibt es nicht; nächster Artikel: Standbriefkasten mit Zeitungsfach Alves'),
+        'hugo2': (40684, 'hoch', ''),
+        'siebert2': (41951, 'hoch', ''),
+        'anton': (34887, 'hoch', ''),
+        'hoffmann': (37241, 'hoch', ''),
+        'stelio': (37765, 'hoch', ''),
+        'enno': (37777, 'hoch', ''),
+        'zeppelin': (35011, 'hoch', ''),
+        'stencil': (36042, 'hoch', ''),
+        'lepo-stahl': (42877, 'hoch', ''),
+        'thobe': (37797, 'hoch', ''),
+        'gustav': (37782, 'hoch', ''),
+        'svena': (37792, 'hoch', ''),
+        'oltmann': (36040, 'hoch', ''),
+        'neumann': (36038, 'hoch', ''),
+        'castor': (36683, 'mittel', '„Castor" gibt es nicht; Kartenbild zeigt Unterputz-Briefkasten Hugo'),
+        'hoffmann-sf': (42961, 'hoch', ''),
+        'cube-wand': (36041, 'hoch', ''),
+        'modell01': (30795, 'hoch', ''),
+        'hoffmann-ns': (43524, 'hoch', ''),
+        'anton-edelstahl': (34888, 'hoch', ''),
+        'anton-anthrazit': (37807, 'hoch', ''),
+        'masiva-eiche': (28399, 'hoch', ''),
+        'modell02': (43399, 'hoch', ''),
+        'masiva-anthrazit': (28397, 'hoch', ''),
+        'masiva-laerche': (28404, 'hoch', ''),
+        'bk212-ns': (36507, 'hoch', ''),
+        'thobe-stand': (38830, 'hoch', ''),
+        'modell-g-stand': (37271, 'hoch', ''),
+        'ebenhard-stand': (38820, 'hoch', ''),
+        'cube-stand': (37312, 'hoch', ''),
+        'enno-stand': (38825, 'hoch', ''),
+        'stencil-stand': (37266, 'hoch', ''),
+        'oltmann-stand': (37284, 'hoch', ''),
+        'hoffmann-stand-pe': (41978, 'hoch', ''),
+        'stand01': (29221, 'hoch', ''),
+        'neumann-stand': (35749, 'hoch', ''),
+        'gustav-stand': (31187, 'hoch', ''),
+        'hermann-stand': (38810, 'hoch', ''),
+        'hoffmann-stand': (26508, 'hoch', ''),
+        'cube-stand-sf': (31306, 'hoch', ''),
+        'stencil2': (36521, 'hoch', ''),
+        'hermann-mfh-edelstahl': (36322, 'hoch', ''),
+        'siebert-mfh-edelstahl': (36317, 'hoch', ''),
+        'oltmann-mfh': (31309, 'hoch', ''),
+        'svena-mfh': (31308, 'hoch', ''),
+        'stencil-mfh': (31445, 'hoch', ''),
+        'hermann-mfh': (31442, 'hoch', ''),
+        'siebert-mfh': (31443, 'hoch', ''),
+        'cube': (31307, 'hoch', 'Standbriefkasten Mehrfamilienhaus Cube, 2 Fächer'),
+        'hoffmann-edelstahl': (29247, 'mittel', 'Standbriefkasten Mehrfamilienhaus Hoffmann; „gebürstete Edelstahl-Front" steht nicht im Export'),
+        'funk02': (26760, 'hoch', ''),
+        'lepo2-funk': (29318, 'hoch', ''),
+        'siebert-funk': (40154, 'hoch', ''),
+        'stencil-funk': (40162, 'hoch', ''),
+        'funk01': (34998, 'hoch', ''),
+        'funk02-stand': (29212, 'hoch', ''),
     },
 }
 
@@ -296,7 +363,24 @@ def build_entry(cat, pid, m, idx):
             e['klingel'] = 'Nein'
         e['set'] = e['klingel'] != 'Nein'
     e['card'] = card_fields(cat, e, g, e['shop'])
+    e['card']['f'] = facet_values(merk, [] if variant else p['variants'])
     return e
+
+
+# Filter der PLPs 1:1 wie im Shop: Rohwerte der Merkmale, nach denen die Live-Kategorie filtert
+# (Vaterartikel + alle Varianten). Schluessel = Gruppen-Code in plp.js / sprechanlage.js.
+FACET_MERKMALE = (('fa', 'Anzahl der Briefkastenfächer'), ('kt', 'Anzahl der Klingeltaster'), ('mo', 'Montageart'),
+                  ('tb', 'Türöffner Bedienung'), ('zf', 'Zeitungsfach'), ('ns', 'Namensschild'), ('pb', 'Paketbox'),
+                  ('sys', 'System'), ('bt', 'Briefkastentyp'), ('mk', 'Marke'))
+
+
+def facet_values(merk, variants):
+    f = {}
+    for code, name in FACET_MERKMALE:
+        vals = uniq(list(merk.get(name) or []) + [x for v in variants for x in (v['merkmale'].get(name) or [])])
+        if vals:
+            f[code] = vals
+    return f
 
 
 # Produktkarten + Filter der PLPs: dieselben Shop-Werte, in die Filter-Schluessel der Prototyp-Karten
@@ -356,6 +440,13 @@ def build(data):
     for cat, c in cats.items():
         idx = {p['id']: p for p in c['products']}
         out[cat] = {pid: build_entry(cat, pid, m, idx) for pid, m in MAP[cat].items()}
+    if os.path.exists(DEF_IMG):
+        with open(DEF_IMG, encoding='utf-8') as f:
+            imgs = json.load(f)
+        for cat in ('sprechanlage', 'briefkasten'):
+            for pid, path in imgs.get(cat, {}).items():
+                if out[cat].get(pid, {}).get('sid'):
+                    out[cat][pid]['img'] = IMG_BASE + path
     return out, cats
 
 
@@ -367,7 +458,10 @@ def write_js(out, path):
           '   abm = B × H × T · kg = Artikelgewicht (Spanne, wenn Varianten abweichen → kgv) · Sprechanlagen: typ, sys, kt (Klingeltaster),\n'
           '   ns (Namensschild), tb (Türöffner-Bedienung), cam/va/nv/ip/ik (laut Produktbeschreibung), kombi ·\n'
           '   Briefkästen: fa (Fächer), zf (Zeitungsfach), mo (Montageart), mat (Material), klingel, set ·\n'
-          '   card = dieselben Werte als Filter-Schlüssel der Produktkarten (plp.js / sprechanlage.js) */\n'
+          '   card = dieselben Werte als Filter-Schlüssel der Produktkarten (plp.js / sprechanlage.js); card.f = Merkmal-Rohwerte\n'
+          '   der Live-Filter (fa Fächer, kt Klingeltaster, mo Montageart, tb Türöffner, zf Zeitungsfach, ns Namensschild, pb Paketbox,\n'
+          '   sys System, bt Briefkastentyp, mk Marke) ·\n'
+          '   img = Hauptbild der Shop-Produktseite (tools/shop-bilder.json), genutzt im Vergleich */\n'
           'window.MTZ_VGL_DATA=' + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ';\n')
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(js)

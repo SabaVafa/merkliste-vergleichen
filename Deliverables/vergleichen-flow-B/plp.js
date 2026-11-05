@@ -1,55 +1,72 @@
 /* ============================================================
    Metzler PLP — Briefkästen
-   Client-side rendering, live filtering, chips, load-more
+   Client-side rendering, live filtering, chips, pagination.
+   Product list, prices, badges, reviews, colour swatches, filters and
+   subcategory rail mirror the live category page
+   edelstahl-tuerklingel.de/briefkasten (Stand 05.11.2026, 79 Artikel,
+   Standard-Sortierung) — see Deliverables/13_PLP_Live-Abgleich.md.
    ============================================================ */
 (function () {
   'use strict';
 
   var IMG = 'Product%20Image/einfamilien-briefkasten.png';
-  var PAGE = 12; // products per page; page 1 = 2 rows + banner + 2 rows
+  var PAGE = 24; // products per page — as in the live shop (79 Artikel = 4 Seiten)
 
-  /* ---- Color system (swatch rendering) — order matches the live website ---- */
+  /* ---- Colour facet (Shop-Merkmal „Farbe") — order + counts as on the live website ---- */
   var COLORS = {
-    anthrazit:   { label: 'Anthrazit',    css: '#383E42', count: 71 },
+    anthrazit:   { label: 'Anthrazit',    css: '#383E42', count: 70 },
     braun:       { label: 'Braun',        css: '#5A3B29', count: 6 },
-    edelstahl:   { label: 'Edelstahl',    css: 'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)', count: 11 },
+    edelstahl:   { label: 'Edelstahl',    css: 'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)', count: 9 },
     eisenglimmer:{ label: 'Eisenglimmer', css: 'linear-gradient(135deg,#3a3d40,#23262a)', count: 46 },
-    grau:        { label: 'Grau',         css: '#B9BCC0', count: 44 },
-    schwarz:     { label: 'Schwarz',      css: '#1A171B', count: 40 },
-    weiss:       { label: 'Weiß',         css: '#FFFFFF', count: 32 },
-    wunschfarbe: { label: 'Wunschfarbe',  css: 'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)', count: 4 }
+    grau:        { label: 'Grau',         css: '#B9BCC0', count: 46 },
+    schwarz:     { label: 'Schwarz',      css: '#1A171B', count: 43 },
+    weiss:       { label: 'Weiß',         css: '#FFFFFF', count: 38 },
+    wunschfarbe: { label: 'Wunschfarbe',  css: 'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)', count: 5 }
   };
 
-  /* ---- Facet definitions (label + count). No price, no sort. ---- */
+  /* ---- Card swatches = the colour bubbles of the live product card (Farbvarianten, in shop order) ---- */
+  var SW = {
+    '7016': { label: 'RAL 7016 Anthrazitgrau', css: '#383E42' },
+    '9016': { label: 'RAL 9016 Verkehrsweiß', css: '#F1F0EA' },
+    '9007': { label: 'RAL 9007 Graualuminium', css: '#8F8F8C' },
+    '703':  { label: 'DB 703 Eisenglimmer', css: 'linear-gradient(135deg,#55595c,#3a3d40 60%,#4d5053)' },
+    '9005': { label: 'RAL 9005 Tiefschwarz', css: '#0E0E10' },
+    '7012': { label: 'RAL 7012 Basaltgrau', css: '#4E5754' },
+    'es':   { label: 'Edelstahl gebürstet', css: 'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)' },
+    'wf':   { label: 'Wunschfarbe nach RAL', css: 'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)' }
+  };
+
+  /* ---- Sidebar facets = the live filter groups, in live order (Shop-Merkmale; option labels + counts
+         exactly as shown on edelstahl-tuerklingel.de/briefkasten). Each product carries the raw shop values
+         in p.f (card.f in vergleich-daten.js); 'color' uses p.colors. noCount: the live page shows no
+         count for this group; plain: count without brackets (as on the live page). ---- */
+  var FACET_ORDER = ['fa', 'kt', 'color', 'mo', 'zf', 'ns', 'mk'];
   var FACETS = {
-    material: { title: 'material', items: [
-      { key: 'edelstahl', label: 'Edelstahl', count: 47 },
-      { key: 'stahl',     label: 'Galvanisierter Stahl', count: 31 },
-      { key: 'acrylglas', label: 'Acrylglas-Front', count: 11 },
-      { key: 'holz',      label: 'Holzoptik', count: 2 }
+    fa: { title: 'Anzahl der Briefkastenfächer', items: [
+      { key: '1', label: '1', chip: '1 Fach', count: 69 },
+      { key: '2', label: '2', chip: '2 Fächer', count: 10 }
     ]},
-    faecher: { title: 'faecher', items: [
-      { key: '1', label: '1 Fach', count: 64 },
-      { key: '2', label: '2 Fächer', count: 10 },
-      { key: '3', label: '3 Fächer', count: 6 },
-      { key: '4', label: '4 Fächer', count: 6 }   /* Shop-Merkmal „Anzahl der Briefkastenfächer" (Export 02.11.2026) */
+    kt: { title: 'Anzahl der Klingeltaster', noCount: true, items: [
+      { key: '1 Taster', label: '1 Taster', count: 7 }
     ]},
-    zeitung: { title: 'zeitung', items: [
-      { key: 'integriert', label: 'Mit Zeitungsfach', count: 63 },
-      { key: 'optional', label: 'Optional erhältlich', count: 9 },
-      { key: 'ohne', label: 'Ohne Zeitungsfach', count: 8 }
+    mo: { title: 'Montageart', items: [
+      { key: 'Aufputz', label: 'Aufputz', count: 44 },
+      { key: 'Standmontage', label: 'Standmontage', count: 29 },
+      { key: 'Unterputz', label: 'Unterputz', count: 4 },
+      { key: 'Zaunmontage', label: 'Zaunmontage', count: 2 }
     ]},
-    montage: { title: 'montage', items: [
-      { key: 'wand', label: 'Wandmontage', count: 49 },
-      { key: 'stand', label: 'Standmontage', count: 14 },
-      { key: 'unterputz', label: 'Unterputzmontage', count: 10 },
-      { key: 'zaun', label: 'Zaunmontage', count: 2 }   /* Shop-Montagearten: Aufputz, Standmontage, Unterputz, Zaunmontage — „Mauerdurchwurf" gibt es im Shop nicht */
+    zf: { title: 'Zeitungsfach', items: [
+      { key: 'Integriert', label: 'Integriert', chip: 'Zeitungsfach integriert', count: 63 },
+      { key: 'Ohne', label: 'Ohne', chip: 'Ohne Zeitungsfach', count: 7 },
+      { key: 'Optional', label: 'Optional', chip: 'Zeitungsfach optional', count: 9 }
     ]},
-    zusatz: { title: 'zusatz', items: [
-      { key: 'paket', label: 'Mit Paketfach', count: 9 },
-      { key: 'klingel', label: 'Mit Funkklingel', count: 11 },
-      { key: 'sprech', label: 'Mit Sprechanlage', count: 7 },
-      { key: 'blumenkasten', label: 'Mit Blumenkasten', count: 2 }
+    ns: { title: 'Namensschild', items: [
+      { key: 'Lasergraviert', label: 'Lasergraviert', chip: 'Namensschild lasergraviert', count: 62 },
+      { key: 'mit Papiereinleger', label: 'mit Papiereinleger', chip: 'Namensschild mit Papiereinleger', count: 7 },
+      { key: 'Ohne Gravur', label: 'Ohne Gravur', chip: 'Namensschild ohne Gravur', count: 5 }
+    ]},
+    mk: { title: 'Marke', plain: true, items: [
+      { key: 'Metzler', label: 'Metzler', count: 64 }
     ]}
   };
 
@@ -57,110 +74,143 @@
   var LABELS = {};
   Object.keys(COLORS).forEach(function (k) { LABELS['color:' + k] = COLORS[k].label; });
   Object.keys(FACETS).forEach(function (g) {
-    FACETS[g].items.forEach(function (it) { LABELS[g + ':' + it.key] = it.label; });
+    FACETS[g].items.forEach(function (it) { LABELS[g + ':' + it.key] = it.chip || it.label; });
   });
-  LABELS['zusatz:klingel+sprech'] = 'Mit Klingel & Sprechanlage';
-  LABELS['faecher:3+'] = 'Ab 3 Fächer';   /* advisor „Mehrfamilienhaus" */   /* advisor combined option */
 
-  /* ---- Subcategory rail ---- */
+  /* ---- Subcategory rail = the live tiles (name, count, target). Image: the shop's tile image,
+         local copy as offline fallback. ---- */
+  var SHOP = 'https://edelstahl-tuerklingel.de/';
+  var CAT_IMG = SHOP + 'media/image/category/';
   var SUBCATS = [
-    { t: 'Einfamilien-Briefkasten', n: 80, img: 'Product%20Image/einfamilien-briefkasten.png' },
-    { t: 'Briefkasten ohne Gravur', n: 22, img: 'Product%20Image/briefkasten-ohne-gravur.webp' },
-    { t: 'Standbriefkästen', n: 14, img: 'Product%20Image/standbriefkaesten.webp' },
-    { t: 'Mit Klingel & Sprechanlage', n: 11, img: 'Product%20Image/briefkasten-klingel-sprechanlage.webp' },
-    { t: 'Mehrfamilien-Anlagen', n: 9, img: 'Product%20Image/mehrfamilien-briefkaesten.webp' },
-    { t: 'Unterputz-Briefkästen', n: 12, img: 'Product%20Image/unterputz-briefkaesten.webp' },
-    { t: 'Anlagen-Konfigurator', n: null, cta: true, img: 'Product%20Image/Briefkastenanlage/konfigurator-tile.png' }
+    { t: 'Einfamilien Briefkasten', n: 77, href: SHOP + 'exklusiv-briefkasten', img: CAT_IMG + '664/md/exklusiv-briefkasten.jpg', fb: 'Product%20Image/einfamilien-briefkasten.png' },
+    { t: 'Briefkasten ohne Gravur', n: 26, href: SHOP + 'briefkasten-ohne-gravur', img: CAT_IMG + '948/md/briefkasten-ohne-gravur.jpg', fb: 'Product%20Image/briefkasten-ohne-gravur.webp' },
+    { t: 'Standbriefkästen', n: 56, href: SHOP + 'standbriefkasten-sets', img: CAT_IMG + '670/md/standbriefkasten-sets.jpg', fb: 'Product%20Image/standbriefkaesten.webp' },
+    { t: 'Briefkasten mit Klingel & Sprechanlage', n: 19, href: SHOP + 'briefkasten-funkklingel-sprechanlage', img: CAT_IMG + '874/md/briefkasten-funkklingel-sprechanlage.jpg', fb: 'Product%20Image/briefkasten-klingel-sprechanlage.webp' },
+    { t: 'Mehrfamilien Briefkästen', n: 35, href: SHOP + 'briefkasten-zweifamilienhaus', img: CAT_IMG + '666/md/briefkasten-zweifamilienhaus.jpg', fb: 'Product%20Image/mehrfamilien-briefkaesten.webp' },
+    { t: 'Unterputz Briefkästen', n: 4, href: SHOP + 'unterputz-briefkaesten', img: CAT_IMG + '1146/md/unterputz-briefkaesten.jpg', fb: 'Product%20Image/unterputz-briefkaesten.webp' },
+    { t: 'Briefkastenanlagen Konfigurator', n: null, cta: true, href: SHOP + 'briefkastenanlage', img: CAT_IMG + '1085/md/briefkastenanlage.jpg', fb: 'Product%20Image/Briefkastenanlage/konfigurator-tile.png' },
+    { t: 'Paketboxen', n: null, href: SHOP + 'paketboxen', img: CAT_IMG + '949/md/paketbox.webp', fb: 'Product%20Image/paketboxen.webp' },
+    { t: 'Briefkastenschilder', n: 16, href: SHOP + 'briefkastenschilder', img: CAT_IMG + '768/md/briefkastenschilder.jpg', fb: 'Product%20Image/briefkastenschilder.webp' },
+    { t: 'Briefkastenständer', n: 20, href: SHOP + 'briefkastenstaender', img: CAT_IMG + '669/md/briefkastenstaender.jpg', fb: 'Product%20Image/briefkastenstaender.webp' },
+    { t: 'Ersatzteile & Zubehör', n: 37, href: SHOP + 'briefkasten-zubehoer', img: CAT_IMG + '809/md/briefkasten-zubehoer.png', fb: 'Product%20Image/ersatzteile-zubehoer.webp' }
   ];
 
-  /* ---- Product catalogue (single placeholder image for all) ---- */
+  /* ---- Product catalogue = the live category listing, all 4 pages in the shop's default order
+         („Standard"). name/price/uvp/ab/rating/reviews/badge/sw are read from the live product cards
+         (price = current price, uvp = struck price, ab = card shows „ab", sw = colour bubbles).
+         Image, colours and filter attributes come from the shop data (vergleich-daten.js, below).
+         Existing prototype ids are kept where they map to the same shop article (deep links, saved
+         Merklisten, comparison tour) — e.g. lessing = Alves, castor = Hugo, zaun = Emma,
+         schneider = Nora, gienger = Modell-G, flora = Siebert Frame J, stencil2 = Stencil MFH. ---- */
+  var SALE = { type: 'sale', text: '−15 %' };
   var PRODUCTS = [
-    { id:'siebert', name:'Briefkasten aus hochwertigem Stahl | Siebert', line:'Bestseller', price:89.99, uvp:null, rating:5, reviews:657,
-      badge:null, colors:['anthrazit','weiss','grau','schwarz'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'wand', seitentuer:true },
-    { id:'ebenhard', name:'Briefkasten mit austauschbarem Namensschild | Ebenhard', line:'Beliebt', price:89.99, uvp:null, rating:5, reviews:219,
-      badge:null, colors:['anthrazit','weiss','grau'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'wand' },
-    { id:'ebenhard-v2a', name:'Briefkasten mit Edelstahlfront | personalisiert mit Gravur | Ebenhard', line:null, price:119.00, uvp:null, rating:5, reviews:64,
-      badge:null, colors:['anthrazit','weiss','grau','eisenglimmer','schwarz','edelstahl','wunschfarbe'], faecher:'1', material:'edelstahl', zeitung:'integriert', montage:'wand' },
-    { id:'hermann', name:'Briefkasten mit Lasergravur | Hermann', line:null, price:99.99, uvp:117.99, rating:5, reviews:142,
-      badge:{type:'sale', text:'−15 %'}, colors:['anthrazit','weiss','grau','eisenglimmer'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'wand', seitentuer:true },
-    { id:'moris', name:'Briefkasten aus Edelstahl | personalisiert | Moris', line:'Edelstahl V2A', price:149.00, uvp:null, rating:4.5, reviews:25,
-      badge:null, colors:['edelstahl','anthrazit','weiss','wunschfarbe'], faecher:'1', material:'edelstahl', zeitung:'optional', montage:'wand', paket:true },
-    { id:'lessing', name:'Standbriefkasten mit Zeitungsfach | Alves', line:null, price:199.00, uvp:null, rating:5, reviews:38,
-      badge:null, colors:['anthrazit','eisenglimmer','schwarz'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'stand', paket:true },
-    { id:'gienger', name:'Briefkasten Design | Modell-G', line:null, price:99.99, uvp:null, rating:5, reviews:31,
-      badge:null, colors:['anthrazit','weiss','grau'], faecher:'1', material:'stahl', zeitung:'ohne', montage:'wand' },
-    { id:'schneider', name:'Durchwurfbriefkasten | Mauerdurchwurf | personalisiert mit Gravur | Nora', line:null, price:120.00, uvp:null, rating:5, reviews:2,
-      badge:null, colors:['anthrazit','edelstahl'], faecher:'1', material:'edelstahl', zeitung:'ohne', montage:'durchwurf' },
-    { id:'lepo', name:'Briefkasten Anthrazit RAL 7016 | Lepo 2', line:null, price:149.00, uvp:175.00, rating:4.5, reviews:64,
-      badge:{type:'sale', text:'−15 %'}, colors:['anthrazit','schwarz','wunschfarbe'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'wand', seitentuer:true },
-    { id:'zaun', name:'Briefkasten für Zaunmontage | personalisiert mit Gravur | Emma', line:null, price:149.00, uvp:null, rating:5, reviews:18,
-      badge:null, colors:['anthrazit','weiss','eisenglimmer'], faecher:'1', material:'stahl', zeitung:'optional', montage:'wand' },
-    { id:'flora', name:'Briefkasten mit Blumenkasten | personalisiert mit Gravur | Siebert Frame J', line:null, price:159.00, uvp:null, rating:4.5, reviews:12,
-      badge:null, colors:['anthrazit','weiss','braun','wunschfarbe'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'wand', blumenkasten:true },
-    { id:'castor', name:'Unterputz-Briefkasten aus hochwertigem Stahl | Hugo', line:null, price:179.00, uvp:null, rating:5, reviews:21,
-      badge:null, colors:['edelstahl','anthrazit'], faecher:'1', material:'edelstahl', zeitung:'optional', montage:'unterputz' },
-    { id:'trias', name:'Briefkastenanlage freistehend für 3 Parteien', line:null, price:349.00, uvp:399.00, rating:5, reviews:9,
-      badge:{type:'sale', text:'−12 %'}, colors:['anthrazit','grau','eisenglimmer'], faecher:'3', material:'stahl', zeitung:'ohne', montage:'stand', paket:true, klingel:true, sprech:true },
-    { id:'vossberg', name:'Briefkasten mit VDM10 2.0 Video-Türsprechanlage | 1 Klingel | BK212', line:'2-in-1', price:299.00, uvp:null, rating:4.5, reviews:27,
-      badge:null, colors:['anthrazit','eisenglimmer'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'wand', paket:true, klingel:true, sprech:true },
-    { id:'duo', name:'Zweifach Briefkasten | austauschbare Namensschilder | BK212 horizontal', line:null, price:229.00, uvp:null, rating:5, reviews:15,
-      badge:null, colors:['anthrazit','weiss','grau','schwarz'], faecher:'2', material:'stahl', zeitung:'integriert', montage:'wand' },
-    /* Zweifamilien depth (live-shop research, /briefkasten-zweifamilienhaus__2 = 17 Artikel):
-       wall-mount ohne Zeitungsfach (BK212), Sichtfenster (Cube, Acrylglas) and rostfreies
-       V4A-Edelstahl (Stencil) all exist for 2 Fächer — these three keep the advisor's
-       dataset-gates offering the full real option set for Zweifamilienhäuser. */
-    { id:'bk212', name:'Zweifach Briefkasten | austauschbare Namensschilder | BK212 vertikal', line:null, price:179.00, uvp:null, rating:5, reviews:17,
-      badge:null, colors:['anthrazit'], faecher:'2', material:'stahl', zeitung:'ohne', montage:'wand' },
-    { id:'cube', name:'Standbriefkasten Mehrfamilienhaus mit Sichtfenster | Cube', line:null, price:289.00, uvp:null, rating:5, reviews:2,
-      badge:null, colors:['anthrazit'], faecher:'2', material:'acrylglas', zeitung:'integriert', montage:'stand' },
-    { id:'stencil2', name:'Edelstahl Standbriefkasten Mehrfamilienhaus | Stencil', line:'Edelstahl V4A', price:299.00, uvp:null, rating:5, reviews:1,
-      badge:null, colors:['anthrazit','edelstahl'], faecher:'2', material:'edelstahl', zeitung:'integriert', montage:'stand' },
-    { id:'hoffmann-edelstahl', name:'Standbriefkasten Mehrfamilienhaus | austauschbares Namensschild | Hoffmann', line:null, price:359.00, uvp:null, rating:5, reviews:11,
-      badge:null, colors:['anthrazit','edelstahl','eisenglimmer','grau','schwarz','weiss'], faecher:'2', material:'stahl', zeitung:'integriert', montage:'stand' },
-    { id:'vdm10-zf', name:'Standbriefkasten mit Video-Türsprechanlage für Zweifamilienhaus | VDM10 | Anthrazit RAL 7016', line:'Video-Türsprechanlage', price:1351.50, uvp:1590.00, rating:5, reviews:3,
-      badge:{type:'sale', text:'−15 %'}, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], faecher:'2', material:'stahl', zeitung:'integriert', montage:'stand', klingel:true, sprech:true },
-    { id:'klar', name:'Briefkasten mit Acrylglas-Front | Klar', line:null, price:139.00, uvp:null, rating:4.5, reviews:8,
-      badge:null, colors:['schwarz','anthrazit'], faecher:'1', material:'acrylglas', zeitung:'ohne', montage:'wand' },
-    { id:'anton2', name:'Briefkasten Holzoptik Eiche | personalisiert mit Gravur | Anton 2', line:null, price:99.99, uvp:null, rating:5, reviews:20,
-      badge:null, colors:['anthrazit','braun'], faecher:'1', material:'holz', zeitung:'integriert', montage:'wand' },
-    { id:'nordkap', name:'Edelstahl-Briefkasten V4A | Küste | Nordkap', line:'Salzwasserfest', price:219.00, uvp:null, rating:5, reviews:11,
-      badge:null, colors:['edelstahl'], faecher:'1', material:'edelstahl', zeitung:'integriert', montage:'stand', paket:true },
-    { id:'kompakt', name:'Kompakt-Briefkasten ohne Gravur | Basic', line:null, price:69.99, uvp:84.99, rating:4.5, reviews:96,
-      badge:{type:'sale', text:'−18 %'}, colors:['weiss','anthrazit','grau','schwarz','eisenglimmer'], faecher:'1', material:'stahl', zeitung:'ohne', montage:'wand' },
-    { id:'quartett', name:'Briefkastenanlage für 4 Parteien', line:null, price:459.00, uvp:null, rating:5, reviews:6,
-      badge:null, colors:['anthrazit','grau','schwarz','eisenglimmer'], faecher:'3', material:'stahl', zeitung:'ohne', montage:'unterputz', paket:true, klingel:true }
+    { id:'siebert', name:'Briefkasten aus hochwertigem Stahl | Siebert', price:76.49, uvp:89.99, ab:true, rating:5, reviews:763, badge:SALE, sw:'7016 9016 9007 703 9005 7012 es wf' },
+    { id:'ebenhard', name:'Briefkasten austauschbares Namensschild | Ebenhard', price:76.49, uvp:89.99, ab:true, rating:5, reviews:253, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'hermann', name:'Briefkasten mit Lasergravur | Hermann', price:84.99, uvp:99.99, rating:5, reviews:160, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'lepo', name:'Briefkasten Anthrazit RAL 7016 Gravur | Lepo 2', price:126.65, uvp:149, rating:4.5, reviews:20, badge:SALE, sw:'' },
+    { id:'zaun', name:'Briefkasten für Zaunmontage | Zaunbriefkasten | personalisiert mit Gravur | Anthrazit RAL 7016 | Emma', price:126.65, uvp:149, rating:4.5, reviews:7, badge:SALE, sw:'' },
+    { id:'emma2', name:'Briefkasten für Zaunmontage | Zaunbriefkasten | personalisiert mit Gravur | Anthrazit RAL 7016 | Emma 2', price:126.65, uvp:149, rating:5, reviews:4, badge:SALE, sw:'' },
+    { id:'moris', name:'Briefkasten aus Edelstahl | personalisiert mit Gravur | Zeitungsfach optional | Moris', price:126.65, uvp:149, ab:true, rating:4.5, reviews:31, badge:SALE, sw:'7016 9016 9007 703 es wf' },
+    { id:'schneider', name:'Durchwurfbriefkasten | Mauerdurchwurf-Briefkasten | personalisiert mit Gravur | Edelstahl-Namensschild | Anthrazit RAL7016 | Nora', price:102, uvp:120, rating:5, reviews:3, badge:SALE, sw:'' },
+    { id:'gienger', name:'Briefkasten Design | Modell-G', price:84.99, uvp:99.99, rating:5, reviews:37, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'flora', name:'Briefkasten mit Blumenkasten | personalisiert mit Gravur | Edelstahl-Namensschild | Siebert Frame J', price:101.15, uvp:119, ab:true, rating:5, reviews:6, badge:SALE, sw:'7016 9016 9007 703 9005 wf' },
+    { id:'stencil2-wand', name:'Briefkasten mit Lasergravur | Stencil 2', price:84.99, uvp:99.99, rating:5, reviews:13, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'lepo1', name:'Briefkasten aus hochwertigem Stahl pulverbeschichtet | personalisiert mit Gravur | Lepo 1', price:126.65, uvp:149, rating:5, reviews:10, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'bk212-zf', name:'Briefkasten mit Zeitungsfach | RAL7016 Anthrazitgrau | BK212-RE-ZF', price:84.99, uvp:99.99, rating:5, reviews:13, badge:SALE, sw:'' },
+    { id:'albrecht', name:'Briefkasten mit zwei Edelstahl-Namensschildern | personalisiert mit Gravur | Albrecht', price:84.99, uvp:99.99, ab:true, rating:5, reviews:132, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'lepo3', name:'Briefkasten Anthrazit Edelstahl | Lepo 3', price:143.65, uvp:169, rating:5, reviews:9, badge:SALE, sw:'' },
+    { id:'hermann-funk', name:'Briefkasten mit Funkklingel | personalisiert mit Gravur | Edelstahl-Namensschild | mit Zeitungsfach | Hermann', price:126.65, uvp:149, rating:5, reviews:19, badge:SALE, sw:'7016 9007 703 9005' },
+    { id:'siebert-sf', name:'Briefkasten mit Sichtfenster | Personalisiert mit Gravur | Edelstahl-Namensschild | Siebert SF', price:92.65, uvp:109, ab:true, rating:5, reviews:36, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'anton2', name:'Briefkasten Holzoptik Eiche | Anthrazit RAL7016 mit Edelstahl Namensschild | Anton 2', price:84.99, uvp:99.99, rating:5, reviews:20, badge:SALE, sw:'' },
+    { id:'nora2', name:'Durchwurfbriefkasten | Mauerdurchwurf-Briefkasten | mit austauschbarem Namensschild | Anthrazit RAL7016 | Nora 2', price:102, uvp:120, rating:5, reviews:3, badge:SALE, sw:'' },
+    { id:'alves3', name:'Standbriefkasten mit Zeitungsfach aus hochwertigem Stahl | Alves 3', price:169.15, uvp:199, rating:5, reviews:9, badge:SALE, sw:'7016 9007 703' },
+    { id:'alves2', name:'Standbriefkasten mit Zeitungsfach aus hochwertigem Stahl | Alves 2', price:160.65, uvp:189, rating:5, reviews:23, badge:SALE, sw:'7016 9007 703' },
+    { id:'siebert-stand', name:'Standbriefkasten aus hochwertigem Stahl | Siebert', price:135.15, uvp:159, ab:true, rating:5, reviews:99, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'lessing', name:'Standbriefkasten mit Zeitungsfach aus hochwertigem Stahl | Alves', price:160.65, uvp:189, rating:5, reviews:44, badge:SALE, sw:'7016 9007 703' },
+    { id:'hugo2', name:'Briefkasten Unterputz | personalisiert mit Gravur | Edelstahl-Namensschild | Hugo 2', price:92.65, uvp:109, rating:5, reviews:36, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'siebert2', name:'Briefkasten | austauschbares Namensschild | Siebert 2', price:67.99, uvp:79.99, rating:5, reviews:10, badge:SALE, sw:'703 9007 9005 9016' },
+    { id:'anton', name:'Briefkasten Holzoptik Eiche mit Edelstahl Namensschild | Anton', price:84.99, uvp:99.99, rating:4.5, reviews:11, badge:SALE, sw:'' },
+    { id:'hoffmann', name:'Briefkasten mit austauschbarem Namensschild | Hoffmann', price:67.99, uvp:79.99, rating:5, reviews:31, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'stelio', name:'Briefkasten pulverbeschichtet | Lasergravur | Stelio', price:76.49, uvp:89.99, rating:5, reviews:26, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'enno', name:'Briefkasten mit Edelstahl-Namensschild | Enno', price:76.49, uvp:89.99, ab:true, rating:5, reviews:36, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'zeppelin', name:'Briefkasten Design Anthrazit Edelstahl | Zeppelin', price:84.99, uvp:99.99, rating:5, reviews:33, badge:SALE, sw:'' },
+    { id:'stencil', name:'Briefkasten mit Lasergravur | Stencil', price:84.99, uvp:99.99, rating:5, reviews:100, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'lepo-stahl', name:'Briefkasten aus hochwertigem Stahl pulverbeschichtet | Lepo', price:118.15, uvp:139, rating:5, reviews:7, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'thobe', name:'Briefkasten mit Namensschild aus Edelstahl | Thobe', price:84.99, uvp:99.99, ab:true, rating:5, reviews:12, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'gustav', name:'Briefkasten mit personalisierbarer Blende aus Edelstahl | Gustav', price:109.65, uvp:129, rating:5, reviews:4, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'svena', name:'Briefkasten mit personalisierter Edelstahlblende und Sichtfenstern | Svena', price:92.65, uvp:109, rating:5, reviews:4, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'oltmann', name:'Briefkasten Stahl Sichtfenster | Oltmann', price:84.99, uvp:99.99, rating:5, reviews:23, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'neumann', name:'Design Briefkasten | Neumann', price:72.24, uvp:84.99, rating:5, reviews:16, badge:SALE, sw:'9007 703 9005' },
+    { id:'castor', name:'Unterputz Briefkasten hochwertiger Stahl | Hugo', price:76.49, uvp:89.99, rating:5, reviews:21, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'hoffmann-sf', name:'Briefkasten mit Sichtfenster | mit austauschbarem Namensschild | Hoffmann SF', price:76.49, uvp:89.99, rating:5, reviews:9, badge:SALE, sw:'7016 9007 703 9016 9005' },
+    { id:'cube-wand', name:'Briefkasten hochwertiger Stahl Sichtfenster | Cube', price:84.99, uvp:99.99, rating:4.5, reviews:31, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'modell01', name:'Briefkasten Anthrazit Gravur optional mit Zeitungsfach | Modell01', price:152.15, uvp:179, rating:5, reviews:8, badge:SALE, sw:'' },
+    { id:'hoffmann-ns', name:'Briefkasten austauschbares Namensschild | Hoffmann', price:92.65, uvp:109, rating:5, reviews:12, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'anton-edelstahl', name:'Briefkasten aus Edelstahl in Holzoptik Eiche | Anton', price:76.49, uvp:89.99, rating:5, reviews:4, badge:SALE, sw:'' },
+    { id:'anton-anthrazit', name:'Briefkasten Anthrazitgrau + Holzoptik Eiche | Anton', price:76.49, uvp:89.99, rating:5, reviews:3, badge:SALE, sw:'' },
+    { id:'masiva-eiche', name:'Briefkasten Echtholz Eiche Edelstahl | Masiva', price:288.15, uvp:339, rating:4.5, reviews:7, badge:SALE, sw:'' },
+    { id:'modell02', name:'Briefkasten Edelstahl Gravur optional | Modell02', price:220.15, uvp:259, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9005' },
+    { id:'masiva-anthrazit', name:'Briefkasten Anthrazit Gravur optional | Masiva', price:237.15, uvp:279, rating:5, reviews:2, badge:SALE, sw:'' },
+    { id:'masiva-laerche', name:'Briefkasten Edelstahl Echtholz Lärche | Masiva', price:288.15, uvp:339, rating:4, reviews:2, badge:SALE, sw:'' },
+    { id:'bk212-ns', name:'Briefkasten in Anthrazit | BK212 mit austauschbarem Namensschild', price:76.49, uvp:89.99, rating:5, reviews:7, badge:SALE, sw:'' },
+    { id:'thobe-stand', name:'Standbriefkasten | inkl. Namensschild aus Edelstahl | Thobe', price:143.65, uvp:169, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'modell-g-stand', name:'Standbriefkasten | Modell G', price:143.65, uvp:169, rating:4.5, reviews:21, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'ebenhard-stand', name:'Standbriefkasten | Namensschild austauschbar | Ebenhard', price:131.75, uvp:155, rating:5, reviews:4, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'cube-stand', name:'Standbriefkasten Anthrazit hochwertiger Stahl | Cube', price:130.9, uvp:154, rating:5, reviews:11, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'enno-stand', name:'Standbriefkasten mit Edelstahl-Namensschild und Edelstahl-Ständer | Enno', price:140.25, uvp:165, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'stencil-stand', name:'Standbriefkasten mit Gravur aus Edelstahl | Stencil', price:126.65, uvp:149, rating:5, reviews:33, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'oltmann-stand', name:'Standbriefkasten Sichtfenster | Oltmann', price:143.65, uvp:169, rating:4.5, reviews:11, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'hoffmann-stand-pe', name:'Standbriefkasten aus hochwertigem Stahl | Namensschild mit Papiereinleger | Hoffmann', price:126.65, uvp:149, rating:3.5, reviews:3, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'stand01', name:'Standbriefkasten Anthrazit Gravur + Zeitungsfach optional | 01', price:245.65, uvp:289, rating:5, reviews:2, badge:SALE, sw:'' },
+    { id:'neumann-stand', name:'Design Standbriefkasten mit Standfuß aus Edelstahl | Neumann', price:131.75, uvp:155, rating:4.5, reviews:3, badge:SALE, sw:'9007 703 9005' },
+    { id:'gustav-stand', name:'Standbriefkasten Anthrazit RAL 7016 Namensschild | Gustav', price:169.15, uvp:199, rating:5, reviews:5, badge:SALE, sw:'' },
+    { id:'hermann-stand', name:'Standbriefkasten | Standfuß aus Edelstahl | mit Lasergravur | Hermann', price:143.65, uvp:169, rating:4.5, reviews:9, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'hoffmann-stand', name:'Standbriefkasten Anthrazit austauschbares Namensschild | Hoffmann', price:143.65, uvp:169, rating:5, reviews:12, badge:SALE, sw:'' },
+    { id:'cube-stand-sf', name:'Standbriefkasten Anthrazit Sichtfenster | Cube', price:135.15, uvp:159, rating:5, reviews:14, badge:SALE, sw:'' },
+    { id:'stencil2', name:'Edelstahl Standbriefkasten Mehrfamilienhaus | Stencil', price:254.15, uvp:299, rating:5, reviews:1, badge:SALE, sw:'7016 9016 9007 703 9005' },
+    { id:'hermann-mfh-edelstahl', name:'Edelstahl Standbriefkasten Mehrfamilienhaus Lasergravur | Hermann', price:271.15, uvp:319, rating:5, reviews:2, badge:SALE, sw:'7016 9007 703 9005' },
+    { id:'siebert-mfh-edelstahl', name:'Edelstahl Standbriefkasten Mehrfamilienhaus mit Lasergravur | Siebert', price:254.15, uvp:299, ab:true, rating:5, reviews:11, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'oltmann-mfh', name:'Standbriefkasten Mehrfamilienhaus Anthrazit Edelstahlleiste | Oltmann', price:245.65, uvp:289, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'svena-mfh', name:'Standbriefkasten Mehrfamilienhaus Anthrazit Edelstahlleiste | Svena', price:245.65, uvp:289, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'stencil-mfh', name:'Standbriefkasten Mehrfamilienhaus Anthrazit Gravurleiste | Stencil', price:245.65, uvp:289, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'hermann-mfh', name:'Standbriefkasten Mehrfamilienhaus Anthrazit Lasergravur | Hermann', price:262.65, uvp:309, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'siebert-mfh', name:'Standbriefkasten Mehrfamilienhaus Anthrazit RAL 7016 Lasergravur | Siebert', price:245.65, uvp:289, rating:4.5, reviews:8, badge:SALE, sw:'' },
+    { id:'cube', name:'Standbriefkasten Mehrfamilienhaus Anthrazit Sichtfenster | Cube', price:245.65, uvp:289, rating:5, reviews:2, badge:SALE, sw:'' },
+    { id:'hoffmann-edelstahl', name:'Standbriefkasten Mehrfamilienhaus austauschbares Namensschild | Hoffmann', price:262.65, uvp:309, rating:5, reviews:2, badge:SALE, sw:'' },
+    { id:'funk02', name:'Briefkasten Funkklingel Anthrazit Edelstahl Gravur optional | 02', price:245.65, uvp:289, rating:4.5, reviews:4, badge:SALE, sw:'' },
+    { id:'lepo2-funk', name:'Briefkasten Funkklingel Anthrazit Gravur optional | Lepo 2', price:160.65, uvp:189, rating:5, reviews:5, badge:SALE, sw:'' },
+    { id:'siebert-funk', name:'Briefkasten mit Funkklingel | personalisiert mit Gravur | Edelstahl-Namensschild | mit Zeitungsfach | Siebert', price:135.15, uvp:159, rating:5, reviews:25, badge:SALE, sw:'7016 9007 703 9005' },
+    { id:'stencil-funk', name:'Briefkasten mit Funkklingel | personalisiert mit Gravur | Edelstahl-Namensschild | mit Zeitungsfach | Stencil', price:126.65, uvp:149, rating:5, reviews:7, badge:SALE, sw:'7016 9007 703 9005' },
+    { id:'funk01', name:'Briefkasten mit Funkklingel Anthrazit Edelstahl | 01', price:194.65, uvp:229, rating:5, reviews:4, badge:SALE, sw:'' },
+    { id:'funk02-stand', name:'Standbriefkasten Funkklingel Anthrazit Edelstahl Gravur optional | 02', price:322.15, uvp:379, rating:5, reviews:5, badge:SALE, sw:'' }
   ];
-
-  /* Version B prototype: a few real category photos so the design-led comparison has something to show
-     (the PLP prototype itself uses one placeholder image for every card). */
-  (function(){
-    var M = {
-      lepo:'Kaufbrater/metzler-briefkasten-aus-hochwertigem-stahl-pulverbeschichtet-lepo~8%20side-direction.webp',
-      castor:'Kaufbrater/metzler-unterputz-briefkasten-hochwertiger-stahl-hugo.webp',
-      schneider:'Product%20Image/unterputz-briefkaesten.webp',
-      lessing:'Product%20Image/standbriefkaesten.webp', cube:'Product%20Image/standbriefkaesten.webp', stencil2:'Product%20Image/standbriefkaesten.webp',
-      'hoffmann-edelstahl':'Product%20Image/standbriefkaesten.webp', nordkap:'Product%20Image/standbriefkaesten.webp',
-      trias:'Product%20Image/mehrfamilien-briefkaesten.webp', quartett:'Product%20Image/mehrfamilien-briefkaesten.webp', duo:'Product%20Image/mehrfamilien-briefkaesten.webp', bk212:'Product%20Image/mehrfamilien-briefkaesten.webp',
-      vossberg:'Product%20Image/briefkasten-klingel-sprechanlage.webp', 'vdm10-zf':'Product%20Image/briefkasten-klingel-sprechanlage.webp',
-      kompakt:'Product%20Image/briefkasten-ohne-gravur.webp', gienger:'Product%20Image/briefkasten-ohne-gravur.webp'
-    };
-    PRODUCTS.forEach(function (p) { if (M[p.id]) p.img = M[p.id]; });
-  })();
 
   /* Shop data (vergleich-daten.js, generated from the JTL export 02.11.2026 by tools/build_vergleich_daten.py):
-     every card matched to a shop article takes its name, colours and filter attributes from the shop — the same
-     values the comparison shows. Montage/Material can have several values (variants) → montages[] / materials[].
-     Not in the export and therefore unchanged: price, rating, Seitentür. Cards without a shop match stay as they are. */
+     every card takes its main image (hotlinked shop image, local category photo as offline fallback),
+     colours and filter attributes from the shop — the same values the comparison shows. Name, price,
+     UVP, rating and reviews stay as listed on the live category page. Montage/Material can have several
+     values (variants) → montages[] / materials[]. */
+  function fallbackImg(p) {
+    var f = p.f || {};
+    if ((f.mo || []).indexOf('Unterputz') !== -1) return 'Product%20Image/unterputz-briefkaesten.webp';
+    if ((f.kt || []).length) return 'Product%20Image/briefkasten-klingel-sprechanlage.webp';
+    if ((f.mo || []).indexOf('Standmontage') !== -1) return 'Product%20Image/standbriefkaesten.webp';
+    if ((f.fa || []).indexOf('2') !== -1) return 'Product%20Image/mehrfamilien-briefkaesten.webp';
+    return IMG;
+  }
   (function () {
     var D = window.MTZ_VGL_DATA && window.MTZ_VGL_DATA.briefkasten;
-    if (!D) return;
     PRODUCTS.forEach(function (p) {
-      var c = D[p.id] && D[p.id].card;
-      if (!c) return;
-      p.name = c.name; p.colors = c.colors.slice(); p.faecher = c.faecher; p.zeitung = c.zeitung;
-      p.montages = c.montages; p.montage = c.montages[0] || null;
-      p.materials = c.materials; p.material = c.materials[0] || null;
-      p.klingel = c.klingel; p.sprech = c.sprech; p.paket = c.paket; p.blumenkasten = c.blumenkasten;
+      p.colors = []; p.f = {};
+      var d = D && D[p.id], c = d && d.card;
+      if (c) {
+        p.colors = c.colors.slice(); p.f = c.f || {}; p.faecher = c.faecher; p.zeitung = c.zeitung;
+        p.montages = c.montages; p.montage = c.montages[0] || null;
+        p.materials = c.materials; p.material = c.materials[0] || null;
+        p.klingel = c.klingel; p.sprech = c.sprech; p.paket = c.paket; p.blumenkasten = c.blumenkasten;
+      }
+      p.img = fallbackImg(p);            /* local photo — offline fallback (card + comparison) */
+      p.shopImg = (d && d.img) || null;  /* real shop main image, hotlinked */
     });
   })();
   function hasVal(p, f, v) { var arr = p[f + 's']; return arr ? arr.indexOf(v) !== -1 : p[f] === v; }
@@ -168,63 +218,79 @@
   window.MTZ_PRODUCTS = PRODUCTS;   /* hook for the Vergleichen add-on */
   window.MTZ_LENS = 'briefkasten';  /* tells the add-on which comparison lens to use */
 
-  var TOTAL = 80; // catalogue headline figure
+  /* Hotlinked shop images fall back to the local photo when offline / blocked. */
+  document.addEventListener('error', function (e) {
+    var t = e.target, fb = t && t.tagName === 'IMG' && t.getAttribute('data-fallback');
+    if (fb && t.getAttribute('src') !== fb) t.setAttribute('src', fb);
+  }, true);
+
+  var TOTAL = 79; // live headline figure („79 Artikel") — equals PRODUCTS.length
 
   /* ---- State ---- */
-  var active = { color: [], zeitung: [], faecher: [], montage: [], zusatz: [], material: [], door: [] };
+  var active = { color: [], fa: [], kt: [], mo: [], zf: [], ns: [], mk: [],
+                 zeitung: [], faecher: [], montage: [], zusatz: [], material: [], door: [] };   /* 2nd row: inactive inline advisor only */
   var page = 1;
   var advisorChips = false;   /* true while the active filters were set by the KI advisor → don't echo them as toolbar chips */
 
   /* ---- Helpers ---- */
   function $(s, ctx) { return (ctx || document).querySelector(s); }
-  function euro(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+  function euro(n) { return n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+,)/g, '.') + ' €'; }   /* 1.490,00 € as on the live card */
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 
+  /* Live rating: full / half / empty stars (e.g. 4.5/5); no rating → no stars (as on the live card) */
   function stars(rating) {
     var html = '';
-    for (var i = 0; i < 5; i++) html += '<span class="star is-full">★</span>';
-    return '<span class="pcard__stars" aria-label="5 von 5 Sternen">' + html + '</span>';
+    for (var i = 1; i <= 5; i++) html += '<span class="star' + (rating >= i ? ' is-full' : (rating >= i - 0.5 ? ' is-half' : '')) + '">★</span>';
+    return '<span class="pcard__stars" aria-label="' + String(rating).replace('.', ',') + ' von 5 Sternen">' + html + '</span>';
   }
 
-  function colorRow(keys) {
+  /* Colour bubbles of the live card: first 3, then „+N weitere"; none when the shop shows none */
+  function colorRow(sw) {
+    var keys = (sw || '').split(' ').filter(function (k) { return SW[k]; });
+    if (!keys.length) return '';
     var max = 3, html = '';
     keys.slice(0, max).forEach(function (k) {
-      var c = COLORS[k]; if (!c) return;
-      html += '<span class="pcard__sw" title="' + c.label + '" style="background:' + c.css + '"></span>';
+      html += '<span class="pcard__sw" title="' + SW[k].label + '" style="background:' + SW[k].css + '"></span>';
     });
     if (keys.length > max) html += '<a class="pcard__more" href="#">+' + (keys.length - max) + ' weitere</a>';
     return '<div class="pcard__colors">' + html + '</div>';
   }
 
-  /* ---- Build subcategory rail ---- */
+  /* ---- Build subcategory rail (live tiles → live subcategory pages, new tab) ---- */
   function buildSubnav() {
     var track = $('#subTrack'); if (!track) return;
     SUBCATS.forEach(function (s) {
       var a = el('a', 'subtile' + (s.cta ? ' subtile--cta' : ''));
-      a.href = '#grid';
+      a.href = s.href || '#grid';
+      if (s.href) { a.target = '_blank'; a.rel = 'noopener'; }
       a.innerHTML =
-        '<span class="subtile__thumb"><img src="' + (s.img || IMG) + '" alt="" loading="lazy"></span>' +
+        '<span class="subtile__thumb"><img src="' + (s.img || s.fb || IMG) + '" data-fallback="' + (s.fb || IMG) + '" alt="" loading="lazy"></span>' +
         '<span class="subtile__text">' +
           '<span class="subtile__label">' + s.t + '</span>' +
           (s.n != null
             ? '<span class="subtile__count">' + s.n + ' Modelle</span>'
-            : '<span class="subtile__count subtile__count--cta">Jetzt konfigurieren</span>') +
+            : (s.cta ? '<span class="subtile__count subtile__count--cta">Jetzt konfigurieren</span>' : '')) +
         '</span>';
       track.appendChild(a);
     });
   }
 
   /* ---- Build filter controls (checkbox rows — matches the live website) ---- */
-  function optionRow(group, key, label, count, swatchCss, plainCount) {
-    var id = 'f-' + group + '-' + key;
+  function fid(group, key) { return 'f-' + group + '-' + String(key).replace(/[^\w-]/g, '_'); }
+  function countText(group, n) {
+    var g = FACETS[group];
+    if (g && g.noCount) return '';
+    return (g && g.plain) ? String(n) : '(' + n + ')';
+  }
+  function optionRow(group, key, label, count, swatchCss) {
+    var id = fid(group, key);
     var row = el('label', 'fopt');
     row.setAttribute('for', id);
-    var countText = plainCount ? count : '(' + count + ')';
     row.innerHTML =
       '<input type="checkbox" id="' + id + '" data-group="' + group + '" data-key="' + key + '">' +
       '<span class="fopt__box" aria-hidden="true"></span>' +
       '<span class="fopt__label">' + label + '</span>' +
-      '<span class="fopt__count">' + countText + '</span>' +
+      '<span class="fopt__count">' + countText(group, count) + '</span>' +
       (swatchCss ? '<span class="fopt__swatch" style="background:' + swatchCss + '"></span>' : '');
     row.querySelector('input').addEventListener('change', function () { toggle(group, key); });
     return row;
@@ -234,14 +300,26 @@
     var wrap = $('#facet-color'); if (!wrap) return;
     Object.keys(COLORS).forEach(function (key) {
       var c = COLORS[key];
-      wrap.appendChild(optionRow('color', key, c.label, c.count, c.css, false));
+      wrap.appendChild(optionRow('color', key, c.label, c.count, c.css));
     });
   }
 
   function buildFacetGroup(group) {
     var wrap = $('#facet-' + group); if (!wrap) return;
     FACETS[group].items.forEach(function (it) {
-      wrap.appendChild(optionRow(group, it.key, it.label, it.count, null, false));
+      wrap.appendChild(optionRow(group, it.key, it.label, it.count, null));
+    });
+  }
+
+  /* Sidebar: one .facet block per live group, in live order (markup generated here so it can't drift) */
+  function buildFacets() {
+    var aside = $('#filters'); if (!aside) return;
+    FACET_ORDER.forEach(function (group) {
+      var box = el('div', 'facet');
+      box.innerHTML = '<h3 class="facet__title">' + (group === 'color' ? 'Farbe' : FACETS[group].title) + '</h3>' +
+        '<div class="facet__body" id="facet-' + group + '" data-group="' + group + '"></div>';
+      aside.appendChild(box);
+      if (group === 'color') buildColorGroup(); else buildFacetGroup(group);
     });
   }
 
@@ -276,27 +354,26 @@
   /* ---- Filtering ----
      matchesWith(p, a) tests a product against an arbitrary active-selection
      object; matches(p) uses the live one. The indirection lets the facet engine
-     compute per-option counts by overriding a single group. */
+     compute per-option counts by overriding a single group. Sidebar groups match the
+     raw shop value (p.f[group]) exactly like the live filter; OR within a group,
+     AND across groups. The second block serves the inactive inline advisor only. */
   function matchesWith(p, a) {
     if (a.color.length && !a.color.some(function (c) { return p.colors.indexOf(c) !== -1; })) return false;
-    if (a.faecher.length) {
-      /* 'paketfach' is a separate attribute (parcel compartment), not a fach count —
-         match it against p.paket; the count keys ('1'/'2'/'3') match p.faecher. */
-      var fOk = a.faecher.some(function (k) { return faecherOk(p, k); });
-      if (!fOk) return false;
+    for (var gi = 0; gi < FACET_ORDER.length; gi++) {
+      var g = FACET_ORDER[gi], sel = a[g];
+      if (g === 'color' || !sel || !sel.length) continue;
+      var vals = (p.f && p.f[g]) || [];
+      if (!sel.some(function (k) { return vals.indexOf(k) !== -1; })) return false;
     }
-    if (a.zeitung.length && a.zeitung.indexOf(p.zeitung) === -1) return false;
-    if (a.montage.length && !a.montage.some(function (v) { return hasVal(p, 'montage', v); })) return false;
-    if (a.door && a.door.length && !a.door.some(function (v) { return hasVal(p, 'montage', 'wand') && (v === 'seite' ? !!p.seitentuer : true); })) return false;   /* Öffnungsrichtung — Aufputz only; 'seite' needs the side-hinge flag */
-    if (a.material && a.material.length && !a.material.some(function (v) { return hasVal(p, 'material', v); })) return false;   /* sidebar Material facet + advisor (Witterung/Optik/Sichtfenster) */
-    if (a.zusatz.length) {
-      /* Extra functions — boolean attributes on the product (p.klingel / p.sprech).
-         OR within the group; a "klingel+sprech" key requires BOTH (combined unit). */
-      var zOk = a.zusatz.some(function (k) {
-        return k.indexOf('+') !== -1 ? k.split('+').every(function (x) { return !!p[x]; }) : !!p[k];
-      });
-      if (!zOk) return false;
-    }
+    /* — inactive inline advisor (legacy keys) — */
+    if (a.faecher && a.faecher.length && !a.faecher.some(function (k) { return faecherOk(p, k); })) return false;
+    if (a.zeitung && a.zeitung.length && a.zeitung.indexOf(p.zeitung) === -1) return false;
+    if (a.montage && a.montage.length && !a.montage.some(function (v) { return hasVal(p, 'montage', v); })) return false;
+    if (a.door && a.door.length && !a.door.some(function (v) { return hasVal(p, 'montage', 'wand') && (v === 'seite' ? !!p.seitentuer : true); })) return false;
+    if (a.material && a.material.length && !a.material.some(function (v) { return hasVal(p, 'material', v); })) return false;
+    if (a.zusatz && a.zusatz.length && !a.zusatz.some(function (k) {
+      return k.indexOf('+') !== -1 ? k.split('+').every(function (x) { return !!p[x]; }) : !!p[k];
+    })) return false;
     return true;
   }
   function matches(p) { return matchesWith(p, active); }
@@ -306,9 +383,8 @@
      current selection: each option shows the real number of matching products
      and options with none are hidden (e.g. picking Unterputz leaves only the
      colours actually available wall-recessed). With no filter active the curated
-     "live-mirror" counts are restored and all options shown. Only sidebar groups
-     participate (material is advisor-only, not rendered). */
-  var FACET_GROUPS = ['color', 'material', 'zeitung', 'faecher', 'montage', 'zusatz'];
+     "live-mirror" counts are restored and all options shown. */
+  var FACET_GROUPS = FACET_ORDER;
   function facetKeys(group) {
     return group === 'color' ? Object.keys(COLORS) : FACETS[group].items.map(function (it) { return it.key; });
   }
@@ -326,11 +402,11 @@
     return PRODUCTS.filter(function (p) { return matchesWith(p, a); }).length;
   }
   function setFacetRow(group, key, n, hide) {
-    var input = document.getElementById('f-' + group + '-' + key);
+    var input = document.getElementById(fid(group, key));
     var row = input && input.closest('.fopt');
     if (!row) return;
     var cnt = row.querySelector('.fopt__count');
-    if (cnt) cnt.textContent = '(' + n + ')';
+    if (cnt) cnt.textContent = group === 'color' ? '(' + n + ')' : countText(group, n);
     row.hidden = hide;
   }
   /* Drop selections that became impossible in combination with the others.
@@ -358,20 +434,20 @@
   function refreshFacetDisplay() {
     var dynamic = activeCount() > 0;
     FACET_GROUPS.forEach(function (group) {
-      var avail = 0, anySelected = false;
+      var hasMatch = false, anySelected = false;
       facetKeys(group).forEach(function (key) {
         var selected = active[group].indexOf(key) !== -1;
         if (selected) anySelected = true;
-        if (!dynamic) { setFacetRow(group, key, curatedCount(group, key), false); avail++; return; }
         var n = optionCount(group, key);
+        if (n > 0) hasMatch = true;
+        if (!dynamic) { setFacetRow(group, key, curatedCount(group, key), false); return; }
         setFacetRow(group, key, n, n === 0 && !selected);
-        if (n > 0 || selected) avail++;
       });
-      /* Redundant one-choice: a group offering ≤1 selectable option can't narrow
-         anything, so hide the whole facet — unless the user has a pick there (so
-         they can still see/clear it). */
+      /* As on the live page, a group stays visible while at least one of its options
+         still has matches (even a single one); a group with none left is hidden —
+         unless the user has a pick there, so they can still see/clear it. */
       var box = facetContainer(group);
-      if (box) box.hidden = (avail <= 1 && !anySelected);
+      if (box) box.hidden = (dynamic && !hasMatch && !anySelected);
     });
   }
   /* User-driven refresh (sidebar toggle / clear): prune impossible picks first.
@@ -385,29 +461,31 @@
     return Object.keys(active).reduce(function (n, g) { return n + active[g].length; }, 0);
   }
 
-  /* ---- Product card ---- */
+  /* ---- Product card (data as on the live card: badge, Metzler, stars + review count,
+         name, „ab" only where the shop shows it, current price + struck UVP, colour bubbles) ---- */
   function card(p) {
     var c = el('article', 'pcard');
     c.dataset.id = p.id;   /* hook for the Vergleichen add-on (vergleichen.js) */
     var badge = p.badge ? '<span class="pcard__badge pcard__badge--' + p.badge.type + '">' + p.badge.text + '</span>' : '';
     var priceBlock =
       (p.uvp ? '<span class="pcard__uvp">' + euro(p.uvp) + '</span>' : '') +
-      '<span class="pcard__ab">ab</span> ' +
+      (p.ab ? '<span class="pcard__ab">ab</span> ' : '') +
       '<span class="pcard__price' + (p.uvp ? ' pcard__price--sale' : '') + '">' + euro(p.price) + '</span>';
+    var rating = p.rating ? '<span class="pcard__rating">' + stars(p.rating) + (p.reviews ? '<span class="pcard__reviews">(' + p.reviews + ')</span>' : '') + '</span>' : '';
 
     c.innerHTML =
       '<div class="pcard__media">' +
         badge +
-        '<img class="pcard__img" src="' + (p.img || IMG) + '" alt="' + p.name + '" loading="lazy">' +
+        '<img class="pcard__img" src="' + (p.shopImg || p.img || IMG) + '" data-fallback="' + (p.img || IMG) + '" alt="' + p.name + '" loading="lazy">' +
       '</div>' +
       '<div class="pcard__body">' +
         '<div class="pcard__top">' +
           '<span class="pcard__brand">Metzler</span>' +
-          '<span class="pcard__rating">' + stars(p.rating) + '<span class="pcard__reviews">(' + p.reviews + ')</span></span>' +
+          rating +
         '</div>' +
         '<h3 class="pcard__title"><a href="#">' + p.name + '</a></h3>' +
         '<div class="pcard__pricerow">' + priceBlock + '</div>' +
-        colorRow(p.colors) +
+        colorRow(p.sw) +
       '</div>';
     return c;
   }
@@ -452,10 +530,12 @@
     grid.innerHTML = '';
     var start = (page - 1) * PAGE;
     var pageItems2 = filtered.slice(start, start + PAGE);
-    // On page 1 (unfiltered), drop the promo banner into the grid so that
-    // exactly 2 rows (6 products) of the page follow it.
-    var bannerAt = (page === 1 && activeCount() === 0 && pageItems2.length > 6)
-      ? pageItems2.length - 6 : -1;
+    // On page 1 (unfiltered), drop the promo banner into the grid as on the live
+    // page: after the first row on desktop (3 cards), after two rows on mobile (4 cards).
+    var cols = (getComputedStyle(grid).gridTemplateColumns || '').split(' ').filter(Boolean).length;
+    if (!(cols > 0 && cols < 7)) cols = 3;
+    var bannerN = cols >= 3 ? cols : cols * 2;
+    var bannerAt = (page === 1 && activeCount() === 0 && pageItems2.length > bannerN) ? bannerN : -1;
     pageItems2.forEach(function (p, i) {
       if (i === bannerAt) grid.appendChild(bannerEl());
       grid.appendChild(card(p));
@@ -1203,12 +1283,7 @@
 
   /* ---- Init ---- */
   buildSubnav();
-  buildColorGroup();
-  buildFacetGroup('material');
-  buildFacetGroup('zeitung');
-  buildFacetGroup('faecher');
-  buildFacetGroup('montage');
-  buildFacetGroup('zusatz');
+  buildFacets();
   updateFacets();
   wireDrawer();
   wireSubnav();

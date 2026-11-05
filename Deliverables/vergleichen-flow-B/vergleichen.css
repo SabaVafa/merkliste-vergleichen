@@ -89,67 +89,6 @@ body.vgl-mode .vgl-toggle{display:inline-flex;animation:vglfade .25s ease}
 .vgl-tray__cta:not([disabled]){background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);border-color:var(--teal,#015253)}
 .vgl-tray__cta:not([disabled]):hover{background:var(--teal,#015253);color:var(--white,#fff)}
 
-/* ---- Compare overlay ---- */
-.vgl-view{position:fixed;inset:0;z-index:900;background:var(--paper-white,#F5F6FA);display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .2s}
-.vgl-view.is-open{opacity:1;visibility:visible}
-.vgl-view__bar{background:var(--white,#fff);border-bottom:.0625rem solid var(--graphite-300,#DADADA);flex-shrink:0}
-.vgl-view__bar-in{max-width:var(--container,100rem);margin:0 auto;padding:0 clamp(1.5rem,4vw,3.5rem);height:3.75rem;display:flex;align-items:center;gap:1rem}
-.vgl-view__title{font-size:var(--text-h3,1.25rem);font-weight:700;color:var(--schwarz,#1A171B)}
-.vgl-view__title span{color:var(--text-muted,#6A6A6A);font-weight:400;font-size:var(--text-body,1rem)}
-.vgl-diff{display:inline-flex;align-items:center;gap:.5rem;margin-left:auto;font-weight:600;font-size:var(--text-body-sm,.875rem);color:var(--text-muted,#6A6A6A);cursor:pointer;user-select:none}
-.vgl-switch{width:2.5rem;height:1.375rem;border-radius:var(--r-pill,9999px);background:var(--graphite-300,#DADADA);position:relative;transition:background .18s;flex-shrink:0}
-.vgl-switch::after{content:'';position:absolute;top:.1875rem;left:.1875rem;width:1rem;height:1rem;border-radius:50%;background:#fff;transition:transform .18s}
-.vgl-diff input{position:absolute;opacity:0;width:.0625rem;height:.0625rem}
-.vgl-diff input:checked+.vgl-switch{background:var(--teal,#015253)}
-.vgl-diff input:checked+.vgl-switch::after{transform:translateX(1.125rem)}
-.vgl-diff input:focus-visible+.vgl-switch{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
-.vgl-close{width:2.5rem;height:2.5rem;border-radius:50%;border:none;background:var(--paper-white,#F5F6FA);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--schwarz,#1A171B);flex-shrink:0}
-.vgl-close:hover{background:var(--graphite-100,#F0F0F0)}
-.vgl-view__scroll{flex:1;overflow:auto}
-.vgl-view__scroll-in{max-width:var(--container,100rem);margin:0 auto;padding:1.5rem clamp(1.5rem,4vw,3.5rem) 1.5rem}
-
-/* ---- Compare table — frozen product header + frozen first column ---- */
-.vgl-wrap{overflow:auto;-webkit-overflow-scrolling:touch;border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,.5rem);background:var(--white,#fff);box-shadow:var(--shadow-sm,0 .0625rem .125rem rgba(0,0,0,.04));max-height:calc(100vh - 6.75rem)}
-table.vgl-t{border-collapse:separate;border-spacing:0;width:100%;min-width:44rem;table-layout:fixed}
-table.vgl-t col.rl{width:14rem}
-table.vgl-t col.pc{width:15.5rem}
-table.vgl-t th,table.vgl-t td{text-align:left;vertical-align:top;padding:.875rem 1.125rem;border-bottom:.0625rem solid var(--graphite-100,#F0F0F0)}
-/* frozen first column */
-table.vgl-t .rh{position:sticky;left:0;z-index:2;background:var(--white,#fff);font-weight:600;color:var(--schwarz,#1A171B);font-size:var(--text-body-sm,.875rem)}
-table.vgl-t tbody .rh{box-shadow:.0625rem 0 0 var(--graphite-200,#E6E6E8)}
-/* frozen header row (product cards stay in view while specs scroll) */
-table.vgl-t thead th{position:sticky;top:0;z-index:3;background:var(--white,#fff);border-bottom:.0625rem solid var(--graphite-200,#E6E6E8);box-shadow:0 .0625rem 0 var(--graphite-200,#E6E6E8)}
-table.vgl-t thead .rh{left:0;top:0;z-index:4;box-shadow:.0625rem 0 0 var(--graphite-200,#E6E6E8),0 .0625rem 0 var(--graphite-200,#E6E6E8)}
-.vgl-ph{vertical-align:top}
-.vgl-ph__media{background:var(--white,#fff);border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,.5rem);height:7rem;display:flex;align-items:center;justify-content:center;padding:.5rem;margin-bottom:.75rem;position:relative}
-.vgl-ph__media img{max-width:100%;max-height:100%;object-fit:contain}
-.vgl-ph__rm{position:absolute;top:.375rem;right:.375rem;width:1.625rem;height:1.625rem;border-radius:50%;background:var(--white,#fff);border:.0625rem solid var(--graphite-200,#E6E6E8);color:var(--graphite-500,#A1A1A1);cursor:pointer;font-size:.9375rem;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm,0 .0625rem .125rem rgba(0,0,0,.06));transition:color .14s,border-color .14s}
-.vgl-ph__rm:hover{color:var(--red-default,#C90000);border-color:var(--red-default,#C90000)}
-.vgl-ph__name{font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--schwarz,#1A171B);line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;height:4.05em;margin-bottom:.625rem}
-.vgl-ph__price{font-size:var(--text-h4,1.125rem);font-weight:700;margin:0 0 .75rem;color:var(--schwarz,#1A171B);line-height:1.15}
-.vgl-ph__price small{display:block;font-weight:400;font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A);margin-top:.1875rem;min-height:1em}
-.vgl-ph__price small.uvp{text-decoration:line-through}
-.vgl-ph .btn{width:100%;height:2.375rem;font-size:var(--text-body-sm,.875rem);display:inline-flex;align-items:center;justify-content:center;text-align:center}
-/* slim, light section headers (replaces the heavy dark bands) */
-tr.vgl-group th,tr.vgl-group td{background:var(--teal-100,#E6EEEE);border-bottom:.0625rem solid var(--graphite-200,#E6E6E8);padding:.5625rem 1.125rem}
-tr.vgl-group .rh{color:var(--teal,#015253);font-weight:700;font-size:.6875rem;letter-spacing:.13em;text-transform:uppercase;background:var(--teal-100,#E6EEEE);box-shadow:.0625rem 0 0 var(--graphite-200,#E6E6E8)}
-/* value cells + row hover */
-td.vgl-val{font-size:var(--text-body-sm,.875rem);color:var(--schwarz,#1A171B)}
-td.vgl-val.na{color:var(--text-muted,#6A6A6A)}
-table.vgl-t tbody tr:not(.vgl-group):hover td.vgl-val{background:var(--paper-white,#F5F6FA)}
-table.vgl-t tbody tr:not(.vgl-group):hover .rh{background:var(--paper-white,#F5F6FA)}
-.vgl-yes{display:inline-flex;align-items:center;gap:.375rem;color:var(--green,#009951);font-weight:600}
-.vgl-no{display:inline-flex;align-items:center;gap:.375rem;color:var(--text-muted,#6A6A6A)}
-/* difference cues: teal left-accent on the label + soft tint on values */
-tr.is-diff td.vgl-val{background:var(--teal-5,rgba(1,82,83,.05))}
-tr.is-diff .rh{box-shadow:inset .1875rem 0 0 var(--teal,#015253),.0625rem 0 0 var(--graphite-200,#E6E6E8)}
-.vgl-dot{display:none}
-.vgl-sw{display:inline-flex;gap:.25rem;flex-wrap:wrap}
-.vgl-sw span{width:.875rem;height:.875rem;border-radius:50%;border:.0625rem solid rgba(0,0,0,.15)}
-.vgl-empty{padding:4rem 1rem;text-align:center;color:var(--text-muted,#6A6A6A);max-width:34rem;margin:0 auto}
-.vgl-empty svg{width:2.75rem;height:2.75rem;color:var(--graphite-300,#DADADA);display:block;margin:0 auto .875rem}
-.vgl-empty b{display:block;font-size:var(--text-h4,1.125rem);color:var(--schwarz,#1A171B);margin-bottom:.375rem}
-.vgl-empty span{font-size:var(--text-body-sm,.875rem);line-height:1.5}
 
 /* ---- Toast ---- */
 .vgl-toast{position:fixed;bottom:6.5rem;left:50%;transform:translateX(-50%) translateY(.75rem);display:flex;align-items:center;gap:.625rem;background:var(--schwarz,#1A171B);color:#fff;padding:.75rem 1.125rem .75rem .875rem;border-radius:var(--r-l,.5rem);font-size:var(--text-body-sm,.875rem);font-weight:500;box-shadow:var(--shadow-lg,0 .75rem 2rem rgba(0,0,0,.12));opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:950;max-width:min(92vw,30rem)}
@@ -193,183 +132,10 @@ tr.is-diff .rh{box-shadow:inset .1875rem 0 0 var(--teal,#015253),.0625rem 0 0 va
 .vgl-visually-hidden{position:absolute;width:.0625rem;height:.0625rem;padding:0;margin:-.0625rem;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* =====================================================================
-   Version B — similarity-aware, benchmark-aligned comparison
-   Scroll model: ONE scroll container (.vgl-view__scroll). The product
-   header row sticks to its top and compacts on scroll (Apple/Samsung),
-   the row-label column sticks left (Baymard). No nested scrollers.
+   Flow-Audit 06a/06b (2026-10-30) — page-level controls (tray, toolbar, card field).
+   One focus language, 2.75 rem hit areas. The overlay rules of that audit were replaced by §12 below.
    ===================================================================== */
-.vgl-view__scroll{overflow:auto;overscroll-behavior:contain}
-.vgl-view__scroll-in{padding-top:1.25rem}
-.vgl-wrap{overflow:visible;max-height:none;border-radius:var(--r-l,.5rem)}
-table.vgl-t col.rl{width:14rem}
-table.vgl-t col.pc{width:15rem}
-table.vgl-t col.pc--add{width:10rem}
-table.vgl-t thead th{top:0}
-table.vgl-t thead th.vgl-ph{padding:1rem 1.125rem 1.125rem}
-
-/* ---- Summary strip: verdict + jump chips ---- */
-.vgl-sum{display:flex;align-items:center;flex-wrap:wrap;gap:.625rem 1.25rem;margin-bottom:1rem;padding:.75rem 1rem;background:var(--white,#fff);border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,.5rem);box-shadow:var(--shadow-sm,0 .0625rem .125rem rgba(0,0,0,.04))}
-.vgl-sum__txt{display:inline-flex;align-items:center;gap:.625rem;font-size:var(--text-body-sm,.875rem);color:var(--schwarz,#1A171B);line-height:1.35}
-.vgl-sum__txt svg{width:1.25rem;height:1.25rem;flex-shrink:0;color:var(--teal,#015253)}
-.vgl-sum__txt--same svg{color:var(--green,#009951)}
-.vgl-sum__chips{display:inline-flex;align-items:center;flex-wrap:wrap;gap:.375rem}
-.vgl-sum__chips::before{content:'Unterschiede:';font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted,#6A6A6A);margin-right:.25rem}
-.vgl-chip{height:1.75rem;padding:0 .6875rem;border-radius:var(--r-pill,9999px);border:.0625rem solid var(--teal-100,#E6EEEE);background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);font-family:inherit;font-size:.8125rem;font-weight:600;line-height:1;cursor:pointer;transition:background .15s,color .15s,border-color .15s;display:inline-flex;align-items:center}
-.vgl-chip:hover{background:var(--teal,#015253);color:#fff;border-color:var(--teal,#015253)}
-.vgl-chip:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
-.vgl-chip--more{background:transparent;border-color:var(--graphite-300,#DADADA);color:var(--text-muted,#6A6A6A);cursor:default}
-
-/* ---- Product header: model line + qualifier, price, "Auf einen Blick", CTA ---- */
-.vgl-ph__media{height:7.75rem}
-.vgl-ph__name{font-size:var(--text-body,1rem);font-weight:700;line-height:1.3;-webkit-line-clamp:2;height:2.6em;margin-bottom:.125rem}
-.vgl-ph__sub{font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.625rem}
-.vgl-ph__price{margin-bottom:.625rem}
-/* CTA is pinned to the cell bottom, so columns stay aligned however many highlights a model has */
-table.vgl-t thead th.vgl-ph{padding-bottom:4.625rem}
-.vgl-ph .btn{position:absolute;left:1.125rem;right:1.125rem;bottom:1.125rem;width:auto}
-.vgl-ph__hl{list-style:none;margin:0;padding:.625rem 0 0;border-top:.0625rem solid var(--graphite-100,#F0F0F0);display:flex;flex-direction:column;gap:.25rem}
-.vgl-ph__hl li{position:relative;padding-left:.875rem;font-size:.8125rem;line-height:1.3;color:var(--schwarz,#1A171B);font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.vgl-ph__hl li::before{content:'';position:absolute;left:0;top:.42em;width:.375rem;height:.375rem;border-radius:50%;background:var(--teal,#015253)}
-.vgl-ph__hl li.is-best::before{background:var(--green,#009951)}
-.vgl-ph__hl li.none{color:var(--text-muted,#6A6A6A);font-weight:400;white-space:normal}
-.vgl-ph__hl li.none::before{display:none}
-.vgl-hl__k{color:var(--text-muted,#6A6A6A);font-weight:400;margin-right:.25rem}
-.vgl-hl__k::after{content:':'}
-/* add-a-model column */
-.vgl-ph--add{vertical-align:top}
-/* the add box fills the whole header cell: top edge = product image box, bottom edge = CTA bottom */
-.vgl-ph--add .vgl-add{position:absolute;top:1rem;left:1.125rem;right:1.125rem;bottom:1.125rem;width:auto;min-height:0}
-.vgl-add{width:100%;min-height:19rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.375rem;padding:1rem;border:.0938rem dashed var(--graphite-300,#DADADA);border-radius:var(--r-l,.5rem);background:var(--paper-white,#F5F6FA);color:var(--teal,#015253);cursor:pointer;font:inherit;transition:border-color .15s,background .15s}
-.vgl-add:hover{border-color:var(--teal,#015253);background:var(--teal-100,#E6EEEE)}
-.vgl-add:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
-.vgl-add svg{width:1.625rem;height:1.625rem;margin-bottom:.25rem}
-.vgl-add b{font-size:var(--text-body-sm,.875rem);font-weight:700}
-.vgl-add small{font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A)}
-td.vgl-addcell{background:var(--paper-white,#F5F6FA)}
-tr.vgl-group td.vgl-addcell{background:var(--teal-100,#E6EEEE)}
-table.vgl-t tbody tr:not(.vgl-group):hover td.vgl-addcell{background:var(--paper-white,#F5F6FA)}
-
-/* ---- Row labels with (i) explanations ---- */
-table.vgl-t tbody .rh{overflow:visible}
-.rh__l{vertical-align:middle}
-.vgl-i{position:relative;display:inline-flex;align-items:center;justify-content:center;width:1.125rem;height:1.125rem;margin-left:.375rem;padding:0;border:none;border-radius:50%;background:transparent;color:var(--text-muted,#6A6A6A);cursor:help;vertical-align:middle}
-.vgl-i svg{width:1rem;height:1rem}
-.vgl-i:hover,.vgl-i:focus-visible{color:var(--teal,#015253);outline:none}
-.vgl-i::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + .5rem);z-index:20;width:17rem;padding:.625rem .75rem;border-radius:var(--r-m,.25rem);background:var(--schwarz,#1A171B);color:#fff;font-family:inherit;font-size:.8125rem;font-weight:400;line-height:1.45;text-align:left;white-space:normal;box-shadow:var(--shadow-lg,0 .75rem 2rem rgba(0,0,0,.12));opacity:0;visibility:hidden;transform:translateY(-.1875rem);transition:opacity .14s,transform .14s;pointer-events:none}
-.vgl-i:hover::after,.vgl-i:focus-visible::after{opacity:1;visibility:visible;transform:none}
-tr.is-flash td.vgl-val{animation:vglflash 1.6s ease}
-@keyframes vglflash{0%{background:var(--teal-100,#E6EEEE)}100%{background:transparent}}
-
-/* ---- Values ---- */
-.vgl-best{display:inline-block;margin-left:.5rem;padding:.125rem .4375rem;border-radius:var(--r-pill,9999px);background:var(--green,#009951);color:#fff;font-size:.625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}
-td.vgl-val.is-best{font-weight:700}
-.vgl-delta{display:block;margin-top:.125rem;font-size:var(--text-caption,.75rem);font-weight:500;color:var(--text-muted,#6A6A6A)}
-.vgl-swn{display:block;margin-top:.3125rem;font-size:var(--text-caption,.75rem);color:var(--text-muted,#6A6A6A)}
-.vgl-link--ic{display:inline-flex;align-items:center;gap:.375rem;text-decoration:none}
-.vgl-link--ic svg{width:1rem;height:1rem}
-.vgl-link--ic:hover{text-decoration:underline}
-.vgl-diff__n{font-weight:400;color:var(--text-muted,#6A6A6A)}
-
-/* ---- After the table ---- */
-.vgl-aftertable{margin-top:1rem;display:flex;flex-direction:column;gap:.875rem}
-.vgl-more{align-self:flex-start;display:inline-flex;align-items:center;gap:.5rem;height:2.5rem;padding:0 1rem;border-radius:var(--r-m,.25rem);border:.0625rem solid var(--graphite-300,#DADADA);background:var(--white,#fff);color:var(--teal,#015253);font-family:inherit;font-size:var(--text-body-sm,.875rem);font-weight:600;line-height:1;cursor:pointer;transition:background .15s,border-color .15s}
-.vgl-more:hover{background:var(--teal-5,rgba(1,82,83,.05));border-color:var(--teal,#015253)}
-.vgl-more svg{width:1rem;height:1rem;transition:transform .18s}
-.vgl-more[aria-expanded="true"] svg{transform:rotate(180deg)}
-.vgl-common{border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,.5rem);background:var(--white,#fff)}
-.vgl-common>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;font-weight:600;color:var(--schwarz,#1A171B);font-size:var(--text-body-sm,.875rem)}
-.vgl-common>summary::-webkit-details-marker{display:none}
-.vgl-common>summary::before{content:'';width:.5rem;height:.5rem;border-right:.125rem solid var(--graphite-500,#A1A1A1);border-bottom:.125rem solid var(--graphite-500,#A1A1A1);transform:rotate(-45deg);transition:transform .18s;margin-right:.125rem}
-.vgl-common[open]>summary::before{transform:rotate(45deg)}
-.vgl-common .cnt{min-width:1.25rem;height:1.25rem;padding:0 .375rem;border-radius:var(--r-pill,9999px);background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);font-size:.6875rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
-.vgl-common__hint{margin-left:auto;font-weight:500;font-size:.8125rem;color:var(--text-muted,#6A6A6A)}
-.vgl-commonlist{list-style:none;margin:0;padding:.25rem 1rem .875rem;columns:2;column-gap:2rem;border-top:.0625rem solid var(--graphite-100,#F0F0F0)}
-.vgl-commonlist li{break-inside:avoid;display:flex;justify-content:space-between;gap:.75rem;padding:.4375rem 0;font-size:.8125rem;border-bottom:.0625rem solid var(--graphite-100,#F0F0F0)}
-.vgl-commonlist .k{color:var(--text-muted,#6A6A6A);flex:0 0 auto}
-.vgl-commonlist .v{color:var(--schwarz,#1A171B);font-weight:600;text-align:right}
-.vgl-vb{margin-left:.625rem;padding:.125rem .5rem;border-radius:var(--r-pill,9999px);background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);font-size:.625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}
-
-/* ---- Twin state: technically identical models → design-led comparison ---- */
-.vgl-view.is-twin .vgl-ph__media{height:12.5rem}                       /* the look IS the difference: bigger hero */
-.vgl-twin{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:1rem;margin-top:1rem}
-.vgl-twin__col{background:var(--white,#fff);border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-l,.5rem);padding:1rem 1.125rem;box-shadow:var(--shadow-sm,0 .0625rem .125rem rgba(0,0,0,.04));min-width:0}
-.vgl-twin__h{margin:0 0 .625rem;font-size:var(--text-body,1rem);font-weight:700;color:var(--schwarz,#1A171B)}
-.vgl-twin__list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
-.vgl-twin__list li{position:relative;padding-left:.875rem;font-size:var(--text-body-sm,.875rem);line-height:1.45;color:var(--schwarz,#1A171B)}
-.vgl-twin__list li::before{content:'';position:absolute;left:0;top:.55em;width:.375rem;height:.375rem;border-radius:50%;background:var(--teal,#015253)}
-.vgl-twin__less{color:var(--text-muted,#6A6A6A)}
-.vgl-twin__note{margin:.75rem 0 0;padding-top:.625rem;border-top:.0625rem solid var(--graphite-100,#F0F0F0);font-size:var(--text-caption,.75rem);line-height:1.45;color:var(--text-muted,#6A6A6A)}
-.vgl-src{margin:0;font-size:var(--text-caption,.75rem);line-height:1.45;color:var(--text-muted,#6A6A6A)}   /* data provenance line under the comparison (11_Vergleich-Datenqualitaet) */
-.vgl-alts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
-.vgl-alt{display:flex;gap:.75rem;align-items:stretch;padding:.5rem;border:.0625rem solid var(--graphite-100,#F0F0F0);border-radius:var(--r-m,.25rem);background:var(--paper-white,#F5F6FA)}
-.vgl-alt__media{flex:0 0 3.25rem;height:4rem;background:var(--white,#fff);border:.0625rem solid var(--graphite-200,#E6E6E8);border-radius:var(--r-s,.1875rem);display:flex;align-items:center;justify-content:center;padding:.25rem}
-.vgl-alt__media img{max-width:100%;max-height:100%;object-fit:contain}
-.vgl-alt__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:.1875rem}
-.vgl-alt__name{font-size:.8125rem;font-weight:700;color:var(--schwarz,#1A171B);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vgl-alt__name span{font-weight:400;color:var(--text-muted,#6A6A6A)}
-.vgl-alt__name span::before{content:'· '}
-.vgl-alt__why{display:flex;flex-wrap:wrap;gap:.25rem .625rem;font-size:.75rem;color:var(--teal,#015253);font-weight:600}
-.vgl-alt__why em{font-style:normal;font-weight:400;color:var(--text-muted,#6A6A6A)}
-.vgl-alt__foot{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:auto;font-size:.8125rem;color:var(--schwarz,#1A171B)}
-.vgl-alt__add{display:inline-flex;align-items:center;gap:.3125rem;height:1.75rem;padding:0 .625rem;border-radius:var(--r-m,.25rem);border:.0625rem solid var(--teal,#015253);background:var(--teal-100,#E6EEEE);color:var(--teal,#015253);font-family:inherit;font-size:.75rem;font-weight:600;line-height:1;cursor:pointer;transition:background .15s,color .15s}
-.vgl-alt__add svg{width:.8125rem;height:.8125rem}
-.vgl-alt__add:hover:not([disabled]){background:var(--teal,#015253);color:#fff}
-.vgl-alt__add[disabled]{opacity:.45;cursor:not-allowed}
-.vgl-swn b{font-weight:600;color:var(--schwarz,#1A171B)}
-.vgl-twin--single{grid-template-columns:1fr}
-@media(max-width:56.25rem){.vgl-twin{grid-template-columns:1fr}}
-/* guardrails in the summary strip */
-.vgl-guard{flex:1 1 100%;display:flex;align-items:flex-start;gap:.5rem;padding:.5rem .625rem;border-radius:var(--r-m,.25rem);font-size:.8125rem;line-height:1.4}
-.vgl-guard svg{width:1rem;height:1rem;flex-shrink:0;margin-top:.0625rem}
-.vgl-guard--info{background:var(--teal-5,rgba(1,82,83,.05));color:var(--schwarz,#1A171B)}
-.vgl-guard--info svg{color:var(--teal,#015253)}
-.vgl-guard--warn{background:rgba(255,192,65,.16);color:var(--schwarz,#1A171B)}
-.vgl-guard--warn svg{color:#B8860B}
-/* set-valued cells (Mehrfachauswahl) */
-.vgl-setl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.1875rem}
-.vgl-setl li{position:relative;padding-left:.75rem}
-.vgl-setl li::before{content:'';position:absolute;left:0;top:.5em;width:.3125rem;height:.3125rem;border-radius:50%;background:var(--teal,#015253)}
-/* Briefkästen lens: design-led → larger hero always */
-.vgl-view.lens-briefkasten .vgl-ph__media{height:10.625rem}
-.vgl-view.lens-briefkasten.is-twin .vgl-ph__media{height:13.75rem}
-
-/* ---- Mobile: two product columns visible, frozen label column, compact header ---- */
-@media(max-width:47.99rem){
-  /* bar: row 1 = title + close, row 2 = switch + clear (print hidden on phones) */
-  .vgl-view__bar-in{height:auto;min-height:3.5rem;padding-block:.5rem;flex-wrap:wrap;gap:.375rem .75rem}
-  .vgl-view__title{font-size:var(--text-body,1rem);flex:1 1 auto;order:0}
-  .vgl-close{order:1;width:2.25rem;height:2.25rem}
-  .vgl-diff{margin-left:0;order:2;font-size:.8125rem}
-  .vgl-link--ic{display:none}
-  .vgl-view__bar-in>.vgl-link{order:3;margin-left:auto}
-  .vgl-view__scroll-in{padding:.875rem .75rem 1.5rem}
-  .vgl-sum{padding:.625rem .75rem;gap:.5rem .875rem}
-  .vgl-sum__chips{width:100%}
-  table.vgl-t{min-width:0}
-  table.vgl-t col.rl{width:7rem}
-  table.vgl-t col.pc{width:10.5rem}
-  table.vgl-t col.pc--add{width:7.5rem}
-  table.vgl-t th,table.vgl-t td{padding:.625rem .75rem}
-  table.vgl-t thead th.vgl-ph{padding:.75rem .75rem 3.875rem}
-  .vgl-ph__media{height:5.25rem}
-  .vgl-ph__name{font-size:var(--text-body-sm,.875rem)}
-  .vgl-ph .btn{height:2.125rem;font-size:.8125rem;left:.75rem;right:.75rem;bottom:.875rem}
-  .vgl-ph--add .vgl-add{top:.75rem;left:.75rem;right:.75rem;bottom:.875rem}
-  .vgl-i::after{width:14rem}
-  .vgl-commonlist{columns:1}
-}
-
-/* =====================================================================
-   Flow-Audit 06a/06b (2026-10-30) — layered over the rules above.
-   One focus language, 2.75 rem hit areas, short sticky header with
-   "Auf einen Blick" as the first row group, PLP chip grammar, toggletips,
-   AA contrast on Ja/Bestwert, mobile tray + chip row, reduced motion.
-   ===================================================================== */
-/* ---- focus: the DS ring everywhere (same values as the Merkliste layer) ---- */
-.vgl-bar-btn:focus-visible,.vgl-cancel:focus-visible,.vgl-tray__cta:focus-visible,.vgl-link:focus-visible,.vgl-slot__rm:focus-visible,.vgl-ph__rm:focus-visible,.vgl-close:focus-visible,.vgl-more:focus-visible,.vgl-alt__add:focus-visible,.vgl-coach__btn:focus-visible,.vgl-coach__x:focus-visible,.vgl-i:focus-visible,.vgl-add__mkl:focus-visible,.vgl-back:focus-visible,.vgl-chip--more:focus-visible,.vgl-tourfab:focus-visible,.vgl-view__title:focus-visible,.vgl-common>summary:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
-tr[tabindex="-1"]:focus{outline:none}
-tr[tabindex="-1"]:focus-visible .rh{box-shadow:inset .1875rem 0 0 var(--teal,#015253),.0625rem 0 0 var(--graphite-200,#E6E6E8)}
-
+.vgl-bar-btn:focus-visible,.vgl-cancel:focus-visible,.vgl-tray__cta:focus-visible,.vgl-link:focus-visible,.vgl-slot__rm:focus-visible,.vgl-coach__btn:focus-visible,.vgl-coach__x:focus-visible,.vgl-tourfab:focus-visible{outline:.1875rem solid var(--v-teal);outline-offset:.125rem}
 /* ---- controls: 2.75 rem targets, one button grammar with the PLP toolbar ---- */
 .vgl-bar-btn{height:2.75rem}
 .vgl-cancel{height:2.75rem;padding:0 .875rem;border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-m,.25rem);background:var(--white,#fff);color:var(--schwarz,#1A171B);text-decoration:none;font-size:var(--text-body-sm,.875rem);font-weight:600}
@@ -378,89 +144,11 @@ tr[tabindex="-1"]:focus-visible .rh{box-shadow:inset .1875rem 0 0 var(--teal,#01
 .vgl-tray__cta{height:2.75rem}
 .vgl-link{display:inline-flex;align-items:center;min-height:2.75rem;padding:0 .5rem;text-decoration:none}
 .vgl-link:hover{text-decoration:underline}
-.vgl-close{width:2.75rem;height:2.75rem}
-.vgl-diff{min-height:2.75rem}
 .vgl-slot__rm::before{content:'';position:absolute;inset:-.8125rem}                 /* 1.125 rem disc inside a 2.75 rem target */
-.vgl-ph__rm{top:.375rem;right:.375rem;width:2.75rem;height:2.75rem;border:0;background:transparent;box-shadow:none;color:var(--text-muted,#6A6A6A);border-radius:var(--r-pill,9999px);font-size:0}
-.vgl-ph__rm svg{width:1.125rem;height:1.125rem}
-.vgl-ph__rm:hover{color:var(--red-default,#C90000);background:var(--graphite-100,#F0F0F0);border-color:transparent}
-.vgl-alt__add{height:2.25rem;padding:0 .75rem;font-size:var(--text-caption,.75rem)}
-.vgl-more{height:2.75rem}
 /* card field: full width, 2.75 rem, inert look at the cap (the input stays live so the cap toast fires) */
 .vgl-toggle{width:100%;min-height:2.75rem;margin-top:.25rem}
 .vgl-box{width:1.25rem;height:1.25rem}
 .vgl-toggle.is-disabled{opacity:.55}
-
-/* ---- (i): 1.125 rem glyph in a 2.75 rem target; the hint is a real node (toggletip, aria-describedby) ---- */
-.vgl-i{width:1.5rem;height:1.5rem;margin-left:.25rem;cursor:pointer;overflow:visible}
-.vgl-i::before{content:'';position:absolute;inset:-.625rem}
-.vgl-i::after{content:none}
-.vgl-i svg{width:1.125rem;height:1.125rem}
-.vgl-i.is-open{color:var(--teal,#015253)}
-.vgl-tip{position:absolute;left:0;top:calc(100% + .625rem);z-index:20;width:17rem;padding:.625rem .75rem;border-radius:var(--r-m,.25rem);background:var(--schwarz,#1A171B);color:var(--white,#fff);font-family:inherit;font-size:.8125rem;font-weight:400;line-height:1.45;text-align:left;white-space:normal;box-shadow:var(--shadow-lg,0 .75rem 2rem rgba(0,0,0,.12));opacity:0;visibility:hidden;transform:translateY(-.1875rem);transition:opacity .14s,transform .14s;pointer-events:none}
-.vgl-i:hover .vgl-tip,.vgl-i:focus-visible .vgl-tip,.vgl-i.is-open .vgl-tip{opacity:1;visibility:visible;transform:none}
-table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}       /* the tip paints above the next sticky label cell */
-
-/* ---- summary strip: verdict as heading, chips in the PLP chip grammar ---- */
-.vgl-sum__txt{margin:0;font-weight:400}
-.vgl-sum__txt b{font-weight:700}
-.vgl-chip{position:relative;flex-shrink:0;height:2rem;padding:0 .75rem;border-radius:var(--r-pill,9999px);background:var(--teal-5,rgba(1,82,83,.05));border:.0625rem solid rgba(1,82,83,.18);color:var(--teal,#015253);font-size:var(--text-body-sm,.875rem);font-weight:600}
-.vgl-chip::before{content:'';position:absolute;inset:-.375rem}                     /* 2.75 rem target around the 2 rem pill */
-.vgl-chip:hover{background:var(--teal-10,rgba(1,82,83,.1));color:var(--teal,#015253);border-color:var(--teal,#015253)}
-.vgl-chip--more{background:transparent;border-style:dashed;color:var(--text-muted,#6A6A6A);cursor:pointer}
-.vgl-chip--more:hover{background:transparent;color:var(--teal,#015253)}
-.vgl-guard--warn{background:var(--graphite-100,#F0F0F0);color:var(--schwarz,#1A171B)}   /* inside the palette: a warning can be quiet */
-.vgl-guard--warn svg{color:var(--schwarz,#1A171B)}
-
-/* ---- sticky product header: media · name · qualifier · price · CTA (highlights moved into the body) ---- */
-table.vgl-t thead th.vgl-ph{padding:1rem 1.125rem 4.25rem}
-.vgl-ph__media{height:7rem;margin-bottom:.625rem}
-.vgl-ph__name{height:auto;min-height:2.6em;-webkit-line-clamp:3;margin-bottom:.125rem}
-.vgl-ph__dx{display:block;font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--teal,#015253)}   /* what tells twins apart, lifted into the name */
-.vgl-ph__sub{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:clip;margin-bottom:.5rem}
-.vgl-ph__price{margin-bottom:.5rem}
-.vgl-ph__price small{min-height:0}
-.vgl-ph .btn{left:1.125rem;right:1.125rem;bottom:1.125rem;height:2.375rem}
-.vgl-view.is-twin .vgl-ph__media{height:9.5rem}
-.vgl-view.lens-briefkasten .vgl-ph__media{height:9rem}
-.vgl-view.lens-briefkasten.is-twin .vgl-ph__media{height:11rem}
-/* "Auf einen Blick" row group */
-tr.vgl-glance td.vgl-val{background:var(--white,#fff)}
-tr.vgl-glance .rh__l{font-weight:400;color:var(--text-muted,#6A6A6A)}
-.vgl-ph__hl{padding:0;border-top:0;gap:.375rem}
-.vgl-ph__hl li{display:block;overflow:visible;overflow-wrap:anywhere;-webkit-line-clamp:unset}
-.vgl-hl__k{margin-right:0}
-/* add column: narrow, the tile matches the image box, body cells untinted */
-table.vgl-t col.pc--add{width:8.5rem}
-.vgl-ph--add .vgl-add{position:static;width:100%;height:7rem;min-height:0;padding:.75rem .5rem;gap:.25rem}
-.vgl-view.is-twin .vgl-ph--add .vgl-add{height:9.5rem}
-.vgl-view.lens-briefkasten .vgl-ph--add .vgl-add{height:9rem}
-.vgl-view.lens-briefkasten.is-twin .vgl-ph--add .vgl-add{height:11rem}
-.vgl-add svg{width:1.375rem;height:1.375rem;margin-bottom:0}
-.vgl-add b{font-size:var(--text-caption,.75rem);text-align:center}
-.vgl-add small{font-size:.6875rem}
-.vgl-add__mkl{display:inline-flex;align-items:center;gap:.375rem;margin-top:.5rem;min-height:2.75rem;padding:0 .25rem;border:0;background:none;color:var(--teal,#015253);font-family:inherit;font-size:var(--text-caption,.75rem);font-weight:600;line-height:1.3;text-align:left;text-decoration:underline;cursor:pointer}
-.vgl-add__mkl svg{width:1rem;height:1rem;flex-shrink:0}
-td.vgl-addcell{background:transparent}
-tr.vgl-group td.vgl-addcell{background:var(--teal-100,#E6EEEE)}
-table.vgl-t tbody tr:not(.vgl-group):hover td.vgl-addcell{background:transparent}
-
-/* ---- values: AA text contrast, PLP swatch grammar ---- */
-.vgl-yes{color:var(--schwarz,#1A171B)}
-.vgl-yes svg{color:var(--green,#009951)}
-.vgl-best{background:var(--teal-100,#E6EEEE);color:var(--teal,#015253)}
-.vgl-sw{gap:.375rem}
-.vgl-sw span{width:1.375rem;height:1.375rem;border-radius:var(--r-m,.25rem);border:0;box-shadow:inset 0 0 0 .0625rem rgba(0,0,0,.14)}
-
-/* ---- overlay bar: heading, way back to the Merkliste, one link treatment ---- */
-.vgl-view__title{margin:0;outline-offset:.25rem}
-.vgl-back{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;padding:0 .5rem;border:0;background:none;color:var(--teal,#015253);font-family:inherit;font-size:.8125rem;font-weight:600;cursor:pointer}
-.vgl-back[hidden]{display:none}
-.vgl-back svg{width:1.125rem;height:1.125rem}
-.vgl-common__h{display:inline;margin:0;font-size:inherit;font-weight:inherit;color:inherit}
-.vgl-common .cnt{margin-left:.5rem}
-.vgl-empty__act{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1.25rem}
-.vgl-empty__act .vgl-more{align-self:auto}
 
 /* ---- toasts: inside the overlay they sit at the bottom edge; an action makes them interactive ---- */
 .vgl-toast.in-view{bottom:1.5rem}
@@ -471,42 +159,19 @@ table.vgl-t tbody tr:not(.vgl-group):hover td.vgl-addcell{background:transparent
 /* the demo tour never competes with a running comparison */
 body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 
-/* ---- mobile ---- */
+/* ---- mobile (page level) ---- */
 .vgl-m-only{display:none}
 @media(max-width:47.99rem){
   .vgl-m-hide{display:none}
   .vgl-m-only{display:inline}
-  .vgl-link--ic{display:none}                                   /* no print on phones (base rule, re-stated after the .vgl-link override) */
-  .vgl-view__bar-in{gap:0 .75rem}
   .vgl-tray__inner{flex-wrap:wrap;gap:.5rem .75rem;padding:.625rem 1rem}
   .vgl-tray__status{flex:1 1 0;min-width:0}
   .vgl-tray__hint{display:inline-flex;font-size:.6875rem;line-height:1.25}
   .vgl-tray__hint svg{display:none}
-  tr.vgl-glance .vgl-ph__hl li:nth-child(n+3){display:none}   /* two bullets per column on phones */
   .vgl-tray__actions{flex:0 0 auto;gap:.25rem}
   .vgl-tray__cta{height:2.75rem;padding:0 1rem}
   .vgl-tray__slots{order:3;flex:1 1 100%;gap:.5rem}
   .vgl-slot{width:2.75rem;height:2.75rem}
-  .vgl-sum__chips{width:auto;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-.75rem;padding:.375rem .75rem;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 1.625rem),transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 1.625rem),transparent 100%)}
-  .vgl-sum__chips::-webkit-scrollbar{display:none}
-  .vgl-sum__chips::before{flex-shrink:0}
-  .vgl-ph__media,.vgl-view.is-twin .vgl-ph__media,.vgl-view.lens-briefkasten .vgl-ph__media,.vgl-view.lens-briefkasten.is-twin .vgl-ph__media{height:5.25rem}
-  .vgl-ph--add .vgl-add,.vgl-view.is-twin .vgl-ph--add .vgl-add,.vgl-view.lens-briefkasten .vgl-ph--add .vgl-add,.vgl-view.lens-briefkasten.is-twin .vgl-ph--add .vgl-add{height:5.25rem}
-  table.vgl-t col.pc--add{width:6rem}
-  table.vgl-t thead th.vgl-ph{padding:.75rem .75rem 3.5rem}
-  .vgl-ph .btn{height:2.25rem;left:.75rem;right:.75rem;bottom:.75rem}
-  .vgl-ph__name{min-height:0}
-  .vgl-close{width:2.75rem;height:2.75rem}
-  table.vgl-t tbody .rh{font-size:.8125rem}
-  .vgl-tip{width:14rem}
-  .vgl-back span{display:none}
-}
-
-/* ---- reduced motion: no slide, fade, flash or pulse in the compare layer ---- */
-@media(prefers-reduced-motion:reduce){
-  .vgl-tray,.vgl-view,.vgl-toast,.vgl-coach,.vgl-scrim,.vgl-chip,.vgl-add,.vgl-more svg,.vgl-switch,.vgl-switch::after,.vgl-box,.vgl-box svg,.vgl-toggle,.vgl-tip,.vgl-bar-btn,.vgl-tray__cta,.vgl-ph__rm,.vgl-alt__add,.vgl-coach__prog,.vgl-cancel,tr.is-flash td.vgl-val,.vgl-spot,.vgl-link--share{transition:none !important;animation:none !important}
-  tr.is-flash td.vgl-val{background:var(--teal-100,#E6EEEE)}
-  .vgl-spot{box-shadow:0 0 0 .375rem rgba(92,219,211,.35)}
 }
 
 /* ============================================================
@@ -529,9 +194,6 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 .vgl-sharepop label{grid-column:1 / -1;font-size:var(--text-body-sm,.875rem);font-weight:600;color:var(--schwarz,#1A171B)}
 .vgl-sharepop input{height:2.75rem;min-width:0;padding:0 var(--sp-3,.75rem);border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-m,.25rem);font-family:inherit;font-size:var(--text-body-sm,.875rem);color:var(--schwarz,#1A171B);background:var(--white,#fff)}
 .vgl-sharepop input:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
-
-/* P0-10: the column CTA is a real link where a product page exists */
-.vgl-ph a.btn{text-decoration:none}
 
 /* P0-9: add a model by search — popover on desktop, bottom sheet on phones */
 .vgl-addsearch{position:fixed;z-index:30;width:20rem;max-height:min(30rem,calc(100vh - 2rem));display:flex;flex-direction:column;gap:var(--sp-3,.75rem);padding:var(--sp-4,1rem);background:var(--white,#fff);border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-l,.5rem);box-shadow:var(--shadow-lg,0 .75rem 2rem rgba(0,0,0,.12));text-align:left}
@@ -561,39 +223,6 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 .vgl-addsearch__foot .vgl-link{padding:0;color:var(--teal,#015253);font-size:var(--text-body-sm,.875rem);font-weight:600}
 .vgl-addsearch.is-sheet{left:0;right:0;bottom:0;top:auto;width:auto;max-height:70vh;border-radius:var(--r-xl,.75rem) var(--r-xl,.75rem) 0 0;border-width:.0625rem 0 0;padding:var(--sp-4,1rem) var(--sp-4,1rem) calc(var(--sp-4,1rem) + env(safe-area-inset-bottom,0px))}
 .vgl-addsearch__scrim{position:fixed;inset:0;z-index:29;background:var(--white-50,rgba(255,255,255,.5))}
-
-/* P0-8: phones — two full product columns, the third cut off as a swipe cue */
-@media(max-width:47.99rem){
-  .vgl-view__scroll-in{padding-inline:.75rem}
-  table.vgl-t col.rl{width:5.5rem}
-  table.vgl-t col.pc{width:calc((100vw - 8rem) / 2)}          /* .75 rem gutter + 5.5 rem labels + 1.75 rem of the 3rd column */
-  .vgl-view__bar-in{gap:0 .5rem}                               /* switch · Teilen · Leeren stay on one second row at 375 px */
-  .vgl-view__bar-in .vgl-link{padding-inline:.25rem}
-  .vgl-link--share{gap:.375rem}
-  table.vgl-t col.pc--add{width:6rem}
-  table.vgl-t th,table.vgl-t td{padding:.5rem .5rem}
-  table.vgl-t tbody .rh{font-size:.75rem;line-height:1.3;hyphens:auto;overflow-wrap:anywhere}
-  table.vgl-t thead th.vgl-ph{padding:.5rem .5rem 3.25rem}
-  .vgl-ph__name{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .vgl-ph__price{font-size:var(--text-body-sm,.875rem)}
-  .vgl-ph .btn{left:.5rem;right:.5rem;bottom:.5rem;font-size:.8125rem;padding:0 .5rem}
-  .vgl-view__scroll,.vgl-wrap{scroll-snap-type:x proximity;scroll-padding-inline-start:6.25rem}
-  table.vgl-t thead th.vgl-ph{scroll-snap-align:start}
-}
-
-/* ---- Print: the comparison only, expanded, no chrome ---- */
-@media print{   /* 09b P0-2: only while printView() runs (body.vgl-printing) — a plain PLP print shows the page */
-  body.vgl-printing>*:not(.vgl-view){display:none !important}
-  body.vgl-printing .vgl-view{position:static;opacity:1;visibility:visible;background:#fff}
-  body.vgl-printing .vgl-view__scroll{overflow:visible}
-  body.vgl-printing .vgl-view__bar{border-bottom:.125rem solid #000}
-  body.vgl-printing .vgl-diff,body.vgl-printing .vgl-link,body.vgl-printing .vgl-close,body.vgl-printing .vgl-ph__rm,body.vgl-printing .vgl-ph--add,body.vgl-printing .vgl-addcell,body.vgl-printing .vgl-more,body.vgl-printing .vgl-ph .btn,body.vgl-printing .vgl-sum__chips,body.vgl-printing .vgl-i,body.vgl-printing .vgl-vb,body.vgl-printing .vgl-back,body.vgl-printing .vgl-add__mkl,body.vgl-printing .vgl-empty__act,body.vgl-printing .vgl-toast,body.vgl-printing .vgl-addsearch,body.vgl-printing .vgl-sharepop{display:none !important}
-  body.vgl-printing .vgl-view__bar-in::after{content:attr(data-print);margin-left:auto;font-size:.8125rem;color:#333}
-  body.vgl-printing table.vgl-t thead th,body.vgl-printing table.vgl-t .rh{position:static;box-shadow:none}
-  body.vgl-printing .vgl-common{break-inside:avoid}
-  body.vgl-printing .vgl-common>summary::before{display:none}
-  body:not(.vgl-printing) .vgl-view,body:not(.vgl-printing) .vgl-tray,body:not(.vgl-printing) .vgl-toast,body:not(.vgl-printing) .vgl-tourfab{display:none !important}
-}
 
 /* ============================================================
    Hinweis / Alert — one anatomy for .vgl-toast and its twin in the other add-on (lead PD pass, 2026-11-02)
@@ -628,11 +257,6 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 /* alert: with left:50% the shrink-to-fit width was capped at half the viewport (one word per line on phones);
    size to the content, capped by the existing max-width */
 .vgl-toast{width:max-content}
-/* product header: pinned unless it would cover > 60 % of the scroll area (JS fitHeader → .is-unpinned:
-   landscape phones, 320 px, enlarged text); the label column stays frozen to the left */
-.vgl-view.is-unpinned table.vgl-t thead th{top:auto}
-/* desktop bar: wraps (JS → .is-barwrap, only when its row would overflow) instead of pushing "Schließen" off-screen with enlarged text */
-@media(min-width:48rem){.vgl-view.is-barwrap .vgl-view__bar-in{height:auto;min-height:3.75rem;padding-block:.5rem;flex-wrap:wrap;row-gap:.375rem}}
 /* toolbar on phones: the control group wraps instead of overflowing at 320 px / enlarged text; left edge aligned with "Filter" */
 @media(max-width:47.99rem){
   .vgl-barwrap{margin-left:0;flex-wrap:wrap;max-width:100%;row-gap:.5rem}
@@ -643,19 +267,319 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 @media(max-width:22.49rem){
   .vgl-tray__status{flex:1 1 100%}
   .vgl-tray__actions{margin-left:auto}
-  .vgl-ph__rm{right:-.5rem}
 }
-/* touch: header CTA (2.25–2.375rem) gets a 2.75rem hit area without changing its size */
-@media(pointer:coarse){.vgl-ph .btn::after{content:'';position:absolute;inset:-.25rem 0}}
 
-/* ==== 13 · Icon hover = design system (2026-11-02) — see merkliste.css §13 ==== */
-.vgl-close,.vgl-ph__rm,.vgl-addsearch__x{background:transparent;transition:background-color .14s}
-.vgl-close:hover,.vgl-ph__rm:hover,.vgl-addsearch__x:hover{background:var(--paper-white,#F5F6FA);border-color:transparent}
-.vgl-close:hover{color:var(--schwarz,#1A171B)}
-.vgl-ph__rm:hover,.vgl-addsearch__x:hover{color:var(--text-muted,#6A6A6A)}
+.vgl-slot__rm:hover{background:var(--v-ink)}   /* §15: icon without hover change */
 
-/* ==== 15 · No hover effect on icons (2026-11-05, user decision — supersedes §13, see merkliste.css §15) ==== */
+/* =====================================================================
+   12 · Vergleich-Redesign (12a UX / 12b UI, 05.11.2026) — the comparison overlay, rebuilt.
+   Order: bar → Fazit → [Bildleiste < 48 rem] → table (ONE sticky identity row, U / O / G) → Alternativen → source.
+   One scroll container, no horizontal scrolling at any width (column picker below 64 rem),
+   the sticky row has one height per comparison (computed from all models, never changed on scroll).
+   Tokens: aliases of the PLP / design-system tokens (one definition block below); everything else rem only.
+   ===================================================================== */
+:root{
+  --v-teal:var(--teal,#015253);--v-teal-600:var(--teal-600,#014A4B);--v-teal-100:var(--teal-100,#E6EEEE);--v-teal-5:var(--teal-5,rgba(1,82,83,.05));
+  --v-ink:var(--schwarz,#1A171B);--v-muted:var(--text-muted,#6A6A6A);--v-white:var(--white,#FFFFFF);--v-paper:var(--paper-white,#F5F6FA);
+  --v-g100:var(--graphite-100,#F0F0F0);--v-g200:var(--graphite-200,#E6E6E8);--v-g300:var(--graphite-300,#DADADA);--v-green:var(--green,#009951);
+  --v-fs-h3:var(--text-h3,1.25rem);--v-fs-h4:var(--text-h4,1.125rem);--v-fs-body:var(--text-body,1rem);--v-fs-sm:var(--text-body-sm,.875rem);--v-fs-cap:var(--text-caption,.75rem);
+  --v-r-m:.25rem;--v-r-l:.5rem;--v-r-xl:.75rem;--v-r-pill:624.94rem;
+  --v-shadow-card:var(--shadow-card,0 .125rem .5rem rgba(0,0,0,.08));--v-shadow-hover:var(--shadow-hover,0 .25rem 1.25rem rgba(0,0,0,.1));--v-shadow-tip:var(--shadow-tooltip,0 .25rem 1rem rgba(0,0,0,.15));   /* DS metzler-tokens.css */
+  --v-container:100rem;--v-pad:clamp(1.5rem,4vw,3.5rem);
+}
+
+/* ---- shell ---- */
+.vgl-view{position:fixed;inset:0;z-index:900;display:flex;flex-direction:column;background:var(--v-paper);color:var(--v-ink);opacity:0;visibility:hidden;transition:opacity .2s}
+.vgl-view.is-open{opacity:1;visibility:visible}
+.vgl-view [hidden]{display:none !important}
+.vgl-view h3.vgl-visually-hidden{font-size:var(--v-fs-sm)}
+.vgl-view :is(button,a,input,[tabindex]):focus-visible{outline:.1875rem solid var(--v-teal);outline-offset:.125rem}
+.vgl-view__scroll{flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+.vgl-view__scroll-in{max-width:var(--v-container);margin:0 auto;padding:0 var(--v-pad) 2rem}
+
+/* ---- bar (3.75 rem, fixed): back · title · switch · text actions · close ---- */
+.vgl-view__bar{flex-shrink:0;background:var(--v-white);border-bottom:.0625rem solid var(--v-g300)}
+.vgl-view__bar-in{position:relative;max-width:var(--v-container);height:3.75rem;margin:0 auto;padding:0 var(--v-pad);display:flex;align-items:center;gap:.75rem}
+.vgl-view__title{margin:0;font-size:var(--v-fs-h3);font-weight:700;line-height:1.35;color:var(--v-ink);white-space:nowrap;outline-offset:.25rem}
+.vgl-view__title span{font-size:var(--v-fs-body);font-weight:400;color:var(--v-muted)}
+.vgl-back{display:inline-flex;align-items:center;gap:.25rem;min-height:2.75rem;margin-left:-.5rem;padding:0 .5rem;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-teal);cursor:pointer}
+.vgl-back svg{width:1.125rem;height:1.125rem}
+.vgl-back:hover .vgl-back__l{text-decoration:underline;text-underline-offset:.1875rem}
+.vgl-diff{margin-left:auto;display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-ink);cursor:pointer;user-select:none;white-space:nowrap}
+.vgl-diff__n{font-weight:400;color:var(--v-muted)}
+.vgl-diff input{position:absolute;opacity:0;width:.0625rem;height:.0625rem}
+.vgl-switch{position:relative;flex-shrink:0;width:2.5rem;height:1.375rem;border-radius:var(--v-r-pill);background:var(--v-muted);transition:background .18s}
+.vgl-switch::after{content:'';position:absolute;top:.1875rem;left:.1875rem;width:1rem;height:1rem;border-radius:50%;background:var(--v-white);transition:transform .18s}
+.vgl-diff input:checked+.vgl-switch{background:var(--v-teal)}
+.vgl-diff input:checked+.vgl-switch::after{transform:translateX(1.125rem)}
+.vgl-diff input:focus-visible+.vgl-switch{outline:.1875rem solid var(--v-teal);outline-offset:.125rem}
+.vgl-bar__act{display:flex;align-items:center;gap:.25rem}
+.vgl-close{flex-shrink:0;width:2.75rem;height:2.75rem;margin-right:-.5rem;padding:0;border:0;border-radius:50%;background:transparent;color:var(--v-ink);display:flex;align-items:center;justify-content:center;cursor:pointer}
+/* text buttons (DS hover = underline; icons inside never change) */
+.vgl-tb{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;padding:0 .5rem;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.25;color:var(--v-ink);text-decoration:none;white-space:nowrap;cursor:pointer}
+.vgl-tb svg{flex:none;width:1.125rem;height:1.125rem}
+.vgl-tb--teal{color:var(--v-teal)}
+.vgl-tb:hover{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.vgl-tb.is-done{text-decoration:none}
+
+/* ---- Fazit: Satz 1 bold, Satz 2 regular; explanations right of it from 90 rem, behind "Was bedeutet das?" below ---- */
+.vgl-fz{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem 2rem;padding:.75rem 0}
+.vgl-fz__txt{margin:0;max-width:75rem;font-size:var(--v-fs-body);line-height:1.55;color:var(--v-ink)}
+.vgl-fz__s1{font-weight:700}
+.vgl-fz__more{position:relative;display:inline-flex;align-items:center;gap:.125rem;padding:0;border:0;background:none;font:inherit;font-weight:600;line-height:inherit;color:var(--v-teal);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem;white-space:nowrap;cursor:pointer}
+.vgl-fz__more::before{content:'';position:absolute;left:-.25rem;right:-.25rem;top:50%;height:2.75rem;transform:translateY(-50%)}   /* 2.75 rem hit area without a line of its own */
+.vgl-fz__more svg{flex:none;width:1rem;height:1rem;transition:transform .14s}
+.vgl-fz__more:hover{text-decoration-thickness:.125rem}
+.vgl-fz.is-ex .vgl-fz__more svg{transform:rotate(180deg)}
+.vgl-fz__note{display:flex;align-items:flex-start;gap:.5rem;margin:.5rem 0 0;font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-muted)}
+.vgl-fz__note svg{flex:none;width:1.125rem;height:1.125rem;margin-top:.125rem;color:var(--v-teal)}
+.vgl-fz__ex{display:none;align-self:start;padding:.5rem 0 .5rem 1rem;border-left:.1875rem solid var(--v-teal)}
+.vgl-fz.is-ex .vgl-fz__ex{display:block}
+.vgl-fz__exh{margin:0 0 .25rem;font-size:var(--v-fs-cap);font-weight:700;line-height:1.4;letter-spacing:.15em;text-transform:uppercase;color:var(--v-muted)}
+.vgl-fz__ex ul{list-style:none;margin:0;padding:0;display:grid;gap:.25rem}
+.vgl-fz__ex li{font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-ink)}
+@media(min-width:90rem){
+  .vgl-fz.has-ex{grid-template-columns:minmax(0,1fr) 24rem}
+  .vgl-fz__ex{display:block}
+  .vgl-fz__more{display:none}
+}
+
+/* ---- table card ---- */
+.vgl-wrap{background:var(--v-white);border:.0625rem solid var(--v-g200);border-radius:var(--v-r-l);box-shadow:var(--v-shadow-card)}
+table.vgl-t{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+table.vgl-t col.rl{width:15rem}
+table.vgl-t th,table.vgl-t td{padding:.75rem 1rem;border-bottom:.0625rem solid var(--v-g100);text-align:left;vertical-align:top;font-size:var(--v-fs-sm);font-weight:400;line-height:1.5;color:var(--v-ink);hyphens:manual;overflow-wrap:break-word}
+table.vgl-t tbody:last-child tr:last-child>*{border-bottom:0}
+/* the identity row: sticky, white, one hairline */
+table.vgl-t thead th{position:sticky;top:0;z-index:3;padding:.75rem;background:var(--v-white);border-bottom:.0625rem solid var(--v-g200);box-shadow:0 .0625rem 0 var(--v-g200)}
+table.vgl-t thead th:first-child{border-top-left-radius:var(--v-r-l)}
+table.vgl-t thead th:last-child{border-top-right-radius:var(--v-r-l)}
+.vgl-view.is-unpinned table.vgl-t thead,.vgl-view.is-unpinned table.vgl-t thead th{position:static}
+/* label column head: add a model / "4 von 4" */
+.vgl-lh{padding-left:1rem}
+.vgl-addbtn{position:relative;display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;padding:0;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.25;color:var(--v-teal);text-align:left;cursor:pointer}
+.vgl-addbtn svg{flex:none;width:1.125rem;height:1.125rem}
+.vgl-addbtn:hover{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.vgl-lh__n{display:block;margin:-.5rem 0 .25rem 1.5rem;font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
+.vgl-lh__full{margin:0;font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
+.vgl-lh__full b{display:block;margin-bottom:.125rem;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-ink)}
+
+/* ---- product head cell: L (photo left) · M (title, thumbnail + price, actions) · phone (text only) ---- */
+.vgl-ph__in{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"title" "money" "act";row-gap:.25rem;min-height:var(--vgl-ph-h,0)}
+.vgl-ph__media{grid-area:media;position:relative;display:flex;align-items:center;justify-content:center;background:var(--v-white);border:.0625rem solid var(--v-g200);border-radius:var(--v-r-l)}
+.vgl-ph__media img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
+table.vgl-t{--vgl-img:10rem}
+table.vgl-t.vgl-t--n4{--vgl-img:7.5rem}
+.vgl-t.is-L .vgl-ph__in{grid-template-columns:var(--vgl-img) minmax(0,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"media title" "media money" "media act";column-gap:1rem}
+.vgl-t.is-L .vgl-ph__media{width:var(--vgl-img);height:var(--vgl-img);padding:.5rem}
+.vgl-t.is-L .vgl-ph__act{align-self:end}
+/* 4 columns side by side (≥ 90 rem): the actions take the full cell width under photo and text */
+.vgl-t--n4.is-L .vgl-ph__in{column-gap:.75rem;grid-template-rows:auto auto 1fr auto;grid-template-areas:"media title" "media money" "media ." "act act"}
+.vgl-t--n4.is-L .vgl-ph__price{font-size:var(--v-fs-sm)}
+.vgl-t.is-M .vgl-ph__in{grid-template-columns:3.5rem minmax(0,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"title title" "media money" "act act";column-gap:.75rem;row-gap:.5rem}
+.vgl-t.is-M .vgl-ph__media{width:3.5rem;height:3.5rem;padding:.25rem}
+.vgl-t:not(.is-L):not(.is-M) thead .vgl-ph__media{display:none}
+.vgl-ph__title,.vgl-ph__pick{grid-area:title;min-width:0}
+.vgl-ph__t{display:block;font-size:var(--v-fs-body);font-weight:700;line-height:1.375;color:var(--v-ink)}
+.vgl-ph__seg{font-weight:700}
+@media(min-width:90rem){table.vgl-t--n2 .vgl-ph__t,table.vgl-t--n3 .vgl-ph__t{font-size:var(--v-fs-h4)}}
+.vgl-ph__money{grid-area:money;display:flex;flex-direction:column;min-width:0}
+.vgl-ph__price{font-size:var(--v-fs-body);font-weight:700;line-height:1.375;color:var(--v-ink);white-space:nowrap}
+.vgl-ph__delta{font-size:var(--v-fs-sm);font-weight:600;line-height:1.375;color:var(--v-ink);white-space:nowrap}
+.vgl-ph__uvp{font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted);white-space:nowrap}
+.vgl-ph__uvp s{text-decoration-thickness:.0625rem}
+.vgl-t.is-M .vgl-ph__price,.vgl-t.is-M .vgl-cta{font-size:var(--v-fs-sm)}
+.vgl-t.is-M .vgl-cta svg{width:1rem;height:1rem}
+.vgl-t.is-M .vgl-ph__rm{margin-left:-.375rem}
+/* actions: the CTA is a DS text link — teal, bold, underlined, chevron — the strongest control of the column; × is a bare icon */
+.vgl-ph__act{grid-area:act;align-self:end;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0;min-height:1.75rem;margin-top:.25rem}
+.vgl-cta{position:relative;display:inline-flex;align-items:center;gap:.125rem;padding:0;border:0;background:none;font-family:inherit;font-size:var(--v-fs-body);font-weight:700;line-height:1.375;color:var(--v-teal);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem;white-space:nowrap;cursor:pointer}
+.vgl-cta::before{content:'';position:absolute;left:-.25rem;right:-.25rem;top:50%;height:2.75rem;transform:translateY(-50%)}   /* 2.75 rem hit area */
+.vgl-cta svg{flex:none;width:1.125rem;height:1.125rem;transition:transform .14s}
+.vgl-cta:hover{color:var(--v-teal);text-decoration-thickness:.125rem}
+.vgl-cta:hover svg{transform:translateX(.125rem)}
+.vgl-ph__rm{position:relative;flex:none;width:2.75rem;height:1.75rem;margin-right:-.75rem;padding:0;border:0;background:transparent;color:var(--v-muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.vgl-ph__rm::before{content:'';position:absolute;left:0;right:0;top:50%;height:2.75rem;transform:translateY(-50%)}
+.vgl-ph__rm svg{width:1.125rem;height:1.125rem}
+/* Spaltenwahl: the title is the picker (text button; the ▾ never changes on hover) */
+.vgl-ph__pick{position:relative;display:flex;align-items:flex-start;gap:.25rem;width:100%;padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.vgl-ph__pick::before{content:'';position:absolute;left:0;right:0;top:50%;height:max(100%,2.75rem);transform:translateY(-50%)}
+.vgl-ph__pick svg{flex:none;width:1.125rem;height:1.125rem;margin-top:.125rem;color:var(--v-teal)}
+.vgl-pill{position:absolute;right:.25rem;bottom:.25rem;padding:0 .375rem;border-radius:var(--v-r-pill);background:var(--v-white);box-shadow:inset 0 0 0 .0625rem var(--v-g300);font-size:var(--v-fs-cap);font-weight:600;line-height:1.4;color:var(--v-ink)}
+/* Merken (merkliste.js injects .mkl-mark--ov into .vgl-ph__media): on the 3.5 rem thumbnail a small white badge so the glyph stays visible on dark photos — static, identical on hover */
+.vgl-t.is-M .mkl-mark--ov{top:-.625rem;left:-.625rem}
+.vgl-t.is-M .mkl-mark--ov .mkl-mark__disc,.vgl-t.is-M .mkl-mark--ov:hover .mkl-mark__disc,.vgl-t.is-M .mkl-mark--ov:not(.is-limit):hover .mkl-mark__disc{width:1.5rem;height:1.5rem;border-radius:var(--v-r-m);background:var(--v-white);box-shadow:inset 0 0 0 .0625rem var(--v-g300)}
+.vgl-t.is-M .mkl-mark--ov svg{width:1rem;height:1rem}
+/* invisible measuring row (lockHead) */
+table.vgl-t--measure{position:absolute;left:0;top:0;visibility:hidden;pointer-events:none}
+
+/* ---- sections U / O / G ---- */
+tr.vgl-sec__h th{padding:.5625rem 1rem;background:var(--v-paper);border-bottom:.0625rem solid var(--v-g200);line-height:1.125rem}
+.vgl-sec--u tr.vgl-sec__h th{background:var(--v-teal-100)}
+.vgl-sec__in{display:flex;flex-wrap:wrap;align-items:center;gap:0 .5rem}
+.vgl-sec__t{font-weight:700;color:var(--v-ink)}
+.vgl-sec--u .vgl-sec__t{color:var(--v-teal)}
+.vgl-sec__n{font-weight:400;color:var(--v-muted)}
+.vgl-sec--u .vgl-sec__n{color:var(--v-teal)}
+.vgl-sec__sub{color:var(--v-muted)}
+.vgl-sec--o .vgl-sec__sub{flex:1 1 100%;font-size:var(--v-fs-cap);line-height:1.4}
+.vgl-sec__btn{position:relative;display:inline-flex;align-items:center;gap:.125rem;margin-left:auto;padding:0;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.125rem;color:var(--v-teal);cursor:pointer}
+.vgl-sec__btn::before{content:'';position:absolute;left:-.5rem;right:-.5rem;top:50%;height:2.75rem;transform:translateY(-50%)}
+.vgl-sec__btn svg{flex:none;width:1.125rem;height:1.125rem;transition:transform .14s}
+.vgl-sec__btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.vgl-sec__btn:hover span{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.vgl-sec__empty{color:var(--v-muted)}
+/* rows */
+table.vgl-t .rh{font-weight:600;color:var(--v-ink)}
+.rh__l{vertical-align:middle}
+.vgl-rowcap{display:block;margin-top:.125rem;font-size:var(--v-fs-cap);font-weight:400;line-height:1.4;color:var(--v-muted)}
+td.vgl-val.na{color:var(--v-muted)}
+.vgl-yes{display:inline-flex;align-items:center;gap:.375rem}
+.vgl-yes svg{width:1rem;height:1rem;color:var(--v-green)}
+.vgl-no{color:var(--v-muted)}
+.vgl-best{display:inline-block;margin-left:.25rem;padding:0 .5rem;border-radius:var(--v-r-pill);background:var(--v-teal-100);font-size:var(--v-fs-cap);font-weight:700;line-height:1.4;color:var(--v-teal);vertical-align:baseline}
+td.vgl-val.is-best{font-weight:700}
+.vgl-sw{display:inline-flex;flex-wrap:wrap;gap:.375rem;vertical-align:middle}
+.vgl-sw span{width:1.375rem;height:1.375rem;border-radius:var(--v-r-m);box-shadow:inset 0 0 0 .0625rem var(--v-g300)}
+.vgl-swc{display:block;margin-top:.25rem;font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
+.vgl-setl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.125rem}
+.vgl-setl li{position:relative;padding-left:.75rem}
+.vgl-setl li::before{content:'';position:absolute;left:0;top:.6em;width:.3125rem;height:.3125rem;border-radius:50%;background:var(--v-teal)}
+/* (i) toggletip: 1.125 rem glyph in a 2.75 rem target */
+.vgl-i{position:relative;display:inline-flex;align-items:center;justify-content:center;width:1.5rem;height:1.5rem;margin-left:.25rem;padding:0;border:0;border-radius:50%;background:transparent;color:var(--v-muted);cursor:pointer;vertical-align:middle}
+.vgl-i::before{content:'';position:absolute;inset:-.625rem}
+.vgl-i svg{width:1.125rem;height:1.125rem}
+.vgl-i.is-open{color:var(--v-teal)}
+.vgl-tip{position:absolute;left:0;top:calc(100% + .625rem);z-index:20;width:17rem;padding:.625rem .75rem;border-radius:var(--v-r-m);background:var(--v-ink);color:var(--v-white);font-family:inherit;font-size:var(--v-fs-sm);font-weight:400;line-height:1.45;text-align:left;white-space:normal;box-shadow:var(--v-shadow-tip);opacity:0;visibility:hidden;transform:translateY(-.1875rem);transition:opacity .14s,transform .14s;pointer-events:none}
+.vgl-i:hover .vgl-tip,.vgl-i:focus-visible .vgl-tip,.vgl-i.is-open .vgl-tip{opacity:1;visibility:visible;transform:none}
+table.vgl-t tbody .rh{position:relative}
+table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
+
+/* ---- after the table ---- */
+.vgl-alts{margin-top:1.5rem}
+.vgl-alts__h{margin:0 0 .75rem;font-size:var(--v-fs-body);font-weight:700;line-height:1.375;color:var(--v-ink)}
+.vgl-alts__list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.75rem}
+.vgl-alt{display:flex;gap:.75rem;padding:.75rem;background:var(--v-white);border:.0625rem solid var(--v-g200);border-radius:var(--v-r-l)}
+.vgl-alt__media{flex:0 0 4rem;height:4rem;display:flex;align-items:center;justify-content:center;padding:.25rem;border:.0625rem solid var(--v-g200);border-radius:var(--v-r-m)}
+.vgl-alt__media img{max-width:100%;max-height:100%;object-fit:contain}
+.vgl-alt__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:.25rem}
+.vgl-alt__name{font-size:var(--v-fs-sm);font-weight:700;line-height:1.375}
+.vgl-alt__why{display:flex;flex-wrap:wrap;gap:0 .75rem;font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-ink)}
+.vgl-alt__why em{font-style:normal;color:var(--v-muted)}
+.vgl-alt__foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.25rem .5rem;margin-top:auto;font-size:var(--v-fs-sm)}
+.vgl-alt__foot b{white-space:nowrap}
+.vgl-alt__add{white-space:nowrap;display:inline-flex;align-items:center;gap:.25rem;min-height:2.75rem;padding:0 .75rem;border:.0625rem solid var(--v-teal);border-radius:var(--v-r-m);background:var(--v-white);font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-teal);cursor:pointer}
+.vgl-alt__add svg{width:1rem;height:1rem}
+.vgl-alt__add:hover:not([disabled]){background:var(--v-teal-100)}
+.vgl-alt__add[disabled]{border-color:var(--v-g300);color:var(--v-muted);cursor:not-allowed}
+.vgl-src{margin-top:1rem}
+.vgl-src p{margin:0;font-size:var(--v-fs-cap);line-height:1.5;color:var(--v-muted)}
+.vgl-actrow{display:none}
+.vgl-strip{display:none}
+/* empty state (< 2 models) */
+.vgl-empty{max-width:34rem;margin:0 auto;padding:4rem 1rem;text-align:center;color:var(--v-muted)}
+.vgl-empty svg{display:block;width:2.75rem;height:2.75rem;margin:0 auto .875rem;color:var(--v-g300)}
+.vgl-empty b{display:block;margin-bottom:.375rem;font-size:var(--v-fs-h4);color:var(--v-ink)}
+.vgl-empty span{font-size:var(--v-fs-sm);line-height:1.5}
+.vgl-empty__act{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1.25rem}
+.vgl-more{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 1rem;border:.0625rem solid var(--v-g300);border-radius:var(--v-r-m);background:var(--v-white);font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1;color:var(--v-teal);cursor:pointer}
+.vgl-more svg{width:1rem;height:1rem}
+.vgl-more:hover{border-color:var(--v-teal);background:var(--v-teal-5)}
+
+/* ---- column picker (Spaltenwahl): popover from 48 rem, bottom sheet below ---- */
+.vgl-pick{position:fixed;z-index:30;width:20rem;max-height:min(30rem,calc(100vh - 2rem));display:flex;flex-direction:column;gap:.5rem;padding:1rem;background:var(--v-white);border:.0625rem solid var(--v-g300);border-radius:var(--v-r-l);box-shadow:var(--v-shadow-hover);text-align:left}
+.vgl-pick.is-sheet{left:0;right:0;bottom:0;top:auto;width:auto;max-height:70vh;border-width:.0625rem 0 0;border-radius:var(--v-r-xl) var(--v-r-xl) 0 0;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0rem))}
+.vgl-pick__head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin:-.5rem -.5rem 0 0}
+.vgl-pick__h{margin:0;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-ink)}
+.vgl-pick__list{list-style:none;margin:0;padding:.125rem;overflow-y:auto;min-height:0}
+.vgl-pick__list:focus-visible{outline:.1875rem solid var(--v-teal);outline-offset:.125rem;border-radius:var(--v-r-m)}
+.vgl-pickopt{display:grid;grid-template-columns:2.5rem minmax(0,1fr);align-items:center;gap:.75rem;min-height:3.25rem;padding:.25rem .5rem;border-radius:var(--v-r-m);cursor:pointer}
+.vgl-pickopt.is-active{outline:.125rem solid var(--v-teal);outline-offset:-.125rem;background:var(--v-teal-5)}
+.vgl-pickopt__t{display:flex;flex-direction:column;min-width:0}
+.vgl-pickopt__t b{font-size:var(--v-fs-sm);font-weight:600;line-height:1.3;color:var(--v-ink)}
+.vgl-pickopt__p{font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-ink)}
+.vgl-pickopt__w{font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
+.vgl-pickopt[aria-selected="true"] .vgl-pickopt__w{font-weight:600;color:var(--v-teal)}
+
+/* ---- toasts in the comparison: bottom centre, wrap, never cut off; pause on hover/focus (JS) ---- */
+.vgl-toast{max-width:min(36rem,calc(100vw - 2rem));white-space:normal;visibility:hidden}
+.vgl-toast.show{visibility:visible;transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),visibility 0s}   /* visible at once, hidden only after the fade (its action is not focusable while hidden) */
+
+/* ---- widths ---- */
+@media(max-width:89.99rem){
+  table.vgl-t col.rl{width:12rem}
+  table.vgl-t,table.vgl-t.vgl-t--n4{--vgl-img:7rem}
+}
+@media(max-width:63.99rem){
+  table.vgl-t col.rl{width:11rem}
+  table.vgl-t,table.vgl-t.vgl-t--n4{--vgl-img:6rem}
+}
+@media(max-width:47.99rem){
+  /* bar 3.5 rem: [back] · title · switch · ×; link/print/clear move to the action row */
+  .vgl-view__bar-in{height:3.5rem;padding:0 1rem;gap:.5rem}
+  .vgl-view__title{font-size:var(--v-fs-body)}
+  .vgl-view__title span{font-size:var(--v-fs-sm)}
+  .vgl-back{margin-left:-.75rem;padding:0;width:2.75rem;justify-content:center}
+  .vgl-back__l{display:none}
+  .vgl-bar__act{display:none}
+  .vgl-view__scroll-in{padding:0 1rem 1.5rem}
+  .vgl-fz{padding:.5rem 0}
+  .vgl-fz__txt{font-size:var(--v-fs-sm);line-height:1.5}
+  /* Bildleiste (scrolls away) */
+  .vgl-strip{display:grid;grid-template-columns:repeat(var(--vgl-n),minmax(0,1fr));gap:.5rem;margin-bottom:.5rem}
+  .vgl-strip .vgl-ph__media{grid-area:auto;height:4.25rem;padding:.25rem}
+  /* the table keeps its semantics (explicit roles) but lays out as a grid: label above the values, no label column */
+  table.vgl-t,table.vgl-t thead,table.vgl-t tbody{display:block}
+  table.vgl-t colgroup{display:none}
+  table.vgl-t tr{display:grid;grid-template-columns:repeat(var(--vgl-n),minmax(0,1fr))}
+  table.vgl-t thead{position:sticky;top:0;z-index:3;border-top-left-radius:var(--v-r-l);border-top-right-radius:var(--v-r-l)}
+  table.vgl-t thead th{position:static;padding:.5rem .75rem}
+  table.vgl-t thead th.rh{display:none}
+  table.vgl-t thead th.vgl-ph:nth-child(2){border-top-left-radius:var(--v-r-l)}
+  table.vgl-t th,table.vgl-t td{padding:.5rem .75rem}
+  table.vgl-t tbody th[scope="row"],table.vgl-t tr.vgl-sec__h th,table.vgl-t .vgl-sec__empty,table.vgl-t td.vgl-val--all{grid-column:1 / -1}
+  table.vgl-t tbody th[scope="row"]{padding-bottom:0;border-bottom:0}
+  tr.vgl-sec__h th{padding:.5625rem .75rem}
+  .vgl-ph__t,.vgl-ph__price,.vgl-cta{font-size:var(--v-fs-sm)}
+  .vgl-ph__act{margin-top:.125rem}
+  .vgl-cta svg{width:1rem;height:1rem}
+  .vgl-ph__rm{margin-left:-.375rem}
+  /* tips open inside the full-width label cell (never past the screen edge); the (i) keeps its 2.75 rem target via negative margins */
+  .vgl-i{position:static;width:2.75rem;height:2.75rem;margin:-.625rem -.625rem -.625rem -.375rem}
+  .vgl-i::before{content:none}
+  .vgl-tip{left:.75rem;right:.75rem;top:calc(100% - .25rem);width:auto}
+  .vgl-alts__list{grid-template-columns:1fr}
+  /* action row at the end */
+  .vgl-actrow{position:relative;display:flex;flex-wrap:wrap;gap:0 .5rem;margin-top:1rem;padding-top:.5rem;border-top:.0625rem solid var(--v-g200)}
+  .vgl-actrow .vgl-tb{padding:0 .25rem}
+}
+@media(min-width:48rem){.vgl-view.is-barwrap .vgl-view__bar-in{height:auto;min-height:3.75rem;padding-block:.5rem;flex-wrap:wrap;row-gap:.375rem}}
+@media(max-width:47.99rem){.vgl-view.is-barwrap .vgl-view__bar-in{height:auto;min-height:3.5rem;padding-block:.375rem;flex-wrap:wrap;row-gap:0}}
+
+/* ---- icon buttons: no hover effect (user decision 05.11., see merkliste.css §15); focus ring stays ---- */
 .vgl-close:hover,.vgl-ph__rm:hover,.vgl-addsearch__x:hover{background:transparent}
-.vgl-close:hover{color:var(--schwarz,#1A171B)}
-.vgl-ph__rm:hover,.vgl-addsearch__x:hover{color:var(--text-muted,#6A6A6A)}
-.vgl-slot__rm:hover{background:var(--schwarz,#1A171B)}
+.vgl-close:hover{color:var(--v-ink)}
+.vgl-ph__rm:hover,.vgl-addsearch__x:hover{color:var(--v-muted)}
+.vgl-ph__pick:hover svg{color:var(--v-teal)}
+
+/* ---- reduced motion: no fade, slide or rotation in the compare layer ---- */
+@media(prefers-reduced-motion:reduce){
+  .vgl-tray,.vgl-view,.vgl-toast,.vgl-coach,.vgl-scrim,.vgl-switch,.vgl-switch::after,.vgl-box,.vgl-box svg,.vgl-toggle,.vgl-tip,.vgl-bar-btn,.vgl-tray__cta,.vgl-coach__prog,.vgl-cancel,.vgl-spot,.vgl-cta svg,.vgl-fz__more svg,.vgl-sec__btn svg{transition:none !important;animation:none !important}
+}
+
+/* ---- print: the comparison only — all models, Gemeinsamkeiten and explanations open, source line, no controls ---- */
+@media print{   /* 09b P0-2: only while printView() runs (body.vgl-printing) — a plain PLP print shows the page */
+  body.vgl-printing>*:not(.vgl-view){display:none !important}
+  body.vgl-printing .vgl-view{position:static;opacity:1;visibility:visible;background:var(--v-white)}
+  body.vgl-printing .vgl-view__scroll{overflow:visible}
+  body.vgl-printing .vgl-view__bar{border-bottom:.125rem solid var(--v-ink)}
+  body.vgl-printing .vgl-diff,body.vgl-printing .vgl-bar__act,body.vgl-printing .vgl-close,body.vgl-printing .vgl-back,body.vgl-printing .vgl-ph__act,body.vgl-printing .vgl-ph__pick svg,body.vgl-printing .vgl-lh>*,body.vgl-printing .vgl-fz__more,body.vgl-printing .vgl-sec__btn,body.vgl-printing .vgl-i,body.vgl-printing .vgl-pill,body.vgl-printing .vgl-actrow,body.vgl-printing .vgl-alts,body.vgl-printing .vgl-toast,body.vgl-printing .vgl-addsearch,body.vgl-printing .vgl-sharepop,body.vgl-printing .vgl-pick,body.vgl-printing .mkl-mark{display:none !important}
+  body.vgl-printing table.vgl-t{--vgl-img:4rem}
+  body.vgl-printing .vgl-strip{display:none !important}
+  body.vgl-printing .vgl-fz__ex{display:block}
+  body.vgl-printing .vgl-view__bar-in::after{content:attr(data-print);margin-left:auto;font-size:var(--v-fs-cap);color:var(--v-ink)}
+  body.vgl-printing table.vgl-t thead,body.vgl-printing table.vgl-t thead th{position:static;box-shadow:none}
+  body.vgl-printing .vgl-wrap{box-shadow:none}
+  body.vgl-printing tr{break-inside:avoid}
+  body:not(.vgl-printing) .vgl-view,body:not(.vgl-printing) .vgl-tray,body:not(.vgl-printing) .vgl-toast,body:not(.vgl-printing) .vgl-tourfab{display:none !important}
+}

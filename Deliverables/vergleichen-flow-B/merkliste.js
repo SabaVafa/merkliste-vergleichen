@@ -543,6 +543,8 @@
   function vStr(x) { return (typeof x === 'string' && x.length <= 300) ? x : null; }
   function vNum(x) { return (typeof x === 'number' && isFinite(x)) ? x : null; }
   function vUrl(x) { x = vStr(x); if (!x || /^javascript:/i.test(x) || x.indexOf('//') > -1 || !/^[\w%./?=&#-]+$/.test(x)) return null; return x; }
+  /* product photos may be the shop's hotlinked main image (PLP cards mirror the live shop) — that one host/path only */
+  function vImg(x) { x = vStr(x); if (x && /^https:\/\/edelstahl-tuerklingel\.de\/media\/image\/product\/[\w%./~-]+$/.test(x)) return x; return vUrl(x); }
   function vKey(x) { return (typeof x === 'string' && /^[^"\\<>]{1,300}$/.test(x)) ? x : null; }
   function vQtyMap(m) { var out = {}; if (!m || typeof m !== 'object' || Array.isArray(m)) return out; Object.keys(m).slice(0, 20).forEach(function (k) { if (vKey(k) && m[k] && typeof m[k] === 'object') out[k] = { qty: Math.max(1, Math.min(99, vNum(m[k].qty) || 1)) }; }); return out; }
   function vState(st) {
@@ -559,7 +561,7 @@
     for (var k in o) if (keys.indexOf(k) < 0) return null;
     var lens = vStr(o.l); if (!LENSES[lens]) return null;
     var name = vStr(o.n); if (!name) return null;
-    var img = vUrl(o.im) || LENSES[lens].img, url = vUrl(o.url) || '#', at = vStr(o.at) || t;
+    var img = vImg(o.im) || LENSES[lens].img, url = vUrl(o.url) || '#', at = vStr(o.at) || t;
     if (o.k === 'm') {
       var id = vStr(o.id); if (!id || !/^[\w.-]{1,80}$/.test(id)) return null;
       return { id: id, articleId: id, lens: lens, name: name, url: url, img: img, priceFrom: vNum(o.p), uvp: vNum(o.u), konfig: o.f === 1, addedAt: t, priceAtAdd: vNum(o.pa), priceSrc: (o.ps === 'plp' || o.ps === 'pdp') ? o.ps : undefined };

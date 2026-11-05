@@ -335,3 +335,13 @@ Karten, Filter und Kaufberater nutzen jetzt **dieselben Shop-Werte wie der Vergl
 - Moris: Tagline „Edelstahl V4A“ → „Edelstahl V2A“ (Shop-Material).
 
 **Unverändert (nicht im Export):** Preise, UVP, Bewertungen, Badges, Seitentür-Angabe sowie die Filter-Anzahlen ohne aktive Auswahl (die zeigt der Prototyp wie die Live-Kategorie). Nicht zugeordnete Prototyp-Artikel (Klar, Nordkap, Kompakt, VDM10 Anlage BK) bleiben, bis entschieden ist, ob sie ersetzt oder entfernt werden.
+
+## 12. Produktbilder im Vergleich (05.11.2026)
+
+**Befund:** Der Vergleich zeigte die Fotos der Produktkarten. Diese sind im Prototyp bewusst Kategorie-Platzhalter (Sprechanlagen: 3 Stationsfotos für alle 33 Modelle; Briefkästen: 6 Kategoriebilder) — im Vergleich, wo Modelle nebeneinander stehen, war damit fast jedes Bild das falsche Produkt (z. B. XDM10 mit dem Bild einer Audio-Station, Kai/Colson/Niko mit demselben Foto, Quartett mit dem Bild einer Mehrfamilien-Anlage anderer Bauart).
+
+**Korrektur:** Jede Vergleichsspalte, die Vergleichsleiste, die Modellsuche und die Alternativen zeigen jetzt das **Hauptbild der Shop-Produktseite** des zugeordneten Artikels (54 Artikel, `og:image` in Größe md/WebP, am 05.11.2026 abgerufen, alle mit HTTP 200 geprüft). Die Adressen stehen in `tools/shop-bilder.json`; das Build-Skript schreibt sie als `img` in `vergleich-daten.js`.
+
+- Bilder werden direkt vom Shop geladen (keine Kopie im Repo). Ohne Verbindung fällt jede Spalte automatisch auf das bisherige Kartenbild zurück.
+- Die Produktkarten der PLPs behalten ihre Kategoriebilder (Vorgabe für das Raster); die Merkliste ebenso.
+- Nicht zugeordnete Prototyp-Artikel (Klar, Nordkap, Kompakt, VDM10 Anlage BK) haben kein Shop-Bild und zeigen weiter das Kartenbild.

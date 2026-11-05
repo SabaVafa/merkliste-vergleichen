@@ -1,53 +1,96 @@
 /* ============================================================
    Metzler PLP — Türsprechanlagen
    Client-side rendering, live filtering, chips, pagination.
-   Data + filter facets mirror the live category page
-   (edelstahl-tuerklingel.de/tuersprechanlagen); styling reuses
-   the shared Briefkasten design system (plp.css).
+   Product list, prices, badges, reviews, awards, colour swatches, filters
+   and subcategory rail mirror the live category page
+   edelstahl-tuerklingel.de/tuersprechanlagen (Stand 05.11.2026, 41 Artikel,
+   Standard-Sortierung) — see Deliverables/13_PLP_Live-Abgleich.md.
+   Styling reuses the shared Briefkasten design system (plp.css).
    ============================================================ */
 (function () {
   'use strict';
 
   var IMG = 'Product%20Image/Sprechanlage/video-station.png';
-  var PAGE = 12; // products per page
+  var PAGE = 24; // products per page — as in the live shop (41 Artikel = 2 Seiten)
 
-  /* ---- Color system (swatch rendering) — same palette as the live website ---- */
+  /* ---- Colour facet (Shop-Merkmal „Farbe") — order + counts as on the live website ---- */
   var COLORS = {
-    anthrazit:   { label: 'Anthrazit',    css: '#383E42', count: 31 },
+    anthrazit:   { label: 'Anthrazit',    css: '#383E42', count: 40 },
     braun:       { label: 'Braun',        css: '#5A3B29', count: 3 },
-    edelstahl:   { label: 'Edelstahl',    css: 'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)', count: 9 },
-    eisenglimmer:{ label: 'Eisenglimmer', css: 'linear-gradient(135deg,#3a3d40,#23262a)', count: 12 },
-    grau:        { label: 'Grau',         css: '#B9BCC0', count: 10 },
-    schwarz:     { label: 'Schwarz',      css: '#1A171B', count: 16 },
-    weiss:       { label: 'Weiß',         css: '#FFFFFF', count: 11 },
-    wunschfarbe: { label: 'Wunschfarbe',  css: 'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)', count: 6 }
+    edelstahl:   { label: 'Edelstahl',    css: 'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)', count: 29 },
+    eisenglimmer:{ label: 'Eisenglimmer', css: 'linear-gradient(135deg,#3a3d40,#23262a)', count: 31 },
+    grau:        { label: 'Grau',         css: '#B9BCC0', count: 31 },
+    schwarz:     { label: 'Schwarz',      css: '#1A171B', count: 31 },
+    weiss:       { label: 'Weiß',         css: '#FFFFFF', count: 30 },
+    wunschfarbe: { label: 'Wunschfarbe',  css: 'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)', count: 27 }
   };
 
-  /* ---- Facet definitions — mirror the live Türsprechanlagen filters.
-         (label + count). No price, no sort. ---- */
+  /* ---- Card swatches = the colour bubbles of the live product card (Farbvarianten, in shop order) ---- */
+  var SW = {
+    '7016': { label: 'RAL 7016 Anthrazitgrau', css: '#383E42' },
+    '9016': { label: 'RAL 9016 Verkehrsweiß', css: '#F1F0EA' },
+    '9007': { label: 'RAL 9007 Graualuminium', css: '#8F8F8C' },
+    '703':  { label: 'DB 703 Eisenglimmer', css: 'linear-gradient(135deg,#55595c,#3a3d40 60%,#4d5053)' },
+    '9005': { label: 'RAL 9005 Tiefschwarz', css: '#0E0E10' },
+    '7012': { label: 'RAL 7012 Basaltgrau', css: '#4E5754' },
+    'es':   { label: 'Edelstahl gebürstet', css: 'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)' },
+    'ltb':  { label: 'Linen Tex Black', css: 'repeating-linear-gradient(45deg,#1c1c1e 0 2px,#2b2b2e 2px 4px)' },
+    'bs':   { label: 'Black Satin', css: 'linear-gradient(135deg,#3a3a3d,#141416)' },
+    'bz':   { label: 'Bronze', css: 'linear-gradient(135deg,#a07a4f,#6e5034)' },
+    'wf':   { label: 'Wunschfarbe nach RAL', css: 'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)' }
+  };
+
+  /* ---- Sidebar facets = the live filter groups, in live order (Shop-Merkmale; option labels + counts
+         exactly as shown on edelstahl-tuerklingel.de/tuersprechanlagen). Each product carries the raw shop
+         values in p.f (card.f in vergleich-daten.js); 'color' uses p.colors. noCount: the live page shows
+         no count for this group. ---- */
+  var FACET_ORDER = ['fa', 'kt', 'color', 'mo', 'tb', 'zf', 'ns', 'pb', 'sys', 'bt'];
   var FACETS = {
-    system: { title: 'system', items: [
-      { key: 'ip',  label: 'IP-System', count: 35 },
-      { key: 'bus', label: 'BUS-System (2-Draht)', count: 3 }
+    fa: { title: 'Anzahl der Briefkastenfächer', items: [
+      { key: '1', label: '1', chip: '1 Briefkastenfach', count: 6 }
     ]},
-    klingel: { title: 'klingel', items: [
-      { key: '1', label: '1 Taster', count: 9 },
-      { key: '2', label: '2 Taster', count: 7 },
-      { key: '3', label: '3 Taster', count: 7 },
-      { key: '4', label: '4 Taster', count: 4 },
-      { key: '5', label: '5 Taster', count: 3 },
-      { key: '6', label: '6 Taster', count: 2 },
-      { key: '7', label: '7 Taster', count: 2 },
-      { key: 'flex', label: 'Flexibel von 1–500', count: 4 }
+    kt: { title: 'Anzahl der Klingeltaster', noCount: true, items: [
+      { key: '1 Taster', label: '1 Taster', count: 19 },
+      { key: '2 Taster', label: '2 Taster', count: 10 },
+      { key: '3 Taster', label: '3 Taster', count: 10 },
+      { key: '4 Taster', label: '4 Taster', count: 7 },
+      { key: '5 Taster', label: '5 Taster', count: 7 },
+      { key: '6 Taster', label: '6 Taster', count: 7 },
+      { key: '7 Taster', label: '7 Taster', count: 5 },
+      { key: 'Flexibel von 1-500', label: 'Flexibel von 1-500', chip: 'Klingeltaster flexibel (1–500)', count: 4 }
     ]},
-    tuer: { title: 'tuer', items: [
-      { key: 'fingerprint', label: 'Fingerprint', count: 3 },
-      { key: 'gesicht',     label: 'Gesichtserkennung', count: 3 },
-      { key: 'pin',         label: 'PIN-Code', count: 4 },
-      { key: 'qr',          label: 'QR-Code', count: 3 },
-      { key: 'rfid',        label: 'RFID', count: 7 }
+    mo: { title: 'Montageart', items: [
+      { key: 'Aufputz', label: 'Aufputz', count: 4 },
+      { key: 'Standmontage', label: 'Standmontage', count: 1 },
+      { key: 'Unterputz', label: 'Unterputz', count: 2 }
     ]},
-    /* advisor-only group — NOT rendered as a sidebar facet (no #facet-material in markup, no buildFacetGroup('material') call). Feeds the Kaufberater "Optik" step + LABELS only. */
+    tb: { title: 'Türöffner Bedienung', items: [
+      { key: 'Fingerprint', label: 'Fingerprint', count: 3 },
+      { key: 'Gesichtserkennung', label: 'Gesichtserkennung', count: 3 },
+      { key: 'PIN-Code', label: 'PIN-Code', count: 4 },
+      { key: 'QR-Code', label: 'QR-Code', count: 3 },
+      { key: 'RFID', label: 'RFID', count: 7 }
+    ]},
+    zf: { title: 'Zeitungsfach', items: [
+      { key: 'Integriert', label: 'Integriert', chip: 'Zeitungsfach integriert', count: 3 }
+    ]},
+    ns: { title: 'Namensschild', items: [
+      { key: 'Lasergraviert', label: 'Lasergraviert', chip: 'Namensschild lasergraviert', count: 21 },
+      { key: 'mit Papiereinleger', label: 'mit Papiereinleger', chip: 'Namensschild mit Papiereinleger', count: 15 },
+      { key: 'Digital', label: 'Digital', chip: 'Namensschild digital', count: 4 }
+    ]},
+    pb: { title: 'Paketbox', items: [
+      { key: 'Integriert', label: 'Integriert', chip: 'Paketbox integriert', count: 4 }
+    ]},
+    sys: { title: 'System', items: [
+      { key: 'IP-System', label: 'IP-System', count: 37 },
+      { key: 'BUS-System', label: 'BUS-System', count: 4 }
+    ]},
+    bt: { title: 'Briefkastentyp', items: [
+      { key: 'Wandbriefkasten', label: 'Wandbriefkasten', count: 2 },
+      { key: 'Standbriefkasten', label: 'Standbriefkasten', count: 4 }
+    ]},
+    /* advisor-only group — NOT rendered as a sidebar facet (inactive inline advisor). */
     material: { title: 'material', items: [
       { key: 'edelstahl',   label: 'Edelstahl', count: 5 },
       { key: 'galvanisiert',label: 'Galvanisierter Stahl', count: 1 },
@@ -59,184 +102,180 @@
   var LABELS = {};
   Object.keys(COLORS).forEach(function (k) { LABELS['color:' + k] = COLORS[k].label; });
   Object.keys(FACETS).forEach(function (g) {
-    FACETS[g].items.forEach(function (it) { LABELS[g + ':' + it.key] = it.label; });
+    FACETS[g].items.forEach(function (it) { LABELS[g + ':' + it.key] = it.chip || it.label; });
   });
 
-  /* ---- Subcategory rail ---- */
+  /* ---- Subcategory rail = the live tiles (name, count, target). Image: the shop's tile image,
+         local photo as offline fallback. ---- */
   var SP = 'Product%20Image/Sprechanlage/';
+  var SHOP = 'https://edelstahl-tuerklingel.de/';
+  var CAT_IMG = SHOP + 'media/image/category/';
   var SUBCATS = [
-    { t: 'Mit Briefkasten/Paketbox', n: 4, img: SP + 'briefkasten-paketbox.png' },
-    { t: 'Video-Sprechanlagen', n: 32, img: SP + 'video-station.png' },
-    { t: 'Audio-Sprechanlagen', n: 6, img: SP + 'audio-station.png' },
-    { t: 'Mehrfamilien-Anlagen', n: 12, img: SP + 'mehrfamilien-anlage.png' },
-    { t: 'Mit Gesichtserkennung', n: 3, img: SP + 'touch-display-station.png' },
-    { t: 'Erweiterungen & Zubehör', n: 8, img: SP + 'zubehoer.png' },
-    { t: '2-Draht-BUS (XDM10)', n: 3, img: SP + 'bus-xdm10.png' },
-    { t: 'Innenstationen', n: 5, img: SP + 'innenstation.png' }
+    { t: 'Video Sprechanlagen', n: 38, href: SHOP + 'video-tuersprechanlagen', img: CAT_IMG + '691/md/video-tuersprechanlagen.jpg', fb: SP + 'video-station.png' },
+    { t: 'Sprechanlagen Sets', n: 6, href: SHOP + 'sprechanlagen-sets', img: CAT_IMG + '1272/md/sprechanlagen-sets.jpg', fb: SP + 'mehrfamilien-anlage.png' },
+    { t: 'Audio Sprechanlagen', n: 7, href: SHOP + 'audio-tuersprechanlagen', img: CAT_IMG + '721/md/audio-tuersprechanlagen.jpg', fb: SP + 'audio-station.png' },
+    { t: 'Video Sprechanlagen mit Briefkasten/Paketbox', n: 12, href: SHOP + 'sprechanlage-briefkasten', img: CAT_IMG + '926/md/sprechanlage-briefkasten.jpg', fb: SP + 'briefkasten-paketbox.png' },
+    { t: 'Briefkastenanlagen Konfigurator', n: null, cta: true, href: SHOP + 'briefkastenanlage', img: CAT_IMG + '1085/md/briefkastenanlage.webp', fb: 'Product%20Image/Briefkastenanlage/konfigurator-tile.png' },
+    { t: 'Innenstationen', n: 11, href: SHOP + 'innenstationen', img: CAT_IMG + '1102/md/innenstationen.jpg', fb: SP + 'innenstation.png' },
+    { t: 'Ersatz Namensschilder', n: 8, href: SHOP + 'ersatz-namensschilder', img: CAT_IMG + '1056/md/ersatz-namensschilder.gif', fb: SP + 'audio-station-namensschild.png' },
+    { t: 'Erweiterungen & Zubehör', n: 22, href: SHOP + 'vdm10-zubehoer', img: CAT_IMG + '810/md/vdm10-zubehoer.jpg', fb: SP + 'zubehoer.png' }
   ];
 
-  /* ---- Product catalogue — real models from the live category page (page 1,
-         24 of 38). img maps each model to a local Sprechanlage photo by type.
-         showMeta:true keeps the discount badge + price on a card; only a couple
-         carry it for now (prices to come from the backend). ---- */
-  /* Category grid uses only three product photos (per request): 82 / 89 / 90 */
-  var I82 = SP+'video-station.png',   // single-party video station (anthracite, Vossberg)
-      I83 = SP+'audio-station-namensschild.png',   // station with nameplate (Vossmann) — audio / named models
-      I84 = SP+'touch-display-station.png',   // touch-display station w/ face recognition — premium / multi
-      I86 = SP+'touch-display-station.png',
-      I87 = SP+'touch-display-station.png';   // BUS / stainless multi → premium touch-display
-  var SALE = {type:'sale', text:'−15 %'};
+  /* ---- Product catalogue = the live category listing, both pages in the shop's default order
+         („Standard"). name/price/uvp/ab/rating/reviews/badge/sw/awards are read from the live product
+         cards (price = current price, uvp = struck price, ab = card shows „ab", sw = colour bubbles,
+         awards = award pills). Image, colours, System, Klingeltaster, Türöffner and filter attributes come
+         from the shop data (vergleich-daten.js, below). Existing prototype ids are kept where they map to
+         the same shop article (dominik1 = Maxior 1 Taster, domaudio1 = ADM10 Dominik, …). ---- */
+  var SALE = { type: 'sale', text: '−15 %' };
   var PRODUCTS = [
-    { id:'dominik1', name:'XDM10 Video-Türsprechanlage mit austauschbarem Namensschild | 2-Draht-BUS | 1 Klingeltaster | Maxior', line:'BUS-System', price:424.15, uvp:499.00, rating:5, reviews:2,
-      badge:SALE, showMeta:true, award:'Badge/reddot-award-badge.svg', colors:['anthrazit','eisenglimmer','grau','schwarz','weiss','wunschfarbe'], system:'bus', klingel:'1', tuer:[], type:'video', img:I83 },
-    { id:'sdm10x', name:'Türsprechanlage mit Kamera | Gesichtserkennung | Touch-Display | Live-HD-Video | Ein- & Mehrfamilien | SDM10X', line:'IP-System', price:1266.50, uvp:1490.00, rating:5, reviews:9,
-      badge:SALE, showMeta:true, colors:['anthrazit','edelstahl','schwarz','weiss','grau'], system:'ip', klingel:'flex', tuer:['rfid','gesicht','pin','qr'], material:'edelstahl', type:'video', img:I84 },
-    { id:'colson1', name:'VDM10 2.0 Video-Türsprechanlage | 1 Klingeltaster | Colson', line:'IP-System', price:594.15, uvp:699.00, rating:5, reviews:63,
-      badge:SALE, showMeta:true, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer','wunschfarbe'], system:'ip', klingel:'1', tuer:['rfid'], type:'video', img:I82 },
-    { id:'horizon', name:'VDM10 2.0 modulare Video-Türsprechanlage | Ein- & Mehrfamilien | Horizon', line:'IP-System', price:849.15, uvp:999.00, rating:5, reviews:21,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz'], system:'ip', klingel:'flex', tuer:['rfid'], type:'video', img:I84 },
-    { id:'sdm10h', name:'Türsprechanlage mit Kamera | Gesichtserkennung | Touch-Display | Hausnummer beleuchtet | SDM10H', line:'IP-System', price:1351.50, uvp:1590.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','edelstahl','schwarz'], system:'ip', klingel:'flex', tuer:['rfid','gesicht','pin','qr'], material:'edelstahl', type:'video', img:I84 },
-    { id:'kian1', name:'VDM10 2.0 Video-Türsprechanlage | 1 Klingeltaster | Kian', line:'IP-System', price:577.15, uvp:679.00, rating:5, reviews:19,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer','braun','wunschfarbe'], system:'ip', klingel:'1', tuer:['rfid'], type:'video', img:I82 },
-    { id:'niko1', name:'VDM10 2.0 Video-Türsprechanlage | mit Fingerprint | 1 Klingeltaster | Niko', line:'IP-System', price:721.65, uvp:849.00, rating:5, reviews:12,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz'], system:'ip', klingel:'1', tuer:['fingerprint','rfid'], type:'video', img:I82 },
-    { id:'neo1', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 1 Klingeltaster | Neo', line:'IP-System', price:551.65, uvp:649.00, rating:5, reviews:4,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz'], system:'ip', klingel:'1', tuer:['rfid'], type:'video', img:I82 },
-    { id:'sdm10s', name:'Video-Türsprechsäule | Klingelstele mit Gesichtserkennung | Farbe wählbar | Ein- & Mehrfamilien | SDM10S', line:'IP-System', price:2209.15, uvp:2599.00, rating:5, reviews:null,
-      badge:SALE, colors:['anthrazit','edelstahl','schwarz','wunschfarbe'], system:'ip', klingel:'flex', tuer:['rfid','gesicht','pin','qr'], material:'v2a', type:'video', img:I87 },
-    { id:'colson2', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 2 Klingeltaster | Colson', line:'IP-System', price:645.15, uvp:759.00, rating:5, reviews:26,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], system:'ip', klingel:'2', tuer:['rfid'], type:'video', img:I84 },
-    { id:'kai1', name:'ADM10 Audio-Türsprechanlage | 1 Klingeltaster | Mit austauschbarem Namensschild | Kai', line:'IP-System', price:424.15, uvp:499.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau'], system:'ip', klingel:'1', tuer:[], type:'audio', img:I83 },
-    { id:'domaudio1', name:'ADM10 Audio-Türsprechanlage | 1 Klingeltaster | RAL 7016 Anthrazit | Dominik', line:'IP-System', price:424.15, uvp:499.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit'], system:'ip', klingel:'1', tuer:[], type:'audio', img:I83 },
-    { id:'kian2', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 2 Klingeltaster | Kian', line:'IP-System', price:628.15, uvp:739.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer','braun','wunschfarbe'], system:'ip', klingel:'2', tuer:['rfid'], type:'video', img:I84 },
-    { id:'niko2', name:'VDM10 2.0 Video-Türsprechanlage | mit Fingerprint | 2 Klingeltaster | Niko', line:'IP-System', price:849.15, uvp:999.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz'], system:'ip', klingel:'2', tuer:['fingerprint','rfid'], type:'video', img:I84 },
-    { id:'neo2', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 2 Klingeltaster | Neo', line:'IP-System', price:577.15, uvp:679.00, rating:5, reviews:6,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz'], system:'ip', klingel:'2', tuer:['rfid'], type:'video', img:I84 },
-    { id:'kai2', name:'ADM10 Audio-Türsprechanlage | 2 Klingeltaster | Mit austauschbarem Namensschild | Kai', line:'IP-System', price:466.65, uvp:549.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau'], system:'ip', klingel:'2', tuer:[], type:'audio', img:I83 },
-    { id:'maxior2', name:'XDM10 Video-Türsprechanlage mit austauschbarem Namensschild | 2-Draht-BUS | 2 Klingeltaster | Maxior', line:'BUS-System', price:806.65, uvp:949.00, rating:5, reviews:null,
-      badge:SALE, colors:['anthrazit','eisenglimmer','grau','schwarz','weiss','wunschfarbe'], system:'bus', klingel:'2', tuer:[], material:'edelstahl', type:'video', img:I87 },
-    { id:'colson3', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 3 Klingeltaster | Colson', line:'IP-System', price:696.15, uvp:819.00, rating:5, reviews:5,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], system:'ip', klingel:'3', tuer:['rfid'], type:'video', img:I84 },
-    { id:'kian3', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 3 Klingeltaster | Kian', line:'IP-System', price:679.15, uvp:799.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer','braun','wunschfarbe'], system:'ip', klingel:'3', tuer:['rfid'], type:'video', img:I84 },
-    { id:'niko3', name:'VDM10 2.0 Video-Türsprechanlage | mit Fingerprint | 3 Klingeltaster | Niko', line:'IP-System', price:892.50, uvp:1050.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz'], system:'ip', klingel:'3', tuer:['fingerprint','rfid'], type:'video', img:I84 },
-    { id:'neo3', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 3 Klingeltaster | Neo', line:'IP-System', price:602.65, uvp:709.00, rating:5, reviews:5,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz'], system:'ip', klingel:'3', tuer:['rfid'], type:'video', img:I84 },
-    { id:'kai3', name:'ADM10 Audio-Türsprechanlage | 3 Klingeltaster | Mit austauschbarem Namensschild | Kai', line:'IP-System', price:509.15, uvp:599.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau'], system:'ip', klingel:'3', tuer:[], type:'audio', img:I83 },
-    { id:'maxior3', name:'XDM10 Video-Türsprechanlage mit austauschbarem Namensschild | 2-Draht-BUS | 3 Klingeltaster | Maxior', line:'BUS-System', price:849.15, uvp:999.00, rating:5, reviews:null,
-      badge:SALE, colors:['anthrazit','eisenglimmer','grau','schwarz','weiss','wunschfarbe'], system:'bus', klingel:'3', tuer:[], material:'v2a', type:'video', img:I87 },
-    { id:'colson4', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 4 Klingeltaster | Colson', line:'IP-System', price:798.15, uvp:939.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], system:'ip', klingel:'4', tuer:['rfid'], type:'video', img:I87 },
-    /* Exakte Klingeltaster-Staffel (live-Drill p2): Colson 5–7, Kai 4–6 */
-    { id:'colson5', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 5 Klingeltaster | Colson', line:'IP-System', price:849.15, uvp:999.00, rating:5, reviews:1,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], system:'ip', klingel:'5', tuer:['rfid'], type:'video', img:I87 },
-    { id:'colson6', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 6 Klingeltaster | Colson', line:'IP-System', price:900.15, uvp:1059.00, rating:5, reviews:1,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], system:'ip', klingel:'6', tuer:['rfid'], type:'video', img:I87 },
-    { id:'colson7', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 7 Klingeltaster | Colson', line:'IP-System', price:951.15, uvp:1119.00, rating:5, reviews:1,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], system:'ip', klingel:'7', tuer:['rfid'], type:'video', img:I87 },
-    { id:'kai4', name:'ADM10 Audio-Türsprechanlage | 4 Klingeltaster | Mit austauschbarem Namensschild | Kai', line:'IP-System', price:551.65, uvp:649.00, rating:5, reviews:3,
-      badge:SALE, colors:['anthrazit','weiss','grau'], system:'ip', klingel:'4', tuer:[], type:'audio', img:I83 },
-    { id:'kai5', name:'ADM10 Audio-Türsprechanlage | 5 Klingeltaster | Mit austauschbarem Namensschild | Kai', line:'IP-System', price:594.15, uvp:699.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau'], system:'ip', klingel:'5', tuer:[], type:'audio', img:I83 },
-    { id:'kai6', name:'ADM10 Audio-Türsprechanlage | 6 Klingeltaster | Mit austauschbarem Namensschild | Kai', line:'IP-System', price:551.65, uvp:649.00, rating:5, reviews:2,
-      badge:SALE, colors:['anthrazit','weiss','grau'], system:'ip', klingel:'6', tuer:[], type:'audio', img:I83 },
-    /* Briefkasten/Paketbox-Kombis (live /sprechanlage-briefkasten, 9 Artikel: Fächer 1–2,
-       Taster 1/2/Flexibel, alle IP) — flagged briefkasten:true so the advisor's Kombi
-       step is dataset-backed instead of silently skipping. */
-    { id:'vdm10-pb', name:'Video-Türsprechanlage mit Paketbox | personalisiert mit Gravur | VDM10', line:'IP-System', price:1019.15, uvp:1199.00, rating:5, reviews:5,
-      badge:SALE, colors:['anthrazit'], system:'ip', klingel:'1', tuer:['rfid'], type:'video', briefkasten:true, img:SP+'briefkasten-paketbox.png' },
-    { id:'vdm10-zf-bk', name:'Standbriefkasten mit Video-Türsprechanlage für Zweifamilienhaus | VDM10', line:'IP-System', price:1351.50, uvp:1590.00, rating:5, reviews:3,
-      badge:SALE, colors:['anthrazit','weiss','grau','schwarz','eisenglimmer'], system:'ip', klingel:'2', tuer:['rfid'], type:'video', briefkasten:true, img:SP+'briefkasten-paketbox.png' },
-    { id:'vdm10-anlage-bk', name:'Modulare Standbriefkastenanlage mit Video-Türsprechanlage | VDM10 | flexibel', line:'IP-System', price:1999.00, uvp:null, rating:5, reviews:null,
-      badge:null, colors:['anthrazit'], system:'ip', klingel:'flex', tuer:['rfid'], type:'video', briefkasten:true, img:SP+'briefkasten-paketbox.png' }
+    { id:'sdm10x', name:'Türsprechanlage mit Kamera | Gesichtserkennung | Touch-Display | Live-HD-Video | Ein- und Mehrfamilien | SDM10X', price:1266.5, uvp:1490, ab:true, rating:4.5, reviews:9, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'colson1', name:'VDM10 2.0 Video-Türsprechanlage | 1 Klingeltaster | Colson', price:594.15, uvp:699, ab:true, rating:4.5, reviews:65, badge:SALE, sw:'7016 9016 9007 703 9005 es ltb wf' },
+    { id:'dominik1', name:'XDM10 Video-Türsprechanlage mit austauschbarem Namensschild | 2-Draht-BUS | 1 Klingeltaster | Maxior', price:764.15, uvp:899, ab:true, rating:4.5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 wf', awards:['reddot','gda-medaille'] },
+    { id:'horizon', name:'VDM10 2.0 modulare Video-Türsprechanlage | Ein- und Mehrfamilien | Horizon', price:849.15, uvp:999, ab:true, rating:5, reviews:25, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'sdm10h', name:'Türsprechanlage mit Kamera | Gesichtserkennung | Touch-Display | Hausnummer beleuchtet | Live-HD-Video | Ein- und Mehrfamilien | SDM10H', price:1351.5, uvp:1590, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 es wf' },
+    { id:'kian1', name:'VDM10 2.0 Video-Türsprechanlage | 1 Klingeltaster | Kian', price:577.15, uvp:679, ab:true, rating:4.5, reviews:22, badge:SALE, sw:'7016 9016 9007 703 9005 es ltb bs bz wf' },
+    { id:'niko1', name:'VDM10 2.0 Video-Türsprechanlage | mit Fingerprint | 1 Klingeltaster | Niko', price:721.65, uvp:849, ab:true, rating:5, reviews:12, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'neo1', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 1 Klingeltaster | Neo', price:551.65, uvp:649, ab:true, rating:5, reviews:4, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'sdm10s', name:'Video-Türsprechsäule | Klingelstele mit Gesichtserkennung | Farbe wählbar | Ein- & Mehrfamilienhaus | Personalisierbar | SDM10S', price:2209.15, uvp:2599, rating:null, reviews:null, badge:SALE, sw:'' },
+    { id:'domaudio1', name:'ADM10 Audio-Türsprechanlage | 1 Klingeltaster | RAL 7016 Anthrazit | Dominik', price:424.15, uvp:499, rating:5, reviews:2, badge:SALE, sw:'' },
+    { id:'colson2', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 2 Klingeltaster | Colson', price:645.15, uvp:759, ab:true, rating:5, reviews:27, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kai1', name:'ADM10 Audio-Türsprechanlage | 1 Klingeltaster | Mit austauschbarem Namensschild | Kai', price:424.15, uvp:499, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kian2', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 2 Klingeltaster | Kian', price:628.15, uvp:739, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es ltb bs bz wf' },
+    { id:'niko2', name:'VDM10 2.0 Video-Türsprechanlage | mit Fingerprint | 2 Klingeltaster | Niko', price:849.15, uvp:999, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'neo2', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 2 Klingeltaster | Neo', price:577.15, uvp:679, ab:true, rating:5, reviews:6, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kai2', name:'ADM10 Audio-Türsprechanlage | 2 Klingeltaster | Mit austauschbarem Namensschild | Kai', price:466.65, uvp:549, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'maxior2', name:'XDM10 Video-Türsprechanlage mit austauschbarem Namensschild | 2-Draht-BUS | 2 Klingeltaster | Maxior', price:806.65, uvp:949, ab:true, rating:5, reviews:1, badge:SALE, sw:'7016 9016 9007 703 9005 es wf', awards:['reddot','gda-medaille'] },
+    { id:'colson3', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 3 Klingeltaster | Colson', price:696.15, uvp:819, ab:true, rating:5, reviews:5, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kian3', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 3 Klingeltaster | Kian', price:679.15, uvp:799, ab:true, rating:4.5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es ltb bs bz wf' },
+    { id:'niko3', name:'VDM10 2.0 Video-Türsprechanlage | mit Fingerprint | 3 Klingeltaster | Niko', price:892.5, uvp:1050, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'neo3', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 3 Klingeltaster | Neo', price:602.65, uvp:709, ab:true, rating:4.5, reviews:5, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kai3', name:'ADM10 Audio-Türsprechanlage | 3 Klingeltaster | Mit austauschbarem Namensschild | Kai', price:509.15, uvp:599, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'maxior3', name:'XDM10 Video-Türsprechanlage mit austauschbarem Namensschild | 2-Draht-BUS | 3 Klingeltaster | Maxior', price:849.15, uvp:999, ab:true, rating:5, reviews:1, badge:SALE, sw:'7016 9016 9007 703 9005 wf', awards:['reddot','gda-medaille'] },
+    { id:'colson4', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 4 Klingeltaster | Colson', price:798.15, uvp:939, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'neo4', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 4 Klingeltaster | Neo', price:636.65, uvp:749, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kai4', name:'ADM10 Audio-Türsprechanlage | 4 Klingeltaster | Mit austauschbarem Namensschild | Kai', price:551.65, uvp:649, ab:true, rating:5, reviews:3, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'colson5', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 5 Klingeltaster | Colson', price:849.15, uvp:999, rating:5, reviews:1, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'neo5', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 5 Klingeltaster | Neo', price:662.15, uvp:779, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kai5', name:'ADM10 Audio-Türsprechanlage | 5 Klingeltaster | Mit austauschbarem Namensschild | Kai', price:594.15, uvp:699, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'colson6', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 6 Klingeltaster | Colson', price:900.15, uvp:1059, rating:5, reviews:1, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'neo6', name:'VDM10 2.0 Video-Türsprechanlage mit austauschbarem Namensschild | 6 Klingeltaster | Neo', price:679.15, uvp:799, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'kai6', name:'ADM10 Audio-Türsprechanlage | 6 Klingeltaster | Mit austauschbarem Namensschild | Kai', price:636.65, uvp:749, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
+    { id:'colson7', name:'VDM10 2.0 Mehrfamilien Video-Türsprechanlage | 7 Klingeltaster | Colson', price:951.15, uvp:1119, rating:5, reviews:1, badge:SALE, sw:'7016 9016 9007 703 9005 es' },
+    { id:'vdm10-bk1', name:'Briefkasten mit VDM10 2.0 Video-Türsprechanlage | 1 Klingel | RAL7016 Anthrazit', price:934.15, uvp:1099, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'bispo2-lan', name:'Video-Türsprechanlage mit Paketbox Bispo 2 | LAN/PoE | mit Brieffach | personalisiert mit Gravur | Anthrazit RAL 7016', price:1189.15, uvp:1399, rating:null, reviews:null, badge:SALE, sw:'' },
+    { id:'zivo2-bus', name:'Video-Türsprechanlage mit Paketbox Zivo 2 | 2-Draht-BUS | mit Brieffach | personalisiert mit Gravur | Entnahme auf der Rückseite | Anthrazit RAL 7016', price:1189.15, uvp:1399, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'zivo2-lan', name:'Video-Türsprechanlage mit Paketbox Zivo 2 | LAN/PoE | mit Brieffach | personalisiert mit Gravur | Entnahme auf der Rückseite | Anthrazit RAL 7016', price:1189.15, uvp:1399, rating:null, reviews:null, badge:SALE, sw:'' },
+    { id:'vdm10-pb', name:'Video-Türsprechanlage mit Paketbox | Anthrazit RAL 7016 | personalisiert mit Gravur | Edelstahl-Namensschild', price:1019.15, uvp:1199, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'siebert-vdm10', name:'Briefkasten rostfrei und massiv, RAL7016 Anthrazitgrau mit Videosprechanlage VDM10 2.0, Modell Siebert', price:764.15, uvp:899, rating:4.5, reviews:3, badge:SALE, sw:'' },
+    { id:'siebert-vdm10-stand', name:'Standbriefkasten rostfrei und massiv, RAL7016 Anthrazitgrau mit Videosprechanlage VDM10 2.0, Modell Siebert', price:900.15, uvp:1059, rating:5, reviews:1, badge:SALE, sw:'' },
+    { id:'vdm10-siebert-set', name:'Videosprechanlage VDM10 2.0 in RAL7016 Anthrazit passend als Set mit dem Briefkasten Modell Siebert', price:679.15, uvp:799, rating:5, reviews:1, badge:SALE, sw:'' }
   ];
 
   /* Shop data (vergleich-daten.js, generated from the JTL export 02.11.2026 by tools/build_vergleich_daten.py):
-     every card matched to a shop article takes its name, colours, System, Klingeltaster, Türöffner-Bedienung,
-     Typ, Kombination, Material and Namensschild from the shop — the same values the comparison shows.
-     Türöffner is only listed where the shop maintains it (7 models); price and rating are not in the export. */
+     every card takes its main image (hotlinked shop image, local photo as offline fallback), colours, System,
+     Klingeltaster, Türöffner-Bedienung, Typ, Kombination, Material, Namensschild and the raw filter values
+     from the shop — the same values the comparison shows. Name, price, UVP, rating and reviews stay as
+     listed on the live category page. */
+  function fallbackImg(p) {
+    if (p.type === 'audio') return SP + 'audio-station.png';
+    if (p.briefkasten) return SP + 'briefkasten-paketbox.png';
+    if (((p.f && p.f.ns) || []).indexOf('Digital') !== -1) return SP + 'touch-display-station.png';
+    return IMG;
+  }
   (function () {
     var D = window.MTZ_VGL_DATA && window.MTZ_VGL_DATA.sprechanlage;
-    if (!D) return;
     PRODUCTS.forEach(function (p) {
-      var c = D[p.id] && D[p.id].card;
-      if (!c) return;
-      p.name = c.name; p.colors = c.colors.slice(); p.tuer = c.tuer.slice(); p.briefkasten = c.briefkasten;
-      if (c.system) { p.system = c.system; p.line = c.system === 'bus' ? 'BUS-System' : 'IP-System'; }
-      if (c.klingel) p.klingel = c.klingel;
-      if (c.type) p.type = c.type;
-      p.material = c.material; p.ns = c.ns;
+      p.colors = []; p.tuer = []; p.f = {};
+      var d = D && D[p.id], c = d && d.card;
+      if (c) {
+        p.colors = c.colors.slice(); p.tuer = c.tuer.slice(); p.briefkasten = c.briefkasten; p.f = c.f || {};
+        if (c.system) { p.system = c.system; p.line = c.system === 'bus' ? 'BUS-System' : 'IP-System'; }
+        if (c.klingel) p.klingel = c.klingel;
+        if (c.type) p.type = c.type;
+        p.material = c.material; p.ns = c.ns;
+      }
+      p.img = fallbackImg(p);            /* local photo — offline fallback (card + comparison) */
+      p.shopImg = (d && d.img) || null;  /* real shop main image, hotlinked */
     });
   })();
 
   /* Expose the catalogue to the Vergleichen add-on (vergleichen.js) — read-only hook. */
   try { window.MTZ_PRODUCTS = PRODUCTS; } catch (e) {}
 
-  var TOTAL = 38; // catalogue headline figure (live total)
+  /* Hotlinked shop images fall back to the local photo when offline / blocked. */
+  document.addEventListener('error', function (e) {
+    var t = e.target, fb = t && t.tagName === 'IMG' && t.getAttribute('data-fallback');
+    if (fb && t.getAttribute('src') !== fb) t.setAttribute('src', fb);
+  }, true);
+
+  var TOTAL = 41; // live headline figure („41 Artikel") — equals PRODUCTS.length
 
   /* ---- State ---- */
-  var active = { color: [], system: [], klingel: [], tuer: [], material: [], type: [], verwendung: [], namensschild: [], kombi: [] };
+  var active = { color: [], fa: [], kt: [], mo: [], tb: [], zf: [], ns: [], pb: [], sys: [], bt: [],
+                 system: [], klingel: [], tuer: [], material: [], type: [], verwendung: [], namensschild: [], kombi: [] };   /* 2nd row: inactive inline advisor only */
   var page = 1;
   var advisorChips = false;   /* true while the active filters were set by the KI advisor → don't echo them as toolbar chips */
 
   /* ---- Helpers ---- */
   function $(s, ctx) { return (ctx || document).querySelector(s); }
-  function euro(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+  function euro(n) { return n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+,)/g, '.') + ' €'; }   /* 1.490,00 € as on the live card */
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 
+  /* Live rating: full / half / empty stars (e.g. 4.5/5); no rating → no stars (as on the live card) */
   function stars(rating) {
     var html = '';
-    for (var i = 0; i < 5; i++) html += '<span class="star is-full">★</span>';
-    return '<span class="pcard__stars" aria-label="5 von 5 Sternen">' + html + '</span>';
+    for (var i = 1; i <= 5; i++) html += '<span class="star' + (rating >= i ? ' is-full' : (rating >= i - 0.5 ? ' is-half' : '')) + '">★</span>';
+    return '<span class="pcard__stars" aria-label="' + String(rating).replace('.', ',') + ' von 5 Sternen">' + html + '</span>';
   }
 
-  function colorRow(keys) {
+  /* Colour bubbles of the live card: first 3, then „+N weitere"; none when the shop shows none */
+  function colorRow(sw) {
+    var keys = (sw || '').split(' ').filter(function (k) { return SW[k]; });
+    if (!keys.length) return '';
     var max = 3, html = '';
     keys.slice(0, max).forEach(function (k) {
-      var c = COLORS[k]; if (!c) return;
-      html += '<span class="pcard__sw" title="' + c.label + '" style="background:' + c.css + '"></span>';
+      html += '<span class="pcard__sw" title="' + SW[k].label + '" style="background:' + SW[k].css + '"></span>';
     });
     if (keys.length > max) html += '<a class="pcard__more" href="#">+' + (keys.length - max) + ' weitere</a>';
     return '<div class="pcard__colors">' + html + '</div>';
   }
 
-  /* ---- Build subcategory rail ---- */
+  /* ---- Build subcategory rail (live tiles → live subcategory pages, new tab) ---- */
   function buildSubnav() {
     var track = $('#subTrack'); if (!track) return;
     SUBCATS.forEach(function (s) {
       var a = el('a', 'subtile' + (s.cta ? ' subtile--cta' : ''));
-      a.href = '#grid';
+      a.href = s.href || '#grid';
+      if (s.href) { a.target = '_blank'; a.rel = 'noopener'; }
       a.innerHTML =
-        '<span class="subtile__thumb"><img src="' + (s.img || IMG) + '" alt="" loading="lazy"></span>' +
+        '<span class="subtile__thumb"><img src="' + (s.img || s.fb || IMG) + '" data-fallback="' + (s.fb || IMG) + '" alt="" loading="lazy"></span>' +
         '<span class="subtile__text">' +
           '<span class="subtile__label">' + s.t + '</span>' +
           (s.n != null
             ? '<span class="subtile__count">' + s.n + ' Modelle</span>'
-            : '<span class="subtile__count subtile__count--cta">Jetzt konfigurieren</span>') +
+            : (s.cta ? '<span class="subtile__count subtile__count--cta">Jetzt konfigurieren</span>' : '')) +
         '</span>';
       track.appendChild(a);
     });
   }
 
   /* ---- Build filter controls (checkbox rows — matches the live website) ---- */
-  function optionRow(group, key, label, count, swatchCss, plainCount) {
-    var id = 'f-' + group + '-' + key;
+  function fid(group, key) { return 'f-' + group + '-' + String(key).replace(/[^\w-]/g, '_'); }
+  function countText(group, n) {
+    var g = FACETS[group];
+    if (g && g.noCount) return '';
+    return (g && g.plain) ? String(n) : '(' + n + ')';
+  }
+  function optionRow(group, key, label, count, swatchCss) {
+    var id = fid(group, key);
     var row = el('label', 'fopt');
     row.setAttribute('for', id);
-    var countText = plainCount ? count : '(' + count + ')';
     row.innerHTML =
       '<input type="checkbox" id="' + id + '" data-group="' + group + '" data-key="' + key + '">' +
       '<span class="fopt__box" aria-hidden="true"></span>' +
       '<span class="fopt__label">' + label + '</span>' +
-      '<span class="fopt__count">' + countText + '</span>' +
+      '<span class="fopt__count">' + countText(group, count) + '</span>' +
       (swatchCss ? '<span class="fopt__swatch" style="background:' + swatchCss + '"></span>' : '');
     row.querySelector('input').addEventListener('change', function () { toggle(group, key); });
     return row;
@@ -246,14 +285,26 @@
     var wrap = $('#facet-color'); if (!wrap) return;
     Object.keys(COLORS).forEach(function (key) {
       var c = COLORS[key];
-      wrap.appendChild(optionRow('color', key, c.label, c.count, c.css, false));
+      wrap.appendChild(optionRow('color', key, c.label, c.count, c.css));
     });
   }
 
   function buildFacetGroup(group) {
     var wrap = $('#facet-' + group); if (!wrap) return;
     FACETS[group].items.forEach(function (it) {
-      wrap.appendChild(optionRow(group, it.key, it.label, it.count, null, false));
+      wrap.appendChild(optionRow(group, it.key, it.label, it.count, null));
+    });
+  }
+
+  /* Sidebar: one .facet block per live group, in live order (markup generated here so it can't drift) */
+  function buildFacets() {
+    var aside = $('#filters'); if (!aside) return;
+    FACET_ORDER.forEach(function (group) {
+      var box = el('div', 'facet');
+      box.innerHTML = '<h3 class="facet__title">' + (group === 'color' ? 'Farbe' : FACETS[group].title) + '</h3>' +
+        '<div class="facet__body" id="facet-' + group + '" data-group="' + group + '"></div>';
+      aside.appendChild(box);
+      if (group === 'color') buildColorGroup(); else buildFacetGroup(group);
     });
   }
 
@@ -285,14 +336,40 @@
     });
   }
 
+  /* ---- Filtering ----
+     matchesWith(p, a) tests a product against an arbitrary active-selection
+     object; matches(p) uses the live one. The indirection lets the facet engine
+     compute per-option counts by overriding a single group. Sidebar groups match the
+     raw shop value (p.f[group]) exactly like the live filter; OR within a group,
+     AND across groups. The second block serves the inactive inline advisor only. */
+  function matchesWith(p, a) {
+    if (a.color.length && !a.color.some(function (c) { return p.colors.indexOf(c) !== -1; })) return false;
+    for (var gi = 0; gi < FACET_ORDER.length; gi++) {
+      var g = FACET_ORDER[gi], sel = a[g];
+      if (g === 'color' || !sel || !sel.length) continue;
+      var vals = (p.f && p.f[g]) || [];
+      if (!sel.some(function (k) { return vals.indexOf(k) !== -1; })) return false;
+    }
+    /* — inactive inline advisor (legacy keys) — */
+    if (a.system && a.system.length && a.system.indexOf(p.system) === -1) return false;
+    if (a.klingel && a.klingel.length && a.klingel.indexOf(p.klingel) === -1 && p.klingel !== 'flex') return false;
+    if (a.tuer && a.tuer.length && !a.tuer.some(function (k) { return (p.tuer || []).indexOf(k) !== -1; })) return false;
+    if (a.type && a.type.length && a.type.indexOf(p.type) === -1) return false;
+    if (a.material && a.material.length && a.material.indexOf(p.material) === -1) return false;
+    if (a.verwendung && a.verwendung.length && a.verwendung.indexOf(verwOf(p)) === -1 && verwOf(p) !== 'flexibel') return false;
+    if (a.namensschild && a.namensschild.length && a.namensschild.indexOf(nsOf(p)) === -1) return false;
+    if (a.kombi && a.kombi.length && !a.kombi.some(function (k) { return k === 'briefkasten' && !!p.briefkasten; })) return false;
+    return true;
+  }
+  function matches(p) { return matchesWith(p, active); }
+
   /* ---- Dynamic facets ------------------------------------------------------
-     When the shopper has selected at least one filter, every facet recomputes
-     against the current selection: each option shows the real number of matching
-     products and options with none are hidden (e.g. picking BUS-System leaves
-     only the colours / Klingeltaster the 2-Draht line actually offers). With no
-     filter active the curated "live-mirror" counts are restored and all options
-     shown. Only the groups rendered in the sidebar participate. */
-  var FACET_GROUPS = ['system', 'klingel', 'tuer', 'color'];
+     When at least one filter is selected, every facet recomputes against the
+     current selection: each option shows the real number of matching products
+     and options with none are hidden (e.g. picking BUS-System leaves only the
+     colours / Klingeltaster the 2-Draht line actually offers). With no filter active the curated
+     "live-mirror" counts are restored and all options shown. */
+  var FACET_GROUPS = FACET_ORDER;
   function facetKeys(group) {
     return group === 'color' ? Object.keys(COLORS) : FACETS[group].items.map(function (it) { return it.key; });
   }
@@ -310,15 +387,14 @@
     return PRODUCTS.filter(function (p) { return matchesWith(p, a); }).length;
   }
   function setFacetRow(group, key, n, hide) {
-    var input = document.getElementById('f-' + group + '-' + key);
+    var input = document.getElementById(fid(group, key));
     var row = input && input.closest('.fopt');
     if (!row) return;
     var cnt = row.querySelector('.fopt__count');
-    if (cnt) cnt.textContent = '(' + n + ')';
+    if (cnt) cnt.textContent = group === 'color' ? '(' + n + ')' : countText(group, n);
     row.hidden = hide;
   }
-  /* Drop selections that became impossible in combination with the others, so a
-     stale pick (e.g. 4 Taster, then BUS) never strands the shopper on 0 results.
+  /* Drop selections that became impossible in combination with the others.
      keepGroup is the group the user just touched — its choice wins, so conflicts
      are resolved by dropping the incompatible values from the OTHER groups. */
   function pruneActive(keepGroup) {
@@ -343,21 +419,20 @@
   function refreshFacetDisplay() {
     var dynamic = activeCount() > 0;
     FACET_GROUPS.forEach(function (group) {
-      var avail = 0, anySelected = false;
+      var hasMatch = false, anySelected = false;
       facetKeys(group).forEach(function (key) {
         var selected = active[group].indexOf(key) !== -1;
         if (selected) anySelected = true;
-        if (!dynamic) { setFacetRow(group, key, curatedCount(group, key), false); avail++; return; }
         var n = optionCount(group, key);
+        if (n > 0) hasMatch = true;
+        if (!dynamic) { setFacetRow(group, key, curatedCount(group, key), false); return; }
         setFacetRow(group, key, n, n === 0 && !selected);
-        if (n > 0 || selected) avail++;
       });
-      /* Redundant one-choice: a group offering ≤1 selectable option can't narrow
-         anything, so hide the whole facet (e.g. Türöffner Bedienung disappears for
-         BUS / Audio, which carry no electronic-access options) — unless the user has
-         a pick there, so they can still see/clear it. */
+      /* As on the live page, a group stays visible while at least one of its options
+         still has matches (even a single one); a group with none left is hidden —
+         unless the user has a pick there, so they can still see/clear it. */
       var box = facetContainer(group);
-      if (box) box.hidden = (avail <= 1 && !anySelected);
+      if (box) box.hidden = (dynamic && !hasMatch && !anySelected);
     });
   }
   /* User-driven refresh (sidebar toggle / clear): prune impossible picks first.
@@ -366,28 +441,6 @@
     if (activeCount() > 0) pruneActive(keepGroup);
     refreshFacetDisplay();
   }
-
-  /* ---- Filtering (mirrors the live Türsprechanlagen facets) ----
-     matchesWith(p, a) tests a product against an arbitrary active-selection
-     object; matches(p) uses the live one. The indirection lets the facet
-     engine compute per-option counts by overriding a single group. */
-  function matchesWith(p, a) {
-    if (a.color.length && !a.color.some(function (c) { return c === 'wunschfarbe' || p.colors.indexOf(c) !== -1; })) return false;   /* Wunschfarbe (RAL nach Wunsch) ist auf allen Modellen möglich */
-    if (a.system.length && a.system.indexOf(p.system) === -1) return false;
-    if (a.klingel.length && a.klingel.indexOf(p.klingel) === -1 && p.klingel !== 'flex') return false;   /* flexible Großanlagen (1–500) matchen jede Taster-Anzahl */   /* '1'..'7' or 'flex' */
-    if (a.type.length && a.type.indexOf(p.type) === -1) return false;            /* advisor-only: video / audio */
-    if (a.material.length && a.material.indexOf(p.material) === -1) return false;
-    if (a.verwendung.length && a.verwendung.indexOf(verwOf(p)) === -1 && verwOf(p) !== 'flexibel') return false;     /* advisor-only: Verwendungszweck — flexible Großanlage (1–500) passt für jede Verwendung */
-    if (a.namensschild.length && a.namensschild.indexOf(nsOf(p)) === -1) return false;   /* advisor-only: Namensschildtyp */
-    if (a.kombi.length && !a.kombi.some(function (k) { return k === 'briefkasten' && !!p.briefkasten; })) return false;   /* advisor-only: Kombination */
-    if (a.tuer.length) {
-      /* Türöffner-Bedienung — array of access methods on the product. OR within the group. */
-      var tOk = a.tuer.some(function (k) { return (p.tuer || []).indexOf(k) !== -1; });
-      if (!tOk) return false;
-    }
-    return true;
-  }
-  function matches(p) { return matchesWith(p, active); }
 
   /* Derived advisor attributes (computed from existing data — no per-product field needed) */
   function verwOf(p) { return p.klingel === 'flex' ? 'flexibel' : (p.klingel === '1' ? 'einfamilien' : 'mehrfamilien'); }
@@ -404,45 +457,46 @@
     return Object.keys(active).reduce(function (n, g) { return n + active[g].length; }, 0);
   }
 
-  /* ---- Product card ---- */
+  /* ---- Product card (data as on the live card: pills = awards, System, Türöffner-Bedienung;
+         badge, Metzler, stars + review count, name, „ab" only where the shop shows it, current
+         price + struck UVP, colour bubbles) ---- */
+  var AWARD_LABEL = { reddot: 'Reddot Winner 2026', 'gda-medaille': 'German Design Award 2026' };
   function card(p) {
     var c = el('article', 'pcard');
     c.dataset.id = p.id;   /* hook for the Vergleichen add-on (vergleichen.js) */
-    /* Show the discount badge + price on every card that has the data. */
     var badge = p.badge ? '<span class="pcard__badge pcard__badge--' + p.badge.type + '">' + p.badge.text + '</span>' : '';
     var priceRow = (p.price != null)
       ? '<div class="pcard__pricerow">' +
           (p.uvp ? '<span class="pcard__uvp">' + euro(p.uvp) + '</span>' : '') +
-          '<span class="pcard__ab">ab</span> ' +
+          (p.ab ? '<span class="pcard__ab">ab</span> ' : '') +
           '<span class="pcard__price' + (p.uvp ? ' pcard__price--sale' : '') + '">' + euro(p.price) + '</span>' +
         '</div>'
       : '';
-    var reviews = p.reviews ? '<span class="pcard__reviews">(' + p.reviews + ')</span>' : '';
+    var rating = p.rating ? '<span class="pcard__rating">' + stars(p.rating) + (p.reviews ? '<span class="pcard__reviews">(' + p.reviews + ')</span>' : '') + '</span>' : '';
+    /* Award pills as on the live card (text-only per PILL RULE — the former image lockup was tuned
+       to a placeholder photo and would cover the real product image) */
+    var awards = (p.awards || []).map(function (a) { return AWARD_LABEL[a] ? '<span class="pcard__feat">' + AWARD_LABEL[a] + '</span>' : ''; }).join('');
     var sys = p.line ? '<span class="pcard__sys">' + p.line + '</span>' : '';   /* IP-System / BUS-System tag */
-    var feat = (p.tuer || []).map(function (k) { return '<span class="pcard__feat">' + (LABELS['tuer:' + k] || k) + '</span>'; }).join('');   /* Türöffner-Bedienung features (RFID, Gesichtserkennung, PIN-Code, QR-Code, Fingerprint) */
-    var tags = (sys || feat)
-      ? '<div class="pcard__tags">' + sys + feat + '</div>'
+    var feat = ((p.f && p.f.tb) || []).map(function (k) { return '<span class="pcard__feat">' + k + '</span>'; }).join('');   /* Türöffner-Bedienung (Shop-Merkmal, live pill text) */
+    var tags = (awards || sys || feat)
+      ? '<div class="pcard__tags">' + awards + sys + feat + '</div>'
       : '';
-    /* Red Dot award: the full "reddot winner 2026" lockup sits on the product image
-       itself (no longer a meta-row pill / seal). */
-    var awardBadge = p.award ? '<img class="pcard__award-badge" src="Badge/reddot-award-badge.svg" alt="Red Dot Award winner 2026">' : '';
 
     c.innerHTML =
       '<div class="pcard__media">' +
         badge +
-        awardBadge +
-        '<img class="pcard__img" src="' + (p.img || IMG) + '" alt="' + p.name + '" loading="lazy">' +
+        '<img class="pcard__img" src="' + (p.shopImg || p.img || IMG) + '" data-fallback="' + (p.img || IMG) + '" alt="' + p.name + '" loading="lazy">' +
       '</div>' +
       '<div class="pcard__body">' +
         tags +
         '<div class="pcard__top">' +
           '<span class="pcard__brand">Metzler</span>' +
-          '<span class="pcard__rating">' + stars(p.rating) + reviews + '</span>' +
+          rating +
         '</div>' +
         '<h3 class="pcard__title"><a href="#">' + p.name + '</a></h3>' +
         '<div class="pcard__footer">' +
           priceRow +
-          colorRow(p.colors) +
+          colorRow(p.sw) +
         '</div>' +
       '</div>';
     return c;
@@ -506,9 +560,12 @@
     grid.innerHTML = '';
     var start = (page - 1) * PAGE;
     var pageItems2 = filtered.slice(start, start + PAGE);
-    // On page 1 (unfiltered), drop the XDM10 hero banner into the MIDDLE of the
-    // grid (after 6 products = 2 rows on the 3-col grid), spanning full width.
-    var bannerAt = (page === 1 && activeCount() === 0 && pageItems2.length > 6) ? 6 : -1;
+    // On page 1 (unfiltered), drop the XDM10 hero banner into the grid as on the live
+    // page: after the first row on desktop (3 cards), after two rows on mobile (4 cards).
+    var cols = (getComputedStyle(grid).gridTemplateColumns || '').split(' ').filter(Boolean).length;
+    if (!(cols > 0 && cols < 7)) cols = 3;
+    var bannerN = cols >= 3 ? cols : cols * 2;
+    var bannerAt = (page === 1 && activeCount() === 0 && pageItems2.length > bannerN) ? bannerN : -1;
     pageItems2.forEach(function (p, i) {
       if (i === bannerAt) grid.appendChild(bannerEl());
       grid.appendChild(card(p));
@@ -1340,10 +1397,7 @@
 
   /* ---- Init ---- */
   buildSubnav();
-  buildFacetGroup('system');
-  buildFacetGroup('klingel');
-  buildFacetGroup('tuer');
-  buildColorGroup();
+  buildFacets();
   updateFacets();
   wireDrawer();
   wireSubnav();

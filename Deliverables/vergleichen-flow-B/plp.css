@@ -220,6 +220,7 @@
   padding: 9px 0; cursor: pointer;
   font-size: var(--text-body); color: var(--schwarz);
 }
+.fopt[hidden] { display: none; }   /* dynamic facets: options without matches disappear (as on the live page) */
 .fopt input { position: absolute; opacity: 0; width: 0; height: 0; }
 .fopt__box {
   flex: 0 0 auto; width: 24px; height: 24px; border-radius: var(--r-m);
