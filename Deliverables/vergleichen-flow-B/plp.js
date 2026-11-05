@@ -31,7 +31,8 @@
     faecher: { title: 'faecher', items: [
       { key: '1', label: '1 Fach', count: 64 },
       { key: '2', label: '2 Fächer', count: 10 },
-      { key: '3', label: '3 Fächer', count: 6 }
+      { key: '3', label: '3 Fächer', count: 6 },
+      { key: '4', label: '4 Fächer', count: 6 }   /* Shop-Merkmal „Anzahl der Briefkastenfächer" (Export 02.11.2026) */
     ]},
     zeitung: { title: 'zeitung', items: [
       { key: 'integriert', label: 'Mit Zeitungsfach', count: 63 },
@@ -42,7 +43,7 @@
       { key: 'wand', label: 'Wandmontage', count: 49 },
       { key: 'stand', label: 'Standmontage', count: 14 },
       { key: 'unterputz', label: 'Unterputzmontage', count: 10 },
-      { key: 'durchwurf', label: 'Mauerdurchwurf', count: 2 }
+      { key: 'zaun', label: 'Zaunmontage', count: 2 }   /* Shop-Montagearten: Aufputz, Standmontage, Unterputz, Zaunmontage — „Mauerdurchwurf" gibt es im Shop nicht */
     ]},
     zusatz: { title: 'zusatz', items: [
       { key: 'paket', label: 'Mit Paketfach', count: 9 },
@@ -58,7 +59,8 @@
   Object.keys(FACETS).forEach(function (g) {
     FACETS[g].items.forEach(function (it) { LABELS[g + ':' + it.key] = it.label; });
   });
-  LABELS['zusatz:klingel+sprech'] = 'Mit Klingel & Sprechanlage';   /* advisor combined option */
+  LABELS['zusatz:klingel+sprech'] = 'Mit Klingel & Sprechanlage';
+  LABELS['faecher:3+'] = 'Ab 3 Fächer';   /* advisor „Mehrfamilienhaus" */   /* advisor combined option */
 
   /* ---- Subcategory rail ---- */
   var SUBCATS = [
@@ -81,7 +83,7 @@
       badge:null, colors:['anthrazit','weiss','grau','eisenglimmer','schwarz','edelstahl','wunschfarbe'], faecher:'1', material:'edelstahl', zeitung:'integriert', montage:'wand' },
     { id:'hermann', name:'Briefkasten mit Lasergravur | Hermann', line:null, price:99.99, uvp:117.99, rating:5, reviews:142,
       badge:{type:'sale', text:'−15 %'}, colors:['anthrazit','weiss','grau','eisenglimmer'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'wand', seitentuer:true },
-    { id:'moris', name:'Briefkasten aus Edelstahl | personalisiert | Moris', line:'Edelstahl V4A', price:149.00, uvp:null, rating:4.5, reviews:25,
+    { id:'moris', name:'Briefkasten aus Edelstahl | personalisiert | Moris', line:'Edelstahl V2A', price:149.00, uvp:null, rating:4.5, reviews:25,
       badge:null, colors:['edelstahl','anthrazit','weiss','wunschfarbe'], faecher:'1', material:'edelstahl', zeitung:'optional', montage:'wand', paket:true },
     { id:'lessing', name:'Standbriefkasten mit Zeitungsfach | Alves', line:null, price:199.00, uvp:null, rating:5, reviews:38,
       badge:null, colors:['anthrazit','eisenglimmer','schwarz'], faecher:'1', material:'stahl', zeitung:'integriert', montage:'stand', paket:true },
@@ -144,6 +146,25 @@
     };
     PRODUCTS.forEach(function (p) { if (M[p.id]) p.img = M[p.id]; });
   })();
+
+  /* Shop data (vergleich-daten.js, generated from the JTL export 02.11.2026 by tools/build_vergleich_daten.py):
+     every card matched to a shop article takes its name, colours and filter attributes from the shop — the same
+     values the comparison shows. Montage/Material can have several values (variants) → montages[] / materials[].
+     Not in the export and therefore unchanged: price, rating, Seitentür. Cards without a shop match stay as they are. */
+  (function () {
+    var D = window.MTZ_VGL_DATA && window.MTZ_VGL_DATA.briefkasten;
+    if (!D) return;
+    PRODUCTS.forEach(function (p) {
+      var c = D[p.id] && D[p.id].card;
+      if (!c) return;
+      p.name = c.name; p.colors = c.colors.slice(); p.faecher = c.faecher; p.zeitung = c.zeitung;
+      p.montages = c.montages; p.montage = c.montages[0] || null;
+      p.materials = c.materials; p.material = c.materials[0] || null;
+      p.klingel = c.klingel; p.sprech = c.sprech; p.paket = c.paket; p.blumenkasten = c.blumenkasten;
+    });
+  })();
+  function hasVal(p, f, v) { var arr = p[f + 's']; return arr ? arr.indexOf(v) !== -1 : p[f] === v; }
+  function faecherOk(p, k) { return k === 'paketfach' ? !!p.paket : (k === '3+' ? +p.faecher >= 3 : p.faecher === k); }
   window.MTZ_PRODUCTS = PRODUCTS;   /* hook for the Vergleichen add-on */
   window.MTZ_LENS = 'briefkasten';  /* tells the add-on which comparison lens to use */
 
@@ -261,15 +282,13 @@
     if (a.faecher.length) {
       /* 'paketfach' is a separate attribute (parcel compartment), not a fach count —
          match it against p.paket; the count keys ('1'/'2'/'3') match p.faecher. */
-      var fOk = a.faecher.some(function (k) {
-        return k === 'paketfach' ? !!p.paket : p.faecher === k;
-      });
+      var fOk = a.faecher.some(function (k) { return faecherOk(p, k); });
       if (!fOk) return false;
     }
     if (a.zeitung.length && a.zeitung.indexOf(p.zeitung) === -1) return false;
-    if (a.montage.length && a.montage.indexOf(p.montage) === -1) return false;
-    if (a.door && a.door.length && !a.door.some(function (v) { return p.montage === 'wand' && (v === 'seite' ? !!p.seitentuer : true); })) return false;   /* Öffnungsrichtung — Aufputz only; 'seite' needs the side-hinge flag */
-    if (a.material && a.material.length && a.material.indexOf(p.material) === -1) return false;   /* sidebar Material facet + advisor (Witterung/Optik/Sichtfenster) */
+    if (a.montage.length && !a.montage.some(function (v) { return hasVal(p, 'montage', v); })) return false;
+    if (a.door && a.door.length && !a.door.some(function (v) { return hasVal(p, 'montage', 'wand') && (v === 'seite' ? !!p.seitentuer : true); })) return false;   /* Öffnungsrichtung — Aufputz only; 'seite' needs the side-hinge flag */
+    if (a.material && a.material.length && !a.material.some(function (v) { return hasVal(p, 'material', v); })) return false;   /* sidebar Material facet + advisor (Witterung/Optik/Sichtfenster) */
     if (a.zusatz.length) {
       /* Extra functions — boolean attributes on the product (p.klingel / p.sprech).
          OR within the group; a "klingel+sprech" key requires BOTH (combined unit). */
@@ -601,7 +620,7 @@
       { q: 'Für welche Wohnsituation suchen Sie einen Briefkasten?', opts: [
         { label: 'Einfamilienhaus',  sub: 'für einen Haushalt',     group: 'faecher', value: '1', chip: 'Einfamilienhaus' },
         { label: 'Zweifamilienhaus', sub: 'für zwei Haushalte',     group: 'faecher', value: '2', chip: 'Zweifamilienhaus' },
-        { label: 'Mehrfamilienhaus', sub: 'für mehrere Parteien',   group: 'faecher', value: '3', chip: 'Mehrfamilienhaus' }
+        { label: 'Mehrfamilienhaus', sub: 'für mehrere Parteien',   group: 'faecher', value: '3+', chip: 'Mehrfamilienhaus' }   /* 3, 4, 6 Fächer */
       ]},
       /* Montage options are dataset-gated (live-shop parity): each mounting kind is
          offered only if the chosen Wohnsituation has such a model — Zweifamilien keeps
@@ -800,17 +819,17 @@
 
     /* ── Recommendation-card helpers ── */
     function fmtPrice(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
-    var MAT = { edelstahl: 'Edelstahl V4A', stahl: 'Pulverbeschichteter Stahl', acrylglas: 'Acrylglas-Front' };
+    var MAT = { edelstahl: 'Edelstahl', stahl: 'Galvanisierter Stahl', acrylglas: 'Acrylglas', holz: 'Holzoptik' };
     function specsOf(p) {
       return [
-        MAT[p.material] || p.material,
+        (p.materials || [p.material]).filter(Boolean).map(function (m) { return MAT[m] || m; }).join(' oder ') || 'Material k. A.',
         labelFor('faecher', p.faecher) + (p.paket ? ' · inkl. Paketfach' : ''),
         labelFor('montage', p.montage) + ' · ' + labelFor('zeitung', p.zeitung)
       ];
     }
     function pickImg(p) {
       if (p.montage === 'stand')      return 'Product%20Image/standbriefkaesten.webp';
-      if (p.faecher === '3')          return 'Product%20Image/mehrfamilien-briefkaesten.webp';
+      if (+p.faecher >= 3)            return 'Product%20Image/mehrfamilien-briefkaesten.webp';
       if (p.montage === 'unterputz' || p.montage === 'durchwurf') return 'Product%20Image/unterputz-briefkaesten.webp';
       return 'Product%20Image/einfamilien-briefkasten.png';
     }
@@ -818,12 +837,12 @@
     function sat(p, o) {
       if (o.group === 'color')    return p.colors.indexOf(o.value) !== -1;
       if (o.group === 'colorset') return (o.values || []).some(function (c) { return p.colors.indexOf(c) !== -1; });
-      if (o.group === 'material') return p.material === o.value;
-      if (o.group === 'faecher')  return o.value === 'paketfach' ? !!p.paket : p.faecher === o.value;
+      if (o.group === 'material') return hasVal(p, 'material', o.value);
+      if (o.group === 'faecher')  return faecherOk(p, o.value);
       if (o.group === 'zusatz')   return o.value.indexOf('+') !== -1 ? o.value.split('+').every(function (x) { return !!p[x]; }) : !!p[o.value];
       if (o.group === 'zeitung')  return p.zeitung === o.value;
-      if (o.group === 'montage')  return p.montage === o.value;
-      if (o.group === 'door')     return p.montage === 'wand' && (o.value === 'seite' ? !!p.seitentuer : true);
+      if (o.group === 'montage')  return hasVal(p, 'montage', o.value);
+      if (o.group === 'door')     return hasVal(p, 'montage', 'wand') && (o.value === 'seite' ? !!p.seitentuer : true);
       return false;
     }
     function recCardHTML(p) {

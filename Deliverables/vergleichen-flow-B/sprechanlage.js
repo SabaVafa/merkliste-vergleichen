@@ -159,6 +159,24 @@
       badge:null, colors:['anthrazit'], system:'ip', klingel:'flex', tuer:['rfid'], type:'video', briefkasten:true, img:SP+'briefkasten-paketbox.png' }
   ];
 
+  /* Shop data (vergleich-daten.js, generated from the JTL export 02.11.2026 by tools/build_vergleich_daten.py):
+     every card matched to a shop article takes its name, colours, System, Klingeltaster, Türöffner-Bedienung,
+     Typ, Kombination, Material and Namensschild from the shop — the same values the comparison shows.
+     Türöffner is only listed where the shop maintains it (7 models); price and rating are not in the export. */
+  (function () {
+    var D = window.MTZ_VGL_DATA && window.MTZ_VGL_DATA.sprechanlage;
+    if (!D) return;
+    PRODUCTS.forEach(function (p) {
+      var c = D[p.id] && D[p.id].card;
+      if (!c) return;
+      p.name = c.name; p.colors = c.colors.slice(); p.tuer = c.tuer.slice(); p.briefkasten = c.briefkasten;
+      if (c.system) { p.system = c.system; p.line = c.system === 'bus' ? 'BUS-System' : 'IP-System'; }
+      if (c.klingel) p.klingel = c.klingel;
+      if (c.type) p.type = c.type;
+      p.material = c.material; p.ns = c.ns;
+    });
+  })();
+
   /* Expose the catalogue to the Vergleichen add-on (vergleichen.js) — read-only hook. */
   try { window.MTZ_PRODUCTS = PRODUCTS; } catch (e) {}
 
@@ -374,6 +392,7 @@
   /* Derived advisor attributes (computed from existing data — no per-product field needed) */
   function verwOf(p) { return p.klingel === 'flex' ? 'flexibel' : (p.klingel === '1' ? 'einfamilien' : 'mehrfamilien'); }
   function nsOf(p) {
+    if (p.ns) return p.ns === 'display' && /Hausnummer|Türsprechsäule|Klingelstele/i.test(p.name) ? 'display-hn' : p.ns;   /* Shop-Merkmal „Namensschild" */
     if (/austauschbar/i.test(p.name)) return 'wechsel';
     if (p.type === 'audio') return 'fest';   /* Audio (ADM10) hat keine Laser-Gravur-Option — fester Namensschild (Kai ist oben schon als wechsel erfasst) */
     if (/Hausnummer|Türsprechsäule|Klingelstele/i.test(p.name)) return 'display-hn';   /* Display-Modelle mit beleuchteter Hausnummer (SDM10H, SDM10S-Säule) */

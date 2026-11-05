@@ -310,3 +310,28 @@ Nach jeder Pflege `build_vergleich_daten.py` mit einem neuen Export ausführen. 
 5. **Colson 4–7 mit 180°:** andere Kamera oder Textfehler?
 6. **Ebenhard Edelstahlfront:** eigener Artikel oder Variante? Heute hängt eine Gravur-Ausführung unter dem Vaterartikel „austauschbares Namensschild“.
 7. **Preis:** Der Export enthält keine Preise. Im Prototyp bleiben die Kartenpreise; in JTL kommt der Live-Preis. Soll der Export künftig Preise liefern, damit der Prototyp sie gegenprüfen kann?
+
+## 11. Produktkarten & Filter an die Shop-Daten angeglichen (05.11.2026)
+
+Karten, Filter und Kaufberater nutzen jetzt **dieselben Shop-Werte wie der Vergleich**. `tools/build_vergleich_daten.py` schreibt pro zugeordnetem Artikel zusätzlich ein Feld `card` (Werte in den Filter-Schlüsseln der Karten); `plp.js` und `sprechanlage.js` übernehmen es beim Laden (`vergleich-daten.js` wird dafür vor den Karten-Skripten geladen). Ein neuer Export → Skript neu ausführen → Karten und Vergleich sind gleichzeitig aktuell.
+
+| Kartenfeld | Quelle |
+|---|---|
+| Name | Shop-Artikelname (ohne „Metzler“, „und“ → „&“) |
+| Farben (Swatches + Farbfilter) | Merkmal „Farbe“ über alle Varianten |
+| Briefkästen: Fächer, Zeitungsfach, Montageart, Material | Merkmale; Montage und Material können mehrere Werte haben (Varianten) |
+| Briefkästen: Klingel / Sprechanlage | Merkmale „System“ / „Anzahl der Klingeltaster“ |
+| Briefkästen: Paketfach, Blumenkasten | nur, wenn der Shop-Artikelname es sagt (kein Merkmal) |
+| Sprechanlagen: System, Klingeltaster, Typ, Kombination, Material, Namensschild | Merkmale |
+| Sprechanlagen: Türöffner-Bedienung | Merkmal — nur bei den 7 Modellen, bei denen der Shop es pflegt |
+
+**Sichtbare Änderungen**
+- Farben stimmen jetzt mit dem Shop (z. B. Siebert 7 statt 4 Farben, Ebenhard Edelstahlfront nur Edelstahl, Colson 7 Farben).
+- Trias / Quartett: kein Paketfach, keine Klingel/Sprechanlage; Quartett hat 4 Fächer und Aufputz (vorher 3 Fächer / Unterputz).
+- Kein Briefkasten mehr fälschlich mit Paketfach (außer dem nicht zugeordneten „Nordkap“).
+- Filter Fächer: neu „4 Fächer“. Filter Montage: neu „Zaunmontage“; „Mauerdurchwurf“ entfällt — diesen Wert gibt es im Shop nicht (Nora ist dort Unterputz).
+- Kaufberater „Mehrfamilienhaus“ findet jetzt alle Anlagen ab 3 Fächern.
+- Türöffner-Filter: RFID 7 · PIN 4 · QR 3 · Fingerprint 3 · Gesichtserkennung 3 — wie im Shop (plus der nicht zugeordnete Prototyp-Artikel „VDM10 Anlage BK“).
+- Moris: Tagline „Edelstahl V4A“ → „Edelstahl V2A“ (Shop-Material).
+
+**Unverändert (nicht im Export):** Preise, UVP, Bewertungen, Badges, Seitentür-Angabe sowie die Filter-Anzahlen ohne aktive Auswahl (die zeigt der Prototyp wie die Live-Kategorie). Nicht zugeordnete Prototyp-Artikel (Klar, Nordkap, Kompakt, VDM10 Anlage BK) bleiben, bis entschieden ist, ob sie ersetzt oder entfernt werden.

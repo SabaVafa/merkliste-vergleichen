@@ -17,6 +17,7 @@ Regeln (siehe Deliverables/11_Vergleich-Datenqualitaet.md):
 import argparse
 import collections
 import json
+import re
 import os
 import sys
 
@@ -294,7 +295,54 @@ def build_entry(cat, pid, m, idx):
         else:
             e['klingel'] = 'Nein'
         e['set'] = e['klingel'] != 'Nein'
+    e['card'] = card_fields(cat, e, g, e['shop'])
     return e
+
+
+# Produktkarten + Filter der PLPs: dieselben Shop-Werte, in die Filter-Schluessel der Prototyp-Karten
+# uebersetzt (plp.js / sprechanlage.js wenden `card` beim Laden an). null/[] = im Shop nicht gepflegt.
+MO_KEY = {'Aufputz': 'wand', 'Standmontage': 'stand', 'Unterputz': 'unterputz', 'Zaunmontage': 'zaun'}
+BK_MAT_KEY = {'Galvanisierter Stahl': 'stahl', 'Edelstahl': 'edelstahl', 'Edelstahl V2A (1.4301)': 'edelstahl',
+              'Edelstahl V4A': 'edelstahl', 'Acrylglas': 'acrylglas', 'Lärchenholz': 'holz'}
+SP_MAT_KEY = {'Galvanisierter Stahl': 'galvanisiert', 'Edelstahl': 'edelstahl', 'V2A Edelstahl (1.4301)': 'v2a'}
+TB_KEY = {'RFID': 'rfid', 'PIN-Code': 'pin', 'QR-Code': 'qr', 'Fingerprint': 'fingerprint', 'Gesichtserkennung': 'gesicht'}
+NS_KEY = {'Lasergraviert': 'gravur', 'mit Papiereinleger': 'wechsel', 'Digital': 'display'}
+
+
+def uniq(xs):
+    out = []
+    for x in xs:
+        if x and x not in out:
+            out.append(x)
+    return out
+
+
+def card_fields(cat, e, g, shop_name):
+    c = {'name': ' '.join(shop_name.replace('Metzler ', '', 1).replace(' und ', ' & ').split()), 'colors': e['col'] or []}
+    if cat == 'sprechanlage':
+        c['system'] = {'IP-System': 'ip', '2-Draht-BUS': 'bus'}.get(e['sys'])
+        kt = e['kt']
+        c['klingel'] = 'flex' if kt and kt.startswith('Flexibel') else kt
+        c['tuer'] = [TB_KEY[t] for t in (e['tb'] or []) if t in TB_KEY]
+        c['type'] = (e['typ'] or '').lower() or None
+        c['briefkasten'] = e['kombi'] != 'Nein'
+        c['material'] = (uniq(SP_MAT_KEY.get(v) for v in (g('Material') or [])) or [None])[0]
+        c['ns'] = (uniq(NS_KEY.get(v) for v in (g('Namensschild') or [])) or [None])[0]
+        return c
+    c['faecher'] = e['fa']
+    c['zeitung'] = (e['zf'] or '').lower() or None
+    c['montages'] = uniq(MO_KEY.get(v) for v in (e['mo'] or []))
+    mats = uniq(BK_MAT_KEY.get(v) for v in (e['mat'] or []))
+    if not mats:                                  # Merkmal fehlt: nur was der Shop-Artikelname selbst sagt
+        n = re.sub(r'edelstahl[- ]namensschild', '', shop_name.lower())   # Schild-Material ist nicht das Gehaeuse
+        mats = uniq(k for w, k in (('edelstahl', 'edelstahl'), ('acrylglas', 'acrylglas'), ('holz', 'holz')) if w in n)
+    c['materials'] = mats
+    kl = e['klingel']
+    c['sprech'] = 'sprechanlage' in kl.lower()
+    c['klingel'] = kl != 'Nein'                   # jede Sprechanlage hat einen Klingeltaster
+    c['paket'] = 'paket' in shop_name.lower()
+    c['blumenkasten'] = 'blumenkasten' in shop_name.lower()
+    return c
 
 
 def load(src):
@@ -318,7 +366,8 @@ def write_js(out, path):
           '   Felder: sid/art/url/shop = Shop-Artikel · conf = Sicherheit der Zuordnung · col = Farben (alle Varianten) ·\n'
           '   abm = B × H × T · kg = Artikelgewicht (Spanne, wenn Varianten abweichen → kgv) · Sprechanlagen: typ, sys, kt (Klingeltaster),\n'
           '   ns (Namensschild), tb (Türöffner-Bedienung), cam/va/nv/ip/ik (laut Produktbeschreibung), kombi ·\n'
-          '   Briefkästen: fa (Fächer), zf (Zeitungsfach), mo (Montageart), mat (Material), klingel, set */\n'
+          '   Briefkästen: fa (Fächer), zf (Zeitungsfach), mo (Montageart), mat (Material), klingel, set ·\n'
+          '   card = dieselben Werte als Filter-Schlüssel der Produktkarten (plp.js / sprechanlage.js) */\n'
           'window.MTZ_VGL_DATA=' + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ';\n')
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(js)
