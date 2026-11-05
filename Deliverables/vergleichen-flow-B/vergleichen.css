@@ -653,3 +653,9 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 .vgl-close:hover,.vgl-ph__rm:hover,.vgl-addsearch__x:hover{background:var(--paper-white,#F5F6FA);border-color:transparent}
 .vgl-close:hover{color:var(--schwarz,#1A171B)}
 .vgl-ph__rm:hover,.vgl-addsearch__x:hover{color:var(--text-muted,#6A6A6A)}
+
+/* ==== 15 · No hover effect on icons (2026-11-05, user decision — supersedes §13, see merkliste.css §15) ==== */
+.vgl-close:hover,.vgl-ph__rm:hover,.vgl-addsearch__x:hover{background:transparent}
+.vgl-close:hover{color:var(--schwarz,#1A171B)}
+.vgl-ph__rm:hover,.vgl-addsearch__x:hover{color:var(--text-muted,#6A6A6A)}
+.vgl-slot__rm:hover{background:var(--schwarz,#1A171B)}

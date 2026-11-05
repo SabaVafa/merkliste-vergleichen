@@ -362,3 +362,15 @@
   .mkl-item__cta{order:2}
 }
 @media(prefers-reduced-motion:reduce){.mkl-item__cta,.mkl-item__cta svg{transition:none !important}}
+
+/* ==== 15 · No hover effect on icons (2026-11-05, user decision — supersedes §13) ====
+   Icon-only buttons look the same on hover as at rest: no background circle, no colour change.
+   Keyboard focus keeps its visible ring. Applies to the header icons (Merkliste, Konto, Warenkorb),
+   the card bookmark, and the drawer/band close and remove icons. */
+.icon-btn:hover,.icon-btn.mkl-hdr:hover{background:transparent}
+.mkl-mark:hover{color:var(--schwarz,#1A171B)}
+.mkl-mark.is-on:hover{color:var(--teal,#015253)}
+.mkl-mark:hover .mkl-mark__disc,.mkl-mark:not(.is-limit):hover .mkl-mark__disc{background:transparent}
+.mkl-close:hover,.mkl-rm:hover,.mkl-item:hover .mkl-rm:hover,.mkl-pdp-band__x:hover{background:transparent}
+.mkl-close:hover{color:var(--schwarz,#1A171B)}
+.mkl-rm:hover,.mkl-pdp-band__x:hover{color:var(--text-muted,#6A6A6A)}
