@@ -174,3 +174,14 @@ Alle Icon-only-Buttons verhalten sich wie die Header-Icons (`.header-icon-btn`):
 - Hover: Unterstreichung 1 → 2 px, Chevron rückt 2 px nach rechts (.14s; ohne Bewegung bei reduzierter Bewegung). Fokus: 3 px Teal-Outline.
 - „Vergleichen“ links, Link rechts — auf allen Breiten in einer Zeile (auf Mobil kein gestapelter Vollbreiten-Button mehr). Trefferfläche bleibt 44 px hoch.
 - Dateien: `merkliste.js` (v=17), `merkliste.css` §14 (v=15).
+
+## 15 · Kaufberater = Live-Version (05.11.2026)
+
+- Der alte eingebettete Berater („Finden statt Suchen · Kaufberater ⌄“) ist auf beiden PLPs durch den **Produktberater der Live-Version** ersetzt (sabavafa.github.io/product-listing-page, Stand Commit c9e3980): „Produktberater · Jetzt starten“, Sprechanlagen 7 Schritte (ab „Wie sieht die Verkabelung bei Ihnen aus?“), Briefkästen 6 Schritte (ab „Wie soll montiert werden?“).
+- Übernommen 1:1 aus dem PLP-Projekt (dort nichts verändert): `plp-berater.html` + Ordner `Kaufbrater Images/` (12 Bilder) und der Einbettungsblock (iframe `#beraterFrame`, `?cat=sprechanlage|briefkasten&v=10`, Höhe per `postMessage {type:"mf-height"}` mit Fallback-Abfrage).
+- Der Berater bringt seine eigenen Empfehlungsdaten mit; seine Produktlinks führen wie live in den Shop (im Prototyp durch den Link-Schutz gesperrt). Merken/Vergleichen gibt es nur auf den Produktkarten, nicht in den Empfehlungen des Beraters.
+- Der alte Berater-Code in `plp.js` / `sprechanlage.js` bleibt inaktiv (er startet nur, wenn `[data-ai]` existiert).
+
+## 16 · Kein Hover-Effekt auf Icons (05.11.2026)
+
+Auf Wunsch ersetzt dies §13: Icon-Buttons sehen beim Hover genauso aus wie im Ruhezustand — kein Paper-Kreis, kein Farbwechsel. Betrifft die Header-Icons (Merkliste, Konto, Warenkorb), das Lesezeichen auf den Karten, Schließen/Entfernen in Merkliste und Vergleich, das × der Modellsuche und das × an den Vorschaubildern in der Vergleichsleiste (vorher rot). Der Tastatur-Fokusring bleibt. `merkliste.css` §15 (v=16), `vergleichen.css` §15 (v=29). Per Hover-Simulation geprüft: Ruhe- und Hover-Zustand identisch.
