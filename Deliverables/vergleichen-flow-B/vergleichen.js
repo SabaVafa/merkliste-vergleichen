@@ -813,16 +813,16 @@
     function td(inner,extra){return '<td class="vgl-hc'+(extra||'')+'" role="cell">'+inner+'</td>';}
     var lcEmpty='<td class="vgl-lc" role="cell"></td>';
     return '<thead role="rowgroup">'+
-      /* (a) actions: Merken (merkliste.js fills .vgl-ph__media) left, remove right — plain icons, nothing on the photo */
-      row('bar',lcEmpty,vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>');}).join(''))+
-      /* (b) photo tiles; the label column holds the quiet "add" tile of the same size */
-      row('img','<td class="vgl-lc" role="cell">'+lc.tile+'</td>',vis.map(function(i){return td('<div class="vgl-ph__img">'+imgHTML(items[i])+(c.pick?'<span class="vgl-pill" aria-hidden="true">'+(i+1)+' / '+n+'</span>':'')+'</div>');}).join(''))+
-      /* (c) names = the column headers */
-      row('name','<th class="vgl-lc" scope="col" role="columnheader"><span class="vgl-visually-hidden">Merkmal</span>'+lc.mkl+'</th>',vis.map(function(i,k){return '<th class="vgl-hc" scope="col" role="columnheader" data-id="'+esc(items[i].id)+'">'+nameCell(items[i],i,k,c)+'</th>';}).join(''))+
-      /* (d) price + UVP on one line, the price gap on its own reserved line */
-      row('money',lcEmpty,vis.map(function(i){return td(moneyCell(items[i],i,c));}).join(''))+
-      /* (e) CTA */
-      row('cta',lcEmpty,vis.map(function(i){return td(ctaHTML(items[i],c.titles[i]));}).join(''))+
+      /* (a) photo tile with the actions in its corners (Merken left — merkliste.js fills .vgl-ph__media —, remove right);
+             the photo is inset, so the icons never sit on it. The label column's "add" slot spans the whole header
+             (an empty product slot) instead of leaving three empty cells under it. */
+      row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick?'<span class="vgl-pill" aria-hidden="true">'+(i+1)+' / '+n+'</span>':'')+'</div>');}).join(''))+
+      /* (b) names = the column headers */
+      row('name','',vis.map(function(i,k){return '<th class="vgl-hc" scope="col" role="columnheader" data-id="'+esc(items[i].id)+'">'+nameCell(items[i],i,k,c)+'</th>';}).join(''))+
+      /* (c) price + UVP on one line, the price gap on its own reserved line */
+      row('money','',vis.map(function(i){return td(moneyCell(items[i],i,c));}).join(''))+
+      /* (d) CTA */
+      row('cta','',vis.map(function(i){return td(ctaHTML(items[i],c.titles[i]));}).join(''))+
       '</thead>';
   }
   /* slim identity strip: thumbnail, name, price, CTA per column — fixed height, overlays the content, shown by an IntersectionObserver */
@@ -839,10 +839,11 @@
     if(c.items.length===2)return gap+' mehr als '+(short?refNom(r):(tw?'die andere Ausführung':'das andere Modell'));
     return '+ '+gap+' ggü. '+(short?r.n:'dem niedrigsten Preis');
   }
-  /* row label: plain text, or — when there is a definition — the label itself is the toggletip button (dotted underline) */
+  /* row label: plain text; when there is a definition, an (i) icon button after it opens the toggletip (user decision 06.11.: icon, not underline) */
   function labelHTML(row){
-    if(!row.hint)return '<span class="rh__l">'+esc(row.label)+'</span>';
-    return '<span class="rh__w"><button class="vgl-i vgl-lbl" type="button" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+esc(row.label)+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+esc(row.hint)+'</span></span>';
+    var l='<span class="rh__l">'+esc(row.label)+'</span>';
+    if(!row.hint)return l;
+    return l+'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+esc(row.hint)+'</span></span>';
   }
   /* "13,3 × 27,4 × k. A. cm" → "B 13,3 · H 27,4 cm · T k. A." */
   function dimHTML(t){
@@ -958,7 +959,7 @@
   /* the strip uses the table's measured column grid (render/resize only, never on scroll) */
   function placePin(){
     var row=viewBody.querySelector('.vgl-pin__row'),tbl=viewBody.querySelector('table.vgl-t');if(!row||!tbl)return;
-    var rp=remPx(),cells=tbl.querySelectorAll('.vgl-hr--name > *'),base=viewBody.querySelector('.vgl-pin__in').getBoundingClientRect().left;
+    var rp=remPx(),cells=tbl.querySelectorAll('.vgl-hr--img > *'),base=viewBody.querySelector('.vgl-pin__in').getBoundingClientRect().left;
     var cols=Array.prototype.map.call(cells,function(e){return (e.getBoundingClientRect().width/rp).toFixed(3)+'rem';});
     var lc=cells[0]&&getComputedStyle(cells[0]).display==='none';
     row.style.gridTemplateColumns=lc?'repeat('+(cells.length-1)+',minmax(0,1fr))':cols.join(' ');

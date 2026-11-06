@@ -329,7 +329,6 @@ table.vgl-t tr>:first-child{padding-left:0}
 
 /* ---- product header: five aligned rows ---- */
 table.vgl-t .vgl-hr>*{padding-top:0;padding-bottom:0;border:0}
-table.vgl-t .vgl-hr--bar>*{padding-top:1.25rem}
 table.vgl-t .vgl-hr--name>*{padding-top:1rem}
 table.vgl-t .vgl-hr--money>*{padding-top:.25rem}
 table.vgl-t .vgl-hr--cta>*{padding-top:.75rem;padding-bottom:.5rem}
@@ -413,13 +412,10 @@ tr.vgl-sec__h th{padding:2.25rem 0 .75rem;border-bottom:.0625rem solid var(--v-g
 table.vgl-t tbody tr:not(.vgl-sec__h)>*{border-bottom:.0625rem solid var(--v-g100);vertical-align:baseline}   /* label and value share the first baseline */
 table.vgl-t .rh{font-size:var(--v-fs-sm);font-weight:600;line-height:1.5;color:var(--v-ink)}
 .vgl-rowcap{display:block;margin-top:.125rem;font-size:var(--v-fs-cap);font-weight:400;color:var(--v-muted)}
-/* label with a definition = toggletip button (dotted underline); tip below the label, Escape closes */
+/* label with a definition: (i) icon button after the label opens the toggletip; Escape closes */
 .rh__w{position:relative;display:inline-block}
-.vgl-lbl{position:relative;padding:0;border:0;background:none;font:inherit;font-weight:600;color:inherit;text-align:left;text-decoration:underline dotted;text-decoration-color:var(--v-muted);text-decoration-thickness:.0625rem;text-underline-offset:.25rem;cursor:help}
-.vgl-lbl::before{content:'';position:absolute;left:-.25rem;right:-.25rem;top:50%;height:max(100%,2.75rem);transform:translateY(-50%)}
-.vgl-lbl:hover,.vgl-lbl.is-open{text-decoration-style:solid}
 .vgl-tip{position:absolute;left:0;top:calc(100% + .5rem);z-index:20;width:17rem;padding:.625rem .75rem;border-radius:var(--v-r-m);background:var(--v-ink);color:var(--v-white);font-size:var(--v-fs-sm);font-weight:400;line-height:1.45;white-space:normal;box-shadow:var(--v-shadow-tip);opacity:0;visibility:hidden;transform:translateY(-.1875rem);transition:opacity .14s,transform .14s;pointer-events:none}
-.vgl-lbl:hover+.vgl-tip,.vgl-lbl:focus-visible+.vgl-tip,.vgl-lbl.is-open+.vgl-tip{opacity:1;visibility:visible;transform:none}
+.vgl-ib:hover+.vgl-tip,.vgl-ib:focus-visible+.vgl-tip,.vgl-ib.is-open+.vgl-tip{opacity:1;visibility:visible;transform:none}
 table.vgl-t tbody .rh{position:relative}
 table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
 /* values: regular weight, body size; caption meta muted */
@@ -511,7 +507,6 @@ td.vgl-val.na,.vgl-ka,.vgl-no{color:var(--v-muted)}
   table.vgl-t tbody th[scope="row"]{padding-bottom:.25rem;border-bottom:0 !important}
   table.vgl-t td.vgl-val{font-size:var(--v-fs-sm)}
   tr.vgl-sec__h th{padding:1.75rem 0 .5rem}
-  table.vgl-t .vgl-hr--bar>*{padding-top:.75rem}
   .vgl-ph__img{padding:.5rem}
   .vgl-ph__t,.vgl-ph__price,.vgl-cta{font-size:var(--v-fs-sm)}
   .vgl-cta svg{width:1rem;height:1rem}
@@ -551,10 +546,47 @@ td.vgl-val.na,.vgl-ka,.vgl-no{color:var(--v-muted)}
   body.vgl-printing .vgl-view{position:static;opacity:1;visibility:visible;background:var(--v-white)}
   body.vgl-printing .vgl-view__scroll{overflow:visible}
   body.vgl-printing .vgl-view__bar{border-bottom:.125rem solid var(--v-ink)}
-  body.vgl-printing .vgl-bar__act,body.vgl-printing .vgl-close,body.vgl-printing .vgl-back,body.vgl-printing .vgl-hr--bar,body.vgl-printing .vgl-hr--cta,body.vgl-printing .vgl-pin,body.vgl-printing .vgl-ph__pick svg,body.vgl-printing .vgl-lc>*,body.vgl-printing .vgl-sec__btn,body.vgl-printing .vgl-pill,body.vgl-printing .vgl-actrow,body.vgl-printing .vgl-alts,body.vgl-printing .vgl-toast,body.vgl-printing .vgl-addsearch,body.vgl-printing .vgl-sharepop,body.vgl-printing .vgl-pick,body.vgl-printing .mkl-mark{display:none !important}
+  body.vgl-printing .vgl-bar__act,body.vgl-printing .vgl-close,body.vgl-printing .vgl-back,body.vgl-printing .vgl-ph__bar,body.vgl-printing .vgl-hr--cta,body.vgl-printing .vgl-pin,body.vgl-printing .vgl-ph__pick svg,body.vgl-printing .vgl-lc>*,body.vgl-printing .vgl-sec__btn,body.vgl-printing .vgl-pill,body.vgl-printing .vgl-actrow,body.vgl-printing .vgl-alts,body.vgl-printing .vgl-toast,body.vgl-printing .vgl-addsearch,body.vgl-printing .vgl-sharepop,body.vgl-printing .vgl-pick,body.vgl-printing .mkl-mark{display:none !important}
   body.vgl-printing .vgl-sec--g .vgl-sec__t,body.vgl-printing .vgl-sec--g .vgl-sec__n,body.vgl-printing .vgl-sec--g .vgl-sec__sub{display:inline !important}
   body.vgl-printing table.vgl-t{--vgl-img:5rem}
   body.vgl-printing .vgl-view__bar-in::after{content:attr(data-print);margin-left:auto;font-size:var(--v-fs-cap);color:var(--v-ink)}
   body.vgl-printing tr{break-inside:avoid}
   body:not(.vgl-printing) .vgl-view,body:not(.vgl-printing) .vgl-tray,body:not(.vgl-printing) .vgl-toast,body:not(.vgl-printing) .vgl-tourfab{display:none !important}
 }
+
+/* ==== Space (Lead UX/UI, 06.11.): same calm system, ~30 % less height before the first data row ====
+   · no separate action row: Merken + remove sit in the photo tile's top corners (the photo is inset, icons never cover it)
+   · the label column's header is one "empty slot" spanning the whole header (add tile + Merkliste link), not one tile over three blank cells
+   · smaller photo tile, tighter name → price → CTA rhythm, less air above section headings and inside rows */
+table.vgl-t{--vgl-img:9rem}
+.vgl-ph__img{padding:1.75rem 1rem .75rem}
+.vgl-ph__bar{position:absolute;top:0;left:0;right:0;z-index:2;height:2.75rem;margin:0}
+table.vgl-t .vgl-hr--img>*{padding-top:1rem}
+table.vgl-t .vgl-hr--name>*{padding-top:.75rem}
+table.vgl-t .vgl-hr--money>*{padding-top:.125rem}
+table.vgl-t .vgl-hr--cta>*{padding-top:.5rem;padding-bottom:0}
+table.vgl-t th.vgl-lc[rowspan]{padding-bottom:0}
+.vgl-lc__slot{display:flex;flex-direction:column;gap:.5rem;height:100%}
+.vgl-lc__slot .vgl-addtile,.vgl-lc__slot .vgl-lc__full{flex:1 1 auto;height:auto;min-height:var(--vgl-img)}
+.vgl-lc__slot .vgl-lc__mkl{align-self:center;margin-left:0}
+tr.vgl-sec__h th{padding:1.75rem 0 .5rem}
+.vgl-sec--u tr.vgl-sec__h th{padding-top:1.5rem}
+@media(min-width:48rem){table.vgl-t tbody tr:not(.vgl-sec__h)>*{padding-top:.75rem;padding-bottom:.75rem}}
+@media(min-width:90rem){table.vgl-t.vgl-t--n4{--vgl-img:8rem}}
+@media(max-width:63.99rem){table.vgl-t{--vgl-img:7rem}}
+@media(max-width:47.99rem){
+  table.vgl-t{--vgl-img:6rem}
+  .vgl-ph__img{padding:1.75rem .5rem .5rem}
+  table.vgl-t .vgl-hr--img>*{padding-top:.75rem}
+  tr.vgl-sec__h th{padding:1.25rem 0 .5rem}
+}
+/* the slot fills the full header height of its column (table cells have no definite height → absolute inset) */
+table.vgl-t th.vgl-lc[rowspan]{position:relative}
+.vgl-lc__slot{position:absolute;top:1rem;left:0;right:1rem;bottom:0;height:auto}
+/* (i) hint icon (06.11.): muted glyph, 2.75 rem target, identical on hover (icon-button rule); open = teal (state, not hover) */
+.rh__w{position:relative;display:inline-block;vertical-align:-.1875rem}
+.vgl-ib{position:relative;display:inline-flex;align-items:center;justify-content:center;width:1.125rem;height:1.125rem;margin-left:.375rem;padding:0;border:0;background:none;color:var(--v-muted);cursor:pointer}
+.vgl-ib::before{content:'';position:absolute;inset:-.8125rem}
+.vgl-ib svg{width:1.125rem;height:1.125rem}
+.vgl-ib:hover{color:var(--v-muted);background:none}
+.vgl-ib.is-open{color:var(--v-teal)}

@@ -237,3 +237,11 @@ Aus Brief §7 umgesetzt: Erklärsätze nur aus der freigegebenen Kurzliste (E1, 
 - **Spalten:** stärkere Trennlinie zwischen Merkmalsspalte und Werten, feine Linien zwischen den Modellen; gleichmäßigere Zeilenhöhe; (i) auf die Textzeile ausgerichtet.
 - „Modell hinzufügen" bricht in der gestrichelten Kachel nicht mehr um (1280 px).
 - Geprüft bei 1800, 1280 und 375 px: kein seitliches Scrollen, keine Konsolenfehler. `vergleichen.js?v=34`, `vergleichen.css?v=37`.
+
+## 11. Platz (Lead UX/UI, 06.11.) + Hinweis-Icon
+
+- **Weniger Leerraum, gleiche Ruhe:** Merken und Entfernen sitzen in den oberen Ecken der Bildkachel (das Foto ist eingerückt, die Icons liegen nie darauf) – die eigene Aktionszeile entfällt. Die Kachel ist 9 rem statt 11 rem hoch (8 rem bei 4 Modellen ≥ 90 rem, 7 rem < 64 rem). Name → Preis → Link enger, weniger Luft über Abschnittsüberschriften und in den Zeilen.
+- **Leere Merkmalsspalte im Kopf:** „Modell hinzufügen" ist ein Platzhalter über die ganze Kopfhöhe (wie ein leerer Modellplatz), „Aus der Merkliste (n)" darin; bei 4 von 4 der Hinweis.
+- Ergebnis bei 1880 × 980 (3 Briefkästen): erste Datenzeile bei 389 px statt ca. 650 px; der ganze Vergleich passt auf einen Bildschirm. Bei 1024 px (4 Modelle): Links auf einer Linie, Leiste deckungsgleich mit den Spalten.
+- **Hinweis-Icon (Nutzerin):** Merkmale mit Erklärung zeigen wieder ein (i)-Icon hinter dem Namen statt einer gepunkteten Unterstreichung. Icon ohne Hover-Effekt, 2,75 rem Klickfläche, geöffnet teal, Escape schließt zuerst den Hinweis.
+- `vergleichen.js?v=38`, `vergleichen.css?v=44`.
