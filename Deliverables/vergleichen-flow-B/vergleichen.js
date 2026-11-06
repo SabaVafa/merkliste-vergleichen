@@ -201,6 +201,9 @@
     /* the action toast pauses while it is hovered or focused (WCAG 2.2.1) */
     toastEl.addEventListener('mouseenter',pauseToast);toastEl.addEventListener('focusin',pauseToast);
     toastEl.addEventListener('mouseleave',resumeToast);toastEl.addEventListener('focusout',resumeToast);
+    /* Responsive audit 14: a toggletip is placed before it shows (hover, keyboard focus or tap) so it stays inside the viewport */
+    view.addEventListener('pointerover',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
+    view.addEventListener('focusin',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
 
     tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm)toggle(rm.getAttribute('data-rm'),false);});
     view.addEventListener('click',function(e){
@@ -227,7 +230,7 @@
         if(k==='print'){printView();}
         if(k==='common'){gShow=!gShow;onCommon();}
         return;}
-      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
+      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
       var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');pendingCol=aid;if(toggle(aid,true)){var anm=baseTitle(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
       var rm=e.target.closest('[data-rm]');if(rm){removeColumn(rm.getAttribute('data-rm'));return;}
       var go=e.target.closest('[data-go]');
@@ -431,13 +434,24 @@
   }
   /* (i) toggletip: click/Enter opens a real tooltip node (aria-describedby), Escape closes it first */
   function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');}}
+  /* Responsive audit 14 (07.11.): the tip opens under its (i) and is shifted sideways only as far as needed to keep
+     1 rem from both viewport edges (Gemeinsamkeiten grid at the right edge, phones); its width is capped in CSS */
+  /* all tips are pre-placed on render/resize too: an unplaced hidden tip still widened the scroll area (scrollWidth) */
+  function placeTips(){if(viewBody)Array.prototype.forEach.call(viewBody.querySelectorAll('.vgl-ib'),placeTip);}
+  function placeTip(b){
+    var t=b.nextElementSibling;if(!t||!t.classList.contains('vgl-tip'))return;
+    t.style.left='';var rp=remPx(),vw=document.documentElement.clientWidth,r=t.getBoundingClientRect(),dx=0;
+    if(r.right>vw-rp)dx=vw-rp-r.right;
+    if(r.left+dx<rp)dx=rp-r.left;
+    if(dx)t.style.left=(dx/rp).toFixed(3)+'rem';
+  }
   function mklCount(){try{if(!window.MTZ_MKL)return 0;return window.MTZ_MKL.items().filter(function(it){return it.lens===(window.MTZ_LENS||'sprechanlage')&&!it.configId&&BY_ID[it.articleId||it.id]&&selected.indexOf(it.articleId||it.id)<0;}).length;}catch(e){return 0;}}
 
   /* toolbar control — rest: "Vergleichen" (starts compare mode → card fields appear);
      in mode: "Vergleich anzeigen (n)", grey until ≥2, teal + opens comparison from 2. */
   function injectBarButton(){
     var bar=document.querySelector('.catalog__bar'); if(!bar||bar.querySelector('.vgl-barwrap'))return;
-    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt" aria-hidden="true">0</span></button><button class="vgl-cancel" type="button">Vergleich beenden</button></div>');
+    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt" aria-hidden="true">0</span></button><button class="vgl-cancel" type="button" aria-label="Vergleich beenden"><span class="vgl-m-hide">Vergleich beenden</span><span class="vgl-m-only">Beenden</span></button></div>');
     barBtn=wrap.querySelector('.vgl-bar-btn');
     cancelBtn=wrap.querySelector('.vgl-cancel');
     barBtn.addEventListener('click',function(){if(!compareMode){enterMode();}else if(canCompare()){openView();}});
@@ -534,8 +548,15 @@
     }
     traySlots.innerHTML='';
     selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));});
-    document.body.style.paddingBottom=shown?((tray.offsetHeight||88)/16)+'rem':'';
-    document.documentElement.style.setProperty('--vgl-tray-h',((tray.offsetHeight||88)/16)+'rem');   /* alerts lift exactly above the tray */   /* measured after the slots exist — the mobile tray wraps to two rows */
+    trayPad();
+  }
+  /* the page keeps room for the tray (last card row, pagination, footer stay reachable); alerts lift exactly above it.
+     Measured after the slots exist — the mobile tray wraps to two rows — and again whenever its height changes
+     (rotation, text zoom: ResizeObserver in init, Responsive audit 14) */
+  function trayPad(){
+    var shown=tray.classList.contains('is-open'),hgt=tray.offsetHeight||88,rp=remPx();
+    document.body.style.paddingBottom=shown?(hgt/rp)+'rem':'';
+    document.documentElement.style.setProperty('--vgl-tray-h',(hgt/rp)+'rem');
   }
   function syncAll(){syncCards();syncBar();syncTray();if(view.classList.contains('is-open'))renderView();}
 
@@ -860,8 +881,8 @@
     var s=String(t),v=s.indexOf(VAR)>-1;s=s.replace(VAR,'').replace(/ cm$/,'');
     var ax=s.split(' × ');if(ax.length!==3)return esc(t);
     var L=['B','H','T'],known=[],unk=[];
-    ax.forEach(function(a,k){if(a==='k. A.')unk.push(L[k]+' <span class="vgl-ka"><span aria-hidden="true">k. A.</span><span class="vgl-visually-hidden">keine Angabe im Shop</span></span>');else known.push(L[k]+' '+esc(a));});
-    return known.join(' · ')+(known.length?' cm':'')+(unk.length?(known.length?' · ':'')+unk.join(' · '):'')+(v?esc(VAR):'');
+    ax.forEach(function(a,k){if(a==='k. A.')unk.push(L[k]+' <span class="vgl-ka"><span aria-hidden="true">k. A.</span><span class="vgl-visually-hidden">keine Angabe im Shop</span></span>');else known.push(L[k]+'&nbsp;'+esc(a));});
+    return known.join(' · ')+(known.length?'&nbsp;cm':'')+(unk.length?(known.length?' · ':'')+unk.join(' · '):'')+(v?esc(VAR):'');
   }
   /* colours: one slot per colour of the whole comparison, same order in every column; a colour a model lacks is an empty outlined slot */
   function colorsHTML(cs,all){
@@ -906,6 +927,7 @@
     var maxC=maxCols(),pick=items.length>maxC,vis=syncVis(items,maxC),nv=vis.length,n=items.length;
     var minPrice=Math.min.apply(null,items.map(function(p){return typeof p.price==='number'?p.price:Infinity;}));
     var c=cur={items:items,an:an,titles:titles,refs:refs,vd:vd,vis:vis,pick:pick,minPrice:minPrice};
+    var anyGap=!vd.noDelta&&items.some(function(p){return typeof p.price==='number'&&p.price>minPrice;});   /* phones drop the reserved gap line when no model has one */
     var gOpen=printing||gShow;
     var allColors=[];items.forEach(function(p){(p.colors||[]).forEach(function(cl){if(allColors.indexOf(cl)<0)allColors.push(cl);});});
     var forAll=n===2?'gilt für beide Modelle':'gilt für alle '+n+' Modelle';
@@ -917,7 +939,7 @@
     /* ---- Table ---- */
     var nMkl=n<MAX?mklCount():0;
     var lc={
-      tile:n>=MAX?'<p class="vgl-lc__full"><b>'+n+' von '+MAX+' Modellen.</b> Entfernen Sie ein Modell, um ein anderes hinzuzufügen.</p>':
+      tile:n>=MAX?'<p class="vgl-lc__full"><b>'+n+' von '+MAX+' Modellen.</b> '+(pick?nv+' sind sichtbar – zum Wechseln den Namen wählen. ':'')+'Entfernen Sie ein Modell, um ein anderes hinzuzufügen.</p>':
         '<button class="vgl-addtile" type="button" data-vgl="add">'+IC_PLUS+'<span class="vgl-addtile__l">Modell hinzufügen</span><span class="vgl-addtile__n">noch '+(MAX-n)+' möglich</span></button>',
       mkl:nMkl?'<button class="vgl-tb vgl-tb--teal vgl-lc__mkl" type="button" data-vgl="addmkl">Aus der Merkliste ('+nMkl+')</button>':''
     };
@@ -950,7 +972,11 @@
     if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g'+(gOpen?'':' is-closed')+'" role="rowgroup">'+secHead('<span class="vgl-sec__ic" aria-hidden="true">'+IC_OK+'</span><span class="vgl-sec__t">Gemeinsamkeiten</span> <span class="vgl-sec__n">'+an.G.length+'</span><span class="vgl-sec__peek" aria-hidden="true">'+esc(byRelevance(an.G).map(function(d){return d.row.label;}).join(' · '))+'</span><span class="vgl-sec__sub">'+forAll+'</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG" aria-label="'+commonAria(gOpen,an.G.length)+'"><span>'+commonLabel(gOpen,an.G.length)+'</span>'+IC_CHD+'</button>')+'</tbody>'+
       '<tbody class="vgl-sec__rows" id="vglG" role="rowgroup"'+(gOpen?'':' hidden')+'>'+commonGridHTML()+'</tbody>';
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
-    var table='<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
+    /* phones (Responsive audit 14): the label column with the add slot is hidden there, so one line above the header carries
+       "Modell hinzufügen" and — when not all models fit — how many are visible and how to switch (CSS shows it < 48 rem only) */
+    var mbar=(pick||n<MAX)?'<div class="vgl-mbar">'+(pick?'<p class="vgl-mbar__t"><b>'+nv+' von '+n+' Modellen sichtbar</b> – zum Wechseln den Namen antippen.</p>':'')+
+      (n<MAX?'<button class="vgl-tb vgl-tb--teal vgl-mbar__add" type="button" data-vgl="add" aria-label="Modell hinzufügen">'+IC_PLUS+'Hinzufügen</button>':'')+'</div>':'';
+    var table=mbar+'<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+(anyGap?'':' no-gap')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
 
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
     var alts=vd.twin?alternatives(items):[],altHTML='';
@@ -962,7 +988,7 @@
       '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb" type="button" data-vgl="clear">Vergleich leeren</button></div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
-    lockHead();placePin();fitHeader();watchPin();
+    lockHead();placePin();fitHeader();placeTips();watchPin();
   }
   /* collapsed Gemeinsamkeiten = a full section bar: heading + count + the shared features named (info scent) + "Anzeigen" */
   function commonLabel(open){return open?'Ausblenden':'Anzeigen';}
@@ -988,6 +1014,9 @@
     row.style.gridTemplateColumns=lc?'repeat('+(cells.length-1)+',minmax(0,1fr))':cols.join(' ');
     row.classList.toggle('no-lc',!!lc);
     var off=cells[lc?1:0]?(cells[lc?1:0].getBoundingClientRect().left-base)/rp:0;row.style.marginLeft=off.toFixed(3)+'rem';
+    /* phones: the header rows are inset on both sides (grey band padding) — the strip's 1fr columns need the same right inset (audit 14: 6 px drift) */
+    var last=cells[cells.length-1],inR=viewBody.querySelector('.vgl-pin__in').getBoundingClientRect().right;
+    row.style.marginRight=(lc&&last)?((inR-last.getBoundingClientRect().right)/rp).toFixed(3)+'rem':'';
   }
   var pinIO=null;
   function watchPin(){
@@ -1007,6 +1036,7 @@
     var nG=cur?cur.an.G.length:0;
     if(rows)rows.hidden=!gShow;
     if(sec)sec.classList.toggle('is-closed',!gShow);
+    placeTips();
     if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('span').textContent=commonLabel(gShow);btn.setAttribute('aria-label',commonAria(gShow,nG));}
     announce(nG+' Gemeinsamkeit'+(nG===1?'':'en')+(gShow?' eingeblendet.':' ausgeblendet.'));
   }
@@ -1194,7 +1224,12 @@
       if(!open&&st&&st.mtzVgl){var m=/[?&]vergleich=([^&#]+)/.exec(location.search);if(m&&setSelection(decodeURIComponent(m[1]).split(','))>=MIN){syncAll();openView({push:false});}}
     });
     /* rotation / window resize / zoom: a new breakpoint re-renders (column count), otherwise the head is re-measured — never on scroll */
-    window.addEventListener('resize',function(){if(!view.classList.contains('is-open'))return;if(tierKey()!==lastTier){renderView();}else{lockHead();placePin();fitHeader();}});
+    function relayout(){if(!view.classList.contains('is-open'))return;if(tierKey()!==lastTier){renderView();}else{lockHead();placePin();fitHeader();placeTips();}}
+    window.addEventListener('resize',relayout);
+    /* Responsive audit 14 (07.11.): the scroll area's own width is the source of truth — it also changes without a window
+       resize (scrollbar appears when Gemeinsamkeiten open, split view, a late resize event); width changes only, once per frame */
+    if(window.ResizeObserver)new ResizeObserver(function(){trayPad();}).observe(tray);
+    if(window.ResizeObserver){var roW=0,roF=0;new ResizeObserver(function(es){var w=Math.round(es[0].contentRect.width);if(!w||w===roW)return;roW=w;cancelAnimationFrame(roF);roF=requestAnimationFrame(relayout);}).observe(scrollEl);}
     /* another tab changed this category's selection */
     window.addEventListener('storage',function(e){if(e.key!==KEY)return;selected=ownIds();syncAll();});
   }

@@ -414,7 +414,7 @@ table.vgl-t .rh{font-size:var(--v-fs-sm);font-weight:600;line-height:1.5;color:v
 .vgl-rowcap{display:block;margin-top:.125rem;font-size:var(--v-fs-cap);font-weight:400;color:var(--v-muted)}
 /* label with a definition: (i) icon button after the label opens the toggletip; Escape closes */
 .rh__w{position:relative;display:inline-block}
-.vgl-tip{position:absolute;left:0;top:calc(100% + .5rem);z-index:20;width:17rem;padding:.625rem .75rem;border-radius:var(--v-r-m);background:var(--v-ink);color:var(--v-white);font-size:var(--v-fs-sm);font-weight:400;line-height:1.45;white-space:normal;box-shadow:var(--v-shadow-tip);opacity:0;visibility:hidden;transform:translateY(-.1875rem);transition:opacity .14s,transform .14s;pointer-events:none}
+.vgl-tip{position:absolute;left:0;top:calc(100% + .5rem);z-index:20;width:min(17rem,calc(100vw - 2rem));padding:.625rem .75rem;border-radius:var(--v-r-m);background:var(--v-ink);color:var(--v-white);font-size:var(--v-fs-sm);font-weight:400;line-height:1.45;white-space:normal;box-shadow:var(--v-shadow-tip);opacity:0;visibility:hidden;transform:translateY(-.1875rem);transition:opacity .14s,transform .14s;pointer-events:none}
 .vgl-ib:hover+.vgl-tip,.vgl-ib:focus-visible+.vgl-tip,.vgl-ib.is-open+.vgl-tip{opacity:1;visibility:visible;transform:none}
 table.vgl-t tbody .rh{position:relative}
 table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
@@ -517,9 +517,7 @@ td.vgl-val.na,.vgl-ka,.vgl-no{color:var(--v-muted)}
   .vgl-pin__col{padding:0}
   .vgl-pin__row{column-gap:1rem}
   .vgl-pin__name{-webkit-line-clamp:1}
-  /* tips open inside the full-width label cell */
-  .rh__w{position:static}
-  .vgl-tip{left:0;right:0;width:auto}
+  /* (tips: placed by JS placeTip() since the responsive audit 14 — the former "full-width label cell" override was cancelled by a later .rh__w rule) */
   .vgl-alts__list{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem}
   .vgl-alt__media{height:6rem}
   /* action row at the end */
@@ -736,3 +734,55 @@ table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size
   .vgl-sec--g.is-closed .vgl-sec__in{padding:.75rem}
   .vgl-sec--g:not(.is-closed) .vgl-sec__in{padding-left:0}
 }
+
+/* =====================================================================
+   14 · Responsive-Audit (07.11.) — fixes and mobile UX; the desktop look (≥ 64 rem) is unchanged.
+   Doc: Deliverables/14_Responsive-Audit.md
+   ===================================================================== */
+/* product header on phones: header cells keep no bottom padding (the label column's first-child spacing leaked in:
+   12 px gap between name and stars, 24 px under the photo and under the CTA) */
+@media(max-width:47.99rem){
+  table.vgl-t thead .vgl-hr>*:nth-child(n){padding-bottom:0}
+  /* the reserved price-gap line is dropped when no model has a price gap (equal prices) — it only aligns columns otherwise */
+  table.vgl-t.no-gap .vgl-ph__delta{display:none}
+}
+/* Spaltenwahl: the chevron follows the last word of the name (with long names it sat at the column edge, next to the
+   neighbouring column) */
+.vgl-ph__pick{display:block}
+.vgl-ph__pick .vgl-ph__t{display:inline}
+.vgl-ph__pick svg{display:inline-block;margin:0 0 0 .25rem;vertical-align:-.25rem}
+/* phones: one line on the grey band above the photos — "n von m Modellen sichtbar" + how to switch, and
+   "Modell hinzufügen" (the label column with the add slot does not exist below 48 rem) */
+.vgl-mbar{display:none}
+@media(max-width:47.99rem){
+  .vgl-mbar{display:flex;align-items:center;justify-content:flex-end;gap:.75rem;padding:.25rem .75rem 0;background:var(--v-paper);box-shadow:0 0 0 100vmax var(--v-paper);clip-path:inset(0 -100vmax)}
+  .vgl-mbar__t{flex:1 1 0;min-width:0;margin:0;padding:.25rem 0;font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
+  .vgl-mbar__t b{font-weight:600;color:var(--v-ink)}
+  .vgl-view .vgl-mbar__add{margin-right:-.5rem}
+  .vgl-mbar+table.vgl-t thead tr.vgl-hr--img>*{padding-top:.25rem}
+}
+/* Ähnliche Modelle on phones: one row per model (photo left, reasons right) instead of a 2-up grid with an orphaned
+   third card; nothing hides behind a horizontal scroll (WCAG 1.4.10) */
+@media(max-width:47.99rem){
+  .vgl-alts{margin-top:2.5rem}
+  .vgl-alts__h{margin-bottom:.25rem}
+  .vgl-alts__list{grid-template-columns:minmax(0,1fr);gap:0}
+  .vgl-alt{display:grid;grid-template-columns:5rem minmax(0,1fr);align-items:start;gap:1rem;padding:1rem 0;border-bottom:.0625rem solid var(--v-g100)}
+  .vgl-alt__media{height:5rem}
+}
+/* short landscape viewports (phones turned sideways): bar and identity strip take 3 rem each instead of 3.75 / 4 rem */
+@media(min-width:48rem) and (max-height:30rem){
+  .vgl-view:not(.is-barwrap) .vgl-view__bar-in{height:3rem}
+  .vgl-pin__in{height:3rem}
+  .vgl-pin__img,.vgl-pin__price{display:none}
+  .vgl-pin__name{-webkit-line-clamp:1}
+}
+/* compare tray on phones: hint at caption size (was 11 px, below the DS caption) */
+@media(max-width:47.99rem){.vgl-tray__hint{font-size:var(--v-fs-cap)}}
+/* enlarged text in narrow columns: price and UVP may wrap instead of running into the neighbouring column
+   (at normal text size they stay on one line at every width from 320 px) */
+.vgl-ph__price,.vgl-ph__uvp{white-space:normal}
+/* same for the rating count and the CTA: with enlarged text they wrap (German hyphenation, lang="de") rather than
+   crossing into the next column */
+.vgl-stars{flex-wrap:wrap;row-gap:.125rem}
+.vgl-cta{white-space:normal;hyphens:auto;-webkit-hyphens:auto}

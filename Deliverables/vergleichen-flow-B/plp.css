@@ -1570,3 +1570,19 @@
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ============================================================
+   14 · Responsive-Audit (07.11.) — fixes only, the look stays (Deliverables/14_Responsive-Audit.md)
+   ============================================================ */
+@media (max-width: 1023px) {
+  /* Filter sheet: the desktop rule "align-self:start" (sticky sidebar) also applies to the fixed sheet in current
+     Chromium (box alignment for positioned boxes) — the sheet grew to its content height (≈ 2360 px at 320 px) and
+     every filter below the first screen was unreachable. Stretch it between top:0 and bottom:0 again; it scrolls inside. */
+  .filters { align-self: stretch; max-height: 100vh; max-height: 100dvh; overscroll-behavior: contain; }
+  /* close control of the sheet: 2.75 rem target (was 36 px) */
+  .filters__close { width: 2.75rem; height: 2.75rem; margin-right: -.25rem; }
+}
+@media (max-width: 767px) {
+  /* "Filter" is the only entry to the filters on phones: 2.75 rem target (was 34 px) */
+  .catalog__filter-btn { height: 2.75rem; }
+}

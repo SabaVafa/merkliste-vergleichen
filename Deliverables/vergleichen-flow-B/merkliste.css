@@ -374,3 +374,16 @@
 .mkl-close:hover,.mkl-rm:hover,.mkl-item:hover .mkl-rm:hover,.mkl-pdp-band__x:hover{background:transparent}
 .mkl-close:hover{color:var(--schwarz,#1A171B)}
 .mkl-rm:hover,.mkl-pdp-band__x:hover{color:var(--text-muted,#6A6A6A)}
+
+/* ==== 16 · Responsive-Audit (07.11.) — phones (Deliverables/14_Responsive-Audit.md) ====
+   The storage hint closes the list (JS placeHint) instead of sitting in the pinned footer; the selection hint shares
+   the row with "Alle n auswählen", so the sticky footer is one short line + the full-width compare CTA. */
+.mkl-hint[hidden]{display:none}
+.mkl-hint--body{margin:0;padding:var(--sp-4,1rem) var(--sp-4,1rem) var(--sp-6,1.5rem)}
+@media(max-width:47.99rem){
+  .mkl-foot__hint{flex:1 1 9rem}
+  .mkl-cta{flex:1 1 100%}
+}
+/* very narrow phones (< 22.5 rem): "Leeren" instead of "Merkliste leeren", so title and count stay on one line */
+.mkl-w-only{display:none}
+@media(max-width:22.49rem){.mkl-w-hide{display:none}.mkl-w-only{display:inline}}

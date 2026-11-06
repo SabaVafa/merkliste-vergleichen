@@ -157,7 +157,7 @@
       '<div class="mkl-head">' +
         '<div class="mkl-head__row">' +
           '<h2 class="mkl-title" id="mklTitle" tabindex="-1">Merkliste <span class="mkl-count">(0)</span></h2>' +
-          '<button class="mkl-link" type="button" data-mkl="clear" hidden>Merkliste leeren</button>' +
+          '<button class="mkl-link" type="button" data-mkl="clear" aria-label="Merkliste leeren" hidden><span class="mkl-w-hide">Merkliste leeren</span><span class="mkl-w-only">Leeren</span></button>' +
           '<button class="mkl-close" type="button" data-mkl="close" aria-label="Merkliste schließen">' + IC_X + '</button>' +
         '</div>' +
         '<div class="mkl-tools" role="group" aria-label="Merkliste weitergeben" hidden>' +
@@ -447,7 +447,7 @@
     notice.hidden = storageOk;
     sharedEl.hidden = !shared; if (shared) sharedEl.innerHTML = bannerHTML();
     sharedLink.hidden = shared || !sharedList; if (!sharedLink.hidden) sharedLink.textContent = 'Geteilte Merkliste anzeigen (' + sharedList.items.length + ')';
-    hintEl.innerHTML = shared ? SHARED_HINT : OWN_HINT;
+    hintEl.innerHTML = shared ? SHARED_HINT : OWN_HINT; hintEl.hidden = n === 0; placeHint();
     emptyEl.hidden = n > 0; listEl.hidden = n === 0; footEl.hidden = n === 0;
     var byLens = {}, order = [LENS]; list.forEach(function (it) { var l = it.lens || LENS; if (!byLens[l]) { byLens[l] = []; if (order.indexOf(l) < 0) order.push(l); } byLens[l].push(it); });
     var multi = order.filter(function (l) { return byLens[l]; }).length > 1;
@@ -458,6 +458,16 @@
     syncCmp();
     if (keep) { var kb = listEl.querySelector(keep); if (kb) kb.focus(); }   /* re-render keeps the keyboard where it was */
     fitDrawer();
+  }
+  /* Responsive audit 14 (07.11.): on phones the storage hint (3–4 lines) leaves the pinned footer and closes the list
+     instead — the footer keeps only the selection and the compare CTA, so the list gets the room (320×568: footer 223 → ~130 px) */
+  var MQ_PHONE = window.matchMedia ? window.matchMedia('(max-width:47.99rem)') : null;
+  function placeHint() {
+    if (!hintEl || !footEl) return;
+    var body = drawer.querySelector('.mkl-body'), inBody = !!(MQ_PHONE && MQ_PHONE.matches);
+    hintEl.classList.toggle('mkl-hint--body', inBody);
+    if (inBody) { if (hintEl.parentNode !== body) body.appendChild(hintEl); }
+    else if (hintEl.parentNode !== footEl) footEl.insertBefore(hintEl, footEl.firstChild);
   }
   /* Responsive audit (2026-11-02): on short viewports (landscape phones) or with enlarged text the pinned head +
      footer left no room for the list (65px at 844×390, 2px at 200 % text) — then the dialog scrolls as one column */
@@ -922,7 +932,7 @@
       injectOverlayHearts();
       new MutationObserver(injectOverlayHearts).observe(body, { childList: true, subtree: true });
     })();
-    window.addEventListener('resize', function () { if (isOpen) fitDrawer(); });   /* rotation re-checks the drawer layout */
+    window.addEventListener('resize', function () { if (!isOpen) return; placeHint(); try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {} fitDrawer(); });   /* rotation re-checks the drawer layout */
     /* cross-tab: another tab changed the list */
     window.addEventListener('storage', function (e) { if (e.key === KEY) { load(); refreshPrices(); syncAll(); live('Merkliste in einem anderen Tab geändert: ' + items.length + ' Artikel'); } });
     if (/[?&]merkliste=demo\b/.test(QS)) seedDemoConfig();
