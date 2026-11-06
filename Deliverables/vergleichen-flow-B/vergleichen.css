@@ -668,3 +668,20 @@ table.vgl-t.is-tight .vgl-stars--side{display:none}
 table.vgl-t.is-tight .vgl-stars--row{display:flex;margin:0 0 .25rem;font-size:var(--v-fs-h4);gap:.125rem}
 table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size:var(--v-fs-sm)}
 @media(max-width:47.99rem){table.vgl-t.is-tight .vgl-stars--row{font-size:var(--v-fs-body)}table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{font-size:var(--v-fs-cap)}}
+
+/* ==== Product header on a grey panel (06.11.): the whole header block (add slot + model columns) sits on the paper
+   tone, so the white photo tiles read as cards; rounded panel corners, 1 rem inner padding. ==== */
+@media(min-width:48rem){
+  table.vgl-t thead .vgl-hr>*{background:var(--v-paper)}
+  table.vgl-t thead th.vgl-lc[rowspan]{padding-left:1rem;border-radius:var(--v-r-l) 0 0 var(--v-r-l)}
+  table.vgl-t thead tr.vgl-hr--img>:last-child{border-top-right-radius:var(--v-r-l)}
+  table.vgl-t thead tr.vgl-hr--cta>:last-child{border-bottom-right-radius:var(--v-r-l)}
+  table.vgl-t thead tr.vgl-hr--cta>*:nth-child(n){padding-bottom:1rem}
+  .vgl-lc__slot{left:1rem;bottom:1rem}
+  table.vgl-t{width:100%;margin-right:0}
+}
+@media(max-width:47.99rem){
+  table.vgl-t thead tr.vgl-hr{padding:0 .75rem;background:var(--v-paper)}
+  table.vgl-t thead tr.vgl-hr--img{border-radius:var(--v-r-l) var(--v-r-l) 0 0}
+  table.vgl-t thead tr.vgl-hr--cta{padding-bottom:.75rem;border-radius:0 0 var(--v-r-l) var(--v-r-l)}
+}
