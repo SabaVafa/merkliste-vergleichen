@@ -245,3 +245,8 @@ Aus Brief §7 umgesetzt: Erklärsätze nur aus der freigegebenen Kurzliste (E1, 
 - Ergebnis bei 1880 × 980 (3 Briefkästen): erste Datenzeile bei 389 px statt ca. 650 px; der ganze Vergleich passt auf einen Bildschirm. Bei 1024 px (4 Modelle): Links auf einer Linie, Leiste deckungsgleich mit den Spalten.
 - **Hinweis-Icon (Nutzerin):** Merkmale mit Erklärung zeigen wieder ein (i)-Icon hinter dem Namen statt einer gepunkteten Unterstreichung. Icon ohne Hover-Effekt, 2,75 rem Klickfläche, geöffnet teal, Escape schließt zuerst den Hinweis.
 - `vergleichen.js?v=38`, `vergleichen.css?v=44`.
+
+- **Weiße Bildkacheln (06.11., Nutzerin: alle Shopfotos haben weißen Hintergrund):** Bildkacheln, Leisten-Vorschaubilder und „Ähnliche Modelle" sind weiß mit Haarlinie (wie die PLP-Karten) statt Paper + Multiply; das Foto füllt die Kachel (128 px statt ca. 90 px bei 1800 px Breite). Der leere „Modell hinzufügen"-Platz ist gestrichelt auf Weiß. `vergleichen.css?v=45`.
+
+- **Sternebewertung im Kopf (06.11.):** zwischen Name und Preis, wie auf der Live-Karte (volle/halbe/leere Sterne in `--color-star`, Bewertungsanzahl gedämpft); Werte aus den Produktdaten (z. B. Siebert 5/763, Moris 4,5/31); Zeile in jeder Spalte reserviert; Screenreader: „4,5 von 5 Sternen, 31 Bewertungen".
+- **Fehler behoben:** Seit die Kopfzeilen Name/Preis/Link keine Merkmalszelle mehr haben, erbte die erste Modellspalte deren Abstände (Desktop: Name 1 rem links neben der Bildkachel; Handy: Sterne/Preis 10 px tiefer). Jetzt in allen Spalten bündig (geprüft bei 1440 und 375 px). `vergleichen.js?v=39`, `vergleichen.css?v=47`.

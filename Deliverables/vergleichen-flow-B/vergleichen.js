@@ -45,13 +45,13 @@
   document.addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='IMG'&&IMG_FB[t.getAttribute('src')]){t.src=IMG_FB[t.getAttribute('src')];}},true);
 
   /* ---- Lens: Türsprechanlagen ---- */
-  function enrichSprech(p){var d=shopOf('sprechanlage',p.id);return {id:p.id,name:p.name,img:shopImg(d,p.img),price:p.price,uvp:p.uvp,shop:!!d.sid,artNr:d.art||'',konfig:konfigOf(p),design:designOf(p),
+  function enrichSprech(p){var d=shopOf('sprechanlage',p.id);return {id:p.id,name:p.name,img:shopImg(d,p.img),price:p.price,uvp:p.uvp,rating:p.rating,reviews:p.reviews,shop:!!d.sid,artNr:d.art||'',konfig:konfigOf(p),design:designOf(p),
     typ:d.typ||null,system:d.sys||null,klingel:d.kt||null,namensschild:d.ns||null,zutritt:d.tb||null,kombi:d.kombi||null,
     kamera:d.cam||null,sichtwinkel:d.va||null,nachtsicht:d.nv?true:null,schutzart:d.ip||null,schlagfestigkeit:d.ik||null,
     abmessungen:withVar(d.abm,d.abmv),gewicht:withVar(d.kg,d.kgv),colors:d.col||null};}
 
   /* ---- Lens: Briefkästen — only Wawi-Merkmale, dimensions and weight ---- */
-  function enrichBK(p){var nm=String(p.name||''),d=shopOf('briefkasten',p.id);return {id:p.id,name:p.name,img:shopImg(d,p.img||'Product%20Image/einfamilien-briefkasten.png'),price:p.price,uvp:p.uvp,shop:!!d.sid,artNr:d.art||'',konfig:!/ohne Gravur|Basic/i.test(nm),design:designOf(p),
+  function enrichBK(p){var nm=String(p.name||''),d=shopOf('briefkasten',p.id);return {id:p.id,name:p.name,img:shopImg(d,p.img||'Product%20Image/einfamilien-briefkasten.png'),price:p.price,uvp:p.uvp,rating:p.rating,reviews:p.reviews,shop:!!d.sid,artNr:d.art||'',konfig:!/ohne Gravur|Basic/i.test(nm),design:designOf(p),
     isSet:!!d.set,namensschild:d.ns||null,colors:d.col||null,faecher:d.fa||null,zeitungsfach:d.zf||null,montage:d.mo||null,
     abmessungen:withVar(d.abm,d.abmv),gewicht:withVar(d.kg,d.kgv),material:d.mat||null,klingelsys:d.klingel||null};}
 
@@ -798,9 +798,16 @@
     var t=c.titles[i];
     return c.pick?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+titleHTML(t)+IC_CHD+'</button>':'<div class="vgl-ph__title">'+titleHTML(t)+'</div>';
   }
+  /* star rating as on the live PLP card (full / half / empty, review count); the line is reserved in every column */
+  function starsHTML(p){
+    if(!p.rating)return '<span class="vgl-stars" aria-hidden="true">&nbsp;</span>';
+    var r=p.rating,h='';for(var k=1;k<=5;k++)h+='<span class="vgl-star'+(r>=k?' is-full':(r>=k-0.5?' is-half':''))+'" aria-hidden="true">★</span>';
+    var lbl=String(r).replace('.',',')+' von 5 Sternen'+(p.reviews?', '+p.reviews+' Bewertungen':'');
+    return '<span class="vgl-stars" role="img" aria-label="'+lbl+'">'+h+(p.reviews?'<span class="vgl-stars__n" aria-hidden="true">('+p.reviews+')</span>':'')+'</span>';
+  }
   function moneyCell(p,i,c){
     var gap=(!c.vd.noDelta&&typeof p.price==='number'&&p.price>c.minPrice)?gapText(p,c):'';
-    return '<div class="vgl-ph__money"><span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span>'+
+    return '<div class="vgl-ph__money">'+starsHTML(p)+'<span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span>'+
       '<span class="vgl-ph__delta">'+(gap?esc(gap):'<span aria-hidden="true">&nbsp;</span>')+'</span></div>';   /* the gap line is reserved in every column */
   }
   function ctaHTML(p,t,cls){
