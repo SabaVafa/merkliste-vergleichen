@@ -182,6 +182,41 @@ Weitere Prüfungen:
 3. **Preisabstand auf dem Handy:** Kurzform „+ 51,00 €" neben der UVP (gedämpft). Sonst würde die Sticky-Höhe 13 rem überschreiten. Screenreader hören „51,00 € mehr als die andere Ausführung".
 4. **Ähnliche Modelle:** In `colson1,colson2`, `dominik1,…` und `siebert,albrecht,cube-stand` erscheint kein Abschnitt, entweder weil es kein Fall „fast baugleich" ist oder weil es keinen passenden Treffer gibt.
 
+## 9 · Visual redesign 06.11. (Umsetzung)
+
+Build `vergleichen.js?v=35`, `vergleichen.css?v=39`; System siehe 12b §8. Geprüft im Browser-Pane:
+- `briefkasten.html?vergleich=siebert,ebenhard,moris`, `index.html?vergleich=colson1,neo1` und `index.html?vergleich=dominik1,sdm10x,colson1,kai1`;
+- bei 1920 / 1440 / 1280 / 1024 / 768 / 375;
+- Transitions aus, danach Speicher geleert und Viewport zurückgesetzt.
+
+| Messung | Ergebnis |
+|---|---|
+| Name, Preis, Bild und CTA auf gleicher Höhe in allen Spalten | ja, in 18 von 18 Fällen |
+| Kopfhöhe (nicht sticky) | 1440/1920 bei 2–3 Modellen: 370 px (Bild 176 px = 11 rem); bei 4 Modellen 338 px; 1024: 338–379 px; 375: 275–292 px |
+| Identitätsleiste | 64 px (4 rem), 375: 56 px (3,5 rem); konstant bei scrollTop 0/300/800/1500; erscheint, sobald die CTA-Zeile aus dem Blick ist |
+| Erste Datenzeile | 1440: 499 px (4 Modelle 467); 375: 381–397 px |
+| Horizontales Scrollen | keines |
+| Spaltentausch (375, Spaltenwahl) | Kopfhöhe 292 → 292 px |
+| Druck | `beforeprint` zeigt alle Spalten, Gemeinsamkeiten offen, keine Leiste; `afterprint` stellt den vorherigen Zustand wieder her |
+| Tastatur | Schließen → Merken/× je Spalte → Spaltenwahl → CTAs → Labels mit Erklärung → „Gemeinsamkeiten anzeigen" → Aktionen |
+| Toggletip | Escape schließt erst den Tipp, dann den Dialog |
+| Konsole | keine Fehler |
+
+**Entfernte CSS-Blöcke:**
+- § 12 Vergleich-Redesign 05.11.: Kartenrahmen und Schatten, sticky `thead`, L/M-Kopf, Bildleiste, Lesezeichen-Badge, (i)-Glyph, Aufzählungspunkte;
+- „Header polish (Lead UI, 06.11.)": × auf der Titelzeile, Spaltenlinien, gestrichelte Add-Kachel;
+- „Table structure (Lead PD, 06.11.)": Bänder, Zählpillen, Teal-Kante, stärkere Labellinie;
+- `is-unpinned` und `is-L` / `is-M`;
+- die ungenutzten Token-Aliase `--v-shadow-card` und `--v-teal-600`.
+
+Ersetzt wurden sie durch einen zusammenhängenden Overlay-Abschnitt. Toolbar, Tray, Tour, Toast, Suche und Teilen sind unverändert.
+
+**Abweichungen:**
+1. Die erste Datenzeile liegt tiefer als die alten Grenzen aus AK 16/18 (≤ 384 bzw. ≤ 487 px); bei 375 px hält sie die Grenze ein. Grund ist der große, nicht klebende Kopf nach der Art Direction.
+2. Die Leiste wechselt beim Scrollen eine Klasse (`is-pinned`). Ihre Höhe ändert sich nie. Das entspricht dem vereinbarten Ansatz mit separater Identitätsleiste statt Größenänderung, widerspricht aber dem Wortlaut von AK 23.
+3. In der Leiste steht kein ×, wie vorgegeben (Bild, Name, Preis, CTA). AK 25 sah „Entfernen" im Sticky-Bereich vor; Entfernen ist im Kopf möglich.
+4. Der Name in der Leiste wird nach 2 Zeilen gekürzt (mobil nach 1 Zeile). Der volle Name steht im `title` und im Kopf; AK 4 gilt dort.
+
 ## 6 · Kundenentscheidungen (Protokoll)
 
 Aus Brief §7 umgesetzt: Erklärsätze nur aus der freigegebenen Kurzliste (E1, E2, E4, E10); Spaltenwahl als mobiles Muster (PO-Freigabe CP1); UVP bleibt, kleiner und ruhiger (Caption, muted, durchgestrichen); andere Klasse erlaubt mit Hinweis ohne „Aufpreis“; Overlay bleibt. Offen bei der Nutzerin: Richtungsfreigabe der Liste 12a §2.8 und Token-Vorschläge P1–P4 (12b §2).

@@ -120,3 +120,39 @@ Keine Größe unter 0,75 rem; Silbentrennung aus (`hyphens:manual`).
 | Sticky 375 | 13 rem (13,5) | max. 12,86 rem (S4, aus allen Modellen inkl. 3-zeiligem Trias-Titel) |
 
 Angewandte Hebel (12a §2.6): Fazit-Polster mobil 0,5 rem, Bildleiste 4,25 statt 4,5 rem. Titel, Fazit-Bausteine und Trefferflächen sind ungekürzt.
+
+---
+
+## 8 · Visual redesign 06.11. (ersetzt §3–§6 bei Widerspruch)
+
+Ziel: ruhig und redaktionell, wenige Linien. Build `vergleichen.css?v=39` / `vergleichen.js?v=35`.
+
+- **Fläche:**
+  - eine weiße Fläche, keine Karte, keine senkrechten Linien;
+  - Zeilen durch eine Haarlinie `--v-g100` getrennt;
+  - Zellpolster 1 rem, damit 2 rem Spaltenabstand;
+  - Labelspalte 14 / 12 / 11 rem (≥ 90 / 64–90 / 48–64 rem).
+- **Produktkopf:** fünf Tabellenzeilen, damit alle Spalten dieselben Spuren haben. Er scrollt weg.
+  1. **Aktionen:** Merken links, × rechts. Beides sind gedämpfte Icons mit 2,75-rem-Ziel und ohne Hover; nichts liegt auf dem Foto.
+  2. **Bildkachel:** `--v-paper`, Radius l, ohne Rahmen. Höhe 11 rem bei 2–3 Modellen ab 90 rem, 9 rem bei 4 Modellen bzw. unter 90 rem, 7,5 / 6 rem darunter. In der Labelspalte steht in dieser Zeile die gleich große Kachel „+ Modell hinzufügen · noch n möglich".
+  3. **Name:** h4, fett, ohne Kürzung. In der Labelspalte steht in dieser Zeile „Aus der Merkliste (n)".
+  4. **Preis:** fett mit gedämpfter UVP in einer Zeile, der Preisabstand als Caption auf einer eigenen, immer reservierten Zeile.
+  5. **CTA:** DS-Textlink.
+- **Identitätsleiste:**
+  - erscheint, sobald die CTA-Zeile aus dem Blick ist (IntersectionObserver);
+  - feste Höhe: 4 rem, 3,5 rem auf dem Handy;
+  - liegt über dem Inhalt, ohne ihn zu verschieben, im selben Spaltenraster (gemessen bei Render und Resize);
+  - zeigt Thumbnail 2,5 rem, Name (höchstens 2 Zeilen), Preis (ab 90 rem) und CTA.
+- **Abschnitte:**
+  - Überschrift „Unterschiede 4": 1 rem fett plus gedämpfte Zahl, 2–2,25 rem Abstand darüber, Haarlinie `--v-g200` darunter;
+  - keine Bänder, Pillen oder Kanten;
+  - Gemeinsamkeiten zugeklappt als Textbutton „Gemeinsamkeiten anzeigen (n)".
+- **Zeilen:**
+  - Label body-sm 600; mit Definition ist es ein Toggletip-Button mit gepunkteter Unterstreichung statt eines (i);
+  - Werte body, regular, nie fett; Mehrfachwerte als gestapelte Zeilen ohne Aufzählungszeichen;
+  - k. A. und Bedeutungszeilen gedämpft;
+  - Label und Wert stehen auf einer Grundlinie.
+- **Farben:** Swatch in PLP-Sprache (quadratisch, Radius m, Innenring g300), 1,5 rem. Gleiche Slots in jeder Spalte; eine fehlende Farbe ist ein gestrichelter Slot. Sichtbar „7 Farben", die Namen nur für Screenreader.
+- **Ähnliche Modelle:** Papierkacheln, keine Rahmen, Textlinks, 4 rem Abstand zur Tabelle.
+- **Leiste:** Die Textaktionen sind gedämpft und werden bei Hover teal mit Unterstreichung.
+- **Typografie:** h4 Namen · body Werte · body-sm Labels · caption Meta. Farben: ink, muted, teal (nur Links/CTA), Graphit-Haarlinien. Keine neuen Tokens; der Alias-Block ist um die nicht mehr genutzten Schatten verkleinert.
