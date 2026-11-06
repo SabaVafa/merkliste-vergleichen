@@ -305,15 +305,7 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 .vgl-back{display:inline-flex;align-items:center;gap:.25rem;min-height:2.75rem;margin-left:-.5rem;padding:0 .5rem;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-teal);cursor:pointer}
 .vgl-back svg{width:1.125rem;height:1.125rem}
 .vgl-back:hover .vgl-back__l{text-decoration:underline;text-underline-offset:.1875rem}
-.vgl-diff{margin-left:auto;display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-ink);cursor:pointer;user-select:none;white-space:nowrap}
-.vgl-diff__n{font-weight:400;color:var(--v-muted)}
-.vgl-diff input{position:absolute;opacity:0;width:.0625rem;height:.0625rem}
-.vgl-switch{position:relative;flex-shrink:0;width:2.5rem;height:1.375rem;border-radius:var(--v-r-pill);background:var(--v-muted);transition:background .18s}
-.vgl-switch::after{content:'';position:absolute;top:.1875rem;left:.1875rem;width:1rem;height:1rem;border-radius:50%;background:var(--v-white);transition:transform .18s}
-.vgl-diff input:checked+.vgl-switch{background:var(--v-teal)}
-.vgl-diff input:checked+.vgl-switch::after{transform:translateX(1.125rem)}
-.vgl-diff input:focus-visible+.vgl-switch{outline:.1875rem solid var(--v-teal);outline-offset:.125rem}
-.vgl-bar__act{display:flex;align-items:center;gap:.25rem}
+.vgl-bar__act{display:flex;align-items:center;gap:.25rem;margin-left:auto}
 .vgl-close{flex-shrink:0;width:2.75rem;height:2.75rem;margin-right:-.5rem;padding:0;border:0;border-radius:50%;background:transparent;color:var(--v-ink);display:flex;align-items:center;justify-content:center;cursor:pointer}
 /* text buttons (DS hover = underline; icons inside never change) */
 .vgl-tb{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;padding:0 .5rem;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.25;color:var(--v-ink);text-decoration:none;white-space:nowrap;cursor:pointer}
@@ -323,25 +315,9 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 .vgl-tb.is-done{text-decoration:none}
 
 /* ---- Fazit: Satz 1 bold, Satz 2 regular; explanations right of it from 90 rem, behind "Was bedeutet das?" below ---- */
-.vgl-fz{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem 2rem;padding:.75rem 0}
-.vgl-fz__txt{margin:0;max-width:75rem;font-size:var(--v-fs-body);line-height:1.55;color:var(--v-ink)}
-.vgl-fz__s1{font-weight:700}
-.vgl-fz__more{position:relative;display:inline-flex;align-items:center;gap:.125rem;padding:0;border:0;background:none;font:inherit;font-weight:600;line-height:inherit;color:var(--v-teal);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem;white-space:nowrap;cursor:pointer}
-.vgl-fz__more::before{content:'';position:absolute;left:-.25rem;right:-.25rem;top:50%;height:2.75rem;transform:translateY(-50%)}   /* 2.75 rem hit area without a line of its own */
-.vgl-fz__more svg{flex:none;width:1rem;height:1rem;transition:transform .14s}
-.vgl-fz__more:hover{text-decoration-thickness:.125rem}
-.vgl-fz.is-ex .vgl-fz__more svg{transform:rotate(180deg)}
-.vgl-fz__note{display:flex;align-items:flex-start;gap:.5rem;margin:.5rem 0 0;font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-muted)}
+.vgl-fz{padding:.75rem 0}
+.vgl-fz__note{display:flex;align-items:flex-start;gap:.5rem;margin:0;font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-muted)}
 .vgl-fz__note svg{flex:none;width:1.125rem;height:1.125rem;margin-top:.125rem;color:var(--v-teal)}
-.vgl-fz__ex{display:none;align-self:start;padding:.5rem 0 .5rem 1rem;border-left:.1875rem solid var(--v-teal)}
-.vgl-fz.is-ex .vgl-fz__ex{display:block}
-.vgl-fz__exh{margin:0 0 .25rem;font-size:var(--v-fs-cap);font-weight:700;line-height:1.4;letter-spacing:.15em;text-transform:uppercase;color:var(--v-muted)}
-.vgl-fz__ex ul{list-style:none;margin:0;padding:0;display:grid;gap:.25rem}
-.vgl-fz__ex li{font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-ink)}
-@media(min-width:90rem){
-  .vgl-fz.has-ex{grid-template-columns:minmax(0,1fr) 24rem}
-  .vgl-fz__ex{display:block}
-  .vgl-fz__more{display:none}
 }
 
 /* ---- table card ---- */
@@ -351,7 +327,7 @@ table.vgl-t col.rl{width:15rem}
 table.vgl-t th,table.vgl-t td{padding:.75rem 1rem;border-bottom:.0625rem solid var(--v-g100);text-align:left;vertical-align:top;font-size:var(--v-fs-sm);font-weight:400;line-height:1.5;color:var(--v-ink);hyphens:manual;overflow-wrap:break-word}
 table.vgl-t tbody:last-child tr:last-child>*{border-bottom:0}
 /* the identity row: sticky, white, one hairline */
-table.vgl-t thead th{position:sticky;top:0;z-index:3;padding:.75rem;background:var(--v-white);border-bottom:.0625rem solid var(--v-g200);box-shadow:0 .0625rem 0 var(--v-g200)}
+table.vgl-t thead th{position:sticky;top:0;z-index:3;padding:.5rem .75rem;background:var(--v-white);border-bottom:.0625rem solid var(--v-g200);box-shadow:0 .0625rem 0 var(--v-g200)}
 table.vgl-t thead th:first-child{border-top-left-radius:var(--v-r-l)}
 table.vgl-t thead th:last-child{border-top-right-radius:var(--v-r-l)}
 .vgl-view.is-unpinned table.vgl-t thead,.vgl-view.is-unpinned table.vgl-t thead th{position:static}
@@ -372,7 +348,6 @@ table.vgl-t{--vgl-img:10rem}
 table.vgl-t.vgl-t--n4{--vgl-img:7.5rem}
 .vgl-t.is-L .vgl-ph__in{grid-template-columns:var(--vgl-img) minmax(0,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"media title" "media money" "media act";column-gap:1rem}
 .vgl-t.is-L .vgl-ph__media{width:var(--vgl-img);height:var(--vgl-img);padding:.5rem}
-.vgl-t.is-L .vgl-ph__act{align-self:end}
 /* 4 columns side by side (≥ 90 rem): the actions take the full cell width under photo and text */
 .vgl-t--n4.is-L .vgl-ph__in{column-gap:.75rem;grid-template-rows:auto auto 1fr auto;grid-template-areas:"media title" "media money" "media ." "act act"}
 .vgl-t--n4.is-L .vgl-ph__price{font-size:var(--v-fs-sm)}
@@ -385,22 +360,23 @@ table.vgl-t.vgl-t--n4{--vgl-img:7.5rem}
 @media(min-width:90rem){table.vgl-t--n2 .vgl-ph__t,table.vgl-t--n3 .vgl-ph__t{font-size:var(--v-fs-h4)}}
 .vgl-ph__money{grid-area:money;display:flex;flex-direction:column;min-width:0}
 .vgl-ph__price{font-size:var(--v-fs-body);font-weight:700;line-height:1.375;color:var(--v-ink);white-space:nowrap}
-.vgl-ph__delta{font-size:var(--v-fs-sm);font-weight:600;line-height:1.375;color:var(--v-ink);white-space:nowrap}
+.vgl-ph__delta{font-size:var(--v-fs-cap);font-weight:400;line-height:1.4;color:var(--v-muted)}
+.vgl-ph__dshort{display:none}
 .vgl-ph__uvp{font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted);white-space:nowrap}
 .vgl-ph__uvp s{text-decoration-thickness:.0625rem}
 .vgl-t.is-M .vgl-ph__price,.vgl-t.is-M .vgl-cta{font-size:var(--v-fs-sm)}
 .vgl-t.is-M .vgl-cta svg{width:1rem;height:1rem}
-.vgl-t.is-M .vgl-ph__rm{margin-left:-.375rem}
 /* actions: the CTA is a DS text link — teal, bold, underlined, chevron — the strongest control of the column; × is a bare icon */
-.vgl-ph__act{grid-area:act;align-self:end;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0;min-height:1.75rem;margin-top:.25rem}
+.vgl-ph__act{grid-area:act;align-self:start;display:flex;flex-wrap:wrap;align-items:center;gap:0;min-height:1.75rem;margin-top:.375rem}
 .vgl-cta{position:relative;display:inline-flex;align-items:center;gap:.125rem;padding:0;border:0;background:none;font-family:inherit;font-size:var(--v-fs-body);font-weight:700;line-height:1.375;color:var(--v-teal);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem;white-space:nowrap;cursor:pointer}
 .vgl-cta::before{content:'';position:absolute;left:-.25rem;right:-.25rem;top:50%;height:2.75rem;transform:translateY(-50%)}   /* 2.75 rem hit area */
 .vgl-cta svg{flex:none;width:1.125rem;height:1.125rem;transition:transform .14s}
 .vgl-cta:hover{color:var(--v-teal);text-decoration-thickness:.125rem}
 .vgl-cta:hover svg{transform:translateX(.125rem)}
-.vgl-ph__rm{position:relative;flex:none;width:2.75rem;height:1.75rem;margin-right:-.75rem;padding:0;border:0;background:transparent;color:var(--v-muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
-.vgl-ph__rm::before{content:'';position:absolute;left:0;right:0;top:50%;height:2.75rem;transform:translateY(-50%)}
+.vgl-ph__rm{grid-area:title;justify-self:end;align-self:start;position:relative;z-index:2;width:2.75rem;height:2.75rem;margin:-.625rem -.75rem 0 0;padding:0;border:0;background:transparent;color:var(--v-muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .vgl-ph__rm svg{width:1.125rem;height:1.125rem}
+.vgl-t.is-L .vgl-ph__rm{grid-area:media;margin:0}
+.vgl-t:not(.is-L) .vgl-ph__title,.vgl-t:not(.is-L) .vgl-ph__pick{padding-right:2rem}
 /* Spaltenwahl: the title is the picker (text button; the ▾ never changes on hover) */
 .vgl-ph__pick{position:relative;display:flex;align-items:flex-start;gap:.25rem;width:100%;padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
 .vgl-ph__pick::before{content:'';position:absolute;left:0;right:0;top:50%;height:max(100%,2.75rem);transform:translateY(-50%)}
@@ -415,12 +391,9 @@ table.vgl-t--measure{position:absolute;left:0;top:0;visibility:hidden;pointer-ev
 
 /* ---- sections U / O / G ---- */
 tr.vgl-sec__h th{padding:.5625rem 1rem;background:var(--v-paper);border-bottom:.0625rem solid var(--v-g200);line-height:1.125rem}
-.vgl-sec--u tr.vgl-sec__h th{background:var(--v-teal-100)}
 .vgl-sec__in{display:flex;flex-wrap:wrap;align-items:center;gap:0 .5rem}
 .vgl-sec__t{font-weight:700;color:var(--v-ink)}
-.vgl-sec--u .vgl-sec__t{color:var(--v-teal)}
 .vgl-sec__n{font-weight:400;color:var(--v-muted)}
-.vgl-sec--u .vgl-sec__n{color:var(--v-teal)}
 .vgl-sec__sub{color:var(--v-muted)}
 .vgl-sec--o .vgl-sec__sub{flex:1 1 100%;font-size:var(--v-fs-cap);line-height:1.4}
 .vgl-sec__btn{position:relative;display:inline-flex;align-items:center;gap:.125rem;margin-left:auto;padding:0;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.125rem;color:var(--v-teal);cursor:pointer}
@@ -434,6 +407,8 @@ table.vgl-t .rh{font-weight:600;color:var(--v-ink)}
 .rh__l{vertical-align:middle}
 .vgl-rowcap{display:block;margin-top:.125rem;font-size:var(--v-fs-cap);font-weight:400;line-height:1.4;color:var(--v-muted)}
 td.vgl-val.na{color:var(--v-muted)}
+.vgl-mean{display:block;margin-top:.25rem;font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
+td.vgl-val b{font-weight:700}
 .vgl-yes{display:inline-flex;align-items:center;gap:.375rem}
 .vgl-yes svg{width:1rem;height:1rem;color:var(--v-green)}
 .vgl-no{color:var(--v-muted)}
@@ -441,6 +416,7 @@ td.vgl-val.na{color:var(--v-muted)}
 td.vgl-val.is-best{font-weight:700}
 .vgl-sw{display:inline-flex;flex-wrap:wrap;gap:.375rem;vertical-align:middle}
 .vgl-sw span{width:1.375rem;height:1.375rem;border-radius:var(--v-r-m);box-shadow:inset 0 0 0 .0625rem var(--v-g300)}
+.vgl-sw .vgl-sw__no{background:var(--v-white);box-shadow:none;border:.0625rem dashed var(--v-muted)}
 .vgl-swc{display:block;margin-top:.25rem;font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
 .vgl-setl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.125rem}
 .vgl-setl li{position:relative;padding-left:.75rem}
@@ -468,12 +444,10 @@ table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
 .vgl-alt__why em{font-style:normal;color:var(--v-muted)}
 .vgl-alt__foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.25rem .5rem;margin-top:auto;font-size:var(--v-fs-sm)}
 .vgl-alt__foot b{white-space:nowrap}
-.vgl-alt__add{white-space:nowrap;display:inline-flex;align-items:center;gap:.25rem;min-height:2.75rem;padding:0 .75rem;border:.0625rem solid var(--v-teal);border-radius:var(--v-r-m);background:var(--v-white);font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-teal);cursor:pointer}
-.vgl-alt__add svg{width:1rem;height:1rem}
-.vgl-alt__add:hover:not([disabled]){background:var(--v-teal-100)}
-.vgl-alt__add[disabled]{border-color:var(--v-g300);color:var(--v-muted);cursor:not-allowed}
-.vgl-src{margin-top:1rem}
-.vgl-src p{margin:0;font-size:var(--v-fs-cap);line-height:1.5;color:var(--v-muted)}
+.vgl-alt__add{position:relative;display:inline-flex;align-items:center;min-height:1.5rem;padding:0;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.375;color:var(--v-teal);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem;white-space:nowrap;cursor:pointer}
+.vgl-alt__add::before{content:'';position:absolute;left:-.25rem;right:-.25rem;top:50%;height:2.75rem;transform:translateY(-50%)}
+.vgl-alt__add:hover:not([disabled]){text-decoration-thickness:.125rem}
+.vgl-alt__add[disabled]{color:var(--v-muted);text-decoration:none;cursor:not-allowed}
 .vgl-actrow{display:none}
 .vgl-strip{display:none}
 /* empty state (< 2 models) */
@@ -524,7 +498,6 @@ table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
   .vgl-bar__act{display:none}
   .vgl-view__scroll-in{padding:0 1rem 1.5rem}
   .vgl-fz{padding:.5rem 0}
-  .vgl-fz__txt{font-size:var(--v-fs-sm);line-height:1.5}
   /* Bildleiste (scrolls away) */
   .vgl-strip{display:grid;grid-template-columns:repeat(var(--vgl-n),minmax(0,1fr));gap:.5rem;margin-bottom:.5rem}
   .vgl-strip .vgl-ph__media{grid-area:auto;height:4.25rem;padding:.25rem}
@@ -542,8 +515,16 @@ table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
   tr.vgl-sec__h th{padding:.5625rem .75rem}
   .vgl-ph__t,.vgl-ph__price,.vgl-cta{font-size:var(--v-fs-sm)}
   .vgl-ph__act{margin-top:.125rem}
+  /* phones: the head has no photo (Bildleiste scrolls away) — × stays in the sticky head at the right end of the action row, apart from the CTA */
+  .vgl-ph__act{justify-content:space-between}
+  .vgl-ph__rm{grid-area:act;justify-self:end;align-self:start;margin:-.375rem -.75rem 0 0}
+  /* price gap in its short form on the UVP line (the full „… mehr als …“ stays for screen readers) */
+  .vgl-ph__money{flex-direction:row;flex-wrap:wrap;column-gap:.5rem}
+  .vgl-ph__price{flex:1 1 100%}
+  .vgl-ph__dlong{position:absolute;width:.0625rem;height:.0625rem;margin:-.0625rem;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+  .vgl-ph__dshort{display:inline}
+  .vgl-t:not(.is-L) .vgl-ph__title,.vgl-t:not(.is-L) .vgl-ph__pick{padding-right:0}
   .vgl-cta svg{width:1rem;height:1rem}
-  .vgl-ph__rm{margin-left:-.375rem}
   /* tips open inside the full-width label cell (never past the screen edge); the (i) keeps its 2.75 rem target via negative margins */
   .vgl-i{position:static;width:2.75rem;height:2.75rem;margin:-.625rem -.625rem -.625rem -.375rem}
   .vgl-i::before{content:none}
@@ -564,7 +545,7 @@ table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
 
 /* ---- reduced motion: no fade, slide or rotation in the compare layer ---- */
 @media(prefers-reduced-motion:reduce){
-  .vgl-tray,.vgl-view,.vgl-toast,.vgl-coach,.vgl-scrim,.vgl-switch,.vgl-switch::after,.vgl-box,.vgl-box svg,.vgl-toggle,.vgl-tip,.vgl-bar-btn,.vgl-tray__cta,.vgl-coach__prog,.vgl-cancel,.vgl-spot,.vgl-cta svg,.vgl-fz__more svg,.vgl-sec__btn svg{transition:none !important;animation:none !important}
+  .vgl-tray,.vgl-view,.vgl-toast,.vgl-coach,.vgl-scrim,.vgl-box,.vgl-box svg,.vgl-toggle,.vgl-tip,.vgl-bar-btn,.vgl-tray__cta,.vgl-coach__prog,.vgl-cancel,.vgl-spot,.vgl-cta svg,.vgl-sec__btn svg{transition:none !important;animation:none !important}
 }
 
 /* ---- print: the comparison only — all models, Gemeinsamkeiten and explanations open, source line, no controls ---- */
@@ -573,13 +554,56 @@ table.vgl-t tbody tr:hover>.rh,table.vgl-t tbody .rh:focus-within{z-index:5}
   body.vgl-printing .vgl-view{position:static;opacity:1;visibility:visible;background:var(--v-white)}
   body.vgl-printing .vgl-view__scroll{overflow:visible}
   body.vgl-printing .vgl-view__bar{border-bottom:.125rem solid var(--v-ink)}
-  body.vgl-printing .vgl-diff,body.vgl-printing .vgl-bar__act,body.vgl-printing .vgl-close,body.vgl-printing .vgl-back,body.vgl-printing .vgl-ph__act,body.vgl-printing .vgl-ph__pick svg,body.vgl-printing .vgl-lh>*,body.vgl-printing .vgl-fz__more,body.vgl-printing .vgl-sec__btn,body.vgl-printing .vgl-i,body.vgl-printing .vgl-pill,body.vgl-printing .vgl-actrow,body.vgl-printing .vgl-alts,body.vgl-printing .vgl-toast,body.vgl-printing .vgl-addsearch,body.vgl-printing .vgl-sharepop,body.vgl-printing .vgl-pick,body.vgl-printing .mkl-mark{display:none !important}
+  body.vgl-printing .vgl-bar__act,body.vgl-printing .vgl-close,body.vgl-printing .vgl-back,body.vgl-printing .vgl-ph__act,body.vgl-printing .vgl-ph__rm,body.vgl-printing .vgl-ph__pick svg,body.vgl-printing .vgl-lh>*,body.vgl-printing .vgl-sec__btn,body.vgl-printing .vgl-i,body.vgl-printing .vgl-pill,body.vgl-printing .vgl-actrow,body.vgl-printing .vgl-alts,body.vgl-printing .vgl-toast,body.vgl-printing .vgl-addsearch,body.vgl-printing .vgl-sharepop,body.vgl-printing .vgl-pick,body.vgl-printing .mkl-mark{display:none !important}
   body.vgl-printing table.vgl-t{--vgl-img:4rem}
   body.vgl-printing .vgl-strip{display:none !important}
-  body.vgl-printing .vgl-fz__ex{display:block}
   body.vgl-printing .vgl-view__bar-in::after{content:attr(data-print);margin-left:auto;font-size:var(--v-fs-cap);color:var(--v-ink)}
   body.vgl-printing table.vgl-t thead,body.vgl-printing table.vgl-t thead th{position:static;box-shadow:none}
   body.vgl-printing .vgl-wrap{box-shadow:none}
   body.vgl-printing tr{break-inside:avoid}
   body:not(.vgl-printing) .vgl-view,body:not(.vgl-printing) .vgl-tray,body:not(.vgl-printing) .vgl-toast,body:not(.vgl-printing) .vgl-tourfab{display:none !important}
+}
+
+/* ==== Header polish (Lead UI, 06.11.) ====
+   · × leaves the photo: it sits in the column's top-right corner on the title line, so the image only carries the bookmark
+   · price and UVP share one line; the price gap sits quietly below
+   · hairline column dividers anchor each model; the label cell becomes a dashed "add" tile the height of the photos */
+.vgl-t.is-L .vgl-ph__rm{grid-area:title;justify-self:end;align-self:start;margin:-.625rem -.75rem 0 0}
+.vgl-t.is-L .vgl-ph__title,.vgl-t.is-L .vgl-ph__pick{padding-right:2.25rem}
+.vgl-t.is-L .vgl-ph__money{flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:.5rem}
+.vgl-t.is-L .vgl-ph__price{font-size:var(--v-fs-h4)}
+.vgl-t.is-L .vgl-ph__uvp{order:2}
+.vgl-t.is-L .vgl-ph__delta{order:3;flex-basis:100%}
+.vgl-t.is-L .vgl-ph__act{margin-top:.75rem}
+table.vgl-t thead th.vgl-ph,table.vgl-t tbody td.vgl-val{border-left:.0625rem solid var(--v-g100)}
+table.vgl-t thead th.vgl-ph{padding-left:1rem}
+table.vgl-t tbody td.vgl-val{padding-left:1rem}
+.vgl-lh__box{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:.25rem}
+.vgl-t.is-L .vgl-lh__box{box-sizing:border-box;min-height:var(--vgl-img);padding:.75rem 1rem;border:.0625rem dashed var(--v-g300);border-radius:var(--v-r-l)}
+.vgl-lh__box .vgl-lh__n{margin:-.625rem 0 0 1.5rem}
+.vgl-lh__box .vgl-addbtn{min-height:2.25rem;white-space:nowrap}
+.vgl-t.is-L .vgl-lh__box{padding:.75rem}
+
+/* ==== Table structure (Lead PD, 06.11.) ====
+   The body had no visible structure: section heads looked like rows, labels and values ran together.
+   · each section is a tinted band with a hairline above and below, its count as a pill (Unterschiede: teal pill + teal edge)
+   · the label column is set off from the values by a stronger divider; rows get a steadier rhythm
+   · the dialog title takes programmatic focus on open (screen readers start there) — no focus frame on a non-interactive heading */
+.vgl-view__title:focus{outline:none}
+tr.vgl-sec__h th{padding:.75rem 1rem;background:var(--v-paper);border-top:.0625rem solid var(--v-g200);border-bottom:.0625rem solid var(--v-g200)}
+table.vgl-t tbody:first-of-type tr.vgl-sec__h th{border-top:0}
+.vgl-sec__in{align-items:center;gap:.25rem .5rem}
+.vgl-sec__t{font-size:var(--v-fs-sm);font-weight:700;color:var(--v-ink)}
+.vgl-sec__n{display:inline-flex;align-items:center;justify-content:center;min-width:1.5rem;height:1.25rem;padding:0 .4375rem;border-radius:var(--v-r-pill);background:var(--v-white);box-shadow:inset 0 0 0 .0625rem var(--v-g300);font-size:var(--v-fs-cap);font-weight:700;line-height:1;color:var(--v-ink)}
+.vgl-sec--u tr.vgl-sec__h th{box-shadow:inset .1875rem 0 0 var(--v-teal)}
+.vgl-sec--u .vgl-sec__n{background:var(--v-teal);box-shadow:none;color:var(--v-white)}
+.vgl-sec__sub{font-size:var(--v-fs-cap);line-height:1.4}
+.vgl-sec--o .vgl-sec__sub{flex:1 1 auto}
+table.vgl-t tbody th[scope="row"],table.vgl-t tbody td.vgl-val{padding-top:.875rem;padding-bottom:.875rem}
+table.vgl-t tbody th[scope="row"]+td.vgl-val,table.vgl-t tbody td.vgl-val--all{border-left-color:var(--v-g200)}
+table.vgl-t .rh{font-size:var(--v-fs-sm)}
+.vgl-i{width:1.25rem;height:1.25rem;margin-left:.375rem;vertical-align:-.25rem}
+@media(max-width:47.99rem){
+  tr.vgl-sec__h th{padding:.625rem .75rem}
+  .vgl-sec--o .vgl-sec__sub{flex:1 1 100%}
 }

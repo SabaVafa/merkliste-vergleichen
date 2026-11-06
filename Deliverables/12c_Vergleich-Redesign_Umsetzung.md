@@ -144,6 +144,61 @@ Build: `vergleichen.js?v=29`, `vergleichen.css?v=31` (beide Seiten). Geprüft mi
 - Zählungen (AK 8): S1 „Lasergraviert“ 2×, S2 „taster“ 5×.
 - Verbotswörter: keine.
 
+## 8 · UX-Review 06.11. (Umsetzung)
+
+Build `vergleichen.js?v=30`, `vergleichen.css?v=32`. Die PLPs und `vergleich-daten.js?v=4` stammen aus dem Live-Shop-Neuaufbau und sind unverändert. Geprüft im Browser-Pane:
+- Transitions aus, Speicher geleert, Viewport zurückgesetzt;
+- 1920 / 1440 / 1024 / 768 / 375;
+- keine Konsolenfehler.
+
+Regeln siehe 12a §11. Bei Widerspruch ersetzt dieser Abschnitt §3–§7.
+
+**Fazit (wörtlich):**
+- `colson1,neo1`: „Laut Shopdaten fast baugleich – der Unterschied ist das Namensschild: graviert bei Colson, austauschbar bei Neo; außerdem die Farben." (19 Wörter)
+- `colson1,colson2`: „Laut Shopdaten technisch gleich bis auf die Tasteranzahl: 2 bei der Ausführung mit Aufpreis, 1 bei der anderen." (18)
+- `dominik1,sdm10x,colson1,kai1`: „Technisch verschieden – vor allem der Typ (Kai: Audio, sonst Video) und das System (Maxior: 2-Draht-BUS, sonst IP-System). Die Preisunterschiede lassen sich keinem einzelnen Merkmal zuordnen." (26, zwei Sätze)
+- `siebert,ebenhard`: „Laut Shopdaten fast baugleich bei gleichem Preis – der Unterschied ist das Material: Edelstahl V4A bei Siebert, Edelstahl bei Ebenhard." (20)
+- `siebert,albrecht,cube-stand`: „Laut Shopdaten technisch gleich bis auf die Montageart (Cube: Standmontage, sonst Aufputz); außerdem das Material und die Farben." (18)
+
+**Messwerte:**
+
+| Größe | Wert |
+|---|---|
+| Kopfhöhe 1440 (2–3 Modelle, Bild 10 rem) | 176,8 px (vorher 185); Sticky 237,6 px = 14,85 rem, konstant bei 0/200/1000 |
+| Erste Unterschiedszeile 1440 | 348 / 323 / 346 / 348 / 348 px (5 Fälle oben) |
+| Erste Unterschiedszeile 375 | 367 / 386 / 428 / 388 / 367 px (Iframe mit Scrollleiste) |
+| Sticky 375 | max. 194,6 px = 12,2 rem |
+| Erste Unterschiedszeile 1024 / 768 | 1024: 308–352 px; 768: 328–377 px |
+| Horizontales Scrollen | keines |
+
+Weitere Prüfungen:
+- „graviert" kommt in S1 2× vor (Zelle + Fazit), „Shopdaten" 1×, keine Verbotswörter.
+- Schließen-× und (i)-Glyph sind beim Hover unverändert; beim (i) erscheint auf Hover nur der Tip, das Symbol selbst ändert sich nicht. Das × misst 2,75 × 2,75 rem und sitzt bündig oben rechts im Bild.
+- `beforeprint` öffnet die Gemeinsamkeiten, `afterprint` stellt den vorherigen Zustand wieder her.
+
+**Abweichungen:**
+1. **Preis im Fazit:** Die Preisdifferenz steht nicht im Fazit, nur im Kopf, damit nichts doppelt steht. Ausnahmen sind „bei gleichem Preis", die andere Produktklasse und 3–4 technisch verschiedene Modelle.
+2. **× auf dem Handy:** Dort hat der Kopf kein Bild, und die Bildleiste scrollt weg. Das × steht deshalb rechts in der Aktionszeile, getrennt vom CTA.
+3. **Preisabstand auf dem Handy:** Kurzform „+ 51,00 €" neben der UVP (gedämpft). Sonst würde die Sticky-Höhe 13 rem überschreiten. Screenreader hören „51,00 € mehr als die andere Ausführung".
+4. **Ähnliche Modelle:** In `colson1,colson2`, `dominik1,…` und `siebert,albrecht,cube-stand` erscheint kein Abschnitt, entweder weil es kein Fall „fast baugleich" ist oder weil es keinen passenden Treffer gibt.
+
 ## 6 · Kundenentscheidungen (Protokoll)
 
 Aus Brief §7 umgesetzt: Erklärsätze nur aus der freigegebenen Kurzliste (E1, E2, E4, E10); Spaltenwahl als mobiles Muster (PO-Freigabe CP1); UVP bleibt, kleiner und ruhiger (Caption, muted, durchgestrichen); andere Klasse erlaubt mit Hinweis ohne „Aufpreis“; Overlay bleibt. Offen bei der Nutzerin: Richtungsfreigabe der Liste 12a §2.8 und Token-Vorschläge P1–P4 (12b §2).
+
+**Nachtrag (Lead-UX-Prüfung):** Die Farbnamen-Liste unter den Swatches wiederholte in jeder Spalte dieselben Namen → sichtbar nur noch „n Farben“, die Namen bleiben für Screenreader (`vgl-visually-hidden`) und als Swatch-Tooltip. `vergleichen.js?v=31`.
+
+## 9. Entscheidungen der Nutzerin 06.11. + UI-Feinschliff Kopfbereich
+
+- **Fazit entfernt** (Nutzerin: „the text is not needed"): kein Zusammenfassungssatz mehr über den Modellköpfen. Es bleibt nur der Datenhinweis, wenn ein Modell keine Shopdaten hat. Damit entfällt auch der Klassenhinweis (Einzel- vs. Mehrfamilienanlage). Tour-Schritt 4 angepasst.
+- **Quell-/Preiszeile unten entfernt** (Nutzerin): „Daten: Metzler Shop (JTL-Wawi), Stand …" und der „ab"-Preis-Hinweis werden nicht mehr angezeigt. Das ersetzt PO-Kriterium 29 und die Footer-Regel aus Doc 11.
+- **Kopfbereich (Lead UI):** × sitzt nicht mehr auf dem Foto, sondern oben rechts in der Spalte auf Höhe des Titels; Preis und UVP stehen in einer Zeile (Preis in h4), die Preisdifferenz leise darunter; feine Spaltentrenner in Kopf und Tabelle; „Modell hinzufügen" ist eine gestrichelte Kachel in Bildhöhe. Kompakt- und Handy-Layout unverändert. Geprüft bei 1600, 1024 und 375 px: kein seitliches Scrollen, keine Konsolenfehler. `vergleichen.js?v=33`, `vergleichen.css?v=34`.
+
+## 10. Tabellenstruktur (Lead PD, 06.11.) + Fehlerbehebung
+
+- **Fehler:** Beim Öffnen bekam der Titel „Vergleich (n)" einen sichtbaren Fokusrahmen (der Fokus springt für Screenreader auf die Überschrift). Die nicht interaktive Überschrift zeigt jetzt keinen Rahmen mehr; der Fokus bleibt dort.
+- **Abschnitte als Bänder:** Unterschiede / Nicht für alle gepflegt / Gemeinsamkeiten sind getönte Bänder mit Haarlinie oben und unten; die Anzahl steht als Pille (Unterschiede: Teal-Pille + Teal-Kante links), Klammern entfallen.
+- **Kurzer Hinweistext** bei „Nicht für alle gepflegt": „Ohne Shop-Angabe („k. A.") oder je nach Ausführung – zählt nicht als Unterschied."
+- **Spalten:** stärkere Trennlinie zwischen Merkmalsspalte und Werten, feine Linien zwischen den Modellen; gleichmäßigere Zeilenhöhe; (i) auf die Textzeile ausgerichtet.
+- „Modell hinzufügen" bricht in der gestrichelten Kachel nicht mehr um (1280 px).
+- Geprüft bei 1800, 1280 und 375 px: kein seitliches Scrollen, keine Konsolenfehler. `vergleichen.js?v=34`, `vergleichen.css?v=37`.

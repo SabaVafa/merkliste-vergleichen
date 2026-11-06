@@ -494,3 +494,36 @@ Kein „Wishlist / Wunschzettel / Favoriten / günstig / Warenkorb"; durchgehend
 
 1. **Richtungsfreigabe** der Liste §2.8 durch die Nutzerin (vor allem Nr. 1: Bauform als eigene Klasse).
 2. **Messung bei CP2** (UI-Mock, echte Texte aus §3.7) für S3 bei 1024/375 und S4 bei 375. Sie ist die Grundlage für die Hebel in §2.6.
+
+---
+
+## 11 · UX-Review 06.11. (ersetzt bei Widerspruch §2.1 Fazit-Region, §2.4 ×, §3.2–3.6, §5 Schalter, §8)
+
+1. **Fazit = ein entscheidender Satz** (bei 3–4 Modellen höchstens zwei). Er enthält keine Werteliste und keine Preisdifferenz, denn die Werte stehen direkt darunter in den Zeilen und die Differenz im Kopf. „laut Shopdaten" steht höchstens einmal. Die Fälle F0–F6 bleiben, jeder hat eine kurze Form:
+   - fast baugleich: „Laut Shopdaten fast baugleich – der Unterschied ist {Merkmal}: {Wert} bei {A}, {Wert} bei {B}; außerdem {Merkmal}."
+   - eine technische Abweichung: „Laut Shopdaten technisch gleich bis auf {Merkmal}: …"
+   - technisch verschieden: „Technisch verschieden – vor allem …" (+ „Die Preisunterschiede lassen sich keinem einzelnen Merkmal zuordnen." bei 3–4 Modellen)
+   - andere Klasse: „Unterschiedliche Produktklassen: … – die Preise sind nicht als Aufpreis vergleichbar."
+   - nur Maße/Gewicht: „Laut Shopdaten technisch gleich – Unterschiede nur bei Maßen und Gewicht."
+   - k. A. bei Technik: Hinweis in Klammern.
+   - Lange Titel (> 24 Zeichen) und Zwillinge werden über den Preis benannt („die Ausführung mit Aufpreis", „beim Modell mit dem höheren Preis").
+2. **Rangfolge** in allen Abschnitten und für das Fazit: Funktion/Technik → Namensschild, Material → Farben → Abmessungen, Gewicht. Maße und Gewicht führen nie das Fazit an.
+3. **Bedeutung in der Zeile** (Unterschiede): Die freigegebenen Sätze E1/E2/E10 stehen als gedämpfte Zeile unter dem jeweiligen Wert. Beim Namensschild gibt es beide Seiten: „Dauerhaft – bei Namensänderung neues Schild." / „Namen selbst austauschbar.". Die Erklärspalte und „Was bedeutet das?" entfallen. Die (i) definieren nur noch.
+4. **Preisabstand im Kopf:** gedämpft in Captiongröße.
+   - bei 2 Modellen: „42,50 € mehr als Neo"
+   - bei 3–4 Modellen: „+ 42,50 € ggü. Kai"
+   - auf dem Handy in Kurzform neben der UVP; Screenreader hören den vollen Text
+5. **× oben rechts auf dem Produktbild** (Merken oben links). Im kompakten Kopf, wo es kein großes Kopfbild gibt, steht es rechts in der Titelzeile; auf dem Handy rechts in der Aktionszeile.
+6. **Unterschied in der Zeile sichtbar:**
+   - Bei den Abmessungen ist die abweichende Achse fett; bei Mengen sind es die abweichenden Elemente.
+   - Farben stehen in gleichen Slots in jeder Spalte; eine fehlende Farbe ist ein leerer, gestrichelter Slot.
+   - Die Farbnamen stehen sichtbar als Liste.
+7. **Maße** als „B 13,3 · H 27,4 cm · T k. A.".
+8. **„Ähnliche Modelle"** (statt „Alternativen …"):
+   - nur gleiche Art: Video ↔ Video, Audio ↔ Audio, gleiche Briefkastenklasse, Sets und Kombis nur zu Sets und Kombis;
+   - eine je Design-Linie, keine reinen Tasteranzahl-Varianten;
+   - Textlink „Zum Vergleich hinzufügen"; ohne Treffer entfällt der Abschnitt.
+9. **Schalter „Nur Unterschiede" entfällt.** Gemeinsamkeiten werden nur über „Anzeigen/Ausblenden" auf- und zugeklappt, mit Live-Ansage „n Gemeinsamkeiten ein-/ausgeblendet.". Standard: zu (bei U = 0 offen). Im Druck sind sie offen.
+10. **Kopf kompakter:** Der CTA steht direkt unter dem Preisblock, das Polster beträgt 0,5 rem; die Höhe bleibt fest.
+11. **Ein Stil für alle Abschnittsköpfe;** „gilt für beide Modelle" bzw. „gilt für alle 3/4 Modelle".
+12. **Kleine graue Texte** nutzen `--text-muted` (#6A6A6A, 5,3:1 auf Weiß). Die Farbnamen sind für Screenreader lesbar. Das Fazit hat bei 2 Modellen höchstens 20 Wörter.

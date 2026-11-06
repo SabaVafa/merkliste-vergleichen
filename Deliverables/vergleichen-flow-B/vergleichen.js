@@ -64,9 +64,9 @@
   var SRC_DESC=' Angabe laut Produktbeschreibung (nicht als Merkmal gepflegt).';
   var ROWS_SPRECH=[
     {key:'typ',label:'Typ',cls:'T',akk:'den Typ',dat:'im Typ',nom:'der Typ',get:g('typ'),hint:'Video: Kamera an der Außenstation. Audio: Sprechverbindung ohne Kamera.'},
-    {key:'system',label:'System',cls:'T',akk:'das System',dat:'im System',nom:'das System',get:g('system'),hint:'IP-System: braucht an der Außenstation eine Verbindung zu Ihrem Heimnetzwerk. 2-Draht-BUS: nutzt eine vorhandene zweiadrige Klingelleitung weiter.'},
+    {key:'system',label:'System',cls:'T',akk:'das System',dat:'im System',nom:'das System',get:g('system'),hint:'IP-System: Anbindung der Außenstation an das Heimnetzwerk. 2-Draht-BUS: Übertragung über eine zweiadrige Leitung.'},
     {key:'klingel',label:'Anzahl Klingeltaster',lst:'Tasteranzahl',cls:'T',akk:'die Tasteranzahl',dat:'in der Tasteranzahl',nom:'die Tasteranzahl',get:g('klingel'),hint:'Ein Klingeltaster je Wohneinheit. „Flexibel (1–500)": laut Shop für 1 bis 500 Parteien wählbar.'},
-    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: dauerhaft graviert – ändert sich ein Name, brauchen Sie ein neues Schild. Austauschbar (Papiereinleger): Name jederzeit wechselbar. Digital: Namen werden elektronisch hinterlegt, kein graviertes Schild.'},
+    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist in das Schild graviert. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen. Digital: Namen werden elektronisch hinterlegt, kein graviertes Schild.'},
     {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A." heißt: im Shop nicht gepflegt — nicht „nicht vorhanden".'},
     {key:'kombi',label:'Mit Briefkasten/Paketbox',lst:'Briefkasten/Paketbox',cls:'T',akk:'die Kombination mit Briefkasten/Paketbox',dat:'bei Briefkasten/Paketbox',nom:'die Kombination mit Briefkasten/Paketbox',get:g('kombi'),hint:'Kombination aus Video-Türsprechanlage und Briefkasten bzw. Paketbox in einem Artikel.'},
     {key:'kamera',label:'Kameraauflösung',cls:'T',akk:'die Kameraauflösung',dat:'in der Kameraauflösung',nom:'die Kameraauflösung',na:isAudio,get:g('kamera'),hint:'Auflösung des Kamerabilds — Full HD (1920 × 1080) entspricht 2 MP.'+SRC_DESC},
@@ -80,7 +80,7 @@
   ];
   /* Briefkästen: the lens order (Design first) holds inside each section U / O / G */
   var ROWS_BK=[
-    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: dauerhaft graviert – ändert sich ein Name, brauchen Sie ein neues Schild. Austauschbar (Papiereinleger): Name jederzeit wechselbar. Ohne Gravur: ohne Namensschild.'},
+    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist in das Schild graviert. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen. Ohne Gravur: ohne Namensschild.'},
     {key:'colors',label:'Farben',cls:'A',akk:'die Farben',dat:'in den Farben',nom:'die Farben',pl:true,swatches:true,hint:'Alle im Shop angebotenen Farbausführungen.'},
     {key:'faecher',label:'Fächer / Parteien',lst:'Fächerzahl',cls:'T',akk:'die Fächerzahl',dat:'in der Fächerzahl',nom:'die Fächerzahl',get:g('faecher'),hint:'Anzahl der Briefkastenfächer — ein Fach je Partei.'},
     {key:'zeitungsfach',label:'Zeitungsfach',cls:'T',akk:'das Zeitungsfach',dat:'im Zeitungsfach',nom:'das Zeitungsfach',get:g('zeitungsfach'),hint:'Integriert: fest verbaut. Optional: als Zubehör erhältlich. Ohne: kein Zeitungsfach.'},
@@ -91,14 +91,11 @@
     {key:'material',label:'Material',cls:'F',set:true,fin:'Material',fdat:'im Material',fbei:'beim Material',nom:'das Material',get:g('material'),hint:'Im Shop für alle Ausführungen gemeinsam gepflegt — das Material der einzelnen Farbe bzw. Front kann abweichen.'}
   ];
 
-  /* Erklärsätze (12a §3.6, released by the user): shown only when the row is a difference and the trigger value occurs */
-  var E_GRAVUR={key:'namensschild',val:'Lasergraviert',t:'Ändert sich ein Name, brauchen Sie ein neues Schild.'};
-  var EXPL_SPRECH=[
-    {key:'system',val:'2-Draht-BUS',t:'Nutzt eine vorhandene zweiadrige Klingelleitung weiter.'},
-    {key:'system',val:'IP-System',t:'Braucht an der Außenstation eine Verbindung zu Ihrem Heimnetzwerk.'},
-    E_GRAVUR
-  ];
-  var EXPL_BK=[E_GRAVUR,{key:'montage',val:'Unterputz',t:'Braucht eine passende Öffnung in der Wand.'}];
+  /* Meaning lines (UX-Review 06.11. #3): the approved consequences (12a §3.6 E1, E2, E4, E10) as a muted line under the value
+     in a difference row, plus the plain counterpart for the other side where the same approved fact gives one (Namensschild). */
+  var MEAN_NS={'Lasergraviert':'Dauerhaft – bei Namensänderung neues Schild.','Austauschbar (Papiereinleger)':'Namen selbst austauschbar.'};
+  var MEAN_SPRECH={system:{'2-Draht-BUS':'Nutzt eine vorhandene zweiadrige Klingelleitung weiter.','IP-System':'Braucht an der Außenstation eine Verbindung zu Ihrem Heimnetzwerk.'},namensschild:MEAN_NS};
+  var MEAN_BK={namensschild:MEAN_NS,montage:{'Unterputz':'Braucht eine passende Öffnung in der Wand.'}};
 
   /* model without shop data → one notice under the Fazit (12a §3.4) */
   function guardsData(items){
@@ -109,8 +106,8 @@
   }
 
   var LENSES={
-    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,expl:EXPL_SPRECH,trio:['kai1','colson1','sdm10x'],step4:'„–" heißt: trifft nicht zu (z. B. Kamera bei Audio-Modellen), „k. A.": im Shop nicht gepflegt.',srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A." = im Shop nicht gepflegt · „–" = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
-    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,expl:EXPL_BK,trio:['siebert','ebenhard','hermann'],designFirst:true,step4:'Bei Briefkästen steht in jedem Abschnitt das Design zuerst, die Technik danach.',srcNote:'„k. A." = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
+    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,mean:MEAN_SPRECH,trio:['kai1','colson1','sdm10x'],step4:'„–" heißt: trifft nicht zu (z. B. Kamera bei Audio-Modellen), „k. A.": im Shop nicht gepflegt.',srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A." = im Shop nicht gepflegt · „–" = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
+    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,mean:MEAN_BK,trio:['siebert','ebenhard','hermann'],designFirst:true,step4:'In jedem Abschnitt steht die Funktion zuerst, dann Namensschild und Material, Farben, zuletzt Maße und Gewicht.',srcNote:'„k. A." = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
   };
   var LENS=LENSES[window.MTZ_LENS]||LENSES.sprechanlage;
   var ROWS=LENS.rows;
@@ -149,9 +146,8 @@
   var IC_INFO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"/></svg>';
   var IC_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8.4 12.5 11 15 16 9.5"/></svg>';
   var IC_LIMIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13.5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
-  function swHTML(colors,lim){lim=lim||8;var o='';(colors||[]).slice(0,lim).forEach(function(c){if(SW[c])o+='<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>';});return '<span class="vgl-sw" aria-hidden="true">'+o+'</span>';}
 
-  var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,diffCb,diffN,scrollEl,toastEl,toastT,barBtn,cancelBtn,lastFocus;
+  var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,scrollEl,toastEl,toastT,barBtn,cancelBtn,lastFocus;
   var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   var IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -163,7 +159,7 @@
   var IC_CHD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
   var liveEl,shareBtn,fromMkl=false,lastCleared=null,prevTitle=null;
   /* render state of the open comparison */
-  var cur=null,visCols=null,pendingCol=null,exOpen=false,printing=false,lastRemoved=null,lastTier='';
+  var cur=null,visCols=null,pendingCol=null,gShow=false,printing=false,lastRemoved=null,lastTier='';   /* gShow = Gemeinsamkeiten open */
   var MQ90=window.matchMedia?window.matchMedia('(min-width:90rem)'):null,MQ64=window.matchMedia?window.matchMedia('(min-width:64rem)'):null,MQ48=window.matchMedia?window.matchMedia('(min-width:48rem)'):null;
   function mq(m,fb){return m?m.matches:fb;}
 
@@ -188,7 +184,6 @@
       '<div class="vgl-view__bar"><div class="vgl-view__bar-in">'+
         '<button class="vgl-back" type="button" data-vgl="back" aria-label="Zurück zur Merkliste" hidden>'+IC_CHL+'<span class="vgl-back__l">Merkliste</span></button>'+
         '<h2 class="vgl-view__title" id="vglTitle" tabindex="-1">Vergleich <span data-vgl="count">(0)</span></h2>'+
-        '<label class="vgl-diff"><input type="checkbox" role="switch" data-vgl="diff"><span class="vgl-switch" aria-hidden="true"></span><span class="vgl-diff__l">Nur Unterschiede <span class="vgl-diff__n" data-vgl="diffn"></span></span></label>'+
         '<div class="vgl-bar__act">'+
           '<button class="vgl-tb vgl-tb--teal vgl-link--share" type="button" data-vgl="share" title="Link zu diesem Vergleich kopieren">'+IC_LINK+'<span class="vgl-share__l">Link kopieren</span></button>'+
           '<button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
@@ -199,8 +194,8 @@
       '<div class="vgl-view__scroll"><div class="vgl-view__scroll-in" data-vgl="body"></div></div>'+
       '<div class="vgl-visually-hidden" aria-live="polite" aria-atomic="true" data-vgl="live"></div></div>');
     document.body.appendChild(view);liveEl=view.querySelector('[data-vgl="live"]');shareBtn=view.querySelector('[data-vgl="share"]');
-    viewBody=view.querySelector('[data-vgl="body"]');viewCount=view.querySelector('[data-vgl="count"]');diffCb=view.querySelector('[data-vgl="diff"]');
-    diffN=view.querySelector('[data-vgl="diffn"]');scrollEl=view.querySelector('.vgl-view__scroll');
+    viewBody=view.querySelector('[data-vgl="body"]');viewCount=view.querySelector('[data-vgl="count"]');
+    scrollEl=view.querySelector('.vgl-view__scroll');
 
     toastEl=h('<div class="vgl-toast" role="status" aria-live="polite"></div>');document.body.appendChild(toastEl);
     /* the action toast pauses while it is hovered or focused (WCAG 2.2.1) */
@@ -230,8 +225,7 @@
         if(k==='addmkl'){closeAdd(false);closeView();if(window.MTZ_MKL)window.MTZ_MKL.open();}
         if(k==='back'){if(window.MTZ_MKL)window.MTZ_MKL.open();}
         if(k==='print'){printView();}
-        if(k==='ex')toggleEx();
-        if(k==='common'){diffCb.checked=!diffCb.checked;onDiff();}
+        if(k==='common'){gShow=!gShow;onCommon();}
         return;}
       var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
       var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');pendingCol=aid;if(toggle(aid,true)){var anm=baseTitle(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
@@ -248,7 +242,6 @@
       if(pickEl){e.stopPropagation();closePick(true);return;}
       if(addPanel){e.stopPropagation();closeAdd(true);return;}
       var pop=view.querySelector('.vgl-sharepop');if(pop){e.stopPropagation();pop.remove();if(shareBtn)shareBtn.focus();return;}});
-    diffCb.addEventListener('change',onDiff);
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&view.classList.contains('is-open')&&!view.querySelector('.vgl-i.is-open')&&!addPanel&&!pickEl&&!view.querySelector('.vgl-sharepop'))closeView();});
     /* the sticky identity row has ONE height per comparison — nothing listens to scroll */
     /* keep keyboard focus inside the dialog (rendered, enabled controls only) */
@@ -650,41 +643,17 @@
     return {base:base,rows:rows,U:U,O:O,G:G};
   }
 
-  /* ---- Phrases (12a §3.3): values verbatim from the cells, value of the pricier model first ---- */
-  function dimPhrase(a,b){
-    var A=a.replace(/ cm$/,'').split(' × '),B=b.replace(/ cm$/,'').split(' × ');
-    if(A.length===3&&B.length===3){var dif=[0,1,2].filter(function(k){return A[k]!==B[k];});
-      if(dif.length===1)return ['Breite','Höhe','Tiefe'][dif[0]]+' '+A[dif[0]]+' statt '+B[dif[0]]+' cm';}
-    return 'Maße '+a.replace(/ cm$/,'')+' statt '+b;
-  }
-  function colorPhrase(cT,cB){
-    var x=diffArr(cT,cB).map(cname),y=diffArr(cB,cT).map(cname);
-    if(x.length&&!y.length)return x.length<=3?'zusätzlich die Farbe'+(x.length>1?'n ':' ')+joinAnd(x):'zusätzlich '+x.length+' weitere Farben';
-    if(!x.length&&y.length)return cT.length<=2?'nur '+joinAnd(cT.map(cname))+' statt '+cB.length+' Farben':cT.length+' statt '+cB.length+' Farben';
-    if(cT.length===cB.length)return 'Farben '+joinAnd(x)+' statt '+joinAnd(y);
-    return cT.length+' statt '+cB.length+' Farben';
-  }
-  function pairPhrase(d,ti,bi,items){
-    var row=d.row,a=tx(d.texts[ti]),b=tx(d.texts[bi]),L=row.lst||row.label;
-    if(row.swatches)return colorPhrase(items[ti].colors||[],items[bi].colors||[]);
-    if(row.key==='abmessungen')return dimPhrase(a,b);
-    if(row.key==='gewicht')return 'Gewicht '+(/ kg$/.test(a)&&/ kg$/.test(b)?a.replace(/ kg$/,''):a)+' statt '+b;
-    if(row.key==='klingel')return a+' statt '+b+' Taster';
-    if(row.key==='faecher')return 'Fächer '+a+' statt '+b;
-    if(row.set&&Array.isArray(d.vals[ti])&&Array.isArray(d.vals[bi])){
-      var x=diffArr(d.vals[ti],d.vals[bi]),y=diffArr(d.vals[bi],d.vals[ti]);
-      if(x.length&&y.length)return L+' '+x.join(', ')+' statt '+y.join(', ');
-      if(x.length)return L+' zusätzlich '+x.join(', ');
-      return L+' ohne '+y.join(', ');
-    }
-    return L+' '+a+' statt '+b;
-  }
-  /* value of one model inside a grouped phrase: sets show only the differing elements */
+  /* ---- Relevance (UX-Review 06.11. #2): function → Namensschild/Material → Farben → Maße/Gewicht; stable lens order inside a tier ---- */
+  function tier(row){return (row.key==='abmessungen'||row.key==='gewicht')?4:(row.swatches?3:((row.key==='namensschild'||row.key==='material')?2:1));}
+  function byRelevance(list){return list.slice().sort(function(a,b){return tier(a.row)-tier(b.row)||ROWS.indexOf(a.row)-ROWS.indexOf(b.row);});}
+  var NS_SHORT={'Lasergraviert':'graviert','Austauschbar (Papiereinleger)':'austauschbar','Digital':'digital','Ohne Gravur':'ohne Gravur'};
+  /* value of one model in a sentence: plain words, sets show only the differing elements */
   function valOf(d,i,idx,items){
     var row=d.row;
     if(row.swatches){var c=items[i].colors||[];return c.length+' Farbe'+(c.length===1?'':'n');}
+    if(row.key==='namensschild'&&NS_SHORT[d.texts[i]])return NS_SHORT[d.texts[i]];
     if(row.set&&Array.isArray(d.vals[i])){var common=d.vals[i].filter(function(x){return idx.every(function(j){return Array.isArray(d.vals[j])&&d.vals[j].indexOf(x)>-1;});});var own=diffArr(d.vals[i],common);return (own.length?own:d.vals[i]).join(', ');}
-    return tx(d.texts[i]);
+    return d.texts[i]===NAT?'trifft nicht zu':d.texts[i];
   }
   function groupPhrase(d,idx,refs,items){
     var gs=[],m={};
@@ -714,78 +683,76 @@
     return null;
   }
   function cap1(s){return s.charAt(0).toUpperCase()+s.slice(1);}
-  var SHORT_REF=24;   /* longer titles (articles without design line) get a short reference in Satz 2 */
-  /* Fazit = Satz 1 (case F0–F6) + Satz 2 (price, neutral, never the Δ number) — fixed templates filled with cell values only */
+  var SHORT_REF=24;   /* longer titles (articles without design line) get a short reference in the Fazit and the price gap */
+  /* Fazit (UX-Review 06.11. #1): ONE deciding sentence (two at most for 3–4 models) — the case, the decisive difference in plain words,
+     no value lists (the values stand in the rows right below), no repeated price (the gap stands in the head). "laut Shopdaten" once at most. */
   function verdict(items,an,refs){
     var n=items.length,B=an.base;
     var is=function(c){return function(d){return d.row.cls===c;};};
-    var UT=an.U.filter(is('T')),OT=an.O.filter(is('T')),UF=an.U.filter(is('F')),OF=an.O.filter(is('F'));
+    var UT=an.U.filter(is('T')),OT=an.O.filter(is('T'));
     var pr=items.map(function(p){return p.price;}),pk=pr.every(function(x){return typeof x==='number';}),pd=pk&&pr.some(function(x){return x!==pr[0];});
     var twin=n===2&&items[0].design!=='–'&&items[0].design===items[1].design;
+    var ranked=byRelevance(an.U),lead=ranked.filter(function(d){return tier(d.row)<4;}),onlyF=an.U.length&&!lead.length;
     var s1='',s2='',fall,K=null;
-    function whyOf(rows){var w=rows.map(function(d){return d.why;});return w.every(function(x){return x==='var';})?'je nach Ausführung':(w.every(function(x){return x==='ka';})?'k. A.':'k. A. bzw. je nach Ausführung');}
-    function fIn(rows){return rows.length===1?rows[0].row.fdat:'in '+joinAnd(rows.map(function(d){return d.row.fin;}));}
-    function fBei(rows){return (rows.length===1?rows[0].row.fbei:'bei '+joinAnd(rows.map(function(d){return d.row.fin;})))+' nicht eindeutig ('+whyOf(rows)+')';}
+    /* two models: who is who in plain words (pricier first) */
+    var A=0,Bi=1;if(n===2&&pd&&pr[1]>pr[0]){A=1;Bi=0;}
+    function who(i,role){   /* role: 'nom' | 'bei' */
+      var high=pd&&pr[i]===Math.max.apply(null,pr),r=refs[i];
+      if(twin)return pd?(role==='bei'?(high?'bei der Ausführung mit Aufpreis':'bei der anderen'):(high?'die Ausführung mit Aufpreis':'die andere')):(role==='bei'?'bei der '+(i===0?'ersten':'zweiten')+' Ausführung':'die '+(i===0?'erste':'zweite')+' Ausführung');
+      if(r.n.length>SHORT_REF)return pd?(role==='bei'?(high?'beim Modell mit dem höheren Preis':'beim Modell mit dem niedrigeren Preis'):(high?'das Modell mit dem höheren Preis':'das Modell mit dem niedrigeren Preis')):(role==='bei'?'beim '+(i===0?'ersten':'zweiten')+' Modell':'das '+(i===0?'erste':'zweite')+' Modell');
+      if(role==='bei')return r.art==='die'?'bei der '+r.n:(r.art==='der'?'beim '+r.n:'bei '+r.n);
+      return refNom(r);
+    }
+    function pairClause(d){   /* "das Namensschild: graviert bei Colson, austauschbar bei Neo" */
+      if(d.row.swatches){
+        var cA=items[A].colors||[],cB=items[Bi].colors||[],x=diffArr(cA,cB).map(cname),y=diffArr(cB,cA).map(cname);
+        if(x.length&&!y.length&&x.length<=2)return 'die Farbe'+(x.length>1?'n ':' ')+joinAnd(x)+' nur '+who(A,'bei');
+        if(y.length&&!x.length&&y.length<=2)return 'die Farbe'+(y.length>1?'n ':' ')+joinAnd(y)+' nur '+who(Bi,'bei');
+        if(!x.length&&cA.length<=2)return 'die Farben: nur '+joinAnd(cA.map(cname))+' '+who(A,'bei')+', '+cB.length+' Farben '+who(Bi,'bei');
+        if(!y.length&&cB.length<=2)return 'die Farben: nur '+joinAnd(cB.map(cname))+' '+who(Bi,'bei')+', '+cA.length+' Farben '+who(A,'bei');
+        return 'die Farben: '+cA.length+' '+who(A,'bei')+', '+cB.length+' '+who(Bi,'bei');
+      }
+      return d.row.nom+': '+valOf(d,A,B,items)+' '+who(A,'bei')+', '+valOf(d,Bi,B,items)+' '+who(Bi,'bei');
+    }
+    function more(list){var m=list.slice(0,2).map(function(d){return d.row.nom;});return m.length?'; außerdem '+joinAnd(m):'';}
+    function onlyFText(){return 'Unterschiede nur bei '+joinAnd(ranked.map(function(d){return d.row.fin;}));}
+    var price2=pd?'':' bei gleichem Preis';
     if(items.filter(function(p){return p.shop;}).length<2){
       fall='F0';s1='Für '+joinAnd(items.filter(function(p){return !p.shop;}).map(function(p){return refNom(refs[items.indexOf(p)]);}))+' enthält der Shop-Export keine Merkmale – ein Vergleich der Merkmale ist nicht möglich.';
-    }else if((K=classRule(items,B,refs))){fall='F1';s1='Unterschiedliche Produktklassen: '+cap1(K.text)+'.';}
-    else if(!an.U.length){fall='F2';s1='Laut Shopdaten in allen '+an.G.length+' gepflegten Merkmalen gleich – '+(items.some(function(p){return p.design!==items[0].design;})?'verschieden ist nur die Design-Linie':'einen Unterschied zeigen die Shopdaten nicht')+'.';}
-    else if(!UT.length&&!OT.length){
-      if(!UF.length&&!OF.length){fall='F3a';s1='Laut Shopdaten technisch gleich.';}
-      else if(UF.length){fall='F3b';s1='Laut Shopdaten technisch gleich, aber '+fIn(UF)+' verschieden'+(OF.length?', '+fBei(OF):'')+'.';}
-      else{fall='F3c';s1='Laut Shopdaten technisch gleich, '+fBei(OF)+'.';}
-    }
-    else if(UT.length===1&&!OT.length){fall='F4';s1='Laut Shopdaten technisch gleich bis auf '+UT[0].row.akk+(UF.length?', außerdem '+fIn(UF)+' verschieden':'')+(OF.length?', '+fBei(OF):'')+'.';}
-    else if(!UT.length){fall='F5';s1='Laut Shopdaten kein technischer '+(pd?'Mehrwert':'Unterschied')+' belegt (nicht gepflegt: '+OT.map(function(d){return d.row.label;}).join(', ')+').';}
-    else{fall='F6';
-      var r=UT.slice(0,n===2?3:2).map(function(d){return d.row.dat+(n>2?' ('+groupPhrase(d,B,refs,items)+')':'');});
-      s1='Technisch verschieden – vor allem '+joinAnd(r)+'; insgesamt '+an.U.length+' Unterschied'+(an.U.length===1?'':'e')+(an.O.length?', '+an.O.length+' Merkmal'+(an.O.length===1?'':'e')+' nicht für alle gepflegt':'')+'.';
-    }
-    var order=function(list){return ['T','A','F'].reduce(function(o,c){return o.concat(list.filter(is(c)));},[]);};
-    if(fall==='F0'){}
-    else if(fall==='F1'){
-      var ex=UT.filter(function(d){return K.keys.indexOf(d.row.key)<0;});if(!ex.length)ex=an.U.filter(function(d){return d.row.cls!=='T';});
-      var lb=ex.slice(0,2).map(function(d){return d.row.label;}).join(', ');
-      s2=pd?'Die Preise sind deshalb nicht als Aufpreis vergleichbar'+(lb?'; außerdem verschieden: '+lb:'')+'.':(lb?'Außerdem verschieden: '+lb+'.':'');
-    }
-    else if(!pk){}
-    else if(!pd){
-      var af=order(an.U.filter(function(d){return d.row.cls!=='T';})).slice(0,4);
-      if(af.length)s2='Gleicher Preis; verschieden '+(af.length>1||af[0].row.pl?'sind ':'ist ')+joinAnd(af.map(function(d){return d.row.nom+' ('+groupPhrase(d,B,refs,items)+')';}))+'.';
-    }
-    else if(n===2){
-      var ti=pr[0]>pr[1]?0:1,bi2=1-ti;
-      if(fall==='F2')s2='Der Preisunterschied geht mit keinem gepflegten Merkmal einher.';
-      else{
-        /* who costs more: twins "Die Ausführung mit Aufpreis"; a title longer than half a phone line → "Das Modell mit dem höheren Preis" (CP4 F1) */
-        var list=order(an.U),ph=list.slice(0,4).map(function(d){return pairPhrase(d,ti,bi2,items);}),rest=list.length-ph.length;
-        var who=twin?'Die Ausführung mit Aufpreis unterscheidet sich in: ':(refs[ti].n.length>SHORT_REF?'Das Modell mit dem höheren Preis unterscheidet sich in: ':cap1(refNom(refs[ti]))+' kostet mehr und unterscheidet sich in: ');
-        s2=who+ph.join(', ')+(rest>0?' und '+rest+' weiteren Merkmal'+(rest>1?'en':''):'')+'.';
+    }else if((K=classRule(items,B,refs))){fall='F1';s1='Unterschiedliche Produktklassen: '+cap1(K.text)+(pd?' – die Preise sind nicht als Aufpreis vergleichbar':'')+'.';}
+    else if(!an.U.length){fall='F2';s1='Laut Shopdaten in allen gepflegten Merkmalen gleich'+(items.some(function(p){return p.design!==items[0].design;})?' – verschieden ist nur die Design-Linie':'')+(pd?'; der Preisunterschied geht mit keinem gepflegten Merkmal einher':'')+'.';}
+    else{
+      var tech=UT.length>1||(UT.length===1&&OT.length);
+      fall=tech?'F6':(UT.length===1?'F4':(OT.length?'F5':(onlyF?'F3b':'F3a')));
+      var pre=tech?'Technisch verschieden':(OT.length?'Laut Shopdaten kein technischer Unterschied belegt ('+joinAnd(OT.map(function(d){return d.row.label;}))+' nicht für alle gepflegt)':(onlyF?'Laut Shopdaten technisch gleich':'Laut Shopdaten fast baugleich'));
+      if(fall==='F4'){   /* one technical difference: name it, the rest only by label */
+        var t0=UT[0],rest4=lead.filter(function(d){return d!==t0;});
+        s1='Laut Shopdaten technisch gleich'+price2+' bis auf '+t0.row.akk+(n===2?': '+valOf(t0,A,B,items)+' '+who(A,'bei')+', '+valOf(t0,Bi,B,items)+' '+who(Bi,'bei'):' ('+groupPhrase(t0,B,refs,items)+')')+more(rest4)+'.';
       }
-    }else{
-      if(fall==='F6')s2='Die Preisunterschiede lassen sich deshalb keinem einzelnen Merkmal zuordnen.';
-      else if(fall==='F2')s2='Die Preisunterschiede gehen mit keinem gepflegten Merkmal einher.';
-      else{   /* only what Satz 1 has not named yet */
-        var named=(fall==='F4'?UT:[]).concat(UF),rest3=order(an.U).filter(function(d){return named.indexOf(d)<0;});
-        s2='Neben den Preisen unterscheiden sich '+(rest3.length?joinAnd(rest3.map(function(d){return d.row.nom;})):'nur die genannten Merkmale')+'.';
+      else if(n===2){
+        if(onlyF)s1=pre+price2+' – '+onlyFText()+'.';
+        else{var cl=pairClause(lead[0]);s1=pre+price2+' – '+(tech?'vor allem ':(cl.indexOf('die Farben')===0?'der Unterschied sind ':'der Unterschied ist '))+cl+more(lead.slice(1))+'.';}
+      }else{
+        if(onlyF)s1=pre+price2+' – '+onlyFText()+'.';
+        else s1=pre+price2+' – '+(tech?'vor allem ':'Unterschiede vor allem bei ')+joinAnd(lead.slice(0,2).map(function(d){return (tech?d.row.nom+' ':(d.row.lst||d.row.label)+' ')+'('+groupPhrase(d,B,refs,items)+')';}))+'.';
+        if(tech&&pd)s2='Die Preisunterschiede lassen sich keinem einzelnen Merkmal zuordnen.';
       }
     }
-    /* Erklärsätze (12a §3.5): the row is U, the trigger value occurs in the base; ≤ 3, lens order */
-    var exs=[];
-    if(fall!=='F0')an.U.forEach(function(d){(LENS.expl||[]).forEach(function(e){
-      if(e.key!==d.row.key||exs.length>=3)return;
-      var who=B.filter(function(i){var v=d.vals[i];return Array.isArray(v)?v.indexOf(e.val)>-1:d.texts[i]===e.val;});
-      if(who.length)exs.push({who:who.map(function(i){return refs[i].n;}).join(', '),t:e.t});
-    });});
-    return {fall:fall,s1:s1,s2:s2,ex:exs,noDelta:fall==='F1',twin:/^F3/.test(fall)};
+    return {fall:fall,s1:s1,s2:s2,noDelta:fall==='F1',twin:fall==='F3a'||fall==='F3b',ranked:ranked};
   }
-  /* Alternatives that differ MEANINGFULLY (shown after G in case F3): nearest models with 1–3 technical differences, closest price first */
+  /* "Ähnliche Modelle" (UX-Review 06.11. #8): same kind as the compared models (video ↔ video, audio ↔ audio; mailbox class; no sets or
+     combinations unless the compared models are), 1–3 technical differences, not just another Tasteranzahl; closest price first */
+  function kindOf(p){
+    if(LENS.designFirst){var f=parseInt(p.faecher,10);return (isNaN(f)?'?':(f===1?'1':'n'))+'|'+(p.klingelsys&&p.klingelsys!=='Nein'?'k':'-')+'|'+(p.isSet?'s':'-');}
+    return (p.typ||'?')+'|'+(((p.kombi&&p.kombi!=='Nein')||/\bSet\b/i.test(p.name))?'c':'-');
+  }
   function alternatives(items){
+    var kinds=uniqArr(items.map(kindOf));if(kinds.length!==1)return [];
     var techRows=ROWS.filter(function(r){return r.cls==='T';});
     var ref=items[0],refPrice=typeof ref.price==='number'?ref.price:0;
-    var out=[],tasterOnly=[];
+    var out=[];
     SRC.forEach(function(raw){
-      var p=BY_ID[raw.id]; if(!p||!p.shop||selected.indexOf(p.id)>-1)return;
+      var p=BY_ID[raw.id]; if(!p||!p.shop||selected.indexOf(p.id)>-1||kindOf(p)!==kinds[0])return;
       var why=[];
       techRows.forEach(function(row){
         var va=cellVal(p,row),vb=cellVal(ref,row),a=disp(va,row),b=disp(vb,row);
@@ -794,18 +761,16 @@
         why.push({k:row.key,l:row.label,v:(row.bool?(a==='ja'?'Ja':'Nein'):a)});
       });
       if(why.length<1||why.length>3)return;
-      if(why.every(function(w){return w.k==='klingel';})){tasterOnly.push({p:p,why:why,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});return;}   /* CP4 F2: only another Tasteranzahl is no alternative */
+      if(why.every(function(w){return w.k==='klingel';}))return;   /* only another Tasteranzahl is no alternative (CP4 F2) */
       out.push({p:p,why:why,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});
     });
     function pick(list){
       list.sort(function(a,b){return a.why.length-b.why.length||a.dist-b.dist;});
-      /* one per design line, so the list doesn't show three Colsons */
-      var seen={},res=[];list.forEach(function(o){var k=o.p.design+'|'+o.why.map(function(w){return w.l+w.v;}).join();if(seen[k])return;seen[k]=1;res.push(o);});
+      /* one per design line, so the list doesn't show three Maxiors */
+      var seen={},res=[];list.forEach(function(o){var k=o.p.design==='–'?o.p.id:o.p.design;if(seen[k])return;seen[k]=1;res.push(o);});
       return res.slice(0,3);
     }
-    var res=pick(out);res.h='Alternativen mit technischem Unterschied';
-    if(!res.length){res=pick(tasterOnly);res.h='Andere Tasteranzahl';}   /* nothing else differs: offer them, honestly labelled */
-    return res;
+    return pick(out);
   }
 
   /* =========================================================
@@ -831,22 +796,52 @@
     var t=c.titles[i];
     var title='<span class="vgl-ph__t">'+esc(t.base)+(t.seg?'<span class="vgl-ph__seg"> · '+esc(t.seg)+'</span>':'')+'</span>';
     var head=c.pick?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+title+IC_CHD+'</button>':'<div class="vgl-ph__title">'+title+'</div>';
-    var delta=(!c.vd.noDelta&&typeof p.price==='number'&&p.price>c.minPrice)?'<span class="vgl-ph__delta">+ '+euro(p.price-c.minPrice)+'<span class="vgl-visually-hidden"> mehr als das Modell mit dem niedrigsten Preis im Vergleich</span></span>':'';
+    var delta=(!c.vd.noDelta&&typeof p.price==='number'&&p.price>c.minPrice)?'<span class="vgl-ph__delta"><span class="vgl-ph__dlong">'+gapText(p,c)+'</span><span class="vgl-ph__dshort" aria-hidden="true">+ '+euro(p.price-c.minPrice)+'</span></span>':'';   /* phones show the short form next to the UVP; screen readers always get the long one */
     var money='<div class="vgl-ph__money"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+delta+(p.uvp?'<span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</div>';
     var lbl=p.konfig?'Konfigurieren':'Zum Produkt',al=' aria-label="'+lbl+' – '+esc(t.t)+'"';
     var cta=PDP_URLS[p.id]?'<a class="vgl-cta" href="'+esc(PDP_URLS[p.id])+'" data-go="'+esc(p.id)+'"'+al+'>'+lbl+IC_CHR+'</a>':'<button class="vgl-cta" type="button" data-go'+al+'>'+lbl+IC_CHR+'</button>';
     return '<div class="vgl-ph__in"><div class="vgl-ph__media">'+imgHTML(p)+'<span data-rm="'+esc(p.id)+'" hidden></span></div>'+head+money+
-      '<div class="vgl-ph__act">'+cta+'<button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div></div>';
+      '<div class="vgl-ph__act">'+cta+'</div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>';
+  }
+  /* price gap (UX-Review 06.11. #4): quiet, relative to the model with the lowest price */
+  function gapText(p,c){
+    var lo=0;c.items.forEach(function(q,i){if(q.price===c.minPrice&&c.items[lo].price!==c.minPrice)lo=i;});
+    var tw=c.items.length===2&&c.items[0].design!=='–'&&c.items[0].design===c.items[1].design,r=c.refs[lo],short=!tw&&r.n.length<=SHORT_REF;
+    var gap=euro(p.price-c.minPrice);
+    if(c.items.length===2)return gap+' mehr als '+(short?refNom(r):(tw?'die andere Ausführung':'das andere Modell'));
+    return '+ '+gap+' ggü. '+(short?r.n:'dem niedrigsten Preis');
   }
   function tipHTML(row){return row.hint?'<button class="vgl-i" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'<span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+esc(row.hint)+'</span></button>':'';}
-  function cellHTML(d,i,p,isb,attr){
-    var row=d.row,v=d.vals[i],t=d.texts[i],inner;
+  /* "13,3 × 27,4 × k. A. cm" → "B 13,3 · H 27,4 cm · T k. A."; axes that differ between the models are bold */
+  function dimHTML(t,diffAx){
+    var s=String(t),v=s.indexOf(VAR)>-1;s=s.replace(VAR,'').replace(/ cm$/,'');
+    var ax=s.split(' × ');if(ax.length!==3)return esc(t);
+    var L=['B','H','T'],known=[],unk=[];
+    ax.forEach(function(a,k){var part=L[k]+' '+(diffAx&&diffAx[k]?'<b>'+esc(a)+'</b>':esc(a));if(a==='k. A.')unk.push(L[k]+' <span aria-hidden="true">k. A.</span><span class="vgl-visually-hidden">keine Angabe im Shop</span>');else known.push(part);});
+    return known.join(' · ')+(known.length?' cm':'')+(unk.length?(known.length?' · ':'')+unk.join(' · '):'')+(v?esc(VAR):'');
+  }
+  function dimDiff(d,idx){var parts=idx.map(function(i){return String(d.texts[i]).replace(VAR,'').replace(/ cm$/,'').split(' × ');});return [0,1,2].map(function(k){return parts.some(function(p){return p[k]!==parts[0][k];});});}
+  /* colours: one slot per colour of the whole comparison, same order in every column; a colour a model lacks is an empty slot */
+  function colorsHTML(cs,all){
+    var sw='<span class="vgl-sw" aria-hidden="true">'+all.map(function(c){return cs.indexOf(c)>-1&&SW[c]?'<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>':'<span class="vgl-sw__no" title="'+(SWL[c]||c)+' nicht erhältlich"></span>';}).join('')+'</span>';
+    /* visible: the count only (the swatches + empty slots already show which colours) — names for screen readers, no repeated name lists */
+    return sw+'<span class="vgl-swc">'+cs.length+' Farbe'+(cs.length===1?'':'n')+'<span class="vgl-visually-hidden">: '+esc(cs.map(cname).join(', '))+'</span></span>';
+  }
+  function meanHTML(d,i){
+    var mp=(LENS.mean||{})[d.row.key];if(!mp)return '';
+    var v=d.vals[i],t=Array.isArray(v)?v.map(function(x){return mp[x];}).filter(Boolean)[0]:mp[d.texts[i]];
+    return t?'<span class="vgl-mean">'+esc(t)+'</span>':'';
+  }
+  function cellHTML(d,i,p,isb,attr,ctx){
+    var row=d.row,v=d.vals[i],t=d.texts[i],inner;ctx=ctx||{};
     if(isUnk(t))inner=unkHTML(t);
-    else if(row.swatches){var cs=p.colors||[];inner=swHTML(cs,10)+'<span class="vgl-swc">'+cs.length+' Farbe'+(cs.length===1?'':'n')+'<span class="vgl-visually-hidden">: '+esc(cs.map(cname).join(', '))+'</span></span>';}
-    else if(row.set&&Array.isArray(v))inner=v.length?'<ul class="vgl-setl">'+v.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'<span class="vgl-no">Keine</span>';
+    else if(row.swatches)inner=colorsHTML(p.colors||[],ctx.allColors||p.colors||[]);
+    else if(row.key==='abmessungen')inner=dimHTML(t,ctx.diffAx);
+    else if(row.set&&Array.isArray(v))inner=v.length?'<ul class="vgl-setl">'+v.map(function(x){return '<li>'+(ctx.common&&ctx.common.indexOf(x)<0?'<b>'+esc(x)+'</b>':esc(x))+'</li>';}).join('')+'</ul>':'<span class="vgl-no">Keine</span>';
     else if(row.bool)inner=v===true?'<span class="vgl-yes">'+CHK+'Ja</span>':'<span class="vgl-no">Nein</span>';
     else inner=esc(t);
     if(isb)inner+=' <span class="vgl-best">Bestwert</span>';
+    if(ctx.mean)inner+=meanHTML(d,i);
     return '<td class="vgl-val'+(isUnk(t)?' na':'')+(isb?' is-best':'')+'" role="cell"'+(attr||'')+'>'+inner+'</td>';
   }
   function renderView(){
@@ -859,7 +854,7 @@
     closePick(false);
     lastTier=tierKey();
     if(items.length<2){
-      cur=null;visCols=null;diffN.textContent='';
+      cur=null;visCols=null;
       viewBody.innerHTML='<div class="vgl-empty">'+SCALE+'<b>Mindestens zwei Modelle wählen</b><span>Markieren Sie über „Vergleichen" auf den Produktkarten weitere Modelle, um sie hier gegenüberzustellen.</span>'+
         '<div class="vgl-empty__act">'+(lastCleared?'<button class="vgl-more" type="button" data-vgl="undo-clear">Vergleich wiederherstellen ('+lastCleared.length+')</button>':'')+'<button class="vgl-more" type="button" data-vgl="add">'+IC_PLUS+'Modell wählen</button>'+(mklCount()?'<button class="vgl-more" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste wählen ('+mklCount()+')</button>':'')+'</div></div>';
       return;
@@ -868,17 +863,14 @@
     var maxC=maxCols(),pick=items.length>maxC,vis=syncVis(items,maxC),nv=vis.length,n=items.length;
     var minPrice=Math.min.apply(null,items.map(function(p){return typeof p.price==='number'?p.price:Infinity;}));
     var c=cur={items:items,an:an,titles:titles,refs:refs,vd:vd,vis:vis,pick:pick,minPrice:minPrice};
-    var gOpen=printing||!diffCb.checked;
-    diffN.textContent='('+an.U.length+')';
+    var gOpen=printing||gShow;
+    var allColors=[];items.forEach(function(p){(p.colors||[]).forEach(function(cl){if(allColors.indexOf(cl)<0)allColors.push(cl);});});
+    var forAll=n===2?'gilt für beide Modelle':'gilt für alle '+n+' Modelle';
 
-    /* ---- Fazit (scrolls away) ---- */
+    /* ---- No summary sentence (user decision 06.11.: the table speaks for itself). Only the data notice
+       for a model without shop data remains, and only when it applies. ---- */
     var note=guardsData(items);
-    var fz='<section class="vgl-fz'+(vd.ex.length?' has-ex':'')+(exOpen||printing?' is-ex':'')+'" aria-labelledby="vglFzH"><h3 class="vgl-visually-hidden" id="vglFzH">Fazit</h3>'+
-      '<div class="vgl-fz__main"><p class="vgl-fz__txt"><strong class="vgl-fz__s1">'+esc(vd.s1)+'</strong>'+(vd.s2?' '+esc(vd.s2):'')+
-      (vd.ex.length?' <button class="vgl-fz__more" type="button" data-vgl="ex" aria-expanded="'+(exOpen?'true':'false')+'" aria-controls="vglEx"><span class="vgl-fz__more-l">'+(exOpen?'Erklärung ausblenden':'Was bedeutet das?')+'</span>'+IC_CHD+'</button>':'')+'</p>'+
-      (note?'<p class="vgl-fz__note">'+IC_INFO+'<span>'+note+'</span></p>':'')+'</div>'+
-      (vd.ex.length?'<div class="vgl-fz__ex" id="vglEx"><p class="vgl-fz__exh">Was das bedeutet</p><ul>'+vd.ex.map(function(e){return '<li><b>'+esc(e.who)+':</b> '+esc(e.t)+'</li>';}).join('')+'</ul></div>':'')+
-      '</section>';
+    var fz=note?'<section class="vgl-fz" aria-label="Hinweis zu den Daten"><p class="vgl-fz__note">'+IC_INFO+'<span>'+note+'</span></p></section>':'';
 
     /* ---- Bildleiste (< 48 rem, scrolls away): photos of the visible columns, pill "i / n" ---- */
     var strip='<div class="vgl-strip" style="--vgl-n:'+nv+'">'+vis.map(function(i){return '<div class="vgl-ph__media vgl-strip__m">'+imgHTML(items[i])+'<span data-rm="'+esc(items[i].id)+'" hidden></span>'+(pick?'<span class="vgl-pill" aria-hidden="true">'+(i+1)+' / '+n+'</span>':'')+'</div>';}).join('')+'</div>';
@@ -887,35 +879,38 @@
     var nMkl=n<MAX?mklCount():0;
     var lh=n>=MAX?'<p class="vgl-lh__full"><b>'+n+' von '+MAX+' Modellen.</b> Entfernen Sie ein Modell, um ein anderes hinzuzufügen.</p>':
       '<button class="vgl-addbtn" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button><span class="vgl-lh__n">noch '+(MAX-n)+' möglich</span>'+(nMkl?'<button class="vgl-addbtn vgl-addbtn--mkl" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'');
-    var thead='<thead role="rowgroup"><tr role="row"><th class="rh vgl-lh" scope="col" role="columnheader"><span class="vgl-visually-hidden">Merkmal</span>'+lh+'</th>'+
+    var thead='<thead role="rowgroup"><tr role="row"><th class="rh vgl-lh" scope="col" role="columnheader"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lh__box">'+lh+'</div></th>'+
       vis.map(function(i,k){return '<th class="vgl-ph" scope="col" role="columnheader" data-id="'+esc(items[i].id)+'">'+phInner(items[i],i,k,c)+'</th>';}).join('')+'</tr></thead>';
     var span=' colspan="'+(nv+1)+'" aria-colspan="'+(nv+1)+'"';
     function rowsHTML(list,kind){
-      return list.map(function(d){
+      return byRelevance(list).map(function(d){
         var row=d.row,capt='';
         if(kind==='U'&&pick){var vk=vis.map(function(i){return d.keys[i];});if(vk.every(function(x){return x===vk[0];})){var hid=an.base.filter(function(i){return vis.indexOf(i)<0&&d.keys[i]!==vk[0];});if(hid.length)capt='Unterschied bei: '+hid.map(function(i){return refs[i].n;}).join(', ');}}
         var th='<th class="rh" scope="row" role="rowheader"><span class="rh__l">'+esc(row.label)+'</span>'+tipHTML(row)+(capt?'<span class="vgl-rowcap">'+esc(capt)+'</span>':'')+'</th>';
-        if(kind==='G'){var i0=an.base[0];return '<tr role="row" data-key="'+row.key+'">'+th+cellHTML(d,i0,items[i0],false,' colspan="'+nv+'" aria-colspan="'+nv+'"').replace('class="vgl-val','class="vgl-val vgl-val--all').replace('</td>','<span class="vgl-visually-hidden"> – gilt für alle '+n+' Modelle</span></td>')+'</tr>';}
+        if(kind==='G'){var i0=an.base[0];return '<tr role="row" data-key="'+row.key+'">'+th+cellHTML(d,i0,items[i0],false,' colspan="'+nv+'" aria-colspan="'+nv+'"').replace('class="vgl-val','class="vgl-val vgl-val--all').replace('</td>','<span class="vgl-visually-hidden"> – '+forAll+'</span></td>')+'</tr>';}
         var bi=kind==='U'?bestIdx(row,d.vals,d.texts):[];
-        return '<tr role="row" data-key="'+row.key+'">'+th+vis.map(function(i){return cellHTML(d,i,items[i],bi.indexOf(i)>-1);}).join('')+'</tr>';
+        var ctx={allColors:allColors,mean:kind==='U'};
+        if(kind==='U'&&row.key==='abmessungen')ctx.diffAx=dimDiff(d,an.base);
+        if(kind==='U'&&row.set)ctx.common=(d.vals[an.base[0]]||[]).filter(function(x){return an.base.every(function(j){return Array.isArray(d.vals[j])&&d.vals[j].indexOf(x)>-1;});});
+        return '<tr role="row" data-key="'+row.key+'">'+th+vis.map(function(i){return cellHTML(d,i,items[i],bi.indexOf(i)>-1,'',ctx);}).join('')+'</tr>';
       }).join('');
     }
     function secHead(cls,inner){return '<tr class="vgl-sec__h" role="row"><th scope="rowgroup" role="rowheader"'+span+'><div class="vgl-sec__in">'+inner+'</div></th></tr>';}
-    var tbody='<tbody class="vgl-sec vgl-sec--u" role="rowgroup">'+secHead('u','<span class="vgl-sec__t">Unterschiede <span class="vgl-sec__n">('+an.U.length+')</span></span>')+
+    var tbody='<tbody class="vgl-sec vgl-sec--u" role="rowgroup">'+secHead('u','<span class="vgl-sec__t">Unterschiede</span><span class="vgl-sec__n">'+an.U.length+'</span>')+
       (an.U.length?rowsHTML(an.U,'U'):'<tr role="row"><td class="vgl-sec__empty" role="cell"'+span+'>Keine belegten Unterschiede.</td></tr>')+'</tbody>';
-    if(an.O.length)tbody+='<tbody class="vgl-sec vgl-sec--o" role="rowgroup">'+secHead('o','<span class="vgl-sec__t">Nicht für alle gepflegt <span class="vgl-sec__n">('+an.O.length+')</span></span><span class="vgl-sec__sub">Mindestens ein Modell ohne Angabe im Shop („k. A.“) oder mit Wert je nach Ausführung – kein belegter Unterschied.</span>')+rowsHTML(an.O,'O')+'</tbody>';
-    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g" role="rowgroup">'+secHead('g','<span class="vgl-sec__t">Gemeinsamkeiten <span class="vgl-sec__n">('+an.G.length+')</span></span><span class="vgl-sec__sub">· gilt für alle '+n+' Modelle</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG"><span>'+(gOpen?'Ausblenden':'Anzeigen')+'</span>'+IC_CHD+'</button>')+'</tbody>'+
+    if(an.O.length)tbody+='<tbody class="vgl-sec vgl-sec--o" role="rowgroup">'+secHead('o','<span class="vgl-sec__t">Nicht für alle gepflegt</span><span class="vgl-sec__n">'+an.O.length+'</span><span class="vgl-sec__sub">Ohne Shop-Angabe („k. A.“) oder je nach Ausführung – zählt nicht als Unterschied.</span>')+rowsHTML(an.O,'O')+'</tbody>';
+    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g" role="rowgroup">'+secHead('g','<span class="vgl-sec__t">Gemeinsamkeiten</span><span class="vgl-sec__n">'+an.G.length+'</span><span class="vgl-sec__sub">'+forAll+'</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG"><span>'+(gOpen?'Ausblenden':'Anzeigen')+'</span>'+IC_CHD+'</button>')+'</tbody>'+
       '<tbody class="vgl-sec__rows" id="vglG" role="rowgroup"'+(gOpen?'':' hidden')+'>'+rowsHTML(an.G,'G')+'</tbody>';
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
     var table='<div class="vgl-wrap"><table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+thead+tbody+'</table></div>';
 
-    /* ---- Alternativen (case F3 only, after G) ---- */
+    /* ---- Ähnliche Modelle (nearly identical models only, after G) ---- */
     var alts=vd.twin?alternatives(items):[],altHTML='';
-    if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><h3 class="vgl-alts__h" id="vglAltH">'+esc(alts.h)+'</h3><ul class="vgl-alts__list">'+
-      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(baseTitle(o.p))+'</div><div class="vgl-alt__why">'+o.why.map(function(w){return '<span><em>'+esc(w.l)+':</em> '+esc(w.v)+'</span>';}).join('')+'</div><div class="vgl-alt__foot"><b>ab '+euro(o.p.price)+'</b><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_PLUS+'Zum Vergleich</button></div></div></li>';}).join('')+'</ul></section>';
+    if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3><ul class="vgl-alts__list">'+
+      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(baseTitle(o.p))+'</div><div class="vgl-alt__why">'+o.why.map(function(w){return '<span><em>'+esc(w.l)+':</em> '+esc(w.v)+'</span>';}).join('')+'</div><div class="vgl-alt__foot"><b>ab '+euro(o.p.price)+'</b><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>Zum Vergleich hinzufügen</button></div></div></li>';}).join('')+'</ul></section>';
 
     /* ---- Source (also printed) + mobile action row ---- */
-    var src='<div class="vgl-src">'+(DATA.quelle?'<p>Daten: '+esc(DATA.quelle)+(STAND?', Stand '+STAND:'')+' · '+LENS.srcNote+'</p>':'')+'<p>'+LENS.priceNote+'</p></div>';
+    var src='';   /* source/price footer removed (user decision 06.11.) */
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+
       '<button class="vgl-tb vgl-tb--teal vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb" type="button" data-vgl="clear">Vergleich leeren</button></div>';
 
@@ -959,18 +954,13 @@
     if(bi&&bi.scrollWidth>bi.clientWidth+1)view.classList.add('is-barwrap');
     if(th&&scrollEl.clientHeight&&th.offsetHeight>scrollEl.clientHeight*0.6)view.classList.add('is-unpinned');
   }
-  /* switch "Nur Unterschiede" and the G button share one state (on = G closed); toggled in place — widths and head height stay */
-  function onDiff(){
-    var open=!diffCb.checked,rows=viewBody.querySelector('#vglG'),btn=viewBody.querySelector('[data-vgl="common"]');
-    if(rows)rows.hidden=!open;
-    if(btn){btn.setAttribute('aria-expanded',String(open));btn.querySelector('span').textContent=open?'Ausblenden':'Anzeigen';}
+  /* Gemeinsamkeiten show/hide (the only control for it, UX-Review 06.11. #9); toggled in place — widths and head height stay */
+  function onCommon(){
+    var rows=viewBody.querySelector('#vglG'),btn=viewBody.querySelector('[data-vgl="common"]');
+    if(rows)rows.hidden=!gShow;
+    if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('span').textContent=gShow?'Ausblenden':'Anzeigen';}
     var nG=cur?cur.an.G.length:0;
-    announce(diffCb.checked?'Nur Unterschiede an – '+nG+' Gemeinsamkeiten ausgeblendet.':'Alle Merkmale – '+nG+' Gemeinsamkeiten eingeblendet.');
-  }
-  function toggleEx(){
-    exOpen=!exOpen;var s=viewBody.querySelector('.vgl-fz'),b=viewBody.querySelector('[data-vgl="ex"]');
-    if(s)s.classList.toggle('is-ex',exOpen);
-    if(b){b.setAttribute('aria-expanded',String(exOpen));b.querySelector('.vgl-fz__more-l').textContent=exOpen?'Erklärung ausblenden':'Was bedeutet das?';}
+    announce(nG+' Gemeinsamkeit'+(nG===1?'':'en')+(gShow?' eingeblendet.':' ausgeblendet.'));
   }
 
   /* ---- Spaltenwahl picker: list of ALL models with their place; neighbour = swap ---- */
@@ -1025,8 +1015,8 @@
     if(selected.length<MIN)return;
     lastFocus=document.activeElement;
     var an=analyzeAll(selected.map(function(id){return BY_ID[id];}));
-    diffCb.checked=an.U.length>0;   /* "Nur Unterschiede" is on by default, off when nothing differs (12a §5) */
-    exOpen=false;visCols=null;pendingCol=null;lastCleared=null;lastRemoved=null;
+    gShow=an.U.length===0;   /* Gemeinsamkeiten start closed, open when nothing differs */
+    visCols=null;pendingCol=null;lastCleared=null;lastRemoved=null;
     view.classList.add('is-open');view.setAttribute('aria-hidden','false');document.body.classList.add('vgl-overlay');document.body.style.overflow='hidden';
     renderView();
     scrollEl.scrollTop=0;
@@ -1064,8 +1054,8 @@
     {k:'Schritt 1 / 6',t:'Ruhezustand',x:'Zunächst ist der Vergleich reduziert: auf den Produktkarten sind <b>keine Auswahlfelder</b> sichtbar. In der Ergebnisleiste lädt die Schaltfläche „Vergleichen" dazu ein, den Vergleich zu starten.',target:function(){return barBtn;}},
     {k:'Schritt 2 / 6',t:'Vergleich starten',x:'Ein Klick auf „Vergleichen" aktiviert den Vergleichsmodus — <b>jetzt erscheint auf jeder Produktkarte ein „Vergleichen"-Feld</b>. Wählen Sie damit 2–4 Modelle.',target:function(){return cardToggle(TRIO[0])||barBtn;}},
     {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Modelle markiert sind, wird „Vergleich anzeigen (3)" <b>aktiv</b> (grün) — in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
-    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben das <b>Fazit in Klartext</b>, darunter die Unterschiede, dann die Gemeinsamkeiten (zugeklappt). Erklärungen per (i), Bestwerte markiert. '+LENS.step4,target:function(){return null;}},
-    {k:'Schritt 5 / 6',t:'Nur Unterschiede',x:'„Nur Unterschiede" ist zu Beginn an: die Gemeinsamkeiten bleiben zugeklappt. Ausgeschaltet zeigt die Tabelle alle Merkmale.',target:function(){return view.querySelector('.vgl-diff');}},
+    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben die Modelle, darunter die Unterschiede — die wichtigsten zuerst, mit ihrer Bedeutung direkt am Wert —, dann die Gemeinsamkeiten (zugeklappt). '+LENS.step4,target:function(){return null;}},
+    {k:'Schritt 5 / 6',t:'Gemeinsamkeiten',x:'Die Gemeinsamkeiten sind zu Beginn zugeklappt. „Anzeigen" blendet sie ein — dann zeigt die Tabelle alle Merkmale.',target:function(){return view.querySelector('[data-vgl="common"]');}},
     {k:'Schritt 6 / 6',t:'Weiter im Kauf',x:'Aus dem Vergleich geht es direkt weiter: <b>Konfigurieren</b> bzw. <b>Zum Produkt</b> (kein Direktkauf, da individualisierbar), Artikel entfernen oder weitere hinzufügen. Das ist der komplette Ablauf.',target:function(){return null;},last:true}
   ];
   function cardToggle(id){var c=document.querySelector('.pcard[data-id="'+id+'"] .vgl-toggle');return c;}
