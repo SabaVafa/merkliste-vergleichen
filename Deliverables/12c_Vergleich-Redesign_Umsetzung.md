@@ -196,7 +196,7 @@ Aus Brief §7 umgesetzt: Erklärsätze nur aus der freigegebenen Kurzliste (E1, 
 
 ## 10. Tabellenstruktur (Lead PD, 06.11.) + Fehlerbehebung
 
-- **Fehler:** Beim Öffnen bekam der Titel „Vergleich (n)" einen sichtbaren Fokusrahmen (der Fokus springt für Screenreader auf die Überschrift). Die nicht interaktive Überschrift zeigt jetzt keinen Rahmen mehr; der Fokus bleibt dort.
+- **Fehler:** Beim Öffnen bekam der Titel „Vergleich (n)" einen sichtbaren Fokusrahmen (der Fokus springt für Screenreader auf die Überschrift). Ursache: die allgemeine Fokusregel `.vgl-view :is(…,[tabindex]):focus-visible` traf auch `tabindex="-1"`. Sie schließt `tabindex="-1"` jetzt aus; die Überschrift zeigt keinen Rahmen, Bedienelemente behalten ihren Fokusring (mit Tastatur geprüft, `vergleichen.css?v=38`).
 - **Abschnitte als Bänder:** Unterschiede / Nicht für alle gepflegt / Gemeinsamkeiten sind getönte Bänder mit Haarlinie oben und unten; die Anzahl steht als Pille (Unterschiede: Teal-Pille + Teal-Kante links), Klammern entfallen.
 - **Kurzer Hinweistext** bei „Nicht für alle gepflegt": „Ohne Shop-Angabe („k. A.") oder je nach Ausführung – zählt nicht als Unterschied."
 - **Spalten:** stärkere Trennlinie zwischen Merkmalsspalte und Werten, feine Linien zwischen den Modellen; gleichmäßigere Zeilenhöhe; (i) auf die Textzeile ausgerichtet.

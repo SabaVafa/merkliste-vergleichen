@@ -293,7 +293,7 @@ body.vgl-mode .vgl-tourfab,body.vgl-overlay .vgl-tourfab{display:none}
 .vgl-view.is-open{opacity:1;visibility:visible}
 .vgl-view [hidden]{display:none !important}
 .vgl-view h3.vgl-visually-hidden{font-size:var(--v-fs-sm)}
-.vgl-view :is(button,a,input,[tabindex]):focus-visible{outline:.1875rem solid var(--v-teal);outline-offset:.125rem}
+.vgl-view :is(button,a,input,[tabindex]:not([tabindex="-1"])):focus-visible{outline:.1875rem solid var(--v-teal);outline-offset:.125rem}
 .vgl-view__scroll{flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
 .vgl-view__scroll-in{max-width:var(--v-container);margin:0 auto;padding:0 var(--v-pad) 2rem}
 
@@ -589,7 +589,7 @@ table.vgl-t tbody td.vgl-val{padding-left:1rem}
    · each section is a tinted band with a hairline above and below, its count as a pill (Unterschiede: teal pill + teal edge)
    · the label column is set off from the values by a stronger divider; rows get a steadier rhythm
    · the dialog title takes programmatic focus on open (screen readers start there) — no focus frame on a non-interactive heading */
-.vgl-view__title:focus{outline:none}
+.vgl-view__title:focus,.vgl-view__title:focus-visible{outline:none}
 tr.vgl-sec__h th{padding:.75rem 1rem;background:var(--v-paper);border-top:.0625rem solid var(--v-g200);border-bottom:.0625rem solid var(--v-g200)}
 table.vgl-t tbody:first-of-type tr.vgl-sec__h th{border-top:0}
 .vgl-sec__in{align-items:center;gap:.25rem .5rem}
