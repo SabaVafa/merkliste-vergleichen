@@ -612,6 +612,59 @@ table.vgl-t th.vgl-lc[rowspan]{position:relative}
 /* header rows without a label cell (name / price / CTA): the first product cell must not take the label column's
    first-child spacing — keeps name, stars, price and CTA aligned with the photo tile in every column */
 table.vgl-t tr.vgl-hr--name>*:nth-child(n){padding-top:.75rem}
-table.vgl-t tr.vgl-hr--money>*:nth-child(n){padding-top:.125rem}
+table.vgl-t tr.vgl-hr--money>*:nth-child(n){padding-top:.375rem}
 table.vgl-t tr.vgl-hr--cta>*:nth-child(n){padding-top:.5rem}
 @media(min-width:48rem){table.vgl-t tr.vgl-hr--name>:first-child,table.vgl-t tr.vgl-hr--money>:first-child,table.vgl-t tr.vgl-hr--cta>:first-child{padding-left:1rem}}
+
+/* ==== Gemeinsamkeiten, collapsed (06.11.): no lone link any more — the same section bar as the other sections:
+   "Gemeinsamkeiten 3", the shared features named in one muted line (what you would see), "Anzeigen ⌄" on the right.
+   The whole bar is the click target (stretched button); open: the names give way to the rows. ==== */
+.vgl-sec--g.is-closed .vgl-sec__t,.vgl-sec--g.is-closed .vgl-sec__n{display:inline}
+.vgl-sec--g.is-closed tr.vgl-sec__h th{border-top:.0625rem solid var(--v-g200);border-bottom:.0625rem solid var(--v-g200);padding:1rem 0;margin-top:1.5rem}
+.vgl-sec--g tr.vgl-sec__h th{position:relative}
+.vgl-sec--g .vgl-sec__in{flex-wrap:nowrap;align-items:baseline;gap:.5rem;min-width:0}
+.vgl-sec--g .vgl-sec__t,.vgl-sec--g .vgl-sec__n{flex:none}
+.vgl-sec__peek{display:none;flex:1 1 auto;min-width:0;margin-left:.5rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--v-fs-sm);color:var(--v-muted)}
+.vgl-sec--g.is-closed .vgl-sec__peek{display:block}
+.vgl-sec--g.is-closed .vgl-sec__sub{display:none}
+.vgl-sec--g .vgl-sec__btn,.vgl-sec--g.is-closed .vgl-sec__btn{flex:none;margin-left:auto;position:static}
+.vgl-sec--g .vgl-sec__btn::before{inset:0;top:0;left:0;right:0;height:auto;transform:none;cursor:pointer}
+.vgl-sec--g.is-closed tr.vgl-sec__h:hover .vgl-sec__btn span{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+@media(max-width:47.99rem){
+  .vgl-sec--g .vgl-sec__in{flex-wrap:wrap}
+  .vgl-sec__peek{flex:1 1 100%;order:3;margin-left:0;white-space:normal}
+}
+
+/* ==== Gemeinsamkeiten, expanded (06.11.): grid of label/value pairs across the full width ==== */
+table.vgl-t td.vgl-gcell{padding:0 !important;border-bottom:0 !important}
+.vgl-glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));column-gap:2rem;margin:0}
+.vgl-gitem{display:flex;flex-direction:column;gap:.125rem;padding:.75rem 0;border-bottom:.0625rem solid var(--v-g100);min-width:0}
+.vgl-gitem__l{margin:0;font-size:var(--v-fs-sm);font-weight:600;line-height:1.5;color:var(--v-ink)}
+.vgl-gitem__v{margin:0;font-size:var(--v-fs-body);line-height:1.5;color:var(--v-ink)}
+@media(max-width:47.99rem){
+  table.vgl-t td.vgl-gcell{grid-column:1 / -1}
+  .vgl-glist{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:1rem}
+  .vgl-gitem__v{font-size:var(--v-fs-sm)}
+}
+
+/* ==== Title + stars on one line (06.11.) ==== */
+.vgl-ph__nameline{display:flex;flex-wrap:wrap;align-items:center;column-gap:.75rem;row-gap:.125rem;min-height:var(--vgl-name-h,0)}
+.vgl-ph__nameline .vgl-ph__title,.vgl-ph__nameline .vgl-ph__pick{min-height:0;width:auto;flex:0 1 auto}
+.vgl-ph__nameline .vgl-stars{margin:0;min-height:0}
+.vgl-ph__nameline .vgl-stars[aria-hidden="true"]{display:none}
+/* stars at the size of the live PLP card (≈ 1.25 rem glyphs), centred on the title line; count at body-sm */
+.vgl-ph__nameline .vgl-stars{gap:.125rem;font-size:var(--v-fs-h3);line-height:1}
+.vgl-ph__nameline .vgl-stars__n{margin-left:.375rem;font-size:var(--v-fs-sm);line-height:1}
+@media(max-width:63.99rem){.vgl-ph__nameline .vgl-stars{font-size:var(--v-fs-h4)}}
+@media(max-width:47.99rem){.vgl-ph__nameline .vgl-stars{font-size:var(--v-fs-body)}.vgl-ph__nameline .vgl-stars__n{font-size:var(--v-fs-cap)}}
+
+/* ==== Stars on the opposite side of the title (06.11.): title left, rating right-aligned on the title line;
+   in tight columns (< 20 rem) the rating takes its own line under the title, aligned across all columns ==== */
+.vgl-ph__nameline{flex-wrap:nowrap;justify-content:space-between;align-items:flex-start;column-gap:1rem}
+.vgl-ph__nameline .vgl-ph__title,.vgl-ph__nameline .vgl-ph__pick{flex:1 1 auto;min-width:0}
+.vgl-ph__nameline .vgl-stars--side{flex:none;margin-top:.125rem}
+.vgl-stars--row{display:none}
+table.vgl-t.is-tight .vgl-stars--side{display:none}
+table.vgl-t.is-tight .vgl-stars--row{display:flex;margin:0 0 .25rem;font-size:var(--v-fs-h4);gap:.125rem}
+table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size:var(--v-fs-sm)}
+@media(max-width:47.99rem){table.vgl-t.is-tight .vgl-stars--row{font-size:var(--v-fs-body)}table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{font-size:var(--v-fs-cap)}}

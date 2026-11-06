@@ -796,18 +796,21 @@
   function titleHTML(t){return '<span class="vgl-ph__t">'+esc(t.base)+(t.seg?'<span class="vgl-ph__seg"> · '+esc(t.seg)+'</span>':'')+'</span>';}
   function nameCell(p,i,k,c){
     var t=c.titles[i];
-    return c.pick?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+titleHTML(t)+IC_CHD+'</button>':'<div class="vgl-ph__title">'+titleHTML(t)+'</div>';
+    /* title and star rating share one line (wrap below only when the column is too narrow) */
+    return '<div class="vgl-ph__nameline">'+(c.pick?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+titleHTML(t)+IC_CHD+'</button>':'<div class="vgl-ph__title">'+titleHTML(t)+'</div>')+starsHTML(p,'side')+'</div>';
   }
   /* star rating as on the live PLP card (full / half / empty, review count); the line is reserved in every column */
-  function starsHTML(p){
-    if(!p.rating)return '<span class="vgl-stars" aria-hidden="true">&nbsp;</span>';
+  /* where: 'side' = right end of the title line (wide columns), 'row' = own line under the title (tight columns) */
+  function starsHTML(p,where){
+    var cls='vgl-stars vgl-stars--'+where;
+    if(!p.rating)return '<span class="'+cls+'" aria-hidden="true">&nbsp;</span>';
     var r=p.rating,h='';for(var k=1;k<=5;k++)h+='<span class="vgl-star'+(r>=k?' is-full':(r>=k-0.5?' is-half':''))+'" aria-hidden="true">★</span>';
     var lbl=String(r).replace('.',',')+' von 5 Sternen'+(p.reviews?', '+p.reviews+' Bewertungen':'');
-    return '<span class="vgl-stars" role="img" aria-label="'+lbl+'">'+h+(p.reviews?'<span class="vgl-stars__n" aria-hidden="true">('+p.reviews+')</span>':'')+'</span>';
+    return '<span class="'+cls+'" role="img" aria-label="'+lbl+'">'+h+(p.reviews?'<span class="vgl-stars__n" aria-hidden="true">('+p.reviews+')</span>':'')+'</span>';
   }
   function moneyCell(p,i,c){
     var gap=(!c.vd.noDelta&&typeof p.price==='number'&&p.price>c.minPrice)?gapText(p,c):'';
-    return '<div class="vgl-ph__money">'+starsHTML(p)+'<span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span>'+
+    return '<div class="vgl-ph__money">'+starsHTML(p,'row')+'<span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span>'+
       '<span class="vgl-ph__delta">'+(gap?esc(gap):'<span aria-hidden="true">&nbsp;</span>')+'</span></div>';   /* the gap line is reserved in every column */
   }
   function ctaHTML(p,t,cls){
@@ -931,11 +934,21 @@
       }).join('');
     }
     function secHead(inner,extra){return '<tr class="vgl-sec__h'+(extra||'')+'" role="row"><th scope="rowgroup" role="rowheader"'+span+'><div class="vgl-sec__in">'+inner+'</div></th></tr>';}
+    /* Gemeinsamkeiten, expanded (06.11.): the values are the same for every model, so they don't need the column grid —
+       a compact grid of label/value pairs across the full width (auto-fill, ≥ 15 rem each) instead of one sparse full-width row per feature */
+    function commonGridHTML(){
+      var i0=an.base[0],p0=items[i0];
+      var cells=byRelevance(an.G).map(function(d){
+        var v=cellHTML(d,i0,p0,false,'',{allColors:p0.colors||[]}).replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'');
+        return '<div class="vgl-gitem" data-key="'+d.row.key+'"><dt class="vgl-gitem__l">'+labelHTML(d.row)+'</dt><dd class="vgl-gitem__v">'+v+'</dd></div>';
+      }).join('');
+      return '<tr role="row"><td class="vgl-gcell" role="cell" colspan="'+(nv+1)+'" aria-colspan="'+(nv+1)+'"><span class="vgl-visually-hidden">'+forAll+':</span><dl class="vgl-glist">'+cells+'</dl></td></tr>';
+    }
     var tbody='<tbody class="vgl-sec vgl-sec--u" role="rowgroup">'+secHead('<span class="vgl-sec__t">Unterschiede</span> <span class="vgl-sec__n">'+an.U.length+'</span>')+
       (an.U.length?rowsHTML(an.U,'U'):'<tr role="row"><td class="vgl-sec__empty" role="cell"'+span+'>Keine belegten Unterschiede.</td></tr>')+'</tbody>';
     if(an.O.length)tbody+='<tbody class="vgl-sec vgl-sec--o" role="rowgroup">'+secHead('<span class="vgl-sec__t">Nicht für alle gepflegt</span> <span class="vgl-sec__n">'+an.O.length+'</span>')+rowsHTML(an.O,'O')+'</tbody>';
-    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g'+(gOpen?'':' is-closed')+'" role="rowgroup">'+secHead('<span class="vgl-sec__t">Gemeinsamkeiten</span> <span class="vgl-sec__n">'+an.G.length+'</span><span class="vgl-sec__sub">'+forAll+'</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG"><span>'+commonLabel(gOpen,an.G.length)+'</span>'+IC_CHD+'</button>')+'</tbody>'+
-      '<tbody class="vgl-sec__rows" id="vglG" role="rowgroup"'+(gOpen?'':' hidden')+'>'+rowsHTML(an.G,'G')+'</tbody>';
+    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g'+(gOpen?'':' is-closed')+'" role="rowgroup">'+secHead('<span class="vgl-sec__t">Gemeinsamkeiten</span> <span class="vgl-sec__n">'+an.G.length+'</span><span class="vgl-sec__peek" aria-hidden="true">'+esc(byRelevance(an.G).map(function(d){return d.row.label;}).join(' · '))+'</span><span class="vgl-sec__sub">'+forAll+'</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG" aria-label="'+commonAria(gOpen,an.G.length)+'"><span>'+commonLabel(gOpen,an.G.length)+'</span>'+IC_CHD+'</button>')+'</tbody>'+
+      '<tbody class="vgl-sec__rows" id="vglG" role="rowgroup"'+(gOpen?'':' hidden')+'>'+commonGridHTML()+'</tbody>';
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
     var table='<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
 
@@ -951,10 +964,13 @@
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
     lockHead();placePin();fitHeader();watchPin();
   }
-  function commonLabel(open,nG){return open?'Ausblenden':'Gemeinsamkeiten anzeigen ('+nG+')';}
+  /* collapsed Gemeinsamkeiten = a full section bar: heading + count + the shared features named (info scent) + "Anzeigen" */
+  function commonLabel(open){return open?'Ausblenden':'Anzeigen';}
+  function commonAria(open,nG){return (open?'Gemeinsamkeiten ausblenden':'Gemeinsamkeiten anzeigen')+' ('+nG+')';}
   /* Spaltenwahl: name and price rows get the height of the tallest of ALL models (hidden ones measured in place), so a swap moves nothing */
   function lockHead(){
     var tbl=viewBody.querySelector('table.vgl-t');if(!tbl||!cur)return;
+    var hc=tbl.querySelector('.vgl-hr--name th.vgl-hc');tbl.classList.toggle('is-tight',!!hc&&hc.getBoundingClientRect().width/remPx()<20);
     tbl.style.removeProperty('--vgl-name-h');tbl.style.removeProperty('--vgl-money-h');
     if(!cur.pick)return;
     var nameTh=tbl.querySelector('.vgl-hr--name th.vgl-hc'),moneyTd=tbl.querySelector('.vgl-hr--money td.vgl-hc');if(!nameTh||!moneyTd)return;
@@ -991,7 +1007,7 @@
     var nG=cur?cur.an.G.length:0;
     if(rows)rows.hidden=!gShow;
     if(sec)sec.classList.toggle('is-closed',!gShow);
-    if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('span').textContent=commonLabel(gShow,nG);}
+    if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('span').textContent=commonLabel(gShow);btn.setAttribute('aria-label',commonAria(gShow,nG));}
     announce(nG+' Gemeinsamkeit'+(nG===1?'':'en')+(gShow?' eingeblendet.':' ausgeblendet.'));
   }
 
