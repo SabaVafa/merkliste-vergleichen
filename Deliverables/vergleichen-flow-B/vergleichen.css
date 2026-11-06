@@ -685,3 +685,37 @@ table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size
   table.vgl-t thead tr.vgl-hr--img{border-radius:var(--v-r-l) var(--v-r-l) 0 0}
   table.vgl-t thead tr.vgl-hr--cta{padding-bottom:.75rem;border-radius:0 0 var(--v-r-l) var(--v-r-l)}
 }
+/* full-width grey band (06.11.): the header panel bleeds to both edges of the overlay — the paper tone is extended
+   sideways with a clipped spread shadow (no layout or scroll impact); square ends, content stays on the column grid */
+@media(min-width:48rem){
+  table.vgl-t thead .vgl-hr>*{border-radius:0 !important}
+  /* only the outer cells extend: the label slot (spans the whole header) to the left, each row's last cell to the right */
+  table.vgl-t thead th.vgl-lc[rowspan]{box-shadow:0 0 0 100vmax var(--v-paper);clip-path:inset(0 0 0 -100vmax)}
+  table.vgl-t thead .vgl-hr>:last-child{box-shadow:0 0 0 100vmax var(--v-paper);clip-path:inset(0 -100vmax 0 0)}
+}
+@media(max-width:47.99rem){
+  table.vgl-t thead tr.vgl-hr{border-radius:0 !important;box-shadow:0 0 0 100vmax var(--v-paper);clip-path:inset(0 -100vmax)}
+}
+@media print{table.vgl-t thead .vgl-hr>*,table.vgl-t thead tr.vgl-hr{box-shadow:none;clip-path:none}}
+
+/* ==== Body colour + dividers (06.11.) — restrained, DS tones only:
+   · label column on the paper tone = a quiet column divider without extra rules
+   · hairlines between the model columns
+   · Unterschiede is the decisive section: teal heading, teal count pill, a 3 px teal edge on each of its labels
+   · the other sections stay neutral (grey pill); the collapsed Gemeinsamkeiten bar sits on the paper tone ==== */
+@media(min-width:48rem){
+  table.vgl-t tbody th[scope="row"]:nth-child(n){padding-left:1rem;background:var(--v-paper)}
+  table.vgl-t tbody td.vgl-val{border-left:.0625rem solid var(--v-g100)}
+  table.vgl-t tbody td.vgl-val:nth-child(2){border-left-color:transparent}
+}
+.vgl-sec--u tbody th[scope="row"],.vgl-sec--u th[scope="row"]{box-shadow:inset .1875rem 0 0 var(--v-teal)}
+.vgl-sec--u .vgl-sec__t{color:var(--v-teal)}
+.vgl-sec__n{display:inline-flex;align-items:center;justify-content:center;min-width:1.5rem;height:1.375rem;padding:0 .5rem;border-radius:var(--v-r-pill);background:var(--v-g100);font-size:var(--v-fs-cap);font-weight:700;line-height:1;color:var(--v-muted);vertical-align:.125rem}
+.vgl-sec--u .vgl-sec__n{background:var(--v-teal-100);color:var(--v-teal)}
+.vgl-sec--g.is-closed tr.vgl-sec__h th{padding-left:1rem;padding-right:1rem;background:var(--v-paper)}
+@media(max-width:47.99rem){
+  table.vgl-t tbody th[scope="row"]:nth-child(n){padding:.5rem .75rem;background:var(--v-paper)}
+  table.vgl-t tbody td.vgl-val:nth-child(n){padding-left:.75rem;padding-right:.75rem}
+}
+/* section headings start on the label text line (labels sit on the paper column with 1 rem inset) */
+@media(min-width:48rem){table.vgl-t tr.vgl-sec__h th:nth-child(n){padding-left:1rem}}
