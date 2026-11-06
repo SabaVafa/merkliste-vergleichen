@@ -719,3 +719,20 @@ table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size
 }
 /* section headings start on the label text line (labels sit on the paper column with 1 rem inset) */
 @media(min-width:48rem){table.vgl-t tr.vgl-sec__h th:nth-child(n){padding-left:1rem}}
+
+/* ==== Gemeinsamkeiten as its own element (06.11.): it read like one more table row (same grey as the label column,
+   flush to the last row). Now: section spacing above, a white card with a hairline outline and the check icon for
+   "shared" — clearly a summary you can open, not data. Open: a normal section heading with the same icon. ==== */
+.vgl-sec__ic{display:inline-flex;flex:none;align-self:center;color:var(--v-teal)}
+.vgl-sec__ic svg{width:1.125rem;height:1.125rem}
+.vgl-sec--g tr.vgl-sec__h th:nth-child(n),.vgl-sec--g.is-closed tr.vgl-sec__h th:nth-child(n){position:static;padding:1.75rem 0 .5rem;background:transparent;border:0}
+.vgl-sec--g .vgl-sec__in{position:relative}
+.vgl-sec--g:not(.is-closed) .vgl-sec__in{padding:0 0 .5rem 1rem;border-bottom:.0625rem solid var(--v-g200)}
+.vgl-sec--g.is-closed .vgl-sec__in{padding:.875rem 1rem;border:.0625rem solid var(--v-g200);border-radius:var(--v-r-l);background:var(--v-white)}
+.vgl-sec--g.is-closed .vgl-sec__in:hover{border-color:var(--v-g300)}
+.vgl-sec--g .vgl-sec__btn::before{position:absolute;inset:0;height:auto;transform:none}
+@media(max-width:47.99rem){
+  .vgl-sec--g tr.vgl-sec__h th:nth-child(n),.vgl-sec--g.is-closed tr.vgl-sec__h th:nth-child(n){padding:1.25rem 0 .5rem}
+  .vgl-sec--g.is-closed .vgl-sec__in{padding:.75rem}
+  .vgl-sec--g:not(.is-closed) .vgl-sec__in{padding-left:0}
+}
