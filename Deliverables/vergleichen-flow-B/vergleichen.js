@@ -225,7 +225,8 @@
         if(k==='pickclose')closePick(true);
         if(k==='share')shareView(a);
         if(k==='sharepop-close'){var sp=view.querySelector('.vgl-sharepop');if(sp)sp.remove();if(shareBtn)shareBtn.focus();}
-        if(k==='addmkl'){closeAdd(false);closeView();if(window.MTZ_MKL)window.MTZ_MKL.open();}
+        if(k==='addmkl'){var anc=(addPanel&&addPanel.contains(a)&&addAnchor)||a;if(addPanel&&addMkl&&addAnchor===a)closeAdd(true);else openAddSearch(anc,true);}
+        if(k==='addall'){var anc2=addAnchor;openAddSearch(anc2,false);}
         if(k==='back'){if(window.MTZ_MKL)window.MTZ_MKL.open();}
         if(k==='print'){printView();}
         if(k==='common'){gShow=!gShow;onCommon();}
@@ -304,12 +305,13 @@
     var inp=pop.querySelector('input');inp.focus();inp.select();
   }
   /* ---- P0-9: add a model by search, without leaving the comparison ---- */
-  var addPanel=null,addAnchor=null,addActive=-1;
+  var addPanel=null,addAnchor=null,addActive=-1,addMkl=false;
   function norm(s){return String(s||'').toLowerCase().replace(/ä/g,'a').replace(/ö/g,'o').replace(/ü/g,'u').replace(/ß/g,'ss');}
   function reviewsOf(id){for(var i=0;i<SRC.length;i++)if(SRC[i].id===id)return SRC[i].reviews||0;return 0;}
   function mklIdsHere(){try{return window.MTZ_MKL?window.MTZ_MKL.items().filter(function(it){return it.lens===LENSKEY&&!it.configId;}).map(function(it){return it.articleId||it.id;}):[];}catch(e){return [];}}
   function addGroups(q){
     var pool=Object.keys(BY_ID).map(function(id){return BY_ID[id];}).filter(function(p){return selected.indexOf(p.id)<0;});
+    if(addMkl){var ids=mklIdsHere();pool=pool.filter(function(p){return ids.indexOf(p.id)>-1;});}
     q=norm(q).trim();
     if(q){
       var toks=q.split(/\s+/);
@@ -321,6 +323,7 @@
     var items=selected.map(function(id){return BY_ID[id];});
     if(items.length>=MIN&&cur&&/^F3/.test(cur.vd.fall))alternatives(items).forEach(function(o){take(o.p,sug);});
     pool.slice().sort(function(a,b){return reviewsOf(b.id)-reviewsOf(a.id);}).forEach(function(p){take(p,sug);});
+    if(addMkl)return [{h:null,list:pool}];
     var gr=[];if(mk.length)gr.push({h:'Aus Ihrer Merkliste',list:mk});if(sug.length)gr.push({h:'Vorschläge',list:sug});
     return gr;
   }
@@ -333,7 +336,7 @@
     });
     ul.innerHTML=html;addActive=-1;inp.removeAttribute('aria-activedescendant');
     inp.setAttribute('aria-expanded',String(any));
-    st.textContent=any?'':'Kein passendes Modell bei '+LENS.label+' gefunden.';
+    st.textContent=any?'':(addMkl?'Kein passendes Modell in Ihrer Merkliste.':'Kein passendes Modell bei '+LENS.label+' gefunden.');
     st.hidden=any;
   }
   function moveActive(d){
@@ -344,17 +347,17 @@
     addPanel.querySelector('input').setAttribute('aria-activedescendant',o.id);
     try{o.scrollIntoView({block:'nearest'});}catch(e){}
   }
-  function openAddSearch(anchor){
+  function openAddSearch(anchor,fromMkl){
     closeAdd(false);closePick(false);
-    addAnchor=anchor;
+    addAnchor=anchor;addMkl=!!fromMkl;
     var mobile=!mq(MQ48,true);
     var nM=mklCount();
-    addPanel=h('<div class="vgl-addsearch'+(mobile?' is-sheet':'')+'" role="dialog" aria-label="Modell zum Vergleich hinzufügen">'+
-      '<div class="vgl-addsearch__head"><label for="vglAddQ">Modell suchen</label><button class="vgl-addsearch__x" type="button" data-vgl="addclose" aria-label="Suche schließen">'+IC_X+'</button></div>'+
+    addPanel=h('<div class="vgl-addsearch'+(mobile?' is-sheet':'')+'" role="dialog" aria-label="'+(addMkl?'Modell aus der Merkliste hinzufügen':'Modell zum Vergleich hinzufügen')+'">'+
+      '<div class="vgl-addsearch__head"><label for="vglAddQ">'+(addMkl?'Aus Ihrer Merkliste':'Modell suchen')+'</label><button class="vgl-addsearch__x" type="button" data-vgl="addclose" aria-label="Suche schließen">'+IC_X+'</button></div>'+
       '<div class="vgl-addsearch__field">'+IC_SEARCH+'<input id="vglAddQ" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="vglAddList" autocomplete="off" placeholder="'+(LENSKEY==='briefkasten'?'z. B. Siebert, Ebenhard':'z. B. VDM10, Colson')+'"></div>'+
       '<ul class="vgl-addsearch__list" id="vglAddList" role="listbox" aria-label="'+esc(LENS.label)+'"></ul>'+
       '<p class="vgl-addsearch__empty" role="status" hidden></p>'+
-      '<div class="vgl-addsearch__foot"><button class="vgl-link" type="button" data-vgl="addgrid">Auf der Produktliste wählen</button>'+(nM?'<button class="vgl-link" type="button" data-vgl="addmkl">Aus der Merkliste ('+nM+')</button>':'')+'</div>'+
+      '<div class="vgl-addsearch__foot">'+(addMkl?'<button class="vgl-link" type="button" data-vgl="addall">Alle Modelle durchsuchen</button>':'<button class="vgl-link" type="button" data-vgl="addgrid">Auf der Produktliste wählen</button>'+(nM?'<button class="vgl-link" type="button" data-vgl="addmkl">Aus der Merkliste ('+nM+')</button>':''))+'</div>'+
     '</div>');
     if(mobile){var scrim=h('<div class="vgl-addsearch__scrim" aria-hidden="true"></div>');view.appendChild(scrim);addPanel._scrim=scrim;}
     view.appendChild(addPanel);
@@ -624,7 +627,9 @@
       var keep=(c2>0&&/^(mit|ohne|für|aus|und)$/i.test(words[0][c2-1]))?c2-1:c2;
       gi.forEach(function(i,j){out[i].seg=words[j].slice(keep).join(' ');});
     });
-    out.forEach(function(t){t.t=t.base+(t.seg?' · '+t.seg:'');});
+    out.forEach(function(t,i){t.t=t.base+(t.seg?' · '+t.seg:'');t.full=String(items[i].name||'').replace(/\s*\|\s*/g,' | ').trim();});
+    /* identical full titles (rare): keep the distinguishing segment */
+    out.forEach(function(t){t.dup=!!t.full&&out.filter(function(u){return u.full===t.full;}).length>1;});
     return out;
   }
   /* Ref (12a §2.3): the design line when it is unique in this comparison, otherwise the title */
@@ -704,7 +709,7 @@
     return null;
   }
   function cap1(s){return s.charAt(0).toUpperCase()+s.slice(1);}
-  var SHORT_REF=24;   /* longer titles (articles without design line) get a short reference in the Fazit and the price gap */
+  var SHORT_REF=24;   /* longer titles (articles without design line) get a short reference in the Fazit */
   /* Fazit (UX-Review 06.11. #1): ONE deciding sentence (two at most for 3–4 models) — the case, the decisive difference in plain words,
      no value lists (the values stand in the rows right below), no repeated price (the gap stands in the head). "laut Shopdaten" once at most. */
   function verdict(items,an,refs){
@@ -770,18 +775,23 @@
   function alternatives(items){
     var kinds=uniqArr(items.map(kindOf));if(kinds.length!==1)return [];
     var techRows=ROWS.filter(function(r){return r.cls==='T';});
-    var ref=items[0],refPrice=typeof ref.price==='number'?ref.price:0;
     var out=[];
-    SRC.forEach(function(raw){
-      var p=BY_ID[raw.id]; if(!p||!p.shop||selected.indexOf(p.id)>-1||kindOf(p)!==kinds[0])return;
+    function diffs(p,ref){
       var why=[];
       techRows.forEach(function(row){
         var va=cellVal(p,row),vb=cellVal(ref,row),a=disp(va,row),b=disp(vb,row);
         if(a===b||isUnk(a)||b===UNK)return;   /* unknown on either side → no claim; "–" (does not apply) is no reason */
-        if(row.set&&Array.isArray(va)&&Array.isArray(vb)){var x=diffArr(va,vb),y=diffArr(vb,va);var parts=[];if(x.length)parts.push('+ '+x.join(', '));if(y.length)parts.push('ohne '+y.join(', '));if(!parts.length)return;why.push({l:row.label,v:parts.join(' · ')});return;}
+        if(row.set&&Array.isArray(va)&&Array.isArray(vb)&&!diffArr(va,vb).length&&!diffArr(vb,va).length)return;
         why.push({k:row.key,l:row.label,v:(row.bool?(a==='ja'?'Ja':'Nein'):a)});
       });
-      if(why.length<1||why.length>3)return;
+      return why;
+    }
+    SRC.forEach(function(raw){
+      var p=BY_ID[raw.id]; if(!p||!p.shop||selected.indexOf(p.id)>-1||kindOf(p)!==kinds[0])return;
+      var best=null;
+      for(var r=0;r<items.length;r++){var w=diffs(p,items[r]);if(!w.length)return;if(!best||w.length<best.why.length)best={why:w,ref:items[r]};}
+      var why=best.why,ref=best.ref,refPrice=typeof ref.price==='number'?ref.price:0;
+      if(why.length>3)return;
       if(why.every(function(w){return w.k==='klingel';}))return;   /* only another Tasteranzahl is no alternative (CP4 F2) */
       out.push({p:p,why:why,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});
     });
@@ -814,7 +824,7 @@
   function imgHTML(p){return '<img src="'+esc(p.img)+'" alt="'+esc(p.name)+'" width="160" height="160" decoding="async">';}
   /* ---- Product header (Visual redesign 06.11.): five table rows, so action icons, photo, name, price and CTA share one
      row grid across all columns. It scrolls away; a slim identity strip (.vgl-pin) takes over once it is out of view. ---- */
-  function titleHTML(t){return '<span class="vgl-ph__t">'+esc(t.base)+(t.seg?'<span class="vgl-ph__seg"> · '+esc(t.seg)+'</span>':'')+'</span>';}
+  function titleHTML(t){return '<span class="vgl-ph__t">'+esc(t.full||t.base)+((!t.full||t.dup)&&t.seg?'<span class="vgl-ph__seg"> · '+esc(t.seg)+'</span>':'')+'</span>';}
   function nameCell(p,i,k,c){
     var t=c.titles[i];
     /* title and star rating share one line (wrap below only when the column is too narrow) */
@@ -830,9 +840,7 @@
     return '<span class="'+cls+'" role="img" aria-label="'+lbl+'">'+h+(p.reviews?'<span class="vgl-stars__n" aria-hidden="true">('+p.reviews+')</span>':'')+'</span>';
   }
   function moneyCell(p,i,c){
-    var gap=(!c.vd.noDelta&&typeof p.price==='number'&&p.price>c.minPrice)?gapText(p,c):'';
-    return '<div class="vgl-ph__money">'+starsHTML(p,'row')+'<span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span>'+
-      '<span class="vgl-ph__delta">'+(gap?esc(gap):'<span aria-hidden="true">&nbsp;</span>')+'</span></div>';   /* the gap line is reserved in every column */
+    return '<div class="vgl-ph__money">'+starsHTML(p,'row')+'<span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span></div>';
   }
   function ctaHTML(p,t,cls){
     var lbl=p.konfig?'Konfigurieren':'Zum Produkt',al=' aria-label="'+lbl+' – '+esc(t.t)+'"';
@@ -850,7 +858,7 @@
       row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick?'<span class="vgl-pill" aria-hidden="true">'+(i+1)+' / '+n+'</span>':'')+'</div>');}).join(''))+
       /* (b) names = the column headers */
       row('name','',vis.map(function(i,k){return '<th class="vgl-hc" scope="col" role="columnheader" data-id="'+esc(items[i].id)+'">'+nameCell(items[i],i,k,c)+'</th>';}).join(''))+
-      /* (c) price + UVP on one line, the price gap on its own reserved line */
+      /* (c) price + UVP on one line */
       row('money','',vis.map(function(i){return td(moneyCell(items[i],i,c));}).join(''))+
       /* (d) CTA */
       row('cta','',vis.map(function(i){return td(ctaHTML(items[i],c.titles[i]));}).join(''))+
@@ -862,14 +870,6 @@
       c.vis.map(function(i){var p=c.items[i],t=c.titles[i];return '<div class="vgl-pin__col"><span class="vgl-pin__img"><img src="'+esc(p.img)+'" alt="" width="40" height="40" decoding="async"></span><span class="vgl-pin__txt"><span class="vgl-pin__name" title="'+esc(t.t)+'">'+esc(t.t)+'</span><span class="vgl-pin__line"><span class="vgl-pin__price">ab '+euro(p.price)+'</span>'+ctaHTML(p,t,' vgl-cta--sm')+'</span></span></div>';}).join('')+
       '</div></div></div>';
   }
-  /* price gap: quiet, relative to the model with the lowest price */
-  function gapText(p,c){
-    var lo=0;c.items.forEach(function(q,i){if(q.price===c.minPrice&&c.items[lo].price!==c.minPrice)lo=i;});
-    var tw=c.items.length===2&&c.items[0].design!=='–'&&c.items[0].design===c.items[1].design,r=c.refs[lo],short=!tw&&r.n.length<=SHORT_REF;
-    var gap=euro(p.price-c.minPrice);
-    if(c.items.length===2)return gap+' mehr als '+(short?refNom(r):(tw?'die andere Ausführung':'das andere Modell'));
-    return '+ '+gap+' ggü. '+(short?r.n:'dem niedrigsten Preis');
-  }
   /* row label: plain text; when there is a definition, an (i) icon button after it opens the toggletip (user decision 06.11.: icon, not underline) */
   /* hint text → light toggletip content: "Term: definition." lists become one line per term with the term in bold;
      a split only happens where the next sentence starts with a short term + colon (so "z. B." stays intact) */
@@ -880,7 +880,7 @@
       return '<span class="vgl-tip__row">'+(m?'<b>'+esc(m[1])+'</b><span>'+esc(m[2].charAt(0).toUpperCase()+m[2].slice(1))+'</span>':'<span class="vgl-tip__full">'+esc(t)+'</span>')+'</span>';}).join('');
   }
   function labelHTML(row){
-    var l='<span class="rh__l">'+esc(row.label)+'</span>';
+    var l='<span class="rh__l">'+esc(row.label).replace(/\//g,'/<wbr>')+'</span>';
     if(!row.hint)return l;
     return '<span class="rh__row">'+l+'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+'<span class="vgl-tip__h">'+IC_INFO+'<span>'+esc(row.label)+'</span></span><span class="vgl-tip__b">'+hintHTML(row.hint)+'</span></span></span></span>';
   }
@@ -894,7 +894,7 @@
   }
   /* colours: one slot per colour of the whole comparison, same order in every column; a colour a model lacks is an empty outlined slot */
   function colorsHTML(cs,all){
-    var sw='<span class="vgl-sw" aria-hidden="true">'+all.map(function(c){return cs.indexOf(c)>-1&&SW[c]?'<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>':'<span class="vgl-sw__no" title="'+(SWL[c]||c)+' nicht erhältlich"></span>';}).join('')+'</span>';
+    var sw='<span class="vgl-sw" aria-hidden="true">'+all.filter(function(c){return cs.indexOf(c)>-1&&SW[c];}).map(function(c){return '<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>';}).join('')+'</span>';
     return sw+'<span class="vgl-swc">'+cs.length+' Farbe'+(cs.length===1?'':'n')+'<span class="vgl-visually-hidden">: '+esc(cs.map(cname).join(', '))+'</span></span>';
   }
   function meanHTML(d,i){
@@ -933,9 +933,7 @@
     }
     var an=analyzeAll(items),titles=titlesOf(items),refs=refsOf(items,titles),vd=verdict(items,an,refs);
     var maxC=maxCols(),pick=items.length>maxC,vis=syncVis(items,maxC),nv=vis.length,n=items.length;
-    var minPrice=Math.min.apply(null,items.map(function(p){return typeof p.price==='number'?p.price:Infinity;}));
-    var c=cur={items:items,an:an,titles:titles,refs:refs,vd:vd,vis:vis,pick:pick,minPrice:minPrice};
-    var anyGap=!vd.noDelta&&items.some(function(p){return typeof p.price==='number'&&p.price>minPrice;});   /* phones drop the reserved gap line when no model has one */
+    var c=cur={items:items,an:an,titles:titles,refs:refs,vd:vd,vis:vis,pick:pick};
     var gOpen=printing||gShow;
     var allColors=[];items.forEach(function(p){(p.colors||[]).forEach(function(cl){if(allColors.indexOf(cl)<0)allColors.push(cl);});});
     var forAll=n===2?'gilt für beide Modelle':'gilt für alle '+n+' Modelle';
@@ -947,9 +945,9 @@
     /* ---- Table ---- */
     var nMkl=n<MAX?mklCount():0;
     var lc={
-      tile:n>=MAX?'<p class="vgl-lc__full"><b>'+n+' von '+MAX+' Modellen.</b> '+(pick?nv+' sind sichtbar – zum Wechseln den Namen wählen. ':'')+'Entfernen Sie ein Modell, um ein anderes hinzuzufügen.</p>':
+      tile:n>=MAX?'<div class="vgl-lc__full" role="note">'+IC_OK+'<b>'+n+' von '+MAX+' Modellen</b><span>'+(pick?nv+' sind sichtbar – zum Wechseln den Namen wählen. ':'')+'Entfernen Sie ein Modell mit ×, um ein anderes hinzuzufügen.</span></div>':
         '<button class="vgl-addtile" type="button" data-vgl="add">'+IC_PLUS+'<span class="vgl-addtile__l">Modell hinzufügen</span><span class="vgl-addtile__n">noch '+(MAX-n)+' möglich</span></button>',
-      mkl:nMkl?'<button class="vgl-tb vgl-tb--teal vgl-lc__mkl" type="button" data-vgl="addmkl">Aus der Merkliste ('+nMkl+')</button>':''
+      mkl:nMkl?'<button class="vgl-lc__mkl" type="button" data-vgl="addmkl" aria-label="Aus der Merkliste hinzufügen, '+nMkl+' Modell'+(nMkl===1?'':'e')+'">'+IC_BM+'<span>Aus der Merkliste</span></button>':''
     };
     var span=' colspan="'+(nv+1)+'" aria-colspan="'+(nv+1)+'"';
     function rowsHTML(list,kind){
@@ -965,7 +963,7 @@
     }
     function secHead(inner,extra){return '<tr class="vgl-sec__h'+(extra||'')+'" role="row"><th scope="rowgroup" role="rowheader"'+span+'><div class="vgl-sec__in">'+inner+'</div></th></tr>';}
     /* Gemeinsamkeiten, expanded (06.11.): the values are the same for every model, so they don't need the column grid —
-       a compact grid of label/value pairs across the full width (auto-fill, ≥ 15 rem each) instead of one sparse full-width row per feature */
+       compact fact units (label over value) on a fixed track width instead of one sparse full-width row per feature */
     function commonGridHTML(){
       var i0=an.base[0],p0=items[i0];
       var cells=byRelevance(an.G).map(function(d){
@@ -977,34 +975,63 @@
     var tbody='<tbody class="vgl-sec vgl-sec--u" role="rowgroup">'+secHead('<span class="vgl-sec__t">Unterschiede</span> <span class="vgl-sec__n">'+an.U.length+'</span>')+
       (an.U.length?rowsHTML(an.U,'U'):'<tr role="row"><td class="vgl-sec__empty" role="cell"'+span+'>Keine belegten Unterschiede.</td></tr>')+'</tbody>';
     if(an.O.length)tbody+='<tbody class="vgl-sec vgl-sec--o" role="rowgroup">'+secHead('<span class="vgl-sec__t">Nicht für alle gepflegt</span> <span class="vgl-sec__n">'+an.O.length+'</span>')+rowsHTML(an.O,'O')+'</tbody>';
-    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g'+(gOpen?'':' is-closed')+'" role="rowgroup">'+secHead('<span class="vgl-sec__ic" aria-hidden="true">'+IC_OK+'</span><span class="vgl-sec__t">Gemeinsamkeiten</span> <span class="vgl-sec__n">'+an.G.length+'</span><span class="vgl-sec__peek" aria-hidden="true">'+esc(byRelevance(an.G).map(function(d){return d.row.label;}).join(' · '))+'</span><span class="vgl-sec__sub">'+forAll+'</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG" aria-label="'+commonAria(gOpen,an.G.length)+'"><span>'+commonLabel(gOpen,an.G.length)+'</span>'+IC_CHD+'</button>')+'</tbody>'+
+    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g'+(gOpen?'':' is-closed')+'" role="rowgroup">'+secHead('<span class="vgl-sec__ic" aria-hidden="true">'+IC_OK+'</span><span class="vgl-sec__t">Gemeinsamkeiten</span> <span class="vgl-sec__n">'+an.G.length+'</span><span class="vgl-sec__peek" aria-hidden="true">'+byRelevance(an.G).map(function(d){var i0=an.base[0];return '<span class="vgl-gp"><span class="vgl-gp__l">'+esc(d.row.label)+'</span> <b>'+esc(peekVal(d,i0,items[i0]))+'</b></span>';}).join('')+'</span><span class="vgl-sec__sub">'+forAll+'</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG" aria-label="'+commonAria(gOpen,an.G.length)+'"><span>'+commonLabel(gOpen,an.G.length)+'</span>'+IC_CHD+'</button>')+'</tbody>'+
       '<tbody class="vgl-sec__rows" id="vglG" role="rowgroup"'+(gOpen?'':' hidden')+'>'+commonGridHTML()+'</tbody>';
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
     /* phones (Responsive audit 14): the label column with the add slot is hidden there, so one line above the header carries
        "Modell hinzufügen" and — when not all models fit — how many are visible and how to switch (CSS shows it < 48 rem only) */
     var mbar=(pick||n<MAX)?'<div class="vgl-mbar">'+(pick?'<p class="vgl-mbar__t"><b>'+nv+' von '+n+' Modellen sichtbar</b> – zum Wechseln den Namen antippen.</p>':'')+
       (n<MAX?'<button class="vgl-tb vgl-tb--teal vgl-mbar__add" type="button" data-vgl="add" aria-label="Modell hinzufügen">'+IC_PLUS+'Hinzufügen</button>':'')+'</div>':'';
-    var table=mbar+'<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+(anyGap?'':' no-gap')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
+    var table=mbar+'<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
 
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
-    var alts=vd.twin?alternatives(items):[],altHTML='';
+    var alts=isFull()?[]:alternatives(items),altHTML='';
     if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3><ul class="vgl-alts__list">'+
-      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(baseTitle(o.p))+'</div><div class="vgl-alt__why">'+o.why.map(function(w){return '<span>'+esc(w.l)+': '+esc(w.v)+'</span>';}).join('')+'</div><div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>Zum Vergleich hinzufügen</button></div></li>';}).join('')+'</ul></section>';
+      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(baseTitle(o.p))+'</div><span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+'</dl><div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>Zum Vergleich hinzufügen</button></div></li>';}).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+
       '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb" type="button" data-vgl="clear">Vergleich leeren</button></div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
-    lockHead();placePin();fitHeader();placeTips();watchPin();
+    lockHead();placePin();fitHeader();fitCommon();placeTips();watchPin();
   }
   /* collapsed Gemeinsamkeiten = a full section bar: heading + count + the shared features named (info scent) + "Anzeigen" */
-  function commonLabel(open){return open?'Ausblenden':'Anzeigen';}
+  /* one shared fact as plain text for the Gemeinsamkeiten bar */
+  function peekVal(d,i,p){
+    var row=d.row,v=d.vals[i],t=d.texts[i];
+    if(isUnk(t))return t;
+    if(row.swatches){var nc=(p.colors||[]).length;return nc+' Farbe'+(nc===1?'':'n');}
+    if(row.bool)return v===true?'Ja':'Nein';
+    if(row.key==='abmessungen')return dimHTML(t).replace(/<[^>]*>/g,'');
+    if(Array.isArray(v))return v.length?v.join(', '):'Keine';
+    return t;
+  }
+  /* Gemeinsamkeiten adapt to their content: when every shared fact fits on the bar's one line, the bar IS the content —
+     no toggle, nothing hidden behind "Anzeigen"; otherwise the line shows the first facts and the toggle opens the grid */
+  function fitCommon(){
+    var sec=viewBody.querySelector('.vgl-sec--g');if(!sec)return;
+    var pk=sec.querySelector('.vgl-sec__peek'),rows=viewBody.querySelector('#vglG');if(!pk)return;
+    Array.prototype.forEach.call(pk.children,function(g){g.classList.remove('is-cut');});
+    sec.classList.remove('is-whole');sec.classList.add('is-closed','is-measure');
+    /* phones stack the facts one per line: up to 4 is the whole section, more show the first 3 */
+    var phone=window.matchMedia('(max-width:47.99rem)').matches,nP=pk.children.length;
+    var fits=!printing&&(phone?nP<=4:pk.scrollWidth<=pk.clientWidth+1);
+    sec.classList.remove('is-measure');
+    sec.classList.toggle('is-whole',fits);
+    sec.classList.toggle('is-closed',fits||!gShow);
+    if(rows)rows.hidden=fits||!gShow;
+    pk.setAttribute('aria-hidden',String(!fits));
+    /* one-line bar that doesn't fit: show whole facts only (no "Nein…" cut mid-value); the button names the total */
+    var pr=pk.getBoundingClientRect().right,cut=false;
+    if(!fits&&!gShow)Array.prototype.forEach.call(pk.children,function(g,k){if(phone?k>=3:(cut||g.getBoundingClientRect().right>pr+1)){cut=true;g.classList.add('is-cut');}});
+  }
+  function commonLabel(open,nG){return open?'Ausblenden':(nG>1?'Alle '+nG+' anzeigen':'Anzeigen');}
   function commonAria(open,nG){return (open?'Gemeinsamkeiten ausblenden':'Gemeinsamkeiten anzeigen')+' ('+nG+')';}
   /* Spaltenwahl: name and price rows get the height of the tallest of ALL models (hidden ones measured in place), so a swap moves nothing */
   function lockHead(){
     var tbl=viewBody.querySelector('table.vgl-t');if(!tbl||!cur)return;
-    var hc=tbl.querySelector('.vgl-hr--name th.vgl-hc');tbl.classList.toggle('is-tight',!!hc&&hc.getBoundingClientRect().width/remPx()<20);
+    var hc=tbl.querySelector('.vgl-hr--name th.vgl-hc');tbl.classList.toggle('is-tight',!!hc);
     tbl.style.removeProperty('--vgl-name-h');tbl.style.removeProperty('--vgl-money-h');
     if(!cur.pick)return;
     var nameTh=tbl.querySelector('.vgl-hr--name th.vgl-hc'),moneyTd=tbl.querySelector('.vgl-hr--money td.vgl-hc');if(!nameTh||!moneyTd)return;
@@ -1044,8 +1071,8 @@
     var nG=cur?cur.an.G.length:0;
     if(rows)rows.hidden=!gShow;
     if(sec)sec.classList.toggle('is-closed',!gShow);
-    placeTips();
-    if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('span').textContent=commonLabel(gShow);btn.setAttribute('aria-label',commonAria(gShow,nG));}
+    fitCommon();placeTips();
+    if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('span').textContent=commonLabel(gShow,nG);btn.setAttribute('aria-label',commonAria(gShow,nG));}
     announce(nG+' Gemeinsamkeit'+(nG===1?'':'en')+(gShow?' eingeblendet.':' ausgeblendet.'));
   }
 
@@ -1096,6 +1123,10 @@
     announce('Spalte '+(col+1)+' zeigt jetzt '+refName(id)+'.');
   }
 
+  window.addEventListener('load',function(){
+    if(!view.classList.contains('is-open')||!mklCount()||view.querySelector('.vgl-lc__mkl'))return;
+    var st=scrollEl.scrollTop;renderView();scrollEl.scrollTop=st;
+  });
   function openView(opt){
     opt=opt||{};
     if(selected.length<MIN)return;
@@ -1232,7 +1263,7 @@
       if(!open&&st&&st.mtzVgl){var m=/[?&]vergleich=([^&#]+)/.exec(location.search);if(m&&setSelection(decodeURIComponent(m[1]).split(','))>=MIN){syncAll();openView({push:false});}}
     });
     /* rotation / window resize / zoom: a new breakpoint re-renders (column count), otherwise the head is re-measured — never on scroll */
-    function relayout(){if(!view.classList.contains('is-open'))return;if(tierKey()!==lastTier){renderView();}else{lockHead();placePin();fitHeader();placeTips();}}
+    function relayout(){if(!view.classList.contains('is-open'))return;if(tierKey()!==lastTier){renderView();}else{lockHead();placePin();fitHeader();fitCommon();placeTips();}}
     window.addEventListener('resize',relayout);
     /* Responsive audit 14 (07.11.): the scroll area's own width is the source of truth — it also changes without a window
        resize (scrollbar appears when Gemeinsamkeiten open, split view, a late resize event); width changes only, once per frame */

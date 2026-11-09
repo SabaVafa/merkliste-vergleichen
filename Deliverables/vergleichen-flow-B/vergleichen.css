@@ -363,7 +363,7 @@ table.vgl-t .vgl-hr--cta>*{padding-top:.75rem;padding-bottom:.5rem}
 .vgl-ph__money{display:flex;flex-direction:column;min-height:var(--vgl-money-h,0)}
 .vgl-ph__line{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.5rem}
 .vgl-ph__price{font-size:var(--v-fs-body);font-weight:700;line-height:1.5;white-space:nowrap}
-.vgl-ph__uvp,.vgl-ph__delta{font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
+.vgl-ph__uvp{font-size:var(--v-fs-cap);line-height:1.4;color:var(--v-muted)}
 .vgl-ph__uvp{white-space:nowrap}
 .vgl-ph__uvp s{text-decoration-thickness:.0625rem}
 /* (e) CTA: DS text link — teal, bold, underlined, chevron; the strongest control of the column */
@@ -743,8 +743,6 @@ table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size
    12 px gap between name and stars, 24 px under the photo and under the CTA) */
 @media(max-width:47.99rem){
   table.vgl-t thead .vgl-hr>*:nth-child(n){padding-bottom:0}
-  /* the reserved price-gap line is dropped when no model has a price gap (equal prices) — it only aligns columns otherwise */
-  table.vgl-t.no-gap .vgl-ph__delta{display:none}
 }
 /* Spaltenwahl: the chevron follows the last word of the name (with long names it sat at the column edge, next to the
    neighbouring column) */
@@ -896,4 +894,70 @@ table.vgl-t tbody th[scope="row"]{position:static}
 @media(min-width:48rem){
   .vgl-alt__body{flex:1 1 auto}
   .vgl-alt__price{margin-top:auto;padding-top:.5rem}
+}
+
+/* ==== Ähnliche Modelle, differences (09.11., Lead Design): a small spec panel in the page's language instead of grey
+   caption text with "+ … · ohne …" — feature name muted on the left, the model's own value in ink on the right,
+   on the paper tone of the table's label column ==== */
+.vgl-alt__why{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:1rem;row-gap:.25rem;align-self:stretch;margin:.375rem 0 0;padding:.5rem .75rem;border-radius:var(--v-r-m);background:var(--v-paper);font-size:var(--v-fs-sm);line-height:1.45;color:var(--v-ink)}
+.vgl-alt__why>div{display:contents}
+.vgl-alt__why dt{margin:0;color:var(--v-muted)}
+.vgl-alt__why dd{margin:0;font-weight:600;color:var(--v-ink);overflow-wrap:anywhere}
+/* two title lines reserved on wide screens, so the spec panels start on one line across the cards */
+@media(min-width:48rem){.vgl-alt__name{min-height:calc(2em * 1.375)}}
+/* Gemeinsamkeiten grid with many shared features (09.11.): multi-value features (e.g. Türöffner-Bedienung with four
+   methods) run inline with " · " instead of one line each, so one long list no longer stretches its whole grid row */
+.vgl-gitem__v .vgl-lines{display:inline}
+.vgl-gitem__v .vgl-lines>span{display:inline-block}
+.vgl-gitem__v .vgl-lines>span:not(:last-child){margin-right:.3125rem}
+.vgl-gitem__v .vgl-lines>span:not(:last-child)::after{content:"\a0\b7";content:"\a0\b7"/"";color:var(--v-muted);font-weight:400}
+/* phones: the shared features as a one-column spec list (feature left, value right) — no mid-word breaks in two narrow
+   columns, and a long list stays a calm scan down one edge; the differences panel of Ähnliche Modelle stacks likewise */
+@media(max-width:47.99rem){
+  .vgl-gcell .vgl-glist{grid-template-columns:minmax(0,1fr)}
+  .vgl-gcell .vgl-gitem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:1rem;align-items:start;padding:.625rem .75rem}
+  .vgl-gcell .vgl-gitem__l{overflow-wrap:break-word;hyphens:auto}
+  .vgl-alt__why{grid-template-columns:minmax(0,1fr);row-gap:0}
+  .vgl-alt__why dd:not(:last-child){margin-bottom:.375rem}
+}
+
+/* ==== "Aus der Merkliste" under the add tile (09.11., Lead Design): a secondary button instead of a bare text link —
+   white with the DS hairline, 4 px button radius, filled bookmark glyph (the Merkliste's own symbol); no count badge
+   (the number stays in the accessible name); full width of the slot, 44 px target ==== */
+.vgl-view .vgl-lc__slot .vgl-lc__mkl{align-self:stretch;display:flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;margin:0;padding:0 .75rem;border:.0625rem solid var(--v-g300);border-radius:var(--v-r-m);background:var(--v-white);font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.25;color:var(--v-teal);cursor:pointer;text-align:left}
+.vgl-lc__mkl svg{flex:none;width:.875rem;height:.875rem;fill:currentColor}
+.vgl-view .vgl-lc__slot .vgl-lc__mkl:hover{border-color:var(--v-teal);background:var(--v-teal-5)}
+
+/* ==== Full comparison (09.11., Lead Design): the slot keeps the add tile's shape — white card with the DS hairline,
+   centred: teal check, "4 von 4 Modellen" in the tile's label style, one muted hint line (caption) ==== */
+.vgl-lc__slot .vgl-lc__full{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;padding:1rem;border:.0625rem solid var(--v-g200);border-radius:var(--v-r-l);background:var(--v-white);text-align:center}
+.vgl-lc__full svg{flex:none;width:1.25rem;height:1.25rem;margin-bottom:.25rem;color:var(--v-teal)}
+.vgl-lc__full b{margin:0;font-size:var(--v-fs-sm);font-weight:600;line-height:1.4;color:var(--v-ink)}
+.vgl-lc__full span{max-width:13rem;font-size:var(--v-fs-cap);line-height:1.45;color:var(--v-muted)}
+
+/* ==== Gemeinsamkeiten, content-aware (09.11., Lead Design) ====
+   Bar: the facts themselves — "Fächer / Parteien 1 | Klingel / Sprechanlage Nein" — label muted, value ink, pairs split
+   by a hairline. If all of them fit on the line (fitCommon), the bar is the whole section: no toggle, no empty card.
+   Opened (many facts): compact units, label over value, on a fixed 11 rem track (auto-fill), so a few facts sit together
+   on the left instead of stretching across the card; no cell borders; (i) right after the label. ==== */
+.vgl-sec__peek .vgl-gp{white-space:nowrap}
+.vgl-sec__peek .vgl-gp+.vgl-gp{margin-left:.75rem;padding-left:.75rem;border-left:.0625rem solid var(--v-g300)}
+.vgl-sec__peek .vgl-gp__l{color:var(--v-muted)}
+.vgl-sec__peek b{font-weight:600;color:var(--v-ink)}
+.vgl-sec--g.is-measure .vgl-sec__peek{display:block;white-space:nowrap;-webkit-line-clamp:none}
+.vgl-view .vgl-sec--g.is-whole .vgl-sec__btn{display:none}
+.vgl-sec__peek .vgl-gp.is-cut{display:none}
+.vgl-sec--g.is-closed .vgl-sec__peek{text-overflow:clip}
+.vgl-view .vgl-sec--g.is-whole .vgl-sec__in:hover{border-color:var(--v-g200)}
+@media(max-width:47.99rem){
+  .vgl-sec__peek{line-height:1.6}
+  .vgl-sec__peek .vgl-gp{display:block}
+  .vgl-sec__peek .vgl-gp+.vgl-gp{margin:0;padding:0;border:0}
+}
+@media(min-width:48rem){
+  .vgl-gcell .vgl-glist{grid-template-columns:repeat(auto-fill,minmax(11rem,1fr));gap:1.25rem 2rem;padding:1.25rem 1rem 1.5rem}
+  .vgl-gcell .vgl-gitem{gap:.25rem;padding:0;margin:0;box-shadow:none}
+  .vgl-gcell .vgl-gitem__l .rh__row{display:block}
+  .vgl-gcell .vgl-gitem__l .rh__l{display:inline;padding:0}
+  .vgl-gcell .vgl-gitem .vgl-gitem__l .rh__row .rh__w,.vgl-gcell .vgl-gitem .vgl-gitem__l .rh__w{position:relative;top:auto;right:auto;display:inline-block;margin-left:.375rem;vertical-align:-.1875rem}
 }
