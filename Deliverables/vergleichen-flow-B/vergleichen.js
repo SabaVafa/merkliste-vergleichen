@@ -160,8 +160,6 @@
   var IC_CHD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
   var liveEl,shareBtn,fromMkl=false,lastCleared=null,prevTitle=null;
   /* render state of the open comparison */
-  var gPer=3;   /* Gemeinsamkeiten: features per row */
-  function gPerNow(){return printing||mq(MQ90,true)?3:(mq(MQ48,true)?2:1);}
   var cur=null,visCols=null,pendingCol=null,gShow=false,printing=false,lastRemoved=null,lastTier='';   /* gShow = Gemeinsamkeiten open */
   var MQ90=window.matchMedia?window.matchMedia('(min-width:90rem)'):null,MQ64=window.matchMedia?window.matchMedia('(min-width:64rem)'):null,MQ48=window.matchMedia?window.matchMedia('(min-width:48rem)'):null;
   function mq(m,fb){return m?m.matches:fb;}
@@ -189,6 +187,7 @@
         '<h2 class="vgl-view__title" id="vglTitle" tabindex="-1">Vergleich <span data-vgl="count">(0)</span></h2>'+
         '<div class="vgl-bar__act">'+
           '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share" title="Link zu diesem Vergleich kopieren">'+IC_LINK+'<span class="vgl-share__l">Link kopieren</span></button>'+
+          '<span class="vgl-bar__sep" aria-hidden="true"></span>'+
           '<button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
           '<span class="vgl-bar__sep" aria-hidden="true"></span>'+
           '<button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button>'+
@@ -884,10 +883,13 @@
     return parts.map(function(t,i){t=t.replace(/\.$/,'')+'.';var m=t.match(/^([^:]{1,40}):\s*(.*)$/);
       return '<span class="vgl-tip__row">'+(m?'<b>'+esc(m[1])+'</b><span>'+esc(m[2].charAt(0).toUpperCase()+m[2].slice(1))+'</span>':'<span class="vgl-tip__full">'+esc(t)+'</span>')+'</span>';}).join('');
   }
+  function tipHTML(row){
+    return row.hint?'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+'<span class="vgl-tip__h">'+IC_INFO+'<span>'+esc(row.label)+'</span></span><span class="vgl-tip__b">'+hintHTML(row.hint)+'</span></span></span>':'';
+  }
   function labelHTML(row){
-    var l='<span class="rh__l">'+esc(row.label).replace(/\//g,'/<wbr>')+'</span>';
+    var l='<span class="rh__l">'+esc(row.label).replace(/\//g,'/<wbr>').replace(/\(([^)]*)\)/,'<span class="rh__nw">($1)</span>')+'</span>';
     if(!row.hint)return l;
-    return '<span class="rh__row">'+l+'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+'<span class="vgl-tip__h">'+IC_INFO+'<span>'+esc(row.label)+'</span></span><span class="vgl-tip__b">'+hintHTML(row.hint)+'</span></span></span></span>';
+    return '<span class="rh__row">'+l+tipHTML(row)+'</span>';
   }
   /* "13,3 × 27,4 × k. A. cm" → "B 13,3 · H 27,4 cm · T k. A." */
   function dimHTML(t){
@@ -967,30 +969,33 @@
     }
     function secHead(inner,extra){return '<tr class="vgl-sec__h'+(extra||'')+'" role="row"><th scope="rowgroup" role="rowheader"'+span+'><div class="vgl-sec__in">'+inner+'</div></th></tr>';}
     /* Gemeinsamkeiten (09.11., Lead UX/UI): the third section of the table, in the same system as the other two —
-       heading like "Nicht für alle gepflegt", each value once. Three features per row from 90 rem, two from 48 rem, one on
-       phones (label | value | label | value | label | value); the inner labels on the same paper band as the label
-       column, so a short value no longer leaves a blank band.
+       heading like "Nicht für alle gepflegt". Feature matrix (user decision 09.11.): the feature and its shared value in
+       the label column, a check in every model column. Features none of the models has (Nein/Ohne/Keine) are left out —
+       they can't tip the choice between these models (user decision 09.11.); Ähnliche Modelle covers that need.
        Collapsed by default (user decision 09.11.): heading + "Anzeigen"; open when nothing differs. */
+    var i0=an.base[0],gList=byRelevance(an.G).filter(function(d){var v=d.vals[i0],t=d.texts[i0];return !(d.row.bool?v===false:(Array.isArray(v)?!v.length:/^(ohne|nein|keine?)$/i.test(String(t))));});
     function commonRowsHTML(){
-      var list=byRelevance(an.G),i0=an.base[0],p0=items[i0],pairs=[];
-      gPer=gPerNow();
-      for(var k=0;k<list.length;k+=gPer)pairs.push(list.slice(k,k+gPer));
-      function val(d){return '<span class="vgl-g2__v'+(isUnk(d.texts[i0])?' na':'')+'">'+cellHTML(d,i0,p0,false,'',{allColors:p0.colors||[]}).replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')+'</span>';}
-      var rows=pairs.map(function(pr,k){
-        var a=pr[0],second='';
-        for(var j=1;j<gPer;j++){var b=pr[j];second+=b?'<span class="vgl-g2__l rh"><span class="vgl-visually-hidden">; </span>'+labelHTML(b.row)+'<span class="vgl-visually-hidden">: </span></span>'+val(b):'<span class="vgl-g2__l is-empty" aria-hidden="true"></span><span class="vgl-g2__v is-empty" aria-hidden="true"></span>';}
-        return '<tr role="row" data-key="'+a.row.key+'" class="vgl-gx" id="vglG'+k+'"'+(gOpen?'':' hidden')+'>'+
-          '<th class="rh" scope="row" role="rowheader">'+labelHTML(a.row)+'</th>'+
-          '<td class="vgl-val vgl-g2cell" role="cell" colspan="'+nv+'" aria-colspan="'+nv+'"><span class="vgl-g2 vgl-g2--'+gPer+'">'+val(a)+second+'</span><span class="vgl-visually-hidden"> – '+forAll+'</span></td></tr>';
+      var p0=items[i0];
+      return gList.map(function(d,k){
+        var row=d.row,v=d.vals[i0],t=d.texts[i0],val='';
+        if(!row.bool){
+          if(isUnk(t))val='<span class="vgl-ka">'+esc(t)+'</span>';
+          else if(row.swatches){var nc=(p0.colors||[]).length;val=nc+' Farbe'+(nc===1?'':'n');}
+          else if(row.key==='abmessungen')val=dimHTML(t);
+          else if(Array.isArray(v))val=esc(v.join(' · '));
+          else val=esc(t);
+        }
+        var mark='<span class="vgl-mark">'+CHK+'<span class="vgl-visually-hidden">Ja</span></span>';
+        return '<tr role="row" data-key="'+row.key+'" class="vgl-gx" id="vglG'+k+'"'+(gOpen?'':' hidden')+'><th class="rh" scope="row" role="rowheader">'+labelHTML(row)+(val?'<span class="vgl-gval">'+val+'</span>':'')+'</th>'+vis.map(function(){return '<td class="vgl-val vgl-val--mark" role="cell">'+mark+'</td>';}).join('')+'</tr>';
       }).join('');
-      return rows;
     }
     var tbody='<tbody class="vgl-sec vgl-sec--u" role="rowgroup">'+secHead('<span class="vgl-sec__t">Unterschiede</span> <span class="vgl-sec__n">'+an.U.length+'</span>')+
       (an.U.length?rowsHTML(an.U,'U'):'<tr role="row"><td class="vgl-sec__empty" role="cell"'+span+'>Keine belegten Unterschiede.</td></tr>')+'</tbody>';
     if(an.O.length)tbody+='<tbody class="vgl-sec vgl-sec--o" role="rowgroup">'+secHead('<span class="vgl-sec__t">Nicht für alle gepflegt</span> <span class="vgl-sec__n">'+an.O.length+'</span>')+rowsHTML(an.O,'O')+'</tbody>';
-    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--s" role="rowgroup">'+secHead('<button class="vgl-gdisc" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="'+Array.apply(null,{length:Math.ceil(an.G.length/gPerNow())}).map(function(x,k){return 'vglG'+k;}).join(' ')+'">'+
-      '<span class="vgl-sec__t">Gemeinsamkeiten</span><span class="vgl-visually-hidden"> – '+forAll+', '+an.G.length+' Merkmal'+(an.G.length===1?'':'e')+'</span>'+
-      '<span class="vgl-gdisc__peek" aria-hidden="true">'+byRelevance(an.G).map(function(d){return '<span>'+esc(d.row.label)+'</span>';}).join('')+'<span class="vgl-gdisc__more" hidden></span></span>'+
+    var gN=gList.length;
+    if(gN)tbody+='<tbody class="vgl-sec vgl-sec--s" role="rowgroup">'+secHead('<button class="vgl-gdisc" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="'+Array.apply(null,{length:gN}).map(function(x,k){return 'vglG'+k;}).join(' ')+'">'+
+      '<span class="vgl-sec__t">Gemeinsamkeiten</span><span class="vgl-visually-hidden"> – '+forAll+', '+gN+' Merkmal'+(gN===1?'':'e')+'</span>'+
+      '<span class="vgl-gdisc__peek" aria-hidden="true">'+gList.map(function(d){return '<span>'+esc(d.row.label)+'</span>';}).join('')+'<span class="vgl-gdisc__more" hidden></span></span>'+
       '<span class="vgl-gdisc__act"><span class="vgl-gdisc__lbl">'+commonLabel(gOpen)+'</span>'+IC_CHD+'</span></button>')+commonRowsHTML()+'</tbody>';
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
     /* phones (Responsive audit 14): the label column with the add slot is hidden there, so one line above the header carries
@@ -1059,7 +1064,7 @@
   }
   /* Gemeinsamkeiten: show/hide the rows in place — column widths stay */
   function onCommon(){
-    var btn=viewBody.querySelector('[data-vgl="common"]'),nG=cur?cur.an.G.length:0;
+    var btn=viewBody.querySelector('[data-vgl="common"]'),nG=viewBody.querySelectorAll('tr.vgl-gx').length;
     Array.prototype.forEach.call(viewBody.querySelectorAll('tr.vgl-gx'),function(r){r.hidden=!gShow;});
     if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('.vgl-gdisc__lbl').textContent=commonLabel(gShow);}
     placeTips();
