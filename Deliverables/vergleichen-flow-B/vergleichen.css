@@ -935,29 +935,82 @@ table.vgl-t tbody th[scope="row"]{position:static}
 .vgl-lc__full b{margin:0;font-size:var(--v-fs-sm);font-weight:600;line-height:1.4;color:var(--v-ink)}
 .vgl-lc__full span{max-width:13rem;font-size:var(--v-fs-cap);line-height:1.45;color:var(--v-muted)}
 
-/* ==== Gemeinsamkeiten, content-aware (09.11., Lead Design) ====
-   Bar: the facts themselves — "Fächer / Parteien 1 | Klingel / Sprechanlage Nein" — label muted, value ink, pairs split
-   by a hairline. If all of them fit on the line (fitCommon), the bar is the whole section: no toggle, no empty card.
-   Opened (many facts): compact units, label over value, on a fixed 11 rem track (auto-fill), so a few facts sit together
-   on the left instead of stretching across the card; no cell borders; (i) right after the label. ==== */
-.vgl-sec__peek .vgl-gp{white-space:nowrap}
-.vgl-sec__peek .vgl-gp+.vgl-gp{margin-left:.75rem;padding-left:.75rem;border-left:.0625rem solid var(--v-g300)}
-.vgl-sec__peek .vgl-gp__l{color:var(--v-muted)}
-.vgl-sec__peek b{font-weight:600;color:var(--v-ink)}
-.vgl-sec--g.is-measure .vgl-sec__peek{display:block;white-space:nowrap;-webkit-line-clamp:none}
-.vgl-view .vgl-sec--g.is-whole .vgl-sec__btn{display:none}
-.vgl-sec__peek .vgl-gp.is-cut{display:none}
-.vgl-sec--g.is-closed .vgl-sec__peek{text-overflow:clip}
-.vgl-view .vgl-sec--g.is-whole .vgl-sec__in:hover{border-color:var(--v-g200)}
-@media(max-width:47.99rem){
-  .vgl-sec__peek{line-height:1.6}
-  .vgl-sec__peek .vgl-gp{display:block}
-  .vgl-sec__peek .vgl-gp+.vgl-gp{margin:0;padding:0;border:0}
-}
+/* ==== Gemeinsamkeiten as the third table section (09.11., Lead UX/UI) ====
+   Same system as "Nicht für alle gepflegt": plain heading, label column on the paper tone with (i), each value once;
+   up to three features per row, the inner labels on the same paper band. Quieter than the differences: compact rows. Long lists: the first four rows,
+   then a teal text button "Alle n Gemeinsamkeiten anzeigen" (chevron turns when open). ==== */
 @media(min-width:48rem){
-  .vgl-gcell .vgl-glist{grid-template-columns:repeat(auto-fill,minmax(11rem,1fr));gap:1.25rem 2rem;padding:1.25rem 1rem 1.5rem}
-  .vgl-gcell .vgl-gitem{gap:.25rem;padding:0;margin:0;box-shadow:none}
-  .vgl-gcell .vgl-gitem__l .rh__row{display:block}
-  .vgl-gcell .vgl-gitem__l .rh__l{display:inline;padding:0}
-  .vgl-gcell .vgl-gitem .vgl-gitem__l .rh__row .rh__w,.vgl-gcell .vgl-gitem .vgl-gitem__l .rh__w{position:relative;top:auto;right:auto;display:inline-block;margin-left:.375rem;vertical-align:-.1875rem}
+  table.vgl-t .vgl-sec--s tr:not(.vgl-sec__h)>*{padding-top:.5rem;padding-bottom:.5rem}
+  table.vgl-t .vgl-sec--s th[scope="row"] .rh__row .rh__w{top:.125rem}
 }
+table.vgl-t tr[hidden]{display:none !important}
+table.vgl-t .vgl-sec--s tr.vgl-gmore>td:nth-child(n){padding:.25rem 0 0 1rem;border-bottom:0;background:none}
+.vgl-gmore__btn{display:inline-flex;align-items:center;gap:.25rem;min-height:2.75rem;padding:0;border:0;background:none;font-family:inherit;font-size:var(--v-fs-sm);font-weight:600;line-height:1.25;color:var(--v-teal);cursor:pointer}
+.vgl-gmore__btn:hover span{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.vgl-gmore__btn svg{width:1rem;height:1rem;flex:none}
+.vgl-gmore__btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+@media(max-width:47.99rem){
+  table.vgl-t .vgl-sec--s tr.vgl-gmore>td:nth-child(n){grid-column:1 / -1;padding-left:0}
+}
+
+/* Gemeinsamkeiten, several features per row (09.11.): value | label | value | label | value inside the spanning cell
+   (3 from 90 rem, 2 from 48 rem, 1 on phones); the inner labels have the width of the table's label column, so every
+   part has the same shape (label + value) */
+table.vgl-t{--vgl-rl:14rem}
+@media(max-width:89.99rem){table.vgl-t{--vgl-rl:12rem}}
+@media(max-width:63.99rem){table.vgl-t{--vgl-rl:11rem}}
+table.vgl-t .vgl-sec--s td.vgl-g2cell:nth-child(n){padding:0}
+.vgl-g2{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch}
+.vgl-g2--2{grid-template-columns:minmax(0,1fr) var(--vgl-rl,14rem) minmax(0,1fr)}
+.vgl-g2--3{grid-template-columns:minmax(0,1fr) var(--vgl-rl,14rem) minmax(0,1fr) var(--vgl-rl,14rem) minmax(0,1fr)}
+.vgl-g2__v{min-width:0;padding:.5rem 1rem;overflow-wrap:break-word;hyphens:auto;-webkit-hyphens:auto}
+.vgl-g2__v.na{color:var(--v-muted)}
+.vgl-g2__l.is-empty{background:none}   /* a short last row ends quietly instead of showing an empty label band */
+.vgl-g2__l{position:relative;padding:.5rem 1rem;background:var(--v-paper);line-height:1.5rem}
+.vgl-g2__l .rh__l{display:block;padding-right:2rem}
+.vgl-g2__l .rh__row{position:relative;display:block}
+.vgl-g2__l .rh__row .rh__w,.vgl-g2__l .rh__w{position:absolute;top:.1875rem;right:0;margin:0}
+@media(max-width:47.99rem){
+  table.vgl-t .vgl-sec--s td.vgl-g2cell{grid-column:1 / -1}
+  .vgl-g2{grid-template-columns:minmax(0,1fr)}
+  .vgl-g2__v{padding:.5rem .75rem}
+  .vgl-g2__l{padding:.5rem .75rem;line-height:1.5}
+  .vgl-g2 .is-empty{display:none}
+}
+
+/* ==== Gemeinsamkeiten disclosure (09.11., Lead Product Design) ====
+   The whole heading row is the control (one big target instead of a small link next to the title):
+   title in the section-heading style · muted preview of the features inside (information scent, one line, hidden
+   when open) · "Anzeigen"/"Ausblenden" with the chevron at the table's right edge, where the eye looks for it.
+   Hover: paper tint over the row + underlined action; keyboard: teal focus ring. ==== */
+.vgl-sec--s tr.vgl-sec__h th:nth-child(n){padding-bottom:.25rem}
+.vgl-sec--s:has(tr.vgl-gx[hidden]) tr.vgl-sec__h th{border-bottom-color:var(--v-g100)}
+.vgl-gdisc{display:flex;align-items:baseline;gap:1rem;width:calc(100% + 1rem);min-height:3rem;margin:0 0 0 -1rem;padding:.625rem 1rem;border:0;border-radius:var(--v-r-m);background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.vgl-gdisc:hover{background:var(--v-paper)}
+.vgl-gdisc:focus-visible{outline:.125rem solid var(--v-teal);outline-offset:.125rem}
+.vgl-gdisc .vgl-sec__t{flex:none}
+.vgl-gdisc__peek{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--v-fs-sm);color:var(--v-muted)}
+.vgl-gdisc[aria-expanded="true"] .vgl-gdisc__peek{visibility:hidden}
+.vgl-gdisc__peek>span+span:not([hidden]):not(.vgl-gdisc__more)::before{content:" · ";content:" · "/""}
+.vgl-gdisc__peek>span.vgl-gdisc__more::before{content:"  ";content:"  "/""}
+.vgl-gdisc__more{color:var(--v-ink)}
+.vgl-gdisc__act{flex:none;display:inline-flex;align-items:center;gap:.375rem;margin-left:auto;align-self:center;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-teal)}
+.vgl-gdisc__act svg{width:1.125rem;height:1.125rem;flex:none}
+.vgl-gdisc[aria-expanded="true"] .vgl-gdisc__act svg{transform:rotate(180deg)}
+.vgl-gdisc:hover .vgl-gdisc__lbl{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+@media(max-width:47.99rem){
+  .vgl-gdisc{width:calc(100% + 1.5rem);margin-left:-.75rem;padding:.625rem .75rem;flex-wrap:wrap;row-gap:.125rem}
+  .vgl-gdisc__peek{order:3;flex-basis:100%}
+}
+
+/* ==== Header toolbar (09.11., Lead Design) ====
+   Was: grey text links (read as disabled), "Vergleich leeren" without icon in the same style as the harmless actions,
+   directly next to the close button. Now: toolbar buttons in ink with icons, 44 px targets, 4 px radius, hover = paper
+   tint (no underline); hairline dividers group them — Teilen/Drucken | Vergleich leeren (trash icon) | close. ==== */
+.vgl-bar__act{gap:.25rem}
+.vgl-view .vgl-bar__act .vgl-tb{padding:0 .75rem;border-radius:var(--v-r-m);color:var(--v-ink)}
+.vgl-view .vgl-bar__act .vgl-tb:hover{background:var(--v-paper);color:var(--v-ink);text-decoration:none}
+.vgl-view .vgl-bar__act .vgl-tb:focus-visible{outline:.125rem solid var(--v-teal);outline-offset:.125rem}
+.vgl-view .vgl-bar__act .vgl-tb.is-done,.vgl-view .vgl-bar__act .vgl-tb.is-done:hover{color:var(--v-teal)}
+.vgl-bar__sep{flex:none;width:.0625rem;height:1.5rem;margin:0 .25rem;background:var(--v-g200)}
+.vgl-bar__act+.vgl-close{margin-left:.25rem}

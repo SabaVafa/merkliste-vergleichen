@@ -148,6 +148,7 @@
   var IC_LIMIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13.5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
 
   var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,scrollEl,toastEl,toastT,barBtn,cancelBtn,lastFocus;
+  var IC_TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   var IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -159,6 +160,8 @@
   var IC_CHD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
   var liveEl,shareBtn,fromMkl=false,lastCleared=null,prevTitle=null;
   /* render state of the open comparison */
+  var gPer=3;   /* Gemeinsamkeiten: features per row */
+  function gPerNow(){return printing||mq(MQ90,true)?3:(mq(MQ48,true)?2:1);}
   var cur=null,visCols=null,pendingCol=null,gShow=false,printing=false,lastRemoved=null,lastTier='';   /* gShow = Gemeinsamkeiten open */
   var MQ90=window.matchMedia?window.matchMedia('(min-width:90rem)'):null,MQ64=window.matchMedia?window.matchMedia('(min-width:64rem)'):null,MQ48=window.matchMedia?window.matchMedia('(min-width:48rem)'):null;
   function mq(m,fb){return m?m.matches:fb;}
@@ -187,7 +190,9 @@
         '<div class="vgl-bar__act">'+
           '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share" title="Link zu diesem Vergleich kopieren">'+IC_LINK+'<span class="vgl-share__l">Link kopieren</span></button>'+
           '<button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
-          '<button class="vgl-tb" type="button" data-vgl="clear">Vergleich leeren</button>'+
+          '<span class="vgl-bar__sep" aria-hidden="true"></span>'+
+          '<button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button>'+
+          '<span class="vgl-bar__sep" aria-hidden="true"></span>'+
         '</div>'+
         '<button class="vgl-close" type="button" data-vgl="close" aria-label="Vergleich schließen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
       '</div></div>'+
@@ -945,7 +950,7 @@
     /* ---- Table ---- */
     var nMkl=n<MAX?mklCount():0;
     var lc={
-      tile:n>=MAX?'<div class="vgl-lc__full" role="note">'+IC_OK+'<b>'+n+' von '+MAX+' Modellen</b><span>'+(pick?nv+' sind sichtbar – zum Wechseln den Namen wählen. ':'')+'Entfernen Sie ein Modell mit ×, um ein anderes hinzuzufügen.</span></div>':
+      tile:n>=MAX?'<div class="vgl-lc__full" role="note">'+IC_OK+'<b>Maximale Anzahl erreicht</b><span>Es können bis zu '+MAX+' Modelle verglichen werden.'+(pick?' '+nv+' davon sind sichtbar – zum Wechseln den Namen wählen.':'')+'</span></div>':
         '<button class="vgl-addtile" type="button" data-vgl="add">'+IC_PLUS+'<span class="vgl-addtile__l">Modell hinzufügen</span><span class="vgl-addtile__n">noch '+(MAX-n)+' möglich</span></button>',
       mkl:nMkl?'<button class="vgl-lc__mkl" type="button" data-vgl="addmkl" aria-label="Aus der Merkliste hinzufügen, '+nMkl+' Modell'+(nMkl===1?'':'e')+'">'+IC_BM+'<span>Aus der Merkliste</span></button>':''
     };
@@ -955,28 +960,38 @@
         var row=d.row,capt='';
         if(kind==='U'&&pick){var vk=vis.map(function(i){return d.keys[i];});if(vk.every(function(x){return x===vk[0];})){var hid=an.base.filter(function(i){return vis.indexOf(i)<0&&d.keys[i]!==vk[0];});if(hid.length)capt='Unterschied bei: '+hid.map(function(i){return refs[i].n;}).join(', ');}}
         var th='<th class="rh" scope="row" role="rowheader">'+labelHTML(row)+(capt?'<span class="vgl-rowcap">'+esc(capt)+'</span>':'')+'</th>';
-        if(kind==='G'){var i0=an.base[0];return '<tr role="row" data-key="'+row.key+'">'+th+cellHTML(d,i0,items[i0],false,' colspan="'+nv+'" aria-colspan="'+nv+'"',{allColors:items[i0].colors||[]}).replace('class="vgl-val','class="vgl-val vgl-val--all').replace(/<\/td>$/,'<span class="vgl-visually-hidden"> – '+forAll+'</span></td>')+'</tr>';}
         var bi=kind==='U'?bestIdx(row,d.vals,d.texts):[];
         var ctx={allColors:allColors,mean:kind==='U'};
         return '<tr role="row" data-key="'+row.key+'">'+th+vis.map(function(i){return cellHTML(d,i,items[i],bi.indexOf(i)>-1,'',ctx);}).join('')+'</tr>';
       }).join('');
     }
     function secHead(inner,extra){return '<tr class="vgl-sec__h'+(extra||'')+'" role="row"><th scope="rowgroup" role="rowheader"'+span+'><div class="vgl-sec__in">'+inner+'</div></th></tr>';}
-    /* Gemeinsamkeiten, expanded (06.11.): the values are the same for every model, so they don't need the column grid —
-       compact fact units (label over value) on a fixed track width instead of one sparse full-width row per feature */
-    function commonGridHTML(){
-      var i0=an.base[0],p0=items[i0];
-      var cells=byRelevance(an.G).map(function(d){
-        var v=cellHTML(d,i0,p0,false,'',{allColors:p0.colors||[]}).replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'');
-        return '<div class="vgl-gitem" data-key="'+d.row.key+'"><dt class="vgl-gitem__l">'+labelHTML(d.row)+'</dt><dd class="vgl-gitem__v">'+v+'</dd></div>';
+    /* Gemeinsamkeiten (09.11., Lead UX/UI): the third section of the table, in the same system as the other two —
+       heading like "Nicht für alle gepflegt", each value once. Three features per row from 90 rem, two from 48 rem, one on
+       phones (label | value | label | value | label | value); the inner labels on the same paper band as the label
+       column, so a short value no longer leaves a blank band.
+       Collapsed by default (user decision 09.11.): heading + "Anzeigen"; open when nothing differs. */
+    function commonRowsHTML(){
+      var list=byRelevance(an.G),i0=an.base[0],p0=items[i0],pairs=[];
+      gPer=gPerNow();
+      for(var k=0;k<list.length;k+=gPer)pairs.push(list.slice(k,k+gPer));
+      function val(d){return '<span class="vgl-g2__v'+(isUnk(d.texts[i0])?' na':'')+'">'+cellHTML(d,i0,p0,false,'',{allColors:p0.colors||[]}).replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')+'</span>';}
+      var rows=pairs.map(function(pr,k){
+        var a=pr[0],second='';
+        for(var j=1;j<gPer;j++){var b=pr[j];second+=b?'<span class="vgl-g2__l rh"><span class="vgl-visually-hidden">; </span>'+labelHTML(b.row)+'<span class="vgl-visually-hidden">: </span></span>'+val(b):'<span class="vgl-g2__l is-empty" aria-hidden="true"></span><span class="vgl-g2__v is-empty" aria-hidden="true"></span>';}
+        return '<tr role="row" data-key="'+a.row.key+'" class="vgl-gx" id="vglG'+k+'"'+(gOpen?'':' hidden')+'>'+
+          '<th class="rh" scope="row" role="rowheader">'+labelHTML(a.row)+'</th>'+
+          '<td class="vgl-val vgl-g2cell" role="cell" colspan="'+nv+'" aria-colspan="'+nv+'"><span class="vgl-g2 vgl-g2--'+gPer+'">'+val(a)+second+'</span><span class="vgl-visually-hidden"> – '+forAll+'</span></td></tr>';
       }).join('');
-      return '<tr role="row"><td class="vgl-gcell" role="cell" colspan="'+(nv+1)+'" aria-colspan="'+(nv+1)+'"><span class="vgl-visually-hidden">'+forAll+':</span><dl class="vgl-glist">'+cells+'</dl></td></tr>';
+      return rows;
     }
     var tbody='<tbody class="vgl-sec vgl-sec--u" role="rowgroup">'+secHead('<span class="vgl-sec__t">Unterschiede</span> <span class="vgl-sec__n">'+an.U.length+'</span>')+
       (an.U.length?rowsHTML(an.U,'U'):'<tr role="row"><td class="vgl-sec__empty" role="cell"'+span+'>Keine belegten Unterschiede.</td></tr>')+'</tbody>';
     if(an.O.length)tbody+='<tbody class="vgl-sec vgl-sec--o" role="rowgroup">'+secHead('<span class="vgl-sec__t">Nicht für alle gepflegt</span> <span class="vgl-sec__n">'+an.O.length+'</span>')+rowsHTML(an.O,'O')+'</tbody>';
-    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--g'+(gOpen?'':' is-closed')+'" role="rowgroup">'+secHead('<span class="vgl-sec__ic" aria-hidden="true">'+IC_OK+'</span><span class="vgl-sec__t">Gemeinsamkeiten</span> <span class="vgl-sec__n">'+an.G.length+'</span><span class="vgl-sec__peek" aria-hidden="true">'+byRelevance(an.G).map(function(d){var i0=an.base[0];return '<span class="vgl-gp"><span class="vgl-gp__l">'+esc(d.row.label)+'</span> <b>'+esc(peekVal(d,i0,items[i0]))+'</b></span>';}).join('')+'</span><span class="vgl-sec__sub">'+forAll+'</span><button class="vgl-sec__btn" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="vglG" aria-label="'+commonAria(gOpen,an.G.length)+'"><span>'+commonLabel(gOpen,an.G.length)+'</span>'+IC_CHD+'</button>')+'</tbody>'+
-      '<tbody class="vgl-sec__rows" id="vglG" role="rowgroup"'+(gOpen?'':' hidden')+'>'+commonGridHTML()+'</tbody>';
+    if(an.G.length)tbody+='<tbody class="vgl-sec vgl-sec--s" role="rowgroup">'+secHead('<button class="vgl-gdisc" type="button" data-vgl="common" aria-expanded="'+gOpen+'" aria-controls="'+Array.apply(null,{length:Math.ceil(an.G.length/gPerNow())}).map(function(x,k){return 'vglG'+k;}).join(' ')+'">'+
+      '<span class="vgl-sec__t">Gemeinsamkeiten</span><span class="vgl-visually-hidden"> – '+forAll+', '+an.G.length+' Merkmal'+(an.G.length===1?'':'e')+'</span>'+
+      '<span class="vgl-gdisc__peek" aria-hidden="true">'+byRelevance(an.G).map(function(d){return '<span>'+esc(d.row.label)+'</span>';}).join('')+'<span class="vgl-gdisc__more" hidden></span></span>'+
+      '<span class="vgl-gdisc__act"><span class="vgl-gdisc__lbl">'+commonLabel(gOpen)+'</span>'+IC_CHD+'</span></button>')+commonRowsHTML()+'</tbody>';
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
     /* phones (Responsive audit 14): the label column with the add slot is hidden there, so one line above the header carries
        "Modell hinzufügen" and — when not all models fit — how many are visible and how to switch (CSS shows it < 48 rem only) */
@@ -991,43 +1006,20 @@
 
     /* ---- mobile action row ---- */
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+
-      '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb" type="button" data-vgl="clear">Vergleich leeren</button></div>';
+      '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
-    lockHead();placePin();fitHeader();fitCommon();placeTips();watchPin();
+    lockHead();placePin();fitHeader();fitPeek();placeTips();watchPin();
   }
   /* collapsed Gemeinsamkeiten = a full section bar: heading + count + the shared features named (info scent) + "Anzeigen" */
-  /* one shared fact as plain text for the Gemeinsamkeiten bar */
-  function peekVal(d,i,p){
-    var row=d.row,v=d.vals[i],t=d.texts[i];
-    if(isUnk(t))return t;
-    if(row.swatches){var nc=(p.colors||[]).length;return nc+' Farbe'+(nc===1?'':'n');}
-    if(row.bool)return v===true?'Ja':'Nein';
-    if(row.key==='abmessungen')return dimHTML(t).replace(/<[^>]*>/g,'');
-    if(Array.isArray(v))return v.length?v.join(', '):'Keine';
-    return t;
+  /* disclosure preview: whole feature names only — what doesn't fit becomes "+ n weitere" (no name cut mid-word) */
+  function fitPeek(){
+    var pk=viewBody.querySelector('.vgl-gdisc__peek');if(!pk||!pk.offsetWidth)return;
+    var names=Array.prototype.filter.call(pk.children,function(e){return !e.classList.contains('vgl-gdisc__more');}),more=pk.querySelector('.vgl-gdisc__more');
+    names.forEach(function(e){e.hidden=false;});more.hidden=true;
+    for(var k=names.length-1;k>0&&pk.scrollWidth>pk.clientWidth+1;k--){names[k].hidden=true;more.hidden=false;more.textContent='+ '+(names.length-k)+' weitere';}
   }
-  /* Gemeinsamkeiten adapt to their content: when every shared fact fits on the bar's one line, the bar IS the content —
-     no toggle, nothing hidden behind "Anzeigen"; otherwise the line shows the first facts and the toggle opens the grid */
-  function fitCommon(){
-    var sec=viewBody.querySelector('.vgl-sec--g');if(!sec)return;
-    var pk=sec.querySelector('.vgl-sec__peek'),rows=viewBody.querySelector('#vglG');if(!pk)return;
-    Array.prototype.forEach.call(pk.children,function(g){g.classList.remove('is-cut');});
-    sec.classList.remove('is-whole');sec.classList.add('is-closed','is-measure');
-    /* phones stack the facts one per line: up to 4 is the whole section, more show the first 3 */
-    var phone=window.matchMedia('(max-width:47.99rem)').matches,nP=pk.children.length;
-    var fits=!printing&&(phone?nP<=4:pk.scrollWidth<=pk.clientWidth+1);
-    sec.classList.remove('is-measure');
-    sec.classList.toggle('is-whole',fits);
-    sec.classList.toggle('is-closed',fits||!gShow);
-    if(rows)rows.hidden=fits||!gShow;
-    pk.setAttribute('aria-hidden',String(!fits));
-    /* one-line bar that doesn't fit: show whole facts only (no "Nein…" cut mid-value); the button names the total */
-    var pr=pk.getBoundingClientRect().right,cut=false;
-    if(!fits&&!gShow)Array.prototype.forEach.call(pk.children,function(g,k){if(phone?k>=3:(cut||g.getBoundingClientRect().right>pr+1)){cut=true;g.classList.add('is-cut');}});
-  }
-  function commonLabel(open,nG){return open?'Ausblenden':(nG>1?'Alle '+nG+' anzeigen':'Anzeigen');}
-  function commonAria(open,nG){return (open?'Gemeinsamkeiten ausblenden':'Gemeinsamkeiten anzeigen')+' ('+nG+')';}
+  function commonLabel(open){return open?'Ausblenden':'Anzeigen';}
   /* Spaltenwahl: name and price rows get the height of the tallest of ALL models (hidden ones measured in place), so a swap moves nothing */
   function lockHead(){
     var tbl=viewBody.querySelector('table.vgl-t');if(!tbl||!cur)return;
@@ -1065,14 +1057,12 @@
     view.classList.remove('is-barwrap');
     if(bi&&bi.scrollWidth>bi.clientWidth+1)view.classList.add('is-barwrap');
   }
-  /* Gemeinsamkeiten show/hide (the only control for it); toggled in place — column widths stay */
+  /* Gemeinsamkeiten: show/hide the rows in place — column widths stay */
   function onCommon(){
-    var rows=viewBody.querySelector('#vglG'),btn=viewBody.querySelector('[data-vgl="common"]'),sec=viewBody.querySelector('.vgl-sec--g');
-    var nG=cur?cur.an.G.length:0;
-    if(rows)rows.hidden=!gShow;
-    if(sec)sec.classList.toggle('is-closed',!gShow);
-    fitCommon();placeTips();
-    if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('span').textContent=commonLabel(gShow,nG);btn.setAttribute('aria-label',commonAria(gShow,nG));}
+    var btn=viewBody.querySelector('[data-vgl="common"]'),nG=cur?cur.an.G.length:0;
+    Array.prototype.forEach.call(viewBody.querySelectorAll('tr.vgl-gx'),function(r){r.hidden=!gShow;});
+    if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('.vgl-gdisc__lbl').textContent=commonLabel(gShow);}
+    placeTips();
     announce(nG+' Gemeinsamkeit'+(nG===1?'':'en')+(gShow?' eingeblendet.':' ausgeblendet.'));
   }
 
@@ -1263,7 +1253,7 @@
       if(!open&&st&&st.mtzVgl){var m=/[?&]vergleich=([^&#]+)/.exec(location.search);if(m&&setSelection(decodeURIComponent(m[1]).split(','))>=MIN){syncAll();openView({push:false});}}
     });
     /* rotation / window resize / zoom: a new breakpoint re-renders (column count), otherwise the head is re-measured — never on scroll */
-    function relayout(){if(!view.classList.contains('is-open'))return;if(tierKey()!==lastTier){renderView();}else{lockHead();placePin();fitHeader();fitCommon();placeTips();}}
+    function relayout(){if(!view.classList.contains('is-open'))return;if(tierKey()!==lastTier){renderView();}else{lockHead();placePin();fitHeader();fitPeek();placeTips();}}
     window.addEventListener('resize',relayout);
     /* Responsive audit 14 (07.11.): the scroll area's own width is the source of truth — it also changes without a window
        resize (scrollbar appears when Gemeinsamkeiten open, split view, a late resize event); width changes only, once per frame */
