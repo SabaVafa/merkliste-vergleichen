@@ -820,3 +820,80 @@ table.vgl-t td.vgl-gcell:nth-child(n){padding:0 !important}
 .vgl-sec--g .vgl-sec__ic{align-self:center}
 /* no counts next to the section headings (09.11., user decision) */
 .vgl-view .vgl-sec .vgl-sec__h .vgl-sec__n{display:none}
+/* no "gilt für alle n Modelle" subtitle in the Gemeinsamkeiten header (09.11., user decision); screen readers still get it in the grid cell */
+.vgl-view .vgl-sec--g .vgl-sec__h .vgl-sec__sub{display:none}
+
+/* ==== (i) placement (09.11., lead product design): one fixed spot instead of trailing the label text.
+   The icon sits at the right edge of the label cell, on the first text line — all icons form one vertical column,
+   labels may wrap without moving it; same top-right spot in the Gemeinsamkeiten cells. ==== */
+table.vgl-t tbody th[scope="row"]{position:relative}
+table.vgl-t tbody th[scope="row"] .rh__l{display:block;padding-right:2rem}
+table.vgl-t tbody th[scope="row"] .rh__w{position:absolute;top:.875rem;right:.75rem;margin:0;vertical-align:top}
+table.vgl-t tbody th[scope="row"] .vgl-ib,.vgl-gitem .vgl-ib{margin-left:0}
+.vgl-gitem{position:relative}
+.vgl-gitem .vgl-gitem__l .rh__l{display:block;padding-right:2rem}
+.vgl-gitem .vgl-gitem__l .rh__w{position:absolute;top:.9375rem;right:.75rem;display:block}
+@media(max-width:47.99rem){
+  table.vgl-t tbody th[scope="row"] .rh__w{top:.625rem;right:.75rem}
+  .vgl-gitem .vgl-gitem__l .rh__w{top:.8125rem;right:.625rem}
+}
+/* the icon is anchored to the label's own first line (rh__row), still flush right in the label column */
+.rh__row{position:relative;display:block}
+table.vgl-t tbody th[scope="row"] .rh__row .rh__w,.vgl-gitem .vgl-gitem__l .rh__row .rh__w{top:.125rem;right:0}
+table.vgl-t tbody th[scope="row"]{position:static}
+@media(max-width:47.99rem){table.vgl-t tbody th[scope="row"] .rh__row .rh__w,.vgl-gitem .vgl-gitem__l .rh__row .rh__w{top:.125rem;right:0}}
+
+/* ==== Lighter toggletips (09.11.): white surface, ink text, hairline + soft shadow instead of a black block;
+   term lists one line per term (term bold); body-sm, comfortable line height ==== */
+.vgl-tip{width:min(18rem,calc(100vw - 2rem));padding:.75rem .875rem;border:.0625rem solid var(--v-g200);border-radius:var(--v-r-l);background:var(--v-white);color:var(--v-ink);font-size:var(--v-fs-sm);line-height:1.5;box-shadow:var(--v-shadow-tip)}
+.vgl-tip__row{display:block;color:var(--v-muted)}
+.vgl-tip__row+.vgl-tip__row{margin-top:.375rem}
+.vgl-tip__row b{display:block;font-weight:600;color:var(--v-ink)}
+
+/* ==== Toggletip with a designed structure (09.11.): teal top accent, a small header naming the feature
+   (teal (i) + label), the explanation below in muted text; shrinks to its content up to 20 rem ==== */
+.vgl-tip{width:max-content;max-width:min(20rem,calc(100vw - 2rem));padding:0;overflow:hidden;border:.0625rem solid var(--v-g200);border-top:.1875rem solid var(--v-teal);border-radius:var(--v-r-l)}
+.vgl-tip__h{display:flex;align-items:center;gap:.375rem;padding:.625rem .875rem .375rem;font-size:var(--v-fs-sm);font-weight:700;line-height:1.3;color:var(--v-ink)}
+.vgl-tip__h svg{flex:none;width:1rem;height:1rem;color:var(--v-teal)}
+.vgl-tip__b{display:block;padding:0 .875rem .75rem 2.25rem;font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-muted)}
+.vgl-tip__b .vgl-tip__row b{color:var(--v-ink)}
+
+/* ==== Radius = design-system tokens (09.11.; Design SYSTEM/metzler-tokens.css):
+   --radius-sm 2 px badges · --radius 4 px buttons/inputs/checkboxes · --radius-lg 8 px cards · --radius-xl 12 px popups/modals.
+   Cards (photo tiles, add tile, Gemeinsamkeiten card, Ähnliche Modelle) and sheets were already right; popups,
+   the checkbox, the tour spotlight and the search thumbnails now use their tokens too. ==== */
+.vgl-tip,.vgl-pick:not(.is-sheet),.vgl-sharepop,.vgl-addsearch:not(.is-sheet),.vgl-toast,.vgl-coach{border-radius:var(--v-r-xl)}
+.vgl-box{border-radius:var(--v-r-m)}
+.vgl-spot{border-radius:var(--v-r-l)}
+.vgl-addopt__img{border-radius:var(--v-r-m)}
+
+/* ==== Toggletip in the page's own language (09.11., lead UI): no accent stripe, no repeated icon.
+   A white popup (hairline, --radius-xl, soft popup shadow); the feature name as a small bold heading with a hairline
+   under it — like the section headings; term lists as a mini table that mirrors the comparison table: terms in a
+   paper-tone column, meanings beside them, rows on g100 hairlines. Single-sentence hints are a plain paragraph. ==== */
+.vgl-tip{border:.0625rem solid var(--v-g200);border-top-width:.0625rem;border-top-color:var(--v-g200);border-radius:var(--v-r-xl);background:var(--v-white);box-shadow:var(--v-shadow-hover);width:max-content;max-width:min(22rem,calc(100vw - 2rem))}
+.vgl-tip__h{display:block;padding:.625rem .875rem;border-bottom:.0625rem solid var(--v-g100);font-size:var(--v-fs-sm);font-weight:700;line-height:1.4;color:var(--v-ink)}
+.vgl-tip__h svg{display:none}
+.vgl-tip__b{display:block;padding:.625rem .875rem .75rem;font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-ink)}
+.vgl-tip__b:has(.vgl-tip__row){display:grid;grid-template-columns:auto 1fr;padding:0}
+.vgl-tip__b .vgl-tip__row{display:contents}
+.vgl-tip__b .vgl-tip__row+.vgl-tip__row{margin:0}
+.vgl-tip__row>b,.vgl-tip__row>span{padding:.5rem .875rem;border-bottom:.0625rem solid var(--v-g100);font-size:var(--v-fs-sm);line-height:1.45}
+.vgl-tip__row:last-child>b,.vgl-tip__row:last-child>span{border-bottom:0}
+.vgl-tip__row>b{display:block;background:var(--v-paper);font-weight:600;color:var(--v-ink);white-space:nowrap}
+.vgl-tip__row>span{display:block;color:var(--v-ink)}
+.vgl-tip__row>.vgl-tip__full{grid-column:1 / -1;background:none}
+@media(max-width:47.99rem){.vgl-tip__row>b{white-space:normal}}
+/* phones: the term sits on its paper band above its meaning (one column), so meanings never get squeezed */
+@media(max-width:47.99rem){
+  .vgl-tip__b:has(.vgl-tip__row){grid-template-columns:1fr}
+  .vgl-tip__row>b{padding:.375rem .875rem;border-bottom:0}
+  .vgl-tip__row>span{padding:.375rem .875rem .625rem}
+}
+
+/* ==== Ähnliche Modelle (09.11.): price and "Zum Vergleich hinzufügen" pinned to the card foot, so they line up across
+   cards whatever the title length or the number of reason lines (grid rows stretch, body fills, price takes the slack) ==== */
+@media(min-width:48rem){
+  .vgl-alt__body{flex:1 1 auto}
+  .vgl-alt__price{margin-top:auto;padding-top:.5rem}
+}

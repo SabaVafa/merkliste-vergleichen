@@ -871,10 +871,18 @@
     return '+ '+gap+' ggü. '+(short?r.n:'dem niedrigsten Preis');
   }
   /* row label: plain text; when there is a definition, an (i) icon button after it opens the toggletip (user decision 06.11.: icon, not underline) */
+  /* hint text → light toggletip content: "Term: definition." lists become one line per term with the term in bold;
+     a split only happens where the next sentence starts with a short term + colon (so "z. B." stays intact) */
+  function hintHTML(h){
+    var parts=String(h).split(/\.\s+(?=[A-ZÄÖÜ0-9„"][^.:]{0,40}:)/);
+    if(parts.length<2)return esc(h);
+    return parts.map(function(t,i){t=t.replace(/\.$/,'')+'.';var m=t.match(/^([^:]{1,40}):\s*(.*)$/);
+      return '<span class="vgl-tip__row">'+(m?'<b>'+esc(m[1])+'</b><span>'+esc(m[2].charAt(0).toUpperCase()+m[2].slice(1))+'</span>':'<span class="vgl-tip__full">'+esc(t)+'</span>')+'</span>';}).join('');
+  }
   function labelHTML(row){
     var l='<span class="rh__l">'+esc(row.label)+'</span>';
     if(!row.hint)return l;
-    return l+'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+esc(row.hint)+'</span></span>';
+    return '<span class="rh__row">'+l+'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+'<span class="vgl-tip__h">'+IC_INFO+'<span>'+esc(row.label)+'</span></span><span class="vgl-tip__b">'+hintHTML(row.hint)+'</span></span></span></span>';
   }
   /* "13,3 × 27,4 × k. A. cm" → "B 13,3 · H 27,4 cm · T k. A." */
   function dimHTML(t){
