@@ -786,3 +786,37 @@ table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size
    crossing into the next column */
 .vgl-stars{flex-wrap:wrap;row-gap:.125rem}
 .vgl-cta{white-space:normal;hyphens:auto;-webkit-hyphens:auto}
+
+/* ==== Gemeinsamkeiten, expanded = the same card as collapsed, opened (09.11., lead design) ====
+   Before: heading indented, grid flush left, per-item underlines with gaps, empty space on the right.
+   Now: one white outlined card — header (icon, title, count, "gilt für alle n Modelle", Ausblenden) on top,
+   then a spec-sheet grid whose cells share clean hairline dividers and stretch to the full card width (auto-fit). */
+.vgl-sec--g:not(.is-closed) tr.vgl-sec__h th:nth-child(n){padding:1.75rem 0 0}
+.vgl-sec--g:not(.is-closed) .vgl-sec__in{padding:.875rem 1rem;border:.0625rem solid var(--v-g200);border-bottom-color:var(--v-g100);border-radius:var(--v-r-l) var(--v-r-l) 0 0;background:var(--v-white)}
+table.vgl-t td.vgl-gcell:nth-child(n){padding:0 !important}
+.vgl-gcell .vgl-glist{grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:0;margin:0;border:.0625rem solid var(--v-g200);border-top:0;border-radius:0 0 var(--v-r-l) var(--v-r-l);background:var(--v-white);overflow:hidden}
+.vgl-gcell .vgl-gitem{gap:.25rem;padding:.875rem 1rem;border:0;box-shadow:inset -.0625rem 0 0 var(--v-g100),inset 0 -.0625rem 0 var(--v-g100);margin:0 -.0625rem -.0625rem 0}
+.vgl-gcell .vgl-gitem__l{display:block;font-size:var(--v-fs-sm);font-weight:600;color:var(--v-muted);overflow-wrap:anywhere}
+.vgl-gcell .vgl-gitem__l .rh__w{display:inline-block}
+.vgl-gcell .vgl-gitem__v{font-size:var(--v-fs-body);font-weight:600;color:var(--v-ink)}
+@media(max-width:47.99rem){
+  .vgl-sec--g:not(.is-closed) tr.vgl-sec__h th:nth-child(n){padding:1.25rem 0 0}
+  .vgl-sec--g:not(.is-closed) .vgl-sec__in{padding:.75rem}
+  .vgl-gcell .vgl-glist{grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}
+  .vgl-gcell .vgl-gitem{padding:.75rem}
+  .vgl-gcell .vgl-gitem__v{font-size:var(--v-fs-sm)}
+}
+/* Gemeinsamkeiten bar on the grey paper tone (09.11.) — collapsed bar and the header of the opened card;
+   the count pill turns white so it still reads on grey; the opened grid stays white */
+.vgl-sec--g.is-closed .vgl-sec__in,.vgl-sec--g:not(.is-closed) .vgl-sec__in{background:var(--v-paper)}
+.vgl-sec--g .vgl-sec__n{background:var(--v-white)}
+
+/* ==== Section counts (09.11., lead design): no pills. One typographic count for every section — same size as
+   the heading, regular weight, muted, tabular figures, sitting on the heading's baseline. ==== */
+.vgl-sec__in{align-items:baseline}
+.vgl-sec__n,.vgl-sec--u .vgl-sec__n,.vgl-sec--g .vgl-sec__n{display:inline;min-width:0;height:auto;padding:0;margin-left:0;border-radius:0;background:none;box-shadow:none;font-size:inherit;font-weight:400;line-height:inherit;color:var(--v-muted);font-variant-numeric:tabular-nums;vertical-align:baseline}
+.vgl-sec__t{font-size:var(--v-fs-body)}
+.vgl-sec__h .vgl-sec__t+.vgl-sec__n{font-size:var(--v-fs-body)}
+.vgl-sec--g .vgl-sec__ic{align-self:center}
+/* no counts next to the section headings (09.11., user decision) */
+.vgl-view .vgl-sec .vgl-sec__h .vgl-sec__n{display:none}
