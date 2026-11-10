@@ -1070,3 +1070,13 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
   .vgl-view .vgl-alts{margin-top:1.5rem}
   .vgl-view .vgl-alts__h{margin:0 0 .75rem;padding:.625rem .75rem}
 }
+
+/* ==== Label column: inset dividers (10.11., user idea) ====
+   Was: the full-width hairline (graphite-100) under each label, nearly invisible on the paper band. Now a divider only
+   as wide as the text area — from the label's text edge to the (i)'s right edge (1 rem in on both sides) — in
+   graphite-300, so it reads on the paper tone and the column stays one calm band; none under a section's last row.
+   Desktop and tablet only: on phones the label is its own band above the values. ==== */
+@media(min-width:48rem){
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>th[scope="row"]{border-bottom-color:transparent;background-image:linear-gradient(var(--v-g300),var(--v-g300));background-size:calc(100% - 2rem) .0625rem;background-position:1rem 100%;background-repeat:no-repeat}
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):last-child>th[scope="row"]{background-image:none}
+}
