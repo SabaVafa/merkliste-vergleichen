@@ -1026,8 +1026,15 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
 .vgl-view .vgl-tb--clear:hover,.vgl-view .vgl-bar__act .vgl-tb--clear:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
 .vgl-view .vgl-actrow .vgl-tb--clear{border-radius:var(--v-r-m,.25rem)}
 
-/* ==== Strip "Maximum erreicht" = warning in the DS orange (10.11., user decision) ====
-   Was grey like a neutral hint. DS --color-orange-600 #B45309 for text and icon (5.0:1 on white, AA for 12 px text;
-   the brighter --color-orange #E07B00 is only 2.9:1), weight 600 like the "Bereit zum Vergleichen" state. ==== */
-.vgl-tray__hint.limit{color:var(--color-orange-600,#B45309);font-weight:600}
-.vgl-tray__hint.limit svg{color:var(--color-orange-600,#B45309)}
+/* ==== Strip "Maximum erreicht" = warning in the design-system orange (10.11., user decision) ====
+   The DS has one orange, --status-warning #E67E00 (metzler-tokens.css). On white it reaches only 2.9:1, so it fills
+   the warning triangle (with an ink "!", 6.3:1) and the text stays ink, weight 600 like "Bereit zum Vergleichen".
+   (Replaces #B45309, which came from the PDP prototype, not from the design system.) ==== */
+.vgl-tray__hint.limit{color:var(--schwarz,#1A171B);font-weight:600}
+.vgl-tray__hint .vgl-warn{width:1rem;height:1rem}
+@media(max-width:47.99rem){.vgl-tray__hint .vgl-warn{display:block}}
+
+/* ==== Gemeinsamkeiten bar grey at rest (10.11., user decision) ====
+   The collapsed disclosure row sits on the paper tone by default (was white, paper only on hover), so it reads as a
+   bar to open. Hover keeps the tone and underlines "Anzeigen"; preview text stays muted (5.0:1 on paper). ==== */
+.vgl-gdisc,.vgl-gdisc:hover{background:var(--v-paper)}
