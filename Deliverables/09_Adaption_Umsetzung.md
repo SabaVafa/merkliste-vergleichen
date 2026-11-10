@@ -189,3 +189,7 @@ Auf Wunsch ersetzt dies §13: Icon-Buttons sehen beim Hover genauso aus wie im R
 ## 17 · Radien = Design-System (10.11.2026)
 
 Geprüft (gemessen im Browser) gegen die DS-Token `--r-s` 2 px Badges · `--r-m` 4 px Buttons/Eingaben/Checkboxen · `--r-l` 8 px Karten/Bildkacheln · `--r-xl` 12 px Pop-ups/Toasts. Bereits korrekt: Bildkachel der Merkliste 8 px, „Auswahl vergleichen" und alle Buttons 4 px, Icon-Ziele rund. Korrigiert: „Vergleichen"-Checkbox der Merkliste 2 → 4 px (wie Vergleich und PLP-Filter), Merkliste-Toast 8 → 12 px (wie alle Toasts/Pop-ups des Vergleichs), Produktberater-Opt-in-Checkbox 3 → 4 px. `merkliste.css?v=18`, `plp.css?v=264`.
+
+## 18 · Speicherhinweis in der Merkliste (10.11.2026)
+
+Nutzer: „Text nicht sichtbar genug, Stil nicht professionell“. Vorher 12-px-Grautext im Fuß, mit „·“ an die Aktionszeile gehängt. Jetzt eigenes Band auf Paper-Ton oben im Fuß, durch eine Haarlinie von der Aktionszeile getrennt: Geräte-Icon (Teal), **„Auf diesem Gerät gespeichert.“** in Schwarz/600, Erklärsatz in Grau (5,4 : 1), „Anmelden“ als Teal-Link – 14 px wie der übrige Sekundärtext der Merkliste. Geteilte Ansicht analog („Geteilte Ansicht. Wird erst gespeichert, wenn Sie sie übernehmen.“). Handy: Hinweis am Listenende, gleiche Gestaltung ohne Band. `merkliste.js?v=22`, `merkliste.css?v=20`.

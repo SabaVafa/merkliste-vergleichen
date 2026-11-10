@@ -399,3 +399,18 @@
 .mkl-cmp.is-in{cursor:default;color:var(--text-muted,#6A6A6A)}
 .mkl-cmp.is-in:hover{color:var(--text-muted,#6A6A6A)}
 .mkl-cmp.is-in input:checked+.mkl-cmp__box{background:var(--text-muted,#6A6A6A);border-color:var(--text-muted,#6A6A6A)}
+
+/* ==== Storage note in the footer (10.11., user: "not visible enough, not professional") ====
+   Was a 12 px grey caption run into the action row with a "·" separator. Now its own band on the paper tone at the
+   top of the footer, split from the action row by a hairline: device icon (teal), bold statement in ink, explaining
+   sentence in muted (5.4:1), "Anmelden" as a teal link — 14 px like the rest of the drawer's secondary text.
+   On phones the note sits at the end of the list (placeHint), same look without the band. ==== */
+.mkl-hint{display:flex;align-items:flex-start;gap:.625rem;font-size:var(--text-body-sm,.875rem);line-height:1.45;color:var(--text-muted,#6A6A6A)}
+.mkl-hint[hidden]{display:none}
+.mkl-hint__ic{flex:none;width:1.25rem;height:1.25rem;margin-top:.0625rem;color:var(--teal,#015253)}
+.mkl-hint__t{min-width:0}
+.mkl-hint b{font-weight:600;color:var(--schwarz,#1A171B)}
+.mkl-hint a{font-weight:600;color:var(--teal,#015253);text-decoration:underline;text-underline-offset:.1875rem}
+.mkl-hint a:hover{color:var(--teal-600,#014A4B)}
+.mkl-foot .mkl-hint{flex:1 1 100%;margin:calc(-1 * var(--sp-3,.75rem)) calc(-1 * var(--sp-5,1.25rem)) .25rem;padding:.75rem var(--sp-5,1.25rem);background:var(--paper-white,#F5F6FA);border-bottom:.0625rem solid var(--graphite-200,#E6E6E8)}
+@media(max-width:47.99rem){.mkl-foot .mkl-hint{margin-inline:calc(-1 * var(--sp-4,1rem));padding-inline:var(--sp-4,1rem)}}

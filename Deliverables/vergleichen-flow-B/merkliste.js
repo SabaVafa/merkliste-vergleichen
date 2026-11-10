@@ -138,8 +138,10 @@
   var hdrBtn, hdrBadge, scrim, drawer, titleEl, countEl, clearBtn, confirmEl, confirmQ, notice, listEl, emptyEl, footHint, cta, footEl, toastEl, toastT, liveEl;
   var toolsEl, shareBtn, printBtn, askEl, popEl, sharedEl, sharedLink, hintEl, allBtn;
   var sharedList = null, sharedMode = false, openParts = {};   /* 09b: shared list (sessionStorage), expanded configuration rows */
-  var OWN_HINT = 'Auf diesem Gerät gespeichert, bis Sie die Browserdaten löschen · <a href="#konto" data-mkl="login">Anmelden</a>, um die Merkliste auf allen Geräten zu nutzen';
-  var SHARED_HINT = 'Geteilte Ansicht — wird nicht gespeichert, bis Sie sie übernehmen.';
+  /* storage note (10.11.): icon + a bold statement + one explaining sentence; 14 px instead of 12 px grey caption */
+  var IC_DEVICE = '<svg class="mkl-hint__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="15" height="11" rx="1.5"/><path d="M6 19h7"/><rect x="15.5" y="9" width="6.5" height="11" rx="1.25"/></svg>';
+  var OWN_HINT = IC_DEVICE + '<span class="mkl-hint__t"><b>Auf diesem Gerät gespeichert.</b> <a href="#konto" data-mkl="login">Anmelden</a>, um Ihre Merkliste auf allen Geräten zu nutzen.</span>';
+  var SHARED_HINT = IC_DEVICE + '<span class="mkl-hint__t"><b>Geteilte Ansicht.</b> Wird erst gespeichert, wenn Sie sie übernehmen.</span>';
   var isOpen = false, opener = null, prevOverflow = '', toastHome = null;
   var cmpSel = [];   /* ids ticked for "Auswahl vergleichen" (session UI state, never persisted) */
   var pick = null;   /* pick mode: opened from the comparison to add models — {lens, inCmp:[ids], slots, onAdd(ids)} */

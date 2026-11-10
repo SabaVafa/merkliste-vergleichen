@@ -1025,3 +1025,9 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
    AA) - the destructive action announces itself on hover; at rest it stays ink, so it doesn't compete with the CTA. ==== */
 .vgl-view .vgl-tb--clear:hover,.vgl-view .vgl-bar__act .vgl-tb--clear:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
 .vgl-view .vgl-actrow .vgl-tb--clear{border-radius:var(--v-r-m,.25rem)}
+
+/* ==== Strip "Maximum erreicht" = warning in the DS orange (10.11., user decision) ====
+   Was grey like a neutral hint. DS --color-orange-600 #B45309 for text and icon (5.0:1 on white, AA for 12 px text;
+   the brighter --color-orange #E07B00 is only 2.9:1), weight 600 like the "Bereit zum Vergleichen" state. ==== */
+.vgl-tray__hint.limit{color:var(--color-orange-600,#B45309);font-weight:600}
+.vgl-tray__hint.limit svg{color:var(--color-orange-600,#B45309)}
