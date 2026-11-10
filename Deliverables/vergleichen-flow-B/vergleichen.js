@@ -223,13 +223,13 @@
         if(k==='close')closeView();
         if(k==='clear')clearView();
         if(k==='undo-clear')undoClear();
-        if(k==='add'){if(addPanel&&addAnchor===a)closeAdd(true);else openAddSearch(a);}
+        if(k==='add'){addFromGrid();}   /* 10.11., user decision: "Modell hinzufügen" leads to the category page, no search dropdown */
         if(k==='addgrid'){closeAdd(false);addFromGrid();}
         if(k==='addclose')closeAdd(true);
         if(k==='pickclose')closePick(true);
         if(k==='share')shareView(a);
         if(k==='sharepop-close'){var sp=view.querySelector('.vgl-sharepop');if(sp)sp.remove();if(shareBtn)shareBtn.focus();}
-        if(k==='addmkl'){var anc=(addPanel&&addPanel.contains(a)&&addAnchor)||a;if(addPanel&&addMkl&&addAnchor===a)closeAdd(true);else openAddSearch(anc,true);}
+        if(k==='addmkl'){openMklPick(a);}
         if(k==='addall'){var anc2=addAnchor;openAddSearch(anc2,false);}
         if(k==='back'){if(window.MTZ_MKL)window.MTZ_MKL.open();}
         if(k==='print'){printView();}
@@ -404,6 +404,29 @@
     announce(nm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');
     focusIn('.vgl-ph__rm[data-rm="'+id+'"]');
   }
+  /* "Aus der Merkliste" (10.11., user decision): opens the Merkliste drawer in pick mode instead of a dropdown —
+     the user ticks models next to their photos and prices and adds them in one step; the drawer returns the ids. */
+  function openMklPick(a){
+    var mk=window.MTZ_MKL;
+    if(!mk||typeof mk.open!=='function'){openAddSearch(a,true);return;}
+    closeAdd(false);closePick(false);
+    mk.open({pick:{lens:LENSKEY,inCmp:selected.slice(),slots:MAX-selected.length,onAdd:addFromMkl}});
+  }
+  /* adds models to the selection (no duplicates, up to MAX); returns the ids that were added */
+  function addIds(ids){
+    var added=[];
+    (ids||[]).forEach(function(id){if(BY_ID[id]&&selected.indexOf(id)<0&&!isFull()){selected.push(id);added.push(id);}});
+    if(added.length){pendingCol=added[0];persist();syncAll();}
+    return added;
+  }
+  function addFromMkl(ids){
+    var added=addIds(ids);
+    if(!added.length)return;
+    var nm=added.length===1?baseTitle(BY_ID[added[0]]):added.length+' Modelle';
+    toast(esc(nm)+' aus der Merkliste hinzugefügt.','ok');
+    announce(nm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');
+    setTimeout(function(){focusIn('.vgl-ph__rm[data-rm="'+added[0]+'"]');},0);
+  }
   function announce(m){if(!liveEl)return;liveEl.textContent='';setTimeout(function(){liveEl.textContent=m;},30);}
   function firstShown(sel){var l=view.querySelectorAll(sel);for(var i=0;i<l.length;i++)if(l[i].getClientRects().length)return l[i];return null;}
   function focusIn(sel){(firstShown(sel)||firstShown('.vgl-ph__rm')||view.querySelector('#vglTitle')).focus();}
@@ -431,13 +454,17 @@
   function clearView(){lastCleared=selected.slice();clearAll();announce('Vergleich geleert.');focusIn('[data-vgl="undo-clear"]');}
   function undoClear(){if(!lastCleared)return;var ids=lastCleared;lastCleared=null;setSelection(ids);syncAll();announce('Vergleich wiederhergestellt: '+selected.length+' Modelle.');focusIn('.vgl-ph__rm');}
   /* "Modell hinzufügen": back to the grid, first free card field focused */
+  /* back to the category page in compare mode: the cards carry their compare checkboxes, the strip keeps the current
+     selection and "Vergleichen" returns to the comparison */
   function addFromGrid(){
+    var free=MAX-selected.length;
     closeView();
+    if(!compareMode){setMode(true);syncAll();}
     var gr=document.getElementById('productGrid');
     if(gr)try{gr.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}
-    var free=null;if(gr)gr.querySelectorAll('.vgl-toggle input').forEach(function(i){if(!free&&!i.checked)free=i;});
-    if(free)setTimeout(function(){free.focus({preventScroll:true});},350);
-    toast('Wählen Sie ein weiteres Modell auf den Karten.','info');
+    var nx=null;if(gr)gr.querySelectorAll('.vgl-toggle input').forEach(function(i){if(!nx&&!i.checked)nx=i;});
+    if(nx)setTimeout(function(){nx.focus({preventScroll:true});},350);
+    toast(free>0?'Wählen Sie '+(free===1?'ein weiteres Modell':'bis zu '+free+' weitere Modelle')+' auf den Karten – „Vergleichen“ führt zurück zum Vergleich.':'Der Vergleich ist vollständig.','info');
   }
   /* (i) toggletip: click/Enter opens a real tooltip node (aria-describedby), Escape closes it first */
   function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');}}
@@ -1234,6 +1261,8 @@
     compare:function(ids){var n=setSelection(ids);if(!n)return 0;fromMkl=true;syncAll();if(canCompare())openView();return n;},
     enterMode:function(){if(!compareMode)enterMode();},
     isMode:function(){return compareMode;},
+    add:function(ids){return addIds(ids);},   /* Merkliste drawer on the category page (10.11.) adds to the selection in the strip */
+    max:MAX,
     selected:function(){return selected.slice();}
   };
 

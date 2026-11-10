@@ -392,3 +392,10 @@
    12 px like every popup/toast of the comparison (was 8 px). Image tile 8 px (card) and buttons 4 px were already right. ==== */
 .mkl-cmp__box{border-radius:var(--r-m,.25rem)}
 .mkl-toast{border-radius:var(--r-xl,.75rem)}
+
+/* ==== Pick mode (10.11.): opened from the comparison's "Aus der Merkliste" ====
+   Models already in the comparison: ticked and locked, "Im Vergleich" — a calm grey box instead of the dimmed
+   "not possible" state, so it reads as done, not as an error. ==== */
+.mkl-cmp.is-in{cursor:default;color:var(--text-muted,#6A6A6A)}
+.mkl-cmp.is-in:hover{color:var(--text-muted,#6A6A6A)}
+.mkl-cmp.is-in input:checked+.mkl-cmp__box{background:var(--text-muted,#6A6A6A);border-color:var(--text-muted,#6A6A6A)}

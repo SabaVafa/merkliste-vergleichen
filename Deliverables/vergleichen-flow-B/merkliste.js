@@ -13,6 +13,11 @@
      · 09b: share as #liste= link (no account) + shared view, print/PDF,
        current price + change since saving, all configuration positions,
        "Alle n auswählen", "Zurück zum Vergleich" on the PDP
+     · pick mode (10.11.): MTZ_MKL.open({pick:{lens, inCmp, slots, onAdd}})
+       from the comparison's "Aus der Merkliste" — tick models, "Zum
+       Vergleich hinzufügen" hands them to onAdd; models already compared
+       show "Im Vergleich". Also on the category page while compare mode
+       is on: the drawer adds to the selection in the strip (MTZ_VGL.add)
    Decoupled layer: reads window.MTZ_PRODUCTS / window.MTZ_LENS, touches no
    PLP file, defines no vgl- class and changes nothing in vergleichen.js.
    ============================================================ */
@@ -137,6 +142,7 @@
   var SHARED_HINT = 'Geteilte Ansicht — wird nicht gespeichert, bis Sie sie übernehmen.';
   var isOpen = false, opener = null, prevOverflow = '', toastHome = null;
   var cmpSel = [];   /* ids ticked for "Auswahl vergleichen" (session UI state, never persisted) */
+  var pick = null;   /* pick mode: opened from the comparison to add models — {lens, inCmp:[ids], slots, onAdd(ids)} */
 
   function buildChrome() {
     /* header control between "Mein Konto" and "Warenkorb" */
@@ -229,12 +235,12 @@
       var rm = e.target.closest('.mkl-rm');
       if (rm) { removeFromRow(rm.getAttribute('data-id'), rm); return; }
       var cmp = e.target.closest('.mkl-cmp');
-      if (cmp) { var inp = cmp.querySelector('input'); if (inp.disabled) { e.preventDefault(); if (cmp.classList.contains('is-lens')) toast('Vergleich nur innerhalb einer Kategorie', 'info'); else toast('Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); } }
+      if (cmp) { var inp = cmp.querySelector('input'); if (inp.disabled) { e.preventDefault(); if (cmp.classList.contains('is-in')) toast('Dieses Modell ist bereits im Vergleich', 'info'); else if (cmp.classList.contains('is-lens')) toast('Vergleich nur innerhalb einer Kategorie', 'info'); else toast(pick ? 'Kein Platz mehr im Vergleich – maximal ' + CMP_MAX + ' Modelle' : 'Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); } }
     });
     drawer.addEventListener('change', function (e) {
       var inp = e.target.closest('.mkl-cmp input'); if (!inp) return;
       var id = inp.getAttribute('data-id'), i = cmpSel.indexOf(id);
-      if (inp.checked && i < 0) { if (cmpSel.length >= CMP_MAX) { inp.checked = false; toast('Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); return; } cmpSel.push(id); }
+      if (inp.checked && i < 0) { if (cmpSel.length >= (pick ? pick.slots : CMP_MAX)) { inp.checked = false; toast(pick ? 'Kein Platz mehr im Vergleich – maximal ' + CMP_MAX + ' Modelle' : 'Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); return; } cmpSel.push(id); }
       else if (!inp.checked && i > -1) cmpSel.splice(i, 1);
       syncCmp();
     });
@@ -265,8 +271,22 @@
   }
 
   /* ---- Drawer open / close ---- */
+  /* category page in compare mode (10.11., user decision): the Merkliste adds its models to the selection in the strip
+     instead of starting a separate comparison — not inside the open comparison ("Zurück zur Merkliste") or a shared list */
+  function autoPick() {
+    var v = window.MTZ_VGL;
+    if (PDP || sharedMode || !v || typeof v.add !== 'function' || !v.isMode() || document.querySelector('.vgl-view.is-open')) return null;
+    var sel = v.selected(), max = v.max || CMP_MAX;
+    return { lens: LENS, inCmp: sel, slots: Math.max(0, max - sel.length), onAdd: function (ids) {
+      var a = v.add(ids) || []; if (!a.length) return;
+      var n = v.selected().length, nm = a.length === 1 ? shortName(items.filter(function (it) { return (it.articleId || it.id) === a[0]; })[0] || { name: a[0] }).main : a.length + ' Modelle';
+      toast(nm + ' zum Vergleich hinzugefügt' + (n < CMP_MIN ? ' – wählen Sie noch ein Modell' : ''), 'ok');
+      live(nm + ' zum Vergleich hinzugefügt. Vergleich: ' + n + ' Modell' + (n === 1 ? '' : 'e') + '.');
+    } };
+  }
   function openDrawer() {
     if (isOpen) return;
+    if (!pick) { pick = autoPick(); if (pick) cmpSel = []; }
     isOpen = true;
     var ae = document.activeElement;
     opener = (ae && ae !== document.body && !toastEl.contains(ae)) ? ae : hdrBtn;
@@ -282,6 +302,7 @@
   function closeDrawer() {
     if (!isOpen) return;
     isOpen = false;
+    if (pick) { pick = null; cmpSel = []; drawer.classList.remove('is-pick'); }
     confirmEl.hidden = true; askEl.hidden = true; popEl.hidden = true;
     hideToast(); document.body.appendChild(toastEl);
     scrim.classList.remove('is-open'); drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden', 'true');
@@ -424,7 +445,7 @@
         '<a class="mkl-item__cta" href="' + esc(ctaHref) + '"><span>' + ctaTxt + '</span>' + IC_CHEV_R + '</a>' +
         '<div class="mkl-item__sec">' +
           (cfg ? '<span class="mkl-item__cfgnote">Vergleich auf Modellebene — über das Basismodell</span>' :
-            '<label class="mkl-cmp"><input type="checkbox" data-id="' + esc(cmpId) + '" data-lens="' + esc(it.lens) + '" aria-label="' + esc(nm.main) + ' zum Vergleich auswählen"><span class="mkl-cmp__box" aria-hidden="true">' + CHK + '</span>Vergleichen</label>') +
+            '<label class="mkl-cmp"><input type="checkbox" data-id="' + esc(cmpId) + '" data-lens="' + esc(it.lens) + '" aria-label="' + esc(nm.main) + ' zum Vergleich auswählen"><span class="mkl-cmp__box" aria-hidden="true">' + CHK + '</span><span class="mkl-cmp__t">Vergleichen</span></label>') +
         '</div>' +
       '</div>' +
     '</article></li>';
@@ -439,7 +460,7 @@
   function render() {
     var shared = !!(sharedMode && sharedList), list = viewItems(), n = list.length;
     var ae = document.activeElement, keep = (ae && listEl.contains(ae)) ? (ae.getAttribute('data-parts') ? '.mkl-item__more[data-parts="' + ae.getAttribute('data-parts').replace(/"/g, '') + '"]' : (ae.getAttribute('data-take') ? '[data-take="' + ae.getAttribute('data-take').replace(/"/g, '') + '"]' : (ae.getAttribute('data-mkl') === 'cmp-all' ? '.mkl-group__all[data-lens="' + ae.getAttribute('data-lens') + '"]' : null))) : null;
-    drawer.classList.toggle('is-shared', shared);
+    drawer.classList.toggle('is-shared', shared); drawer.classList.toggle('is-pick', !!pick);
     titleEl.firstChild.nodeValue = shared ? 'Geteilte Merkliste ' : 'Merkliste ';
     countEl.textContent = (!shared && n >= LIMIT) ? '(' + n + ' / ' + LIMIT + ')' : '(' + n + ')';
     clearBtn.hidden = n === 0 || shared; if (clearBtn.hidden) confirmEl.hidden = true;
@@ -495,6 +516,7 @@
     if (!cta.disabled) cta.focus();
   }
   function syncCmp() {
+    if (pick) { syncPick(); return; }
     var n = cmpSel.length, lock = n ? lensOfCmp(cmpSel[0]) : null, full = n >= CMP_MAX;
     listEl.querySelectorAll('.mkl-cmp').forEach(function (lab) {
       var inp = lab.querySelector('input'), id = inp.getAttribute('data-id'), on = cmpSel.indexOf(id) > -1;
@@ -515,6 +537,31 @@
     footHint.hidden = n >= CMP_MIN;
     if (n >= CMP_MIN && lock && lock !== LENS) footHint.hidden = false, footHint.textContent = 'Öffnet den Vergleich auf der Seite ' + (LENSES[lock] || LENSES[LENS]).label;
     else if (n < CMP_MIN) footHint.textContent = 'Wählen Sie mindestens 2 Modelle derselben Kategorie';
+    try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
+    fitDrawer();
+  }
+
+  /* Pick mode (10.11.): the drawer adds models to an open comparison. Models already compared stay ticked and locked
+     ("Im Vergleich"), other categories are locked, at most the free slots can be ticked; the CTA hands the ids over. */
+  function syncPick() {
+    var n = cmpSel.length, free = pick.slots - n, lab0 = (LENSES[pick.lens] || LENSES[LENS]).label;
+    listEl.querySelectorAll('.mkl-cmp').forEach(function (lab) {
+      var inp = lab.querySelector('input'), id = inp.getAttribute('data-id'), inCmp = pick.inCmp.indexOf(id) > -1, on = cmpSel.indexOf(id) > -1;
+      var otherLens = inp.getAttribute('data-lens') !== pick.lens, dis = inCmp || (!on && (free <= 0 || otherLens));
+      inp.checked = inCmp || on; inp.disabled = dis;
+      lab.classList.toggle('is-in', inCmp); lab.classList.toggle('is-disabled', dis && !inCmp); lab.classList.toggle('is-lens', otherLens && !inCmp);
+      var t = lab.querySelector('.mkl-cmp__t'); if (t) t.textContent = inCmp ? 'Im Vergleich' : 'Vergleichen';
+      inp.setAttribute('aria-label', inp.getAttribute('aria-label').replace(/ (zum Vergleich auswählen|ist bereits im Vergleich)$/, inCmp ? ' ist bereits im Vergleich' : ' zum Vergleich auswählen'));
+    });
+    listEl.querySelectorAll('.mkl-group').forEach(function (g) {
+      var hint = g.querySelector('.mkl-group__hint'), other = g.getAttribute('data-lens') !== pick.lens;
+      hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie — Ihr Vergleich läuft bei ' + lab0;
+    });
+    allBtn.hidden = true; listEl.querySelectorAll('.mkl-group__all').forEach(function (b) { b.hidden = true; });
+    cta.textContent = n ? (n === 1 ? '1 Modell' : n + ' Modelle') + ' zum Vergleich hinzufügen' : 'Zum Vergleich hinzufügen';
+    cta.disabled = n < 1;
+    footHint.hidden = false;
+    footHint.textContent = free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle';
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
     fitDrawer();
   }
@@ -713,6 +760,7 @@
 
   /* ---- Handover to the compare flow (§3.5) ---- */
   function startCompare() {
+    if (pick) { var add = cmpSel.slice(0, pick.slots), fn = pick.onAdd; if (!add.length) return; closeDrawer(); if (typeof fn === 'function') fn(add); return; }
     var ids = cmpSel.slice(0, CMP_MAX); if (ids.length < CMP_MIN) return;
     var lens = lensOfCmp(ids[0]) || LENS;
     if (lens === LENS && window.MTZ_VGL && typeof window.MTZ_VGL.compare === 'function') {
@@ -943,6 +991,12 @@
     if (m && /[?&]von=merkliste\b/.test(QS)) { var n = decodeURIComponent(m[1]).split(',').filter(function (id) { return BY_ID[id]; }).length; if (n >= CMP_MIN) setTimeout(function () { toast('Vergleich mit ' + n + ' Modellen aus Ihrer Merkliste', 'ok'); }, 300); }
     receiveShared();
   }
-  window.MTZ_MKL = { open: function () { openDrawer(); }, close: closeDrawer, items: function () { return items.slice(); }, has: has, seedDemoConfig: seedDemoConfig, reload: function () { load(); refreshPrices(); syncAll(); }, print: function () { printList(); } };
+  window.MTZ_MKL = { open: function (o) {
+      if (isOpen) return;
+      var pk = o && o.pick;
+      pick = pk ? { lens: pk.lens || LENS, inCmp: (pk.inCmp || []).slice(), slots: Math.max(0, pk.slots || 0), onAdd: pk.onAdd } : null;
+      if (pick) { cmpSel = []; sharedMode = false; }
+      openDrawer();
+    }, close: closeDrawer, items: function () { return items.slice(); }, has: has, seedDemoConfig: seedDemoConfig, reload: function () { load(); refreshPrices(); syncAll(); }, print: function () { printList(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
