@@ -64,9 +64,9 @@
   var SRC_DESC=' Angabe laut Produktbeschreibung (nicht als Merkmal gepflegt).';
   var ROWS_SPRECH=[
     {key:'typ',label:'Typ',cls:'T',akk:'den Typ',dat:'im Typ',nom:'der Typ',get:g('typ'),hint:'Video: Kamera an der Außenstation. Audio: Sprechverbindung ohne Kamera.'},
-    {key:'system',label:'System',cls:'T',akk:'das System',dat:'im System',nom:'das System',get:g('system'),hint:'IP-System: Anbindung der Außenstation an das Heimnetzwerk. 2-Draht-BUS: Übertragung über eine zweiadrige Leitung.'},
+    {key:'system',label:'System',cls:'T',akk:'das System',dat:'im System',nom:'das System',get:g('system'),hint:'IP-System: die Außenstation läuft über Ihr Heimnetzwerk und braucht dort eine Netzwerkverbindung. 2-Draht-BUS: Übertragung über eine zweiadrige Leitung – eine vorhandene Klingelleitung lässt sich weiter nutzen.'},
     {key:'klingel',label:'Anzahl Klingeltaster',lst:'Tasteranzahl',cls:'T',akk:'die Tasteranzahl',dat:'in der Tasteranzahl',nom:'die Tasteranzahl',get:g('klingel'),hint:'Ein Klingeltaster je Wohneinheit. „Flexibel (1–500)": laut Shop für 1 bis 500 Parteien wählbar.'},
-    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist in das Schild graviert. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen. Digital: Namen werden elektronisch hinterlegt, kein graviertes Schild.'},
+    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist dauerhaft in das Schild graviert – bei einer Namensänderung braucht es ein neues Schild. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen und lässt sich selbst austauschen. Digital: Namen werden elektronisch hinterlegt, kein graviertes Schild.'},
     {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A." heißt: im Shop nicht gepflegt — nicht „nicht vorhanden".'},
     {key:'kombi',label:'Mit Briefkasten/Paketbox',lst:'Briefkasten/Paketbox',cls:'T',akk:'die Kombination mit Briefkasten/Paketbox',dat:'bei Briefkasten/Paketbox',nom:'die Kombination mit Briefkasten/Paketbox',get:g('kombi'),hint:'Kombination aus Video-Türsprechanlage und Briefkasten bzw. Paketbox in einem Artikel.'},
     {key:'kamera',label:'Kameraauflösung',cls:'T',akk:'die Kameraauflösung',dat:'in der Kameraauflösung',nom:'die Kameraauflösung',na:isAudio,get:g('kamera'),hint:'Auflösung des Kamerabilds — Full HD (1920 × 1080) entspricht 2 MP.'+SRC_DESC},
@@ -80,22 +80,19 @@
   ];
   /* Briefkästen: the lens order (Design first) holds inside each section U / O / G */
   var ROWS_BK=[
-    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist in das Schild graviert. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen. Ohne Gravur: ohne Namensschild.'},
+    {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist dauerhaft in das Schild graviert – bei einer Namensänderung braucht es ein neues Schild. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen und lässt sich selbst austauschen. Ohne Gravur: ohne Namensschild.'},
     {key:'colors',label:'Farben',cls:'A',akk:'die Farben',dat:'in den Farben',nom:'die Farben',pl:true,swatches:true,hint:'Alle im Shop angebotenen Farbausführungen.'},
     {key:'faecher',label:'Fächer / Parteien',lst:'Fächerzahl',cls:'T',akk:'die Fächerzahl',dat:'in der Fächerzahl',nom:'die Fächerzahl',get:g('faecher'),hint:'Anzahl der Briefkastenfächer — ein Fach je Partei.'},
     {key:'zeitungsfach',label:'Zeitungsfach',cls:'T',akk:'das Zeitungsfach',dat:'im Zeitungsfach',nom:'das Zeitungsfach',get:g('zeitungsfach'),hint:'Integriert: fest verbaut. Optional: als Zubehör erhältlich. Ohne: kein Zeitungsfach.'},
     {key:'klingelsys',label:'Klingel / Sprechanlage',cls:'T',akk:'die Klingel / Sprechanlage',dat:'bei Klingel / Sprechanlage',nom:'die Klingel / Sprechanlage',get:g('klingelsys'),hint:'Enthält der Artikel eine Klingel oder Video-Türsprechanlage? Sets sind preislich nicht direkt mit Einzelbriefkästen vergleichbar.'},
-    {key:'montage',label:'Montageart',cls:'T',set:true,akk:'die Montageart',dat:'in der Montageart',nom:'die Montageart',get:g('montage'),hint:'Aufputz: an der Wand. Standmontage: freistehend. Unterputz: in der Wand bzw. als Mauerdurchwurf. Zaunmontage: am Zaun.'},
+    {key:'montage',label:'Montageart',cls:'T',set:true,akk:'die Montageart',dat:'in der Montageart',nom:'die Montageart',get:g('montage'),hint:'Aufputz: an der Wand. Standmontage: freistehend. Unterputz: in der Wand bzw. als Mauerdurchwurf – braucht eine passende Öffnung in der Wand. Zaunmontage: am Zaun.'},
     {key:'abmessungen',label:'Abmessungen (B × H × T)',lst:'Maßen',cls:'F',fin:'Maßen',fdat:'in den Maßen',fbei:'bei den Maßen',nom:'die Maße',pl:true,get:g('abmessungen'),hint:'Außenmaße laut Shop, in cm.'},
     {key:'gewicht',label:'Gewicht',cls:'F',fin:'Gewicht',fdat:'im Gewicht',fbei:'beim Gewicht',nom:'das Gewicht',get:g('gewicht'),hint:'Artikelgewicht laut Shop. „je nach Ausführung": für die Farbvarianten sind unterschiedliche Gewichte hinterlegt.'},
     {key:'material',label:'Material',cls:'F',set:true,fin:'Material',fdat:'im Material',fbei:'beim Material',nom:'das Material',get:g('material'),hint:'Im Shop für alle Ausführungen gemeinsam gepflegt — das Material der einzelnen Farbe bzw. Front kann abweichen.'}
   ];
 
-  /* Meaning lines (UX-Review 06.11. #3): the approved consequences (12a §3.6 E1, E2, E4, E10) as a muted line under the value
-     in a difference row, plus the plain counterpart for the other side where the same approved fact gives one (Namensschild). */
-  var MEAN_NS={'Lasergraviert':'Dauerhaft – bei Namensänderung neues Schild.','Austauschbar (Papiereinleger)':'Namen selbst austauschbar.'};
-  var MEAN_SPRECH={system:{'2-Draht-BUS':'Nutzt eine vorhandene zweiadrige Klingelleitung weiter.','IP-System':'Braucht an der Außenstation eine Verbindung zu Ihrem Heimnetzwerk.'},namensschild:MEAN_NS};
-  var MEAN_BK={namensschild:MEAN_NS,montage:{'Unterputz':'Braucht eine passende Öffnung in der Wand.'}};
+  /* Meaning lines under the values were moved into the row's (i) explanation (10.11., user decision): one place per
+     term, no repeated sentence in every column that shares the value. */
 
   /* model without shop data → one notice under the Fazit (12a §3.4) */
   function guardsData(items){
@@ -106,8 +103,8 @@
   }
 
   var LENSES={
-    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,mean:MEAN_SPRECH,trio:['kai1','colson1','sdm10x'],step4:'„–" heißt: trifft nicht zu (z. B. Kamera bei Audio-Modellen), „k. A.": im Shop nicht gepflegt.',srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A." = im Shop nicht gepflegt · „–" = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
-    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,mean:MEAN_BK,trio:['siebert','ebenhard','hermann'],designFirst:true,step4:'In jedem Abschnitt steht die Funktion zuerst, dann Namensschild und Material, Farben, zuletzt Maße und Gewicht.',srcNote:'„k. A." = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
+    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,trio:['kai1','colson1','sdm10x'],step4:'„–" heißt: trifft nicht zu (z. B. Kamera bei Audio-Modellen), „k. A.": im Shop nicht gepflegt.',srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A." = im Shop nicht gepflegt · „–" = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
+    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,trio:['siebert','ebenhard','hermann'],designFirst:true,step4:'In jedem Abschnitt steht die Funktion zuerst, dann Namensschild und Material, Farben, zuletzt Maße und Gewicht.',srcNote:'„k. A." = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
   };
   var LENS=LENSES[window.MTZ_LENS]||LENSES.sprechanlage;
   var ROWS=LENS.rows;
@@ -933,11 +930,6 @@
     var sw='<span class="vgl-sw" aria-hidden="true">'+all.filter(function(c){return cs.indexOf(c)>-1&&SW[c];}).map(function(c){return '<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>';}).join('')+'</span>';
     return sw+'<span class="vgl-swc">'+cs.length+' Farbe'+(cs.length===1?'':'n')+'<span class="vgl-visually-hidden">: '+esc(cs.map(cname).join(', '))+'</span></span>';
   }
-  function meanHTML(d,i){
-    var mp=(LENS.mean||{})[d.row.key];if(!mp)return '';
-    var v=d.vals[i],t=Array.isArray(v)?v.map(function(x){return mp[x];}).filter(Boolean)[0]:mp[d.texts[i]];
-    return t?'<span class="vgl-mean">'+esc(t)+'</span>':'';
-  }
   function cellHTML(d,i,p,isb,attr,ctx){
     var row=d.row,v=d.vals[i],t=d.texts[i],inner;ctx=ctx||{};
     if(isUnk(t))inner=unkHTML(t);
@@ -947,7 +939,6 @@
     else if(row.bool)inner=v===true?'<span class="vgl-yes">'+CHK+'Ja</span>':'<span class="vgl-no">Nein</span>';
     else inner=esc(t);
     if(isb)inner+=' <span class="vgl-best">Bestwert</span>';
-    if(ctx.mean)inner+=meanHTML(d,i);
     return '<td class="vgl-val'+(isUnk(t)?' na':'')+'" role="cell"'+(attr||'')+'>'+inner+'</td>';
   }
   function renderView(){
@@ -992,7 +983,7 @@
         if(kind==='U'&&pick){var vk=vis.map(function(i){return d.keys[i];});if(vk.every(function(x){return x===vk[0];})){var hid=an.base.filter(function(i){return vis.indexOf(i)<0&&d.keys[i]!==vk[0];});if(hid.length)capt='Unterschied bei: '+hid.map(function(i){return refs[i].n;}).join(', ');}}
         var th='<th class="rh" scope="row" role="rowheader">'+labelHTML(row)+(capt?'<span class="vgl-rowcap">'+esc(capt)+'</span>':'')+'</th>';
         var bi=kind==='U'?bestIdx(row,d.vals,d.texts):[];
-        var ctx={allColors:allColors,mean:kind==='U'};
+        var ctx={allColors:allColors};
         return '<tr role="row" data-key="'+row.key+'">'+th+vis.map(function(i){return cellHTML(d,i,items[i],bi.indexOf(i)>-1,'',ctx);}).join('')+'</tr>';
       }).join('');
     }

@@ -1038,3 +1038,35 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
    The collapsed disclosure row sits on the paper tone by default (was white, paper only on hover), so it reads as a
    bar to open. Hover keeps the tone and underlines "Anzeigen"; preview text stays muted (5.0:1 on paper). ==== */
 .vgl-gdisc,.vgl-gdisc:hover{background:var(--v-paper)}
+
+/* ==== Consistency pass (10.11., Lead Product Design, user: "apply consistency all over the Vergleich page") ====
+   Measured before: section titles teal (Unterschiede) vs ink (others); 24 vs 28 px above the titles; a line under two
+   headers, a grey bar under the third; a 3 px teal edge on the Unterschiede rows only; "Ähnliche Modelle" 18 px vs
+   16 px; teal text actions 700 (column CTAs) vs 600 (all others, Merkliste included); strip thumbnails 4 px vs 8 px.
+   One system now:
+   1 Section header = the grey bar of Gemeinsamkeiten for every section (Unterschiede, Nicht für alle gepflegt,
+     Gemeinsamkeiten, Ähnliche Modelle): paper tone, 3 rem high, 4 px radius, title 16 px / 700 ink; the same 2 rem above
+     each (1.5 rem above the first); no lines. Only Gemeinsamkeiten adds its action on the right.
+   2 No coloured row edges: the difference is told by the section, not by a stripe on one section.
+   3 Teal text actions all 14 px / 600, underlined when they are text-only links (CTA, "Zum Vergleich hinzufügen");
+     controls with an icon ("Anzeigen ⌄", "+ Modell hinzufügen") underline on hover — as in the Merkliste.
+   4 Image tiles 8 px everywhere (card radius), the strip thumbnails included. ==== */
+.vgl-view table.vgl-t tbody.vgl-sec tr.vgl-sec__h th:nth-child(n){padding-top:2rem;padding-bottom:.5rem;border-bottom:0}
+.vgl-view table.vgl-t tbody.vgl-sec--u tr.vgl-sec__h th:nth-child(n){padding-top:1.5rem}
+.vgl-view .vgl-sec--u tr.vgl-sec__h .vgl-sec__in,.vgl-view .vgl-sec--o tr.vgl-sec__h .vgl-sec__in{display:flex;align-items:center;width:calc(100% + 1rem);min-height:3rem;margin:0 0 0 -1rem;padding:.625rem 1rem;border-radius:var(--v-r-m);background:var(--v-paper)}
+.vgl-view .vgl-sec__t,.vgl-view .vgl-sec--u .vgl-sec__t,.vgl-view .vgl-gdisc .vgl-sec__t,.vgl-view .vgl-alts__h{font-size:var(--v-fs-body);font-weight:700;line-height:1.375;color:var(--v-ink)}
+.vgl-view .vgl-gdisc{align-items:center}
+.vgl-view .vgl-gdisc__act{align-self:center}
+.vgl-view .vgl-alts{margin-top:2rem}
+.vgl-view .vgl-alts__h{display:flex;align-items:center;min-height:3rem;margin:0 0 1.25rem;padding:.625rem 1rem;border-radius:var(--v-r-m);background:var(--v-paper)}
+.vgl-view .vgl-sec--u th[scope="row"]{box-shadow:none}
+.vgl-view .vgl-cta,.vgl-view .vgl-cta--sm{font-size:var(--v-fs-sm);font-weight:600}
+.vgl-view .vgl-pin__img{border-radius:var(--v-r-l)}
+@media(max-width:47.99rem){
+  .vgl-view table.vgl-t tbody.vgl-sec tr.vgl-sec__h th:nth-child(n){padding-top:1.5rem}
+  .vgl-view table.vgl-t tbody.vgl-sec--u tr.vgl-sec__h th:nth-child(n){padding-top:1.25rem}
+  /* phones: every section bar = the label band (page gutter to gutter), title on the label text line (.75 rem in) */
+  .vgl-view .vgl-sec--u tr.vgl-sec__h .vgl-sec__in,.vgl-view .vgl-sec--o tr.vgl-sec__h .vgl-sec__in,.vgl-view .vgl-gdisc{width:100%;margin:0;padding:.625rem .75rem}
+  .vgl-view .vgl-alts{margin-top:1.5rem}
+  .vgl-view .vgl-alts__h{margin:0 0 .75rem;padding:.625rem .75rem}
+}
