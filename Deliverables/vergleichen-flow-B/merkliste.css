@@ -387,3 +387,8 @@
 /* very narrow phones (< 22.5 rem): "Leeren" instead of "Merkliste leeren", so title and count stay on one line */
 .mkl-w-only{display:none}
 @media(max-width:22.49rem){.mkl-w-hide{display:none}.mkl-w-only{display:inline}}
+
+/* ==== Radii = design system (10.11.): checkbox 4 px like the comparison and the PLP filters (was 2 px), floating toast
+   12 px like every popup/toast of the comparison (was 8 px). Image tile 8 px (card) and buttons 4 px were already right. ==== */
+.mkl-cmp__box{border-radius:var(--r-m,.25rem)}
+.mkl-toast{border-radius:var(--r-xl,.75rem)}

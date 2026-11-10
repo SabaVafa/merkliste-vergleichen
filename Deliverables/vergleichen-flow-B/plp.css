@@ -1307,7 +1307,7 @@
 .advisor__optin.is-on { border-color: var(--teal); }   /* checked: teal border only — no fill */
 .advisor__optin input { position: absolute; opacity: 0; width: 0; height: 0; }
 .advisor__optin-box {
-  flex: 0 0 auto; width: 1.125rem; height: 1.125rem; border-radius: 0.1875rem;   /* checkbox-sm 18px */
+  flex: 0 0 auto; width: 1.125rem; height: 1.125rem; border-radius: var(--r-m);   /* checkbox-sm 18px, DS input radius 4 px */
   border: 1px solid var(--graphite-300); background: var(--white);
   display: grid; place-items: center; transition: background .12s ease, border-color .12s ease;
 }
