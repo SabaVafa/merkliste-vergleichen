@@ -1009,3 +1009,19 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
    other values and labels */
 .vgl-yes{display:inline}
 .vgl-yes svg{display:inline-block;margin-right:.375rem;vertical-align:-.125rem}
+
+/* ==== Strip: "Vergleich leeren" reads as a button (10.11.) ====
+   Was grey 13 px text without underline or frame - looked like a status label. Now the same tertiary button as
+   "Vergleich leeren" in the comparison header: trash icon + ink label, 14 px / 600, 44 px target, 4 px radius,
+   paper background on hover. Stays visually below the "Vergleichen" CTA (no border, no fill at rest). ==== */
+.vgl-tray .vgl-tray__clear{gap:.375rem;min-height:2.75rem;padding:0 .75rem;border-radius:var(--r-m,.25rem);color:var(--v-ink,#1A171B);font-size:var(--text-body-sm,.875rem);font-weight:600;line-height:1.25;text-decoration:none;white-space:nowrap}
+.vgl-tray .vgl-tray__clear svg{flex:none;width:1.125rem;height:1.125rem}
+.vgl-tray .vgl-tray__clear:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
+.vgl-tray .vgl-tray__clear:focus-visible{outline:.125rem solid var(--v-teal,#015253);outline-offset:.125rem}
+@media(max-width:47.99rem){.vgl-tray .vgl-tray__clear{padding:0 .5rem}}
+
+/* ==== "Vergleich leeren" hover = DS red scale (10.11., user decision) ====
+   Strip, comparison header and phone action row: red-50 background, red-600 label + trash icon (5.8:1 on red-50,
+   AA) - the destructive action announces itself on hover; at rest it stays ink, so it doesn't compete with the CTA. ==== */
+.vgl-view .vgl-tb--clear:hover,.vgl-view .vgl-bar__act .vgl-tb--clear:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
+.vgl-view .vgl-actrow .vgl-tb--clear{border-radius:var(--v-r-m,.25rem)}

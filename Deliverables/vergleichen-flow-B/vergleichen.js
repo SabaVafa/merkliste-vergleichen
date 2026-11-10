@@ -173,7 +173,7 @@
         '</div>'+
         '<div class="vgl-tray__slots"></div>'+
         '<div class="vgl-tray__actions">'+
-          '<button class="vgl-link" type="button" data-vgl="reset"><span class="vgl-m-hide">Vergleich leeren</span><span class="vgl-m-only">Leeren</span></button>'+
+          '<button class="vgl-link vgl-tray__clear" type="button" data-vgl="reset">'+IC_TRASH+'<span class="vgl-m-hide">Vergleich leeren</span><span class="vgl-m-only">Leeren</span></button>'+
           '<button class="vgl-tray__cta" type="button" data-vgl="open" disabled>Vergleichen</button>'+
         '</div>'+
       '</div></div>');
@@ -1011,7 +1011,7 @@
 
     /* ---- mobile action row ---- */
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+
-      '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div>';
+      '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
     lockHead();placePin();fitHeader();fitPeek();placeTips();watchPin();
