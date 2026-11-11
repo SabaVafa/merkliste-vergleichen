@@ -414,3 +414,12 @@
    decision) — DS --color-red-50 fill, --color-red-600 text (5.9:1, AA), 4 px radius, no underline. "Abbrechen" stays neutral. */
 .mkl-link[data-mkl="clear"]{border-radius:var(--r-m,.25rem)}
 .mkl-link[data-mkl="clear"]:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
+
+/* ==== Footer status (11.11., user: "the info is not provided in a professional way") ====
+   Was one 12 px grey sentence wrapping beside a disabled "Auswahl vergleichen (0)". Now a status block like a checkout
+   summary: line 1 what is selected (14 px / 600 ink), line 2 what comes next (14 px muted, 5.4:1); the button only
+   says "Vergleichen" / "Hinzufügen" and points to the status via aria-describedby. ==== */
+.mkl-foot__hint{display:flex;flex-direction:column;gap:.125rem;min-width:0;margin:0;font-size:var(--text-body-sm,.875rem);line-height:1.35}
+.mkl-foot__s{font-weight:600;color:var(--schwarz,#1A171B)}
+.mkl-foot__d{color:var(--text-muted,#6A6A6A)}
+.mkl-cta{min-width:9rem}

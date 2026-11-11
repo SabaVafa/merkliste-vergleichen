@@ -187,8 +187,8 @@
       '</div>' +
       '<div class="mkl-foot">' +
         '<p class="mkl-hint">' + OWN_HINT + '</p>' +
-        '<span class="mkl-foot__hint">Wählen Sie mindestens 2 Modelle derselben Kategorie</span>' +
-        '<button class="mkl-cta" type="button" data-mkl="compare" disabled>Auswahl vergleichen (0)</button>' +
+        '<p class="mkl-foot__hint" id="mkl-foot-status" aria-live="polite"><b class="mkl-foot__s">Keine Modelle ausgewählt</b><span class="mkl-foot__d">2 bis 4 Modelle einer Kategorie</span></p>' +
+        '<button class="mkl-cta" type="button" data-mkl="compare" aria-describedby="mkl-foot-status" disabled>Vergleichen</button>' +
       '</div>' +
     '</div>');
     document.body.appendChild(drawer);
@@ -501,6 +501,10 @@
     if (b && !listEl.hidden && b.clientHeight < drawer.clientHeight * 0.35) { drawer.classList.add('is-flow'); drawer.scrollTop = st; }   /* re-measuring keeps the reading position */
   }
   function lensOfCmp(id) { var l = viewItems(); for (var i = 0; i < l.length; i++) if ((l[i].articleId || l[i].id) === id) return l[i].lens; return null; }
+  function setFoot(status, detail) {
+    footHint.hidden = false;
+    footHint.firstChild.textContent = status; footHint.lastChild.textContent = detail;
+  }
   function syncCmp() {
     if (pick) { syncPick(); return; }
     var n = cmpSel.length, lock = n ? lensOfCmp(cmpSel[0]) : null, full = n >= CMP_MAX;
@@ -515,11 +519,17 @@
       var hint = g.querySelector('.mkl-group__hint'), other = !!(lock && g.getAttribute('data-lens') !== lock);
       hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie — Ihre Auswahl läuft bei ' + (LENSES[lock] || LENSES[LENS]).label;
     });
-    cta.textContent = n >= CMP_MIN ? n + ' ' + (LENSES[lock] || LENSES[LENS]).label + ' vergleichen' : 'Auswahl vergleichen (' + n + ')';
+    /* footer status (11.11., user: "not professional"): what is selected (bold) + what comes next (muted); the
+       button just says "Vergleichen" */
+    var lab = (LENSES[lock] || LENSES[LENS]).label;
+    cta.textContent = 'Vergleichen';
     cta.disabled = n < CMP_MIN;
-    footHint.hidden = n >= CMP_MIN;
-    if (n >= CMP_MIN && lock && lock !== LENS) footHint.hidden = false, footHint.textContent = 'Öffnet den Vergleich auf der Seite ' + (LENSES[lock] || LENSES[LENS]).label;
-    else if (n < CMP_MIN) footHint.textContent = 'Wählen Sie mindestens 2 Modelle derselben Kategorie';
+    setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' ' + lab + ' ausgewählt') : 'Keine Modelle ausgewählt',
+      !n ? CMP_MIN + ' bis ' + CMP_MAX + ' Modelle einer Kategorie'
+        : n < CMP_MIN ? 'Noch mindestens 1 weiteres Modell'
+        : lock && lock !== LENS ? 'Der Vergleich öffnet bei ' + lab
+        : full ? 'Maximum von ' + CMP_MAX + ' Modellen erreicht'
+        : 'Bis zu ' + (CMP_MAX - n) + ' weitere möglich');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
     fitDrawer();
   }
@@ -540,10 +550,10 @@
       var hint = g.querySelector('.mkl-group__hint'), other = g.getAttribute('data-lens') !== pick.lens;
       hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie — Ihr Vergleich läuft bei ' + lab0;
     });
-    cta.textContent = n ? (n === 1 ? '1 Modell' : n + ' Modelle') + ' zum Vergleich hinzufügen' : 'Zum Vergleich hinzufügen';
+    cta.textContent = 'Hinzufügen';
     cta.disabled = n < 1;
-    footHint.hidden = false;
-    footHint.textContent = free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle';
+    setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' Modelle ausgewählt') : 'Keine Modelle ausgewählt',
+      free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
     fitDrawer();
   }
