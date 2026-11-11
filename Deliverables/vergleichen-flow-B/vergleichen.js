@@ -98,7 +98,7 @@
   function guardsData(items){
     var miss=items.filter(function(p){return !p.shop;});
     if(!miss.length)return '';
-    var nm=miss.map(function(p){return '„'+esc(baseTitle(p))+'“';}).join(', ');
+    var nm=miss.map(function(p){return '„'+esc(shopName(p))+'“';}).join(', ');
     return nm+(miss.length>1?' sind':' ist')+' im Shop-Export'+(STAND?' vom '+STAND:'')+' nicht enthalten — dafür zeigt der Vergleich keine Merkmale („k. A.“).';
   }
 
@@ -235,7 +235,7 @@
         if(k==='common'){gShow=!gShow;onCommon();}
         return;}
       var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
-      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');pendingCol=aid;if(toggle(aid,true)){var anm=baseTitle(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
+      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');pendingCol=aid;if(toggle(aid,true)){var anm=shopName(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
       var rm=e.target.closest('[data-rm]');if(rm){removeColumn(rm.getAttribute('data-rm'));return;}
       var go=e.target.closest('[data-go]');
       if(go&&go.tagName==='A'){   /* real product page: remember the way back (P0-10), then navigate normally */
@@ -394,7 +394,7 @@
     if(!keep)closeAdd(false);
     pendingCol=id;
     if(!toggle(id,true))return;
-    var nm=baseTitle(BY_ID[id]);
+    var nm=shopName(BY_ID[id]);
     if(keep){
       announce(nm+' hinzugefügt. Wählen Sie ein weiteres Modell.');
       var a2=view.querySelector('[data-vgl="'+anchorSel+'"]');if(addPanel){addPanel.querySelector('input').value='';renderAddList();addPanel.querySelector('input').focus();}if(a2)addAnchor=a2;
@@ -421,7 +421,7 @@
   function addFromMkl(ids){
     var added=addIds(ids);
     if(!added.length)return;
-    var nm=added.length===1?baseTitle(BY_ID[added[0]]):added.length+' Modelle';
+    var nm=added.length===1?shopName(BY_ID[added[0]]):added.length+' Modelle';
     toast(esc(nm)+' aus der Merkliste hinzugefügt.','ok');
     announce(nm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');
     setTimeout(function(){focusIn('.vgl-ph__rm[data-rm="'+added[0]+'"]');},0);
@@ -633,6 +633,9 @@
   /* ---- Titles (12a §2.3): model code + design line; a collision lifts the distinguishing segment into the title ---- */
   var CODE_RE=/^[A-Z]{2,4}\d{2}[A-Z0-9]*(?: \d\.\d)?/;
   function segsOf(p){return String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);}
+  /* the product's real title as in the online shop (11.11., user: "grab the real existing name for the products") —
+     used wherever a single product is named to the customer: alternative cards, their reasons, toasts, export note */
+  function shopName(p){return String(p&&p.name||p&&p.id||'');}
   function baseTitle(p){
     var s=segsOf(p);if(!s.length)return String(p.name||p.id);
     if(LENS.designFirst)return s.length>1?s[s.length-1]:s[0].split(',')[0].trim();
@@ -797,7 +800,12 @@
     return {fall:fall,s1:s1,s2:s2,noDelta:fall==='F1',twin:fall==='F3a'||fall==='F3b',ranked:ranked};
   }
   /* "Ähnliche Modelle" (UX-Review 06.11. #8): same kind as the compared models (video ↔ video, audio ↔ audio; mailbox class; no sets or
-     combinations unless the compared models are), 1–3 technical differences, not just another Tasteranzahl; closest price first */
+     combinations unless the compared models are), not just another Tasteranzahl, one per design line.
+     11.11. (user: "provide the max options, not just one"): the list is filled up to ALT_MAX (one full row on desktop).
+     The nearly identical models (1–3 technical differences) come first; the remaining places go to the next-closest models
+     of the same kind (fewest differences, then closest price). A card lists at most 3 differences and says how many more
+     there are, so nothing is hidden. */
+  var ALT_MAX=4,ALT_WHY=3;
   function kindOf(p){
     if(LENS.designFirst){var f=parseInt(p.faecher,10);return (isNaN(f)?'?':(f===1?'1':'n'))+'|'+(p.klingelsys&&p.klingelsys!=='Nein'?'k':'-')+'|'+(p.isSet?'s':'-');}
     return (p.typ||'?')+'|'+(((p.kombi&&p.kombi!=='Nein')||/\bSet\b/i.test(p.name))?'c':'-');
@@ -810,6 +818,7 @@
       var why=[];
       techRows.forEach(function(row){
         var va=cellVal(p,row),vb=cellVal(ref,row),a=disp(va,row),b=disp(vb,row);
+        if(a===UNK||b===UNK)why.unk=true;   /* remembered, so "gleich" can say "soweit angegeben" */
         if(a===b||isUnk(a)||b===UNK)return;   /* unknown on either side → no claim; "–" (does not apply) is no reason */
         if(row.set&&Array.isArray(va)&&Array.isArray(vb)&&!diffArr(va,vb).length&&!diffArr(vb,va).length)return;
         why.push({k:row.key,l:row.label,v:(row.bool?(a==='ja'?'Ja':'Nein'):a)});
@@ -818,18 +827,34 @@
     }
     SRC.forEach(function(raw){
       var p=BY_ID[raw.id]; if(!p||!p.shop||selected.indexOf(p.id)>-1||kindOf(p)!==kinds[0])return;
-      var best=null;
-      for(var r=0;r<items.length;r++){var w=diffs(p,items[r]);if(!w.length)return;if(!best||w.length<best.why.length)best={why:w,ref:items[r]};}
+      /* same technology as a compared model: an alternative only in another design line ("Design: Colson"), shown first;
+         same technology and same design (a pure variant) stays out (11.11.) */
+      var best=null,twin=null,twinUnk=false;
+      for(var r=0;r<items.length;r++){
+        var w=diffs(p,items[r]),sameLine=!!p.design&&p.design!=='–'&&p.design===items[r].design;
+        /* a variant of a compared model (same design line, at most another Tasteranzahl) is no alternative */
+        if(sameLine&&w.every(function(x){return x.k==='klingel';}))return;
+        if(!w.length){if(!p.design||p.design==='–')return;twin=items[r];twinUnk=!!w.unk;continue;}
+        if(!best||w.length<best.why.length)best={why:w,ref:items[r]};
+      }
+      /* 11.11. (user: "what is Ausstattung?"): "Technik" names what is compared (the technical rows); "soweit angegeben"
+         when a feature is missing for either model, so "gleich" never claims more than the data shows */
+      if(twin)best={why:[{k:'design',l:'Technik',v:'gleich wie „'+shopName(twin)+'“'+(twinUnk?' (soweit angegeben)':'')+', nur anderes Design'}],ref:twin,design:true};
+      if(!best)return;
       var why=best.why,ref=best.ref,refPrice=typeof ref.price==='number'?ref.price:0;
-      if(why.length>3)return;
-      if(why.every(function(w){return w.k==='klingel';}))return;   /* only another Tasteranzahl is no alternative (CP4 F2) */
-      out.push({p:p,why:why,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});
+      /* only another Tasteranzahl of the same design line is a variant, not an alternative (CP4 F2); in another design line
+         it is one, and the card names the design first (11.11.) */
+      if(why.every(function(w){return w.k==='klingel';})){
+        if(!p.design||p.design==='–'||p.design===ref.design)return;
+        why=[{k:'design',l:'Design',v:'anders als „'+shopName(ref)+'“'}].concat(why);
+      }
+      out.push({p:p,why:why.slice(0,ALT_WHY),more:Math.max(0,why.length-ALT_WHY),n:best.design?0:why.length,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});
     });
     function pick(list){
-      list.sort(function(a,b){return a.why.length-b.why.length||a.dist-b.dist;});
+      list.sort(function(a,b){return a.n-b.n||a.dist-b.dist;});
       /* one per design line, so the list doesn't show three Maxiors */
       var seen={},res=[];list.forEach(function(o){var k=o.p.design==='–'?o.p.id:o.p.design;if(seen[k])return;seen[k]=1;res.push(o);});
-      return res.slice(0,3);
+      return res.slice(0,ALT_MAX);
     }
     return pick(out);
   }
@@ -1027,7 +1052,7 @@
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
     var alts=isFull()?[]:alternatives(items),altHTML='';
     if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3><ul class="vgl-alts__list">'+
-      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(baseTitle(o.p))+'</div><span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+'</dl><div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>Zum Vergleich hinzufügen</button></div></li>';}).join('')+'</ul></section>';
+      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div><span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div'+(w.k==='design'?' class="vgl-alt__wide"':'')+'><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl><div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>Zum Vergleich hinzufügen</button></div></li>';}).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+

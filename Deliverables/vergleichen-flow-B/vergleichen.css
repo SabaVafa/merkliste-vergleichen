@@ -1105,3 +1105,20 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
 .vgl-tip__row>b{white-space:normal;overflow-wrap:break-word;hyphens:auto}
 .vgl-tip__row>span{min-width:0;overflow-wrap:break-word;hyphens:auto}
 @media(max-width:47.99rem){.vgl-tip__b:has(.vgl-tip__row){grid-template-columns:minmax(0,1fr)}}
+
+/* ==== Ähnliche Modelle: up to 4, one row on desktop (11.11., user decision) ====
+   4 equal columns from 64 rem (2 on tablets, list on phones as before); "+ n weitere Unterschiede" spans the
+   difference box in muted text when a model differs in more than 3 features. ==== */
+@media(min-width:64rem){.vgl-view .vgl-alts__list{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.vgl-alt__why>.vgl-alt__more{display:block;grid-column:1 / -1}
+.vgl-alt__why>.vgl-alt__more dd{font-weight:400;color:var(--v-muted)}
+
+/* ==== Ähnliche Modelle: real shop titles (11.11., user decision) ====
+   Full titles are longer than the former "VDM10 2.0 Kian", so they take the column-header type (16 / 600, 1.4) and the
+   reason values may wrap; the 2-line min-height keeps prices and links aligned across the row as before. ==== */
+.vgl-view .vgl-alt__name{font-size:var(--v-fs-body);font-weight:600;line-height:1.4}
+/* sentence-type reasons ("Technik: gleich wie „…“", "Design: anders als „…“") name a full shop title, so they use the
+   whole box width: label above, sentence below in regular weight */
+.vgl-alt__why>.vgl-alt__wide{display:block;grid-column:1 / -1}
+.vgl-alt__why>.vgl-alt__wide dt{margin-bottom:.125rem}
+.vgl-alt__why>.vgl-alt__wide dd{font-weight:400;overflow-wrap:break-word;hyphens:auto}
