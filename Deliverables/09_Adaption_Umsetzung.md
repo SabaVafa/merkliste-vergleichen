@@ -193,3 +193,13 @@ Geprüft (gemessen im Browser) gegen die DS-Token `--r-s` 2 px Badges · `--r-m`
 ## 18 · Speicherhinweis in der Merkliste (10.11.2026)
 
 Nutzer: „Text nicht sichtbar genug, Stil nicht professionell“. Vorher 12-px-Grautext im Fuß, mit „·“ an die Aktionszeile gehängt. Jetzt eigenes Band auf Paper-Ton oben im Fuß, durch eine Haarlinie von der Aktionszeile getrennt: Geräte-Icon (Teal), **„Auf diesem Gerät gespeichert.“** in Schwarz/600, Erklärsatz in Grau (5,4 : 1), „Anmelden“ als Teal-Link – 14 px wie der übrige Sekundärtext der Merkliste. Geteilte Ansicht analog („Geteilte Ansicht. Wird erst gespeichert, wenn Sie sie übernehmen.“). Handy: Hinweis am Listenende, gleiche Gestaltung ohne Band. `merkliste.js?v=22`, `merkliste.css?v=20`.
+
+**Nachtrag 11.11. (Nutzerentscheidung):** das Geräte-Icon vor dem Speicherhinweis wird durch ein Hinweis-Icon ersetzt (Kreis mit „i“, Teal wie zuvor, DS-Strichstil 1,8) – auch in der geteilten Ansicht. `merkliste.js?v=24`, `merkliste.css?v=23`.
+
+## 19 · „Merkliste leeren": rote Hover-Fläche (11.11.2026)
+
+Nutzerentscheidung: „Merkliste leeren" ist eine löschende Aktion und wird beim Hover rot – wie „Vergleich leeren" in der Vergleichsleiste: Fläche `--color-red-50` (#FFF0EF), Text `--color-red-600` (#B52320, 5,9 : 1 – AA), Radius 4 px, ohne Unterstreichung. „Abbrechen" in der Bestätigung bleibt neutral. `merkliste.css?v=21`.
+
+## 20 · „Alle n auswählen" entfernt (11.11.2026)
+
+Nutzerentscheidung: die Option wird nicht gebraucht. Entfernt im Gruppenkopf (beide Kategorien gemerkt) und im Fuß (eine Kategorie), samt Logik (`syncAllBtn`, `selectAll`, `modelIds`, Fokus-Wiederherstellung) und Styles. Modelle werden einzeln über „Vergleichen" angehakt; ab 2 Modellen derselben Kategorie ist „n … vergleichen" aktiv. Geprüft mit 4 Türsprechanlagen + 2 Briefkästen: Gruppenköpfe nur noch mit Titel und Anzahl, 2 angehakt → „2 Türsprechanlagen vergleichen", keine Fehler. `merkliste.js?v=25`, `merkliste.css?v=24`.

@@ -1080,3 +1080,28 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>th[scope="row"]{border-bottom-color:transparent;background-image:linear-gradient(var(--v-g300),var(--v-g300));background-size:calc(100% - 2rem) .0625rem;background-position:1rem 100%;background-repeat:no-repeat}
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):last-child>th[scope="row"]{background-image:none}
 }
+
+/* ==== Product titles in the header (10.11., Lead Product Design, user: "adjust the title size") ====
+   Measured at 1024 px with 4 models: 18 px / 700, up to 10 lines, header 538 px — the title outweighed the price and
+   the section headings. Full titles stay (user decision 09.11.); the size now follows the column width:
+   16 px / 600 by default; 14 px / 600 with 3–4 models below 90 rem (narrow columns) and on phones. Weight 600 so
+   the price (700) is the strongest line of the column; line height 1.4 for the long multi-segment titles. ==== */
+.vgl-view .vgl-ph__t{font-size:var(--v-fs-body);font-weight:600;line-height:1.4}
+@media(max-width:89.99rem){.vgl-view table.vgl-t--n3 .vgl-ph__t,.vgl-view table.vgl-t--n4 .vgl-ph__t{font-size:var(--v-fs-sm)}}
+@media(max-width:47.99rem){.vgl-view .vgl-ph__t{font-size:var(--v-fs-sm)}}
+
+/* ==== Toggletip heading on a light green band (11.11., user decision) ====
+   DS --color-teal-75 #E3F2F0, the lightest green-tinted fill in metzler-tokens.css; ink title 15.4:1 (AA).
+   The hairline under it becomes the same tint, so the band ends cleanly against the white body. ==== */
+.vgl-tip__h{background:var(--color-teal-75,#E3F2F0);border-bottom-color:var(--color-teal-75,#E3F2F0)}
+
+/* ==== Toggletip term lists: no clipped text (11.11., user report) ====
+   Terms were nowrap, so "Austauschbar (Papiereinleger)" took 229 px of the 352 px popup and left the meaning 139 px —
+   "Namensänderung" ran 17 px past the edge and was cut off by the popup's overflow:hidden. Now list popups have one
+   fixed width (22 rem), the term column is capped at 9.5 rem and wraps, the meaning takes the rest and may hyphenate
+   long German compounds (lang="de"). ==== */
+.vgl-tip:has(.vgl-tip__row){width:min(22rem,calc(100vw - 2rem))}
+.vgl-tip__b:has(.vgl-tip__row){grid-template-columns:fit-content(9.5rem) minmax(0,1fr)}
+.vgl-tip__row>b{white-space:normal;overflow-wrap:break-word;hyphens:auto}
+.vgl-tip__row>span{min-width:0;overflow-wrap:break-word;hyphens:auto}
+@media(max-width:47.99rem){.vgl-tip__b:has(.vgl-tip__row){grid-template-columns:minmax(0,1fr)}}

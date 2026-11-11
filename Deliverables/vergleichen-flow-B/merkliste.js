@@ -12,7 +12,7 @@
      · localStorage['mtz_merkliste'] = {v:1, updatedAt, items[]}, limit 50
      · 09b: share as #liste= link (no account) + shared view, print/PDF,
        current price + change since saving, all configuration positions,
-       "Alle n auswählen", "Zurück zum Vergleich" on the PDP
+       "Zurück zum Vergleich" on the PDP ("Alle n auswählen" removed 11.11., user decision)
      · pick mode (10.11.): MTZ_MKL.open({pick:{lens, inCmp, slots, onAdd}})
        from the comparison's "Aus der Merkliste" — tick models, "Zum
        Vergleich hinzufügen" hands them to onAdd; models already compared
@@ -136,12 +136,14 @@
 
   /* ---- Chrome ---- */
   var hdrBtn, hdrBadge, scrim, drawer, titleEl, countEl, clearBtn, confirmEl, confirmQ, notice, listEl, emptyEl, footHint, cta, footEl, toastEl, toastT, liveEl;
-  var toolsEl, shareBtn, printBtn, askEl, popEl, sharedEl, sharedLink, hintEl, allBtn;
+  var toolsEl, shareBtn, printBtn, askEl, popEl, sharedEl, sharedLink, hintEl;
   var sharedList = null, sharedMode = false, openParts = {};   /* 09b: shared list (sessionStorage), expanded configuration rows */
   /* storage note (10.11.): icon + a bold statement + one explaining sentence; 14 px instead of 12 px grey caption */
-  var IC_DEVICE = '<svg class="mkl-hint__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="15" height="11" rx="1.5"/><path d="M6 19h7"/><rect x="15.5" y="9" width="6.5" height="11" rx="1.25"/></svg>';
-  var OWN_HINT = IC_DEVICE + '<span class="mkl-hint__t"><b>Auf diesem Gerät gespeichert.</b> <a href="#konto" data-mkl="login">Anmelden</a>, um Ihre Merkliste auf allen Geräten zu nutzen.</span>';
-  var SHARED_HINT = IC_DEVICE + '<span class="mkl-hint__t"><b>Geteilte Ansicht.</b> Wird erst gespeichert, wenn Sie sie übernehmen.</span>';
+  /* hint glyph (11.11., user decision): info circle = "Hinweis"; replaces the device icon. DS icon style: inline,
+     currentColor stroke 1.8, round caps; decorative (the sentence carries the meaning). */
+  var IC_HINT = '<svg class="mkl-hint__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.75" r=".6" fill="currentColor" stroke="none"/></svg>';
+  var OWN_HINT = IC_HINT + '<span class="mkl-hint__t"><b>Auf diesem Gerät gespeichert.</b> <a href="#konto" data-mkl="login">Anmelden</a>, um Ihre Merkliste auf allen Geräten zu nutzen.</span>';
+  var SHARED_HINT = IC_HINT + '<span class="mkl-hint__t"><b>Geteilte Ansicht.</b> Wird erst gespeichert, wenn Sie sie übernehmen.</span>';
   var isOpen = false, opener = null, prevOverflow = '', toastHome = null;
   var cmpSel = [];   /* ids ticked for "Auswahl vergleichen" (session UI state, never persisted) */
   var pick = null;   /* pick mode: opened from the comparison to add models — {lens, inCmp:[ids], slots, onAdd(ids)} */
@@ -185,7 +187,6 @@
       '</div>' +
       '<div class="mkl-foot">' +
         '<p class="mkl-hint">' + OWN_HINT + '</p>' +
-        '<button class="mkl-link mkl-foot__all" type="button" data-mkl="cmp-all" hidden></button>' +
         '<span class="mkl-foot__hint">Wählen Sie mindestens 2 Modelle derselben Kategorie</span>' +
         '<button class="mkl-cta" type="button" data-mkl="compare" disabled>Auswahl vergleichen (0)</button>' +
       '</div>' +
@@ -197,7 +198,7 @@
     notice.hidden = storageOk;
     toolsEl = drawer.querySelector('.mkl-tools'); shareBtn = drawer.querySelector('[data-mkl="share"]'); printBtn = drawer.querySelector('[data-mkl="print"]');
     askEl = drawer.querySelector('.mkl-shareask'); popEl = drawer.querySelector('.mkl-sharepop'); sharedEl = drawer.querySelector('.mkl-shared'); sharedLink = drawer.querySelector('.mkl-sharedlink');
-    hintEl = drawer.querySelector('.mkl-hint'); allBtn = drawer.querySelector('.mkl-foot__all');
+    hintEl = drawer.querySelector('.mkl-hint');
 
     drawer.addEventListener('click', function (e) {
       var a = e.target.closest('[data-mkl]');
@@ -217,7 +218,6 @@
         if (k === 'take') { takeShared(); return; }
         if (k === 'show-own') { sharedMode = false; render(); titleEl.focus(); return; }
         if (k === 'show-shared') { sharedMode = true; render(); sharedEl.focus(); live('Geteilte Merkliste mit ' + sharedList.items.length + ' Artikeln geöffnet.'); return; }
-        if (k === 'cmp-all') { selectAll(a); return; }
       }
       var pb = e.target.closest('.mkl-item__more');
       if (pb) { var pid = pb.getAttribute('data-parts'); openParts[pid] = !openParts[pid]; render(); var nb2 = listEl.querySelector('.mkl-item__more[data-parts="' + pid.replace(/"/g, '') + '"]'); if (nb2) nb2.focus(); return; }
@@ -455,13 +455,13 @@
   /* rows grouped by category: the current page's category first; the lock hint sits once in the group head */
   function groupHTML(lens, rows, shared) {
     var lab = (LENSES[lens] || LENSES[LENS]).label;
-    return '<li class="mkl-group" data-lens="' + esc(lens) + '"><div class="mkl-group__row"><h3 class="mkl-group__h">' + esc(lab) + ' <span class="mkl-group__n">(' + rows.length + ')</span></h3><button class="mkl-link mkl-group__all" type="button" data-mkl="cmp-all" data-lens="' + esc(lens) + '" hidden></button></div><span class="mkl-group__hint" hidden></span></li>' + rows.map(function (it) { return rowHTML(it, shared); }).join('');
+    return '<li class="mkl-group" data-lens="' + esc(lens) + '"><div class="mkl-group__row"><h3 class="mkl-group__h">' + esc(lab) + ' <span class="mkl-group__n">(' + rows.length + ')</span></h3></div><span class="mkl-group__hint" hidden></span></li>' + rows.map(function (it) { return rowHTML(it, shared); }).join('');
   }
   function viewItems() { return (sharedMode && sharedList) ? sharedList.items : items; }
   function viewById(id) { var l = viewItems(); for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; return null; }
   function render() {
     var shared = !!(sharedMode && sharedList), list = viewItems(), n = list.length;
-    var ae = document.activeElement, keep = (ae && listEl.contains(ae)) ? (ae.getAttribute('data-parts') ? '.mkl-item__more[data-parts="' + ae.getAttribute('data-parts').replace(/"/g, '') + '"]' : (ae.getAttribute('data-take') ? '[data-take="' + ae.getAttribute('data-take').replace(/"/g, '') + '"]' : (ae.getAttribute('data-mkl') === 'cmp-all' ? '.mkl-group__all[data-lens="' + ae.getAttribute('data-lens') + '"]' : null))) : null;
+    var ae = document.activeElement, keep = (ae && listEl.contains(ae)) ? (ae.getAttribute('data-parts') ? '.mkl-item__more[data-parts="' + ae.getAttribute('data-parts').replace(/"/g, '') + '"]' : (ae.getAttribute('data-take') ? '[data-take="' + ae.getAttribute('data-take').replace(/"/g, '') + '"]' : null)) : null;
     drawer.classList.toggle('is-shared', shared); drawer.classList.toggle('is-pick', !!pick);
     titleEl.firstChild.nodeValue = shared ? 'Geteilte Merkliste ' : 'Merkliste ';
     countEl.textContent = (!shared && n >= LIMIT) ? '(' + n + ' / ' + LIMIT + ')' : '(' + n + ')';
@@ -501,22 +501,6 @@
     if (b && !listEl.hidden && b.clientHeight < drawer.clientHeight * 0.35) { drawer.classList.add('is-flow'); drawer.scrollTop = st; }   /* re-measuring keeps the reading position */
   }
   function lensOfCmp(id) { var l = viewItems(); for (var i = 0; i < l.length; i++) if ((l[i].articleId || l[i].id) === id) return l[i].lens; return null; }
-  /* 09b P0-7: model ids of one category in the visible list (configurations compare on model level via their base model) */
-  function modelIds(lens) { var out = []; viewItems().forEach(function (it) { var id = it.articleId || it.id; if (!it.configId && (it.lens || LENS) === lens && out.indexOf(id) < 0) out.push(id); }); return out; }
-  function syncAllBtn(btn, lens, lock) {
-    var ids = modelIds(lens), c = ids.length, show = c >= CMP_MIN && c <= CMP_MAX && !(lock && lock !== lens);
-    btn.hidden = !show; if (!show) return;
-    var allOn = cmpSel.length === c && ids.every(function (id) { return cmpSel.indexOf(id) > -1; });
-    btn.setAttribute('data-lens', lens); btn.setAttribute('data-on', allOn ? '1' : '');
-    btn.textContent = allOn ? 'Auswahl aufheben' : 'Alle ' + c + ' auswählen';
-  }
-  function selectAll(btn) {
-    var lens = btn.getAttribute('data-lens'), ids = modelIds(lens);
-    if (btn.getAttribute('data-on') === '1') { cmpSel = []; syncCmp(); live('Auswahl aufgehoben.'); btn.focus(); return; }
-    cmpSel = ids.slice(0, CMP_MAX); syncCmp();
-    live(cmpSel.length + ' Modelle zum Vergleich ausgewählt.');
-    if (!cta.disabled) cta.focus();
-  }
   function syncCmp() {
     if (pick) { syncPick(); return; }
     var n = cmpSel.length, lock = n ? lensOfCmp(cmpSel[0]) : null, full = n >= CMP_MAX;
@@ -531,9 +515,6 @@
       var hint = g.querySelector('.mkl-group__hint'), other = !!(lock && g.getAttribute('data-lens') !== lock);
       hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie — Ihre Auswahl läuft bei ' + (LENSES[lock] || LENSES[LENS]).label;
     });
-    var groups = listEl.querySelectorAll('.mkl-group__all');
-    if (groups.length) { allBtn.hidden = true; groups.forEach(function (b) { syncAllBtn(b, b.getAttribute('data-lens'), lock); }); }
-    else { var one = viewItems().filter(function (it) { return !it.configId; })[0]; if (one) syncAllBtn(allBtn, one.lens || LENS, lock); else allBtn.hidden = true; }
     cta.textContent = n >= CMP_MIN ? n + ' ' + (LENSES[lock] || LENSES[LENS]).label + ' vergleichen' : 'Auswahl vergleichen (' + n + ')';
     cta.disabled = n < CMP_MIN;
     footHint.hidden = n >= CMP_MIN;
@@ -559,7 +540,6 @@
       var hint = g.querySelector('.mkl-group__hint'), other = g.getAttribute('data-lens') !== pick.lens;
       hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie — Ihr Vergleich läuft bei ' + lab0;
     });
-    allBtn.hidden = true; listEl.querySelectorAll('.mkl-group__all').forEach(function (b) { b.hidden = true; });
     cta.textContent = n ? (n === 1 ? '1 Modell' : n + ' Modelle') + ' zum Vergleich hinzufügen' : 'Zum Vergleich hinzufügen';
     cta.disabled = n < 1;
     footHint.hidden = false;

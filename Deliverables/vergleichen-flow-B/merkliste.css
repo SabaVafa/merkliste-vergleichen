@@ -250,12 +250,7 @@
 .mkl-item__parts dt{color:var(--text-muted,#6A6A6A)}
 .mkl-item__parts dd{margin:0;color:var(--schwarz,#1A171B);overflow-wrap:anywhere}
 .mkl-item__parts dd.is-open{font-style:italic}
-/* "Alle n auswählen": footer (one category) or group head (both) */
-.mkl-foot__all{padding:0;color:var(--teal,#015253);font-weight:600}
-.mkl-foot__all[hidden]{display:none}
 .mkl-group__row{display:flex;align-items:center;gap:var(--sp-2,.5rem)}
-.mkl-group__all{margin-left:auto;padding:0;color:var(--teal,#015253);font-weight:600}
-.mkl-group__all[hidden]{display:none}
 @media(max-width:47.99rem){
   .mkl-shared{margin-inline:var(--sp-4,1rem)}
   .mkl-shared__take.btn{width:100%}
@@ -376,8 +371,8 @@
 .mkl-rm:hover,.mkl-pdp-band__x:hover{color:var(--text-muted,#6A6A6A)}
 
 /* ==== 16 · Responsive-Audit (07.11.) — phones (Deliverables/14_Responsive-Audit.md) ====
-   The storage hint closes the list (JS placeHint) instead of sitting in the pinned footer; the selection hint shares
-   the row with "Alle n auswählen", so the sticky footer is one short line + the full-width compare CTA. */
+   The storage hint closes the list (JS placeHint) instead of sitting in the pinned footer; the selection hint and
+   the compare CTA share the footer, so the sticky footer is one short line + the full-width compare CTA. */
 .mkl-hint[hidden]{display:none}
 .mkl-hint--body{margin:0;padding:var(--sp-4,1rem) var(--sp-4,1rem) var(--sp-6,1.5rem)}
 @media(max-width:47.99rem){
@@ -402,7 +397,7 @@
 
 /* ==== Storage note in the footer (10.11., user: "not visible enough, not professional") ====
    Was a 12 px grey caption run into the action row with a "·" separator. Now its own band on the paper tone at the
-   top of the footer, split from the action row by a hairline: device icon (teal), bold statement in ink, explaining
+   top of the footer, split from the action row by a hairline: hint icon (info circle, teal; replaced the device icon 11.11., user decision), bold statement in ink, explaining
    sentence in muted (5.4:1), "Anmelden" as a teal link — 14 px like the rest of the drawer's secondary text.
    On phones the note sits at the end of the list (placeHint), same look without the band. ==== */
 .mkl-hint{display:flex;align-items:flex-start;gap:.625rem;font-size:var(--text-body-sm,.875rem);line-height:1.45;color:var(--text-muted,#6A6A6A)}
@@ -414,3 +409,8 @@
 .mkl-hint a:hover{color:var(--teal-600,#014A4B)}
 .mkl-foot .mkl-hint{flex:1 1 100%;margin:calc(-1 * var(--sp-3,.75rem)) calc(-1 * var(--sp-5,1.25rem)) .25rem;padding:.75rem var(--sp-5,1.25rem);background:var(--paper-white,#F5F6FA);border-bottom:.0625rem solid var(--graphite-200,#E6E6E8)}
 @media(max-width:47.99rem){.mkl-foot .mkl-hint{margin-inline:calc(-1 * var(--sp-4,1rem));padding-inline:var(--sp-4,1rem)}}
+
+/* "Merkliste leeren" is destructive: on hover the same red as "Vergleich leeren" in the comparison strip (11.11., user
+   decision) — DS --color-red-50 fill, --color-red-600 text (5.9:1, AA), 4 px radius, no underline. "Abbrechen" stays neutral. */
+.mkl-link[data-mkl="clear"]{border-radius:var(--r-m,.25rem)}
+.mkl-link[data-mkl="clear"]:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
