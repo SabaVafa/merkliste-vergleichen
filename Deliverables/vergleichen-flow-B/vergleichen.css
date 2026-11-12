@@ -1248,3 +1248,8 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    notification toast (user, 12.11.; ink title 15:1, AA), same tone as the line under it. ==== */
 .vgl-tip,.vgl-pick:not(.is-sheet),.vgl-sharepop,.vgl-addsearch:not(.is-sheet){border-radius:var(--v-r-l)}
 .vgl-tip__h{background:var(--color-teal-100,#E6EEEE);border-bottom-color:var(--color-teal-100,#E6EEEE)}
+
+/* ==== Notification toast on the DS radius (12.11., user decision) ====
+   The DS defines no toast radius; the nearest is --radius-lg 8 px (cards, dropdowns, modals), as for the tooltips.
+   Was 12 px (--radius-xl is for large panels only). Same in merkliste.css for the Merkliste / PDP toast. ==== */
+.vgl-toast{border-radius:var(--v-r-l)}

@@ -423,3 +423,7 @@
 .mkl-foot__s{font-weight:600;color:var(--schwarz,#1A171B)}
 .mkl-foot__d{color:var(--text-muted,#6A6A6A)}
 .mkl-cta{min-width:9rem}
+
+/* ==== Notification toast on the DS radius (12.11., user decision): --radius-lg 8 px like the comparison toast and
+   the tooltips (was 12 px; --radius-xl is for large panels only). ==== */
+.mkl-toast{border-radius:var(--r-l,.5rem)}
