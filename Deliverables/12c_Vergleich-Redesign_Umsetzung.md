@@ -350,3 +350,8 @@ Aus Brief §7 umgesetzt: Erklärsätze nur aus der freigegebenen Kurzliste (E1, 
   - „Merkliste leeren“ und die übrigen Merkliste-Textlinks 14 px statt 13 px (DS-Skala).
   - Anführungszeichen: 10 Texte schlossen „…" mit geradem Zeichen, jetzt „…“ (u. a. „k. A.“, „je nach Ausführung“, „Konfiguration öffnen“, Gravurtext-Frage).
   - Versionen: `vergleichen.js?v=116`, `vergleichen.css?v=156`, `merkliste.js?v=29`, `merkliste.css?v=27`, `merkliste-pdp.css?v=23`.
+- **Mitlaufende Modellleiste überarbeitet (12.11., Lead Product Design):**
+  - Abgrenzung: die Zeilen glitten bisher nur unter einer 1-px-Linie durch, ihr Text schien an der Leiste zu kleben – jetzt Linie plus DS-Kartenschatten (`--shadow-card`), beide über die volle Breite.
+  - Orientierung: der leere Platz über der Bezeichnungsspalte zeigt den Abschnitt, in dem man gerade liest („Unterschiede“, „Nicht für alle gepflegt“, „Gemeinsamkeiten“, „Ähnliche Modelle“), 14 px / 700 grau, bündig mit den Zeilenbezeichnungen; für Screenreader ausgeblendet (die Abschnitte haben eigene Überschriften).
+  - Hierarchie: Modellname 16 px / 700 einzeilig (voller Titel im Tooltip), Preis und Link 14 px darunter – vorher alles 14 px fett.
+  - `vergleichen.js?v=117`, `vergleichen.css?v=158`.

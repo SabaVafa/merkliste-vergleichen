@@ -1262,3 +1262,17 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 .vgl-slot__rm::before{inset:-.625rem}
 .vgl-slot__rm:hover{background:var(--color-red-50,#FFF0EF);border-color:var(--color-red-600,#B52320);color:var(--color-red-600,#B52320)}
 @media(prefers-reduced-motion:reduce){.vgl-slot__rm{transition:none}}
+
+/* ==== Sticky model strip (12.11., Lead Product Design: "enhance the selected section") ====
+   1 Separation: the rows used to slide under a 1 px line only, so their text seemed to touch the strip. Now the
+     hairline plus the DS card shadow (--shadow-card 0 .125rem .5rem rgba(0,0,0,.08)), both full-bleed like the white.
+   2 Orientation: the empty slot over the label column names the section being read (Unterschiede, Nicht für alle
+     gepflegt, Gemeinsamkeiten, Ähnliche Modelle), 14 px / 700 muted, on the row labels' left edge.
+   3 Hierarchy: model name 16 px / 700 on one line (full title in the tooltip), price and link 14 px below — before,
+     name, price and link were all 14 px bold. ==== */
+.vgl-pin__in{box-shadow:0 -100vmax 0 100vmax var(--v-white),0 calc(.0625rem - 100vmax) 0 100vmax var(--v-g200),0 calc(.25rem - 100vmax) .5rem 100vmax rgba(0,0,0,.08);clip-path:inset(0 -100vmax -1rem)}
+.vgl-pin__lc{display:flex;align-items:center;min-width:0;padding:0 1rem}
+.vgl-pin__sec{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--v-fs-sm);font-weight:700;line-height:1.3;color:var(--v-muted)}
+.vgl-pin__name{-webkit-line-clamp:1;font-size:var(--v-fs-body);line-height:1.35}
+.vgl-pin__txt{gap:.125rem}
+@media(max-width:47.99rem){.vgl-pin__name{font-size:var(--v-fs-sm)}}

@@ -951,7 +951,7 @@
   }
   /* slim identity strip: thumbnail, name, price, CTA per column — fixed height, overlays the content, shown by an IntersectionObserver */
   function pinHTML(c){
-    return '<div class="vgl-pin"><div class="vgl-pin__in" role="region" aria-label="Modellübersicht"><div class="vgl-pin__row"><span class="vgl-pin__lc"></span>'+
+    return '<div class="vgl-pin"><div class="vgl-pin__in" role="region" aria-label="Modellübersicht"><div class="vgl-pin__row"><span class="vgl-pin__lc"><span class="vgl-pin__sec" aria-hidden="true"></span></span>'+
       c.vis.map(function(i){var p=c.items[i],t=c.titles[i];return '<div class="vgl-pin__col"><span class="vgl-pin__img"><img src="'+esc(p.img)+'" alt="" width="40" height="40" decoding="async"></span><span class="vgl-pin__txt"><span class="vgl-pin__name" title="'+esc(t.t)+'">'+esc(t.t)+'</span><span class="vgl-pin__line"><span class="vgl-pin__price">ab '+euro(p.price)+'</span>'+ctaHTML(p,t,' vgl-cta--sm')+'</span></span></div>';}).join('')+
       '</div></div></div>';
   }
@@ -1132,6 +1132,16 @@
     tbl.style.setProperty('--vgl-name-h',(Math.ceil(mn)/rp)+'rem');tbl.style.setProperty('--vgl-money-h',(Math.ceil(mm)/rp)+'rem');
   }
   /* the strip uses the table's measured column grid (render/resize only, never on scroll) */
+  /* strip label slot = the section being read (12.11., Lead Product Design): the last section whose top has passed the
+     strip; past the table it names "Ähnliche Modelle". Decorative (aria-hidden) — the sections keep their headings. */
+  var secRaf=0;
+  function syncPinSec(){
+    var el=view.querySelector('.vgl-pin__sec'),pin=view.querySelector('.vgl-pin__in');if(!el||!pin||!view.classList.contains('is-pinned'))return;
+    var lim=pin.getBoundingClientRect().bottom+1,cur='';
+    Array.prototype.forEach.call(viewBody.querySelectorAll('tbody.vgl-sec'),function(tb){var t=tb.querySelector('.vgl-sec__t');if(t&&tb.getBoundingClientRect().top<lim)cur=t.textContent;});
+    var alts=viewBody.querySelector('.vgl-alts');if(alts&&alts.getBoundingClientRect().top<lim)cur='Ähnliche Modelle';
+    if(el.textContent!==cur)el.textContent=cur;
+  }
   function placePin(){
     var row=viewBody.querySelector('.vgl-pin__row'),tbl=viewBody.querySelector('table.vgl-t');if(!row||!tbl)return;
     var rp=remPx(),cells=tbl.querySelectorAll('.vgl-hr--img > *'),base=viewBody.querySelector('.vgl-pin__in').getBoundingClientRect().left;
@@ -1147,8 +1157,9 @@
   var pinIO=null;
   function watchPin(){
     var cta=viewBody.querySelector('.vgl-hr--cta');if(!cta||!window.IntersectionObserver)return;
-    pinIO=new IntersectionObserver(function(es){var e=es[es.length-1];var out=!e.isIntersecting&&e.boundingClientRect.top<(e.rootBounds?e.rootBounds.top:0);view.classList.toggle('is-pinned',out&&!printing);},{root:scrollEl,threshold:0});
+    pinIO=new IntersectionObserver(function(es){var e=es[es.length-1];var out=!e.isIntersecting&&e.boundingClientRect.top<(e.rootBounds?e.rootBounds.top:0);view.classList.toggle('is-pinned',out&&!printing);syncPinSec();},{root:scrollEl,threshold:0});
     pinIO.observe(cta);
+    if(!scrollEl._vglSec){scrollEl._vglSec=1;scrollEl.addEventListener('scroll',function(){if(secRaf)return;secRaf=requestAnimationFrame(function(){secRaf=0;syncPinSec();});},{passive:true});}
   }
   /* Responsive audit (2026-11-02): the bar wraps only when its row would overflow. Runs on render and resize, never on scroll. */
   function fitHeader(){
