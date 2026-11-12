@@ -150,6 +150,7 @@
   var IC_TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  var IC_ADD='<svg class="vgl-alt__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="vgl-alt__plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></g><polyline class="vgl-alt__chk" points="5 12.5 10 17.5 19 7" pathLength="1"/></svg>';
   var IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   var IC_BM='<svg viewBox="0 0 27 26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 1.7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v22.9a.6.6 0 0 1-.97.47L13.5 19.4l-8.03 5.67a.6.6 0 0 1-.97-.47V1.7z"/></svg>';   /* same glyph as merkliste.js (DS icon canvas 27×26) */
   var IC_LINK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg>';
@@ -235,7 +236,13 @@
         if(k==='common'){gShow=!gShow;onCommon();}
         return;}
       var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
-      var alt=e.target.closest('[data-alt]');if(alt){var aid=alt.getAttribute('data-alt');pendingCol=aid;if(toggle(aid,true)){var anm=shopName(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');}return;}
+      var alt=e.target.closest('[data-alt]');if(alt){
+        if(alt.classList.contains('is-added'))return;
+        var aid=alt.getAttribute('data-alt');
+        if(isFull()){toggle(aid,true);return;}
+        alt.classList.add('is-added');alt.setAttribute('aria-disabled','true');alt.querySelector('.vgl-alt__l').textContent='Hinzugefügt';
+        setTimeout(function(){pendingCol=aid;if(toggle(aid,true)){var anm=shopName(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');flashCol(aid);}},reduced()?0:650);
+        return;}
       var rm=e.target.closest('[data-rm]');if(rm){removeColumn(rm.getAttribute('data-rm'));return;}
       var go=e.target.closest('[data-go]');
       if(go&&go.tagName==='A'){   /* real product page: remember the way back (P0-10), then navigate normally */
@@ -428,6 +435,9 @@
   }
   function announce(m){if(!liveEl)return;liveEl.textContent='';setTimeout(function(){liveEl.textContent=m;},30);}
   function firstShown(sel){var l=view.querySelectorAll(sel);for(var i=0;i<l.length;i++)if(l[i].getClientRects().length)return l[i];return null;}
+  /* new column from "Ähnliche Modelle": its image tile lights up once, so the eye finds it after the jump to the top */
+  function reduced(){return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);}
+  function flashCol(id){var b=view.querySelector('.vgl-ph__rm[data-rm="'+id+'"]'),t=b&&b.closest('.vgl-ph__img');if(!t)return;t.classList.remove('is-arrived');void t.offsetWidth;t.classList.add('is-arrived');setTimeout(function(){t.classList.remove('is-arrived');},1800);}
   function focusIn(sel){(firstShown(sel)||firstShown('.vgl-ph__rm')||view.querySelector('#vglTitle')).focus();}
   function refName(id){if(cur){for(var i=0;i<cur.items.length;i++)if(cur.items[i].id===id)return cur.refs[i].n;}return BY_ID[id]?baseTitle(BY_ID[id]):id;}
   /* remove a column: focus moves to the next column's remove control (or the add control); 2 → 1 keeps the dialog open with the empty state;
@@ -818,7 +828,6 @@
       var why=[];
       techRows.forEach(function(row){
         var va=cellVal(p,row),vb=cellVal(ref,row),a=disp(va,row),b=disp(vb,row);
-        if(a===UNK||b===UNK)why.unk=true;   /* remembered, so "gleich" can say "soweit angegeben" */
         if(a===b||isUnk(a)||b===UNK)return;   /* unknown on either side → no claim; "–" (does not apply) is no reason */
         if(row.set&&Array.isArray(va)&&Array.isArray(vb)&&!diffArr(va,vb).length&&!diffArr(vb,va).length)return;
         why.push({k:row.key,l:row.label,v:(row.bool?(a==='ja'?'Ja':'Nein'):a)});
@@ -829,24 +838,24 @@
       var p=BY_ID[raw.id]; if(!p||!p.shop||selected.indexOf(p.id)>-1||kindOf(p)!==kinds[0])return;
       /* same technology as a compared model: an alternative only in another design line ("Design: Colson"), shown first;
          same technology and same design (a pure variant) stays out (11.11.) */
-      var best=null,twin=null,twinUnk=false;
+      var best=null,twin=null;
       for(var r=0;r<items.length;r++){
         var w=diffs(p,items[r]),sameLine=!!p.design&&p.design!=='–'&&p.design===items[r].design;
         /* a variant of a compared model (same design line, at most another Tasteranzahl) is no alternative */
         if(sameLine&&w.every(function(x){return x.k==='klingel';}))return;
-        if(!w.length){if(!p.design||p.design==='–')return;twin=items[r];twinUnk=!!w.unk;continue;}
+        if(!w.length){if(!p.design||p.design==='–')return;twin=items[r];continue;}
         if(!best||w.length<best.why.length)best={why:w,ref:items[r]};
       }
-      /* 11.11. (user: "what is Ausstattung?"): "Technik" names what is compared (the technical rows); "soweit angegeben"
-         when a feature is missing for either model, so "gleich" never claims more than the data shows */
-      if(twin)best={why:[{k:'design',l:'Technik',v:'gleich wie „'+shopName(twin)+'“'+(twinUnk?' (soweit angegeben)':'')+', nur anderes Design'}],ref:twin,design:true};
+      /* same technology in another design line: no reason row (11.11., user: "Technik section not needed") —
+         title and image already show the design */
+      if(twin)best={why:[],ref:twin,design:true};
       if(!best)return;
       var why=best.why,ref=best.ref,refPrice=typeof ref.price==='number'?ref.price:0;
       /* only another Tasteranzahl of the same design line is a variant, not an alternative (CP4 F2); in another design line
          it is one, and the card names the design first (11.11.) */
       if(why.every(function(w){return w.k==='klingel';})){
         if(!p.design||p.design==='–'||p.design===ref.design)return;
-        why=[{k:'design',l:'Design',v:'anders als „'+shopName(ref)+'“'}].concat(why);
+        /* the design difference shows in title and image; the card lists the Tasteranzahl only */
       }
       out.push({p:p,why:why.slice(0,ALT_WHY),more:Math.max(0,why.length-ALT_WHY),n:best.design?0:why.length,dist:Math.abs((typeof p.price==='number'?p.price:0)-refPrice)});
     });
@@ -895,7 +904,8 @@
     return '<span class="'+cls+'" role="img" aria-label="'+lbl+'">'+h+(p.reviews?'<span class="vgl-stars__n" aria-hidden="true">('+p.reviews+')</span>':'')+'</span>';
   }
   function moneyCell(p,i,c){
-    return '<div class="vgl-ph__money">'+starsHTML(p,'row')+'<span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span></div>';
+    /* inner wrapper: .vgl-ph__money is the size container, so its content can switch to one line on wide columns */
+    return '<div class="vgl-ph__money"><div class="vgl-ph__mi">'+starsHTML(p,'row')+'<span class="vgl-ph__line"><span class="vgl-ph__price">ab '+euro(p.price)+'</span>'+(p.uvp?' <span class="vgl-ph__uvp"><span aria-hidden="true">UVP </span><span class="vgl-visually-hidden">Unverbindliche Preisempfehlung </span><s>'+euro(p.uvp)+'</s></span>':'')+'</span></div></div>';
   }
   function ctaHTML(p,t,cls){
     var lbl=p.konfig?'Konfigurieren':'Zum Produkt',al=' aria-label="'+lbl+' – '+esc(t.t)+'"';
@@ -1052,7 +1062,7 @@
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
     var alts=isFull()?[]:alternatives(items),altHTML='';
     if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3><ul class="vgl-alts__list">'+
-      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div><span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div'+(w.k==='design'?' class="vgl-alt__wide"':'')+'><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl><div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>Zum Vergleich hinzufügen</button></div></li>';}).join('')+'</ul></section>';
+      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div>'+(o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'')+'<div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Zum Vergleich hinzufügen</span></button></div></li>';}).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+

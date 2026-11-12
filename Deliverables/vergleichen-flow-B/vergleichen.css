@@ -1117,8 +1117,49 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
    Full titles are longer than the former "VDM10 2.0 Kian", so they take the column-header type (16 / 600, 1.4) and the
    reason values may wrap; the 2-line min-height keeps prices and links aligned across the row as before. ==== */
 .vgl-view .vgl-alt__name{font-size:var(--v-fs-body);font-weight:600;line-height:1.4}
-/* sentence-type reasons ("Technik: gleich wie „…“", "Design: anders als „…“") name a full shop title, so they use the
-   whole box width: label above, sentence below in regular weight */
-.vgl-alt__why>.vgl-alt__wide{display:block;grid-column:1 / -1}
-.vgl-alt__why>.vgl-alt__wide dt{margin-bottom:.125rem}
-.vgl-alt__why>.vgl-alt__wide dd{font-weight:400;overflow-wrap:break-word;hyphens:auto}
+
+/* ==== Price and rating on one line in wide columns (11.11., Lead UI, user decision) ====
+   From a 24 rem column (2 models on desktop, 3 on wide screens) the rating moves behind the price — "ab 594,15 € UVP
+   699,00 € | ★★★★½ (65)" — one line less in the header. Price first (the fact that is compared), rating right after it
+   behind a hairline, not pushed to the far edge. The switch is a container query on the price block: columns are equal
+   (table-layout: fixed), so all columns switch together and price/rating stay level across models; 24 rem fits the
+   longest case on one line, so the line never wraps. Narrower columns keep the stacked layout. ==== */
+.vgl-ph__money{container-type:inline-size}
+.vgl-ph__mi{display:flex;flex-direction:column}
+@container (min-width:24rem){
+  .vgl-ph__mi{flex-direction:row;flex-wrap:nowrap;align-items:center;column-gap:.875rem}
+  .vgl-ph__mi .vgl-ph__line{order:1;flex-wrap:nowrap}
+  table.vgl-t.is-tight .vgl-ph__mi .vgl-stars--row{order:2;margin:0;padding-left:.875rem;border-left:.0625rem solid var(--v-g200);font-size:var(--v-fs-body)}
+  table.vgl-t.is-tight .vgl-ph__mi .vgl-stars--row[aria-hidden="true"]{display:none}
+}
+
+/* ==== Ähnliche Modelle: images fill their tile (11.11., user: "the images look tiny") ====
+   The <img> carries width/height 64 and the tile only capped it (max-height), so the photo stayed 64 px in a 128 px
+   tile. Now it fills the tile like the column-header images (tile minus .5 rem padding, object-fit: contain), and on
+   desktop the tile has the header tile's height (9 rem), so suggestions read at the same scale as the compared models.
+   Tablet (6 rem) and phone (5 rem) tiles keep their height and are filled the same way. ==== */
+.vgl-view .vgl-alt__media img{width:100%;height:100%;object-fit:contain}
+@media(min-width:64rem){.vgl-view .vgl-alt__media{height:9rem}}
+
+/* ==== "Zum Vergleich hinzufügen" with icon and feedback (11.11., user request) ====
+   Like the other teal controls with an icon ("+ Modell hinzufügen"): plus icon, no underline at rest, underline on
+   hover. Hover: the plus turns a quarter. Click: the plus turns into a drawn check and the label reads
+   "Hinzugefügt" (0.65 s), then the model joins the comparison, the page goes to the top and the new column's image
+   tile lights up once in the DS green fill (teal-75) with a teal ring. Reduced motion: no turning, no drawing, no delay. ==== */
+.vgl-view .vgl-alt__add{display:inline-flex;align-items:center;gap:.375rem;align-self:flex-start;text-decoration:none}
+.vgl-view .vgl-alt__add:hover:not([disabled]) .vgl-alt__l{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.vgl-alt__ic{flex:none;width:1.125rem;height:1.125rem;overflow:visible}
+.vgl-alt__plus{transform-origin:12px 12px;transition:transform .2s ease,opacity .15s ease}
+.vgl-alt__add:hover:not([disabled]) .vgl-alt__plus{transform:rotate(90deg)}
+.vgl-alt__chk{stroke-dasharray:1;stroke-dashoffset:1;opacity:0}
+.vgl-alt__add.is-added{cursor:default}
+.vgl-alt__add.is-added .vgl-alt__l{text-decoration:none !important}
+.vgl-alt__add.is-added .vgl-alt__plus{transform:rotate(90deg) scale(0);opacity:0}
+.vgl-alt__add.is-added .vgl-alt__chk{opacity:1;stroke-dashoffset:0;transition:stroke-dashoffset .3s ease .1s,opacity 0s .1s}
+.vgl-ph__img.is-arrived{animation:vglarrive 1.8s ease-out}
+@keyframes vglarrive{0%,35%{background:var(--color-teal-75,#E3F2F0);box-shadow:inset 0 0 0 .125rem var(--v-teal)}100%{background:var(--v-white);box-shadow:inset 0 0 0 .0625rem var(--v-g200)}}
+@media(prefers-reduced-motion:reduce){
+  .vgl-alt__plus,.vgl-alt__chk{transition:none !important}
+  .vgl-alt__add:hover:not([disabled]) .vgl-alt__plus{transform:none}
+  .vgl-ph__img.is-arrived{animation:none;box-shadow:inset 0 0 0 .125rem var(--v-teal)}
+}
