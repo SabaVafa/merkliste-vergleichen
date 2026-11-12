@@ -1236,3 +1236,15 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
    centred on the label block instead of its first line. Section headers are not affected. ==== */
 table.vgl-t tbody tr:not(.vgl-sec__h)>th,table.vgl-t tbody tr:not(.vgl-sec__h)>td,table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:middle}
 table.vgl-t tbody th[scope="row"] .rh__row .rh__w,table.vgl-t .vgl-sec--s th[scope="row"] .rh__row .rh__w{top:50%;transform:translateY(-50%)}   /* centred on the label block */
+/* the transform gives every (i) its own stacking layer, so a later row's (i) painted over an open tooltip (bug 12.11.):
+   the (i) whose tooltip shows (hover, focus, toggled open) is lifted above the others */
+table.vgl-t tbody th[scope="row"] .rh__w{z-index:1}
+table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"] .rh__w:focus-within,table.vgl-t tbody th[scope="row"] .rh__w:has(.vgl-ib.is-open){z-index:30}
+
+/* ==== Tooltip and popovers on the DS radius (12.11., user decision) ====
+   DS (FOR-CLAUDE.md): --radius-lg 8 px = "cards, dropdowns, modals", --radius-xl 12 px = "large panels". The (i)
+   tooltip, the column picker, the share popover and the model search are dropdown/modal surfaces → 8 px (were 12 px).
+   Bottom sheets on phones stay 12 px (large panel). Tooltip header: DS --color-teal-50 #F2F6F6 (user, 12.11.; ink title
+   16:1, AA), same tone as the line under it. ==== */
+.vgl-tip,.vgl-pick:not(.is-sheet),.vgl-sharepop,.vgl-addsearch:not(.is-sheet){border-radius:var(--v-r-l)}
+.vgl-tip__h{background:var(--color-teal-50,#F2F6F6);border-bottom-color:var(--color-teal-50,#F2F6F6)}
