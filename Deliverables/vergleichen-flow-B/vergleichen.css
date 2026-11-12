@@ -1220,6 +1220,11 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
 /* ==== Remove (×) on a model turns red on hover (12.11., user decision — exception to "icon buttons have no hover") ====
    Same delete hover as "Vergleich leeren" and the Merkliste "Leeren": --color-red-50 #FFF0EF fill, --color-red-600 #B52320
    icon (5.8:1 on red-50), 4 px radius. ==== */
-.vgl-view .vgl-ph__rm{border-radius:var(--v-r-m);transition:color .15s ease,background-color .15s ease}
-.vgl-view .vgl-ph__rm:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320)}   /* same delete hover as "Vergleich leeren" / Merkliste "Leeren": red-50 fill, red-600, 4 px */
-@media(prefers-reduced-motion:reduce){.vgl-view .vgl-ph__rm{transition:none}}
+/* The 44 px target sits flush in the tile corner; the fill is an inset 32 px square (.375rem from every side), so it
+   keeps a 6 px gap to the tile frame and ~7 px padding round the 18 px glyph (12.11., user: "apply paddings"). */
+.vgl-view .vgl-ph__rm{position:relative;transition:color .15s ease}
+.vgl-view .vgl-ph__rm::before{content:'';position:absolute;inset:.375rem;border-radius:var(--v-r-m);background:transparent;transition:background-color .15s ease}
+.vgl-view .vgl-ph__rm svg{position:relative}
+.vgl-view .vgl-ph__rm:hover{background:transparent;color:var(--color-red-600,#B52320)}
+.vgl-view .vgl-ph__rm:hover::before{background:var(--color-red-50,#FFF0EF)}   /* same delete hover as "Vergleich leeren" / Merkliste "Leeren": red-50 fill, red-600, 4 px */
+@media(prefers-reduced-motion:reduce){.vgl-view .vgl-ph__rm,.vgl-view .vgl-ph__rm::before{transition:none}}
