@@ -1216,3 +1216,10 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
   .vgl-view .vgl-alts__h{margin:0 0 .75rem;padding:0}
   .vgl-view .vgl-alts__list,.vgl-view .vgl-alts__list:has(.vgl-altc){gap:.75rem}
 }
+
+/* ==== Remove (×) on a model turns red on hover (12.11., user decision — exception to "icon buttons have no hover") ====
+   Same delete hover as "Vergleich leeren" and the Merkliste "Leeren": --color-red-50 #FFF0EF fill, --color-red-600 #B52320
+   icon (5.8:1 on red-50), 4 px radius. ==== */
+.vgl-view .vgl-ph__rm{border-radius:var(--v-r-m);transition:color .15s ease,background-color .15s ease}
+.vgl-view .vgl-ph__rm:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320)}   /* same delete hover as "Vergleich leeren" / Merkliste "Leeren": red-50 fill, red-600, 4 px */
+@media(prefers-reduced-motion:reduce){.vgl-view .vgl-ph__rm{transition:none}}
