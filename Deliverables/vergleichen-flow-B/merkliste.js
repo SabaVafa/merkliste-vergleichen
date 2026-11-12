@@ -346,6 +346,7 @@
   }
   function scanCards() { var grid = document.getElementById('productGrid'); if (!grid) return; grid.querySelectorAll('.pcard[data-id]').forEach(injectCardHeart); }
   function injectOverlayHearts() {
+    document.querySelectorAll('.vgl-altc .pcard[data-id]').forEach(injectCardHeart);   /* Ähnliche Modelle = PLP cards (12.11.) */
     document.querySelectorAll('.vgl-ph__media').forEach(function (media) {
       if (media.querySelector('.mkl-mark')) return;
       var rm = media.querySelector('[data-rm]'); var id = rm && rm.getAttribute('data-rm'); if (!id || !BY_ID[id]) return;

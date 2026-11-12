@@ -489,6 +489,7 @@
       '</div>';
     return c;
   }
+  window.MTZ_PLP_CARD = card;   /* read-only hook: the comparison's "Ähnliche Modelle" render the same card (12.11.) */
 
   /* ---- In-grid promo banner (spans the full grid width) ---- */
   function bannerEl() {

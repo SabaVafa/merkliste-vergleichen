@@ -501,6 +501,7 @@
       '</div>';
     return c;
   }
+  window.MTZ_PLP_CARD = card;   /* read-only hook: the comparison's "Ähnliche Modelle" render the same card (12.11.) */
 
   /* ---- In-grid promo banner — compact version of the Home XDM10 hero
          (reuses .hero-banner from Home/styles-v2.css; .hero-banner--inline

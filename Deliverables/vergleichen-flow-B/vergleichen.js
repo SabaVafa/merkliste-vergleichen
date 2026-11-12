@@ -149,6 +149,7 @@
   var IC_TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  var IC_UNDO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>';
   var IC_ADD='<svg class="vgl-alt__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="vgl-alt__plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></g><polyline class="vgl-alt__chk" points="5 12.5 10 17.5 19 7" pathLength="1"/></svg>';
   var IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   var IC_BM='<svg viewBox="0 0 27 26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 1.7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v22.9a.6.6 0 0 1-.97.47L13.5 19.4l-8.03 5.67a.6.6 0 0 1-.97-.47V1.7z"/></svg>';   /* same glyph as merkliste.js (DS icon canvas 27×26) */
@@ -210,6 +211,7 @@
 
     tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm)toggle(rm.getAttribute('data-rm'),false);});
     view.addEventListener('click',function(e){
+      if(e.target.closest('.vgl-altc .pcard__title a'))e.preventDefault();
       if(addPanel&&!addPanel.contains(e.target)&&!(addAnchor&&addAnchor.contains(e.target)))closeAdd(false);   /* outside click closes the search */
       if(pickEl&&!pickEl.contains(e.target)&&!(pickBtn&&pickBtn.contains(e.target)))closePick(false);
       var pop=view.querySelector('.vgl-sharepop');if(pop&&!pop.contains(e.target)&&!e.target.closest('[data-vgl="share"]'))pop.remove();
@@ -436,6 +438,24 @@
   function firstShown(sel){var l=view.querySelectorAll(sel);for(var i=0;i<l.length;i++)if(l[i].getClientRects().length)return l[i];return null;}
   /* new column from "Ähnliche Modelle": its image tile lights up once, so the eye finds it after the jump to the top */
   function reduced(){return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);}
+  /* Ähnliche Modelle = the PLP product card (12.11., user: "consistent with our current PLP"): the PLP renders the
+     card (window.MTZ_PLP_CARD, same markup and plp.css styles, Merkliste bookmark added by merkliste.js); the
+     comparison adds the differences above the price and "Zum Vergleich hinzufügen" at the foot. */
+  function fillAltCards(){
+    var raw={};(window.MTZ_PRODUCTS||[]).forEach(function(p){raw[p.id]=p;});
+    Array.prototype.forEach.call(viewBody.querySelectorAll('li.vgl-altc'),function(li){
+      var p=raw[li.getAttribute('data-altc')];if(!p)return;
+      var card;try{card=window.MTZ_PLP_CARD(p);}catch(e){return;}
+      var body=card.querySelector('.pcard__body')||card,foot=body.querySelector('.pcard__footer')||body.querySelector('.pcard__pricerow');
+      var why=li.querySelector('.vgl-altc__why'),add=li.querySelector('.vgl-alt__add');
+      if(why&&why.children.length){if(foot)body.insertBefore(why,foot);else body.appendChild(why);}else if(why)why.remove();
+      if(add)body.appendChild(add);
+      card.querySelectorAll('img[data-fallback]').forEach(function(im){im.addEventListener('error',function(){var f=im.getAttribute('data-fallback');if(f&&im.getAttribute('src')!==f)im.src=f;},{once:true});});
+      li.insertBefore(card,li.firstChild);
+      /* feature-pill row: the PLP's edge fade (is-scroll / at-start / at-end), as on the category page */
+      card.querySelectorAll('.pcard__tags').forEach(function(t){var upd=function(){var mx=t.scrollWidth-t.clientWidth,on=mx>1;t.classList.toggle('is-scroll',on);t.classList.toggle('at-start',!on||t.scrollLeft<=1);t.classList.toggle('at-end',!on||t.scrollLeft>=mx-1);};requestAnimationFrame(upd);t.addEventListener('scroll',upd,{passive:true});});
+    });
+  }
   function flashCol(id){var b=view.querySelector('.vgl-ph__rm[data-rm="'+id+'"]'),t=b&&b.closest('.vgl-ph__img');if(!t)return;t.classList.remove('is-arrived');void t.offsetWidth;t.classList.add('is-arrived');setTimeout(function(){t.classList.remove('is-arrived');},1800);}
   function focusIn(sel){(firstShown(sel)||firstShown('.vgl-ph__rm')||view.querySelector('#vglTitle')).focus();}
   function refName(id){if(cur){for(var i=0;i<cur.items.length;i++)if(cur.items[i].id===id)return cur.refs[i].n;}return BY_ID[id]?baseTitle(BY_ID[id]):id;}
@@ -459,7 +479,8 @@
     focusIn('.vgl-ph__rm[data-rm="'+r.id+'"]');
   }
   /* "Vergleich leeren" inside the dialog: keeps the dialog open (empty state) and offers an inline undo */
-  function clearView(){lastCleared=selected.slice();clearAll();announce('Vergleich geleert.');focusIn('[data-vgl="undo-clear"]');}
+  function clearView(){if(selected.length)lastCleared=selected.slice();   /* a second clear must not overwrite the undo with nothing */
+    clearAll();announce('Vergleich geleert.');focusIn('[data-vgl="undo-clear"]');}
   function undoClear(){if(!lastCleared)return;var ids=lastCleared;lastCleared=null;setSelection(ids);syncAll();announce('Vergleich wiederhergestellt: '+selected.length+' Modelle.');focusIn('.vgl-ph__rm');}
   /* "Modell hinzufügen": back to the grid, first free card field focused */
   /* back to the category page in compare mode: the cards carry their compare checkboxes, the strip keeps the current
@@ -988,8 +1009,21 @@
     if(pinIO){pinIO.disconnect();pinIO=null;}
     if(items.length<2){
       cur=null;visCols=null;
-      viewBody.innerHTML='<div class="vgl-empty">'+SCALE+'<b>Mindestens zwei Modelle wählen</b><span>Markieren Sie über „Vergleichen" auf den Produktkarten weitere Modelle, um sie hier gegenüberzustellen.</span>'+
-        '<div class="vgl-empty__act">'+(lastCleared?'<button class="vgl-more" type="button" data-vgl="undo-clear">Vergleich wiederherstellen ('+lastCleared.length+')</button>':'')+'<button class="vgl-more" type="button" data-vgl="add">'+IC_PLUS+'Modell wählen</button>'+(mklCount()?'<button class="vgl-more" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste wählen ('+mklCount()+')</button>':'')+'</div></div>';
+      /* Empty / one-model state (12.11., Lead Design): two slots show what is there and what is missing (the model
+         that is left, a numbered empty slot), one clear next step (primary "Modell hinzufügen"), the Merkliste as the
+         second way, and the undo after "Vergleich leeren" as a quiet text link below. */
+      var slots=[0,1].map(function(i){var p=items[i];return p?'<div class="vgl-empty__slot is-filled">'+imgHTML(p)+'</div>':'<div class="vgl-empty__slot"><span>'+(i+1)+'</span></div>';}).join('');
+      var nMk=mklCount();
+      viewBody.innerHTML='<div class="vgl-empty" role="group" aria-labelledby="vglEmptyT">'+
+        '<div class="vgl-empty__slots" aria-hidden="true">'+slots+'</div>'+
+        '<h3 class="vgl-empty__t" id="vglEmptyT">'+(items.length?'Wählen Sie ein zweites Modell':'Wählen Sie zwei Modelle')+'</h3>'+
+        '<p class="vgl-empty__d">'+(items.length?'<b>'+esc(shopName(items[0]))+'</b> ist im Vergleich. ':'')+'Bis zu '+(['','eins','zwei','drei','vier','fünf','sechs'][MAX]||MAX)+' Modelle lassen sich gegenüberstellen.</p>'+
+        '<div class="vgl-empty__act">'+
+          '<button class="btn btn--primary vgl-empty__btn" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>'+
+          (nMk?'<button class="btn btn--secondary vgl-empty__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMk+')</button>':'')+
+        '</div>'+
+        (lastCleared&&lastCleared.length?'<button class="vgl-empty__undo" type="button" data-vgl="undo-clear">'+IC_UNDO+'Vorherigen Vergleich wiederherstellen ('+lastCleared.length+' Modelle)</button>':'')+
+      '</div>';
       return;
     }
     var an=analyzeAll(items),titles=titlesOf(items),refs=refsOf(items,titles),vd=verdict(items,an,refs);
@@ -1061,13 +1095,19 @@
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
     var alts=isFull()?[]:alternatives(items),altHTML='';
     if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3><ul class="vgl-alts__list">'+
-      alts.map(function(o){return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div>'+(o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'')+'<div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Zum Vergleich hinzufügen</span></button></div></li>';}).join('')+'</ul></section>';
+      alts.map(function(o){
+        var why=o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'';
+        var add='<button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Zum Vergleich hinzufügen</span></button>';
+        if(window.MTZ_PLP_CARD)return '<li class="vgl-altc" data-altc="'+esc(o.p.id)+'"><div class="vgl-altc__why">'+why+'</div>'+add+'</li>';
+        return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div>'+(o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'')+'<div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Zum Vergleich hinzufügen</span></button></div></li>';
+      }).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+
       '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
+    fillAltCards();
     lockHead();placePin();fitHeader();fitPeek();placeTips();watchPin();
   }
   /* collapsed Gemeinsamkeiten = a full section bar: heading + count + the shared features named (info scent) + "Anzeigen" */
@@ -1116,12 +1156,38 @@
     view.classList.remove('is-barwrap');
     if(bi&&bi.scrollWidth>bi.clientWidth+1)view.classList.add('is-barwrap');
   }
-  /* Gemeinsamkeiten: show/hide the rows in place — column widths stay */
+  /* Gemeinsamkeiten: show/hide the rows in place — column widths stay.
+     Motion (12.11., user: "enhance the dropdown animation"): opening, the rows fade and slide in one after the
+     other (24 ms apart, at most 240 ms) while everything below the table glides down to its new place (FLIP);
+     closing, the rows fade out together (140 ms), then the content below glides up. A second click during the
+     motion takes over at once (running animations are settled, a pending close is dropped).
+     Reduced motion or no Web Animations: the old instant toggle. */
+  var G_EASE='cubic-bezier(.2,.7,.2,1)',gAnims=[],gRun=0;
+  function belowTable(el){var out=[],n=el&&el.closest('table');while(n&&n!==viewBody&&n.parentElement){for(var s=n.nextElementSibling;s;s=s.nextElementSibling)if(s.offsetParent)out.push(s);n=n.parentElement;}return out;}
   function onCommon(){
-    var btn=viewBody.querySelector('[data-vgl="common"]'),nG=viewBody.querySelectorAll('tr.vgl-gx').length;
-    Array.prototype.forEach.call(viewBody.querySelectorAll('tr.vgl-gx'),function(r){r.hidden=!gShow;});
+    var btn=viewBody.querySelector('[data-vgl="common"]'),rows=Array.prototype.slice.call(viewBody.querySelectorAll('tr.vgl-gx')),nG=rows.length,run=++gRun;
+    gAnims.forEach(function(a){a.cancel();});gAnims=[];
+    var after=belowTable(rows[0]),anim=nG&&!reduced()&&typeof rows[0].animate==='function';
+    var tops=after.map(function(el){return el.getBoundingClientRect().top;});
+    function glide(from){after.forEach(function(el,i){var d=from[i]-el.getBoundingClientRect().top;if(Math.abs(d)>1)gAnims.push(el.animate([{transform:'translateY('+d+'px)'},{transform:'none'}],{duration:280,easing:G_EASE}));});}
     if(btn){btn.setAttribute('aria-expanded',String(gShow));btn.querySelector('.vgl-gdisc__lbl').textContent=commonLabel(gShow);}
-    placeTips();
+    if(gShow){
+      rows.forEach(function(r){r.hidden=false;});
+      if(anim){
+        glide(tops);
+        rows.forEach(function(r,i){gAnims.push(r.animate([{opacity:0,transform:'translateY(-.5rem)'},{opacity:1,transform:'none'}],{duration:240,delay:Math.min(i*24,240),easing:G_EASE,fill:'backwards'}));});
+      }
+      placeTips();
+    }else if(anim){
+      rows.forEach(function(r){gAnims.push(r.animate([{opacity:1},{opacity:0}],{duration:140,easing:'ease-in',fill:'forwards'}));});
+      setTimeout(function(){   /* a timer, not onfinish: it also fires when the tab is in the background */
+        if(run!==gRun)return;   /* reopened meanwhile */
+        var from=after.map(function(el){return el.getBoundingClientRect().top;});
+        rows.forEach(function(r){r.hidden=true;});
+        gAnims.forEach(function(a){a.cancel();});gAnims=[];
+        glide(from);placeTips();
+      },150);
+    }else{rows.forEach(function(r){r.hidden=true;});placeTips();}
     announce(nG+' Gemeinsamkeit'+(nG===1?'':'en')+(gShow?' eingeblendet.':' ausgeblendet.'));
   }
 
