@@ -1199,7 +1199,7 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
    Was an 18 px glyph (the cross itself ~9 px) next to the 18 px toolbar icons. Now a 48 px target with a 32 px glyph
    (cross ~16 px, stroke ~2.3 px); pulled right so the cross ends on the content edge. No hover effect (icon-button rule). ==== */
 .vgl-view .vgl-close,.vgl-view .vgl-bar__act+.vgl-close{width:3rem;height:3rem;margin-right:-1rem}
-.vgl-view .vgl-close svg,.vgl-view .vgl-bar__act+.vgl-close svg{width:2rem;height:2rem;stroke-width:1.75}
+.vgl-view .vgl-close svg,.vgl-view .vgl-bar__act+.vgl-close svg{width:1.9375rem;height:1.9375rem;stroke-width:1.75}   /* 31 px (12.11., user: 1 px smaller) */
 
 /* ==== Ähnliche Modelle as its own zone (12.11., Lead Product Design: "more distinguishable … increase the integrity") ====
    Before: the heading used the same grey bar as the table sections (Unterschiede, Nicht für alle gepflegt,
