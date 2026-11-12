@@ -659,12 +659,8 @@ table.vgl-t.is-tight .vgl-stars--row .vgl-stars__n{margin-left:.375rem;font-size
 }
 /* full-width grey band (06.11.): the header panel bleeds to both edges of the overlay — the paper tone is extended
    sideways with a clipped spread shadow (no layout or scroll impact); square ends, content stays on the column grid */
-@media(min-width:48rem){
-  table.vgl-t thead .vgl-hr>*{border-radius:0 !important}
-  /* only the outer cells extend: the label slot (spans the whole header) to the left, each row's last cell to the right */
-  table.vgl-t thead th.vgl-lc[rowspan]{box-shadow:0 0 0 100vmax var(--v-paper);clip-path:inset(0 0 0 -100vmax)}
-  table.vgl-t thead .vgl-hr>:last-child{box-shadow:0 0 0 100vmax var(--v-paper);clip-path:inset(0 -100vmax 0 0)}
-}
+/* (desktop full-bleed band removed 12.11.: the page itself is paper grey now and the header is a white card —
+   its square-corner !important rule kept the card's corners from rounding) */
 @media(max-width:47.99rem){
   table.vgl-t thead tr.vgl-hr{border-radius:0 !important;box-shadow:0 0 0 100vmax var(--v-paper);clip-path:inset(0 -100vmax)}
 }
@@ -1340,4 +1336,36 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>th,.vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>td,.vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>:last-child{border-left:0;border-right:0;border-radius:0;box-shadow:none}
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):last-child{border-bottom:.0625rem solid var(--v-g200);border-radius:0 0 var(--v-r-l) var(--v-r-l)}
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):last-child>*{border-bottom:0}
+}
+
+/* ==== Model header = the first white card (12.11., user: "the top section must align the ones below") ====
+   The header rows share the table's columns, so styling them as a card makes edges, columns and text line up with
+   the section cards by construction: white cells, 1 px graphite-200 frame, 8 px corners (the "Modell hinzufügen"
+   cell carries the left edge and both left corners — it spans the four header rows), and the same column lines as
+   the cards (graphite-100; the add column set off by an inset line like the label column below). ==== */
+.vgl-view table.vgl-t thead tr.vgl-hr>*{background:var(--v-white)}
+.vgl-view table.vgl-t thead tr.vgl-hr--img>*{border-top:.0625rem solid var(--v-g200)}
+.vgl-view table.vgl-t thead tr.vgl-hr>:last-child{border-right:.0625rem solid var(--v-g200)}
+.vgl-view table.vgl-t thead tr.vgl-hr--cta>*{border-bottom:.0625rem solid var(--v-g200)}
+.vgl-view table.vgl-t thead tr.vgl-hr--img>:last-child{border-top-right-radius:var(--v-r-l)}
+.vgl-view table.vgl-t thead tr.vgl-hr--cta>:last-child{border-bottom-right-radius:var(--v-r-l)}
+.vgl-view table.vgl-t thead tr.vgl-hr--img>th[rowspan]{border-left:.0625rem solid var(--v-g200);border-bottom:.0625rem solid var(--v-g200);border-radius:var(--v-r-l) 0 0 var(--v-r-l);box-shadow:inset -.0625rem 0 0 var(--v-g100)}
+.vgl-view table.vgl-t thead tr.vgl-hr>td,.vgl-view table.vgl-t thead tr.vgl-hr:not(.vgl-hr--img)>th{border-left:.0625rem solid var(--v-g100)}
+.vgl-view table.vgl-t thead tr.vgl-hr--img>th[rowspan]+td,.vgl-view table.vgl-t thead tr.vgl-hr:not(.vgl-hr--img)>:first-child{border-left-color:transparent}
+
+/* ==== "Maximum erreicht": colour on the icon only (12.11., Lead Product Design, replaces the orange text #B45309) ====
+   Reaching four models is an expected state, not an error: the DS orange stays in the warning triangle, the text is
+   neutral — "Maximum erreicht" in ink / 700 as the headline, the rest regular in muted grey (5.4:1). All DS tokens. ==== */
+.vgl-tray__hint.limit{color:var(--v-muted);font-weight:400}
+.vgl-tray__hint.limit b{font-weight:700;color:var(--v-ink)}
+.vgl-tray__hint.limit .vgl-tray__hd{color:var(--v-muted)}
+
+/* Header card on phones: the header rows are their own rows there (no "add" column), so the card sits on the rows —
+   white, side frame, top frame + corners on the first row, bottom frame + corners on the CTA row; the old grey
+   full-bleed band of the rows is switched off, cells carry no frame of their own. */
+@media(max-width:47.99rem){
+  .vgl-view table.vgl-t thead tr.vgl-hr{background:var(--v-white);border-left:.0625rem solid var(--v-g200);border-right:.0625rem solid var(--v-g200);box-shadow:none;clip-path:none}
+  .vgl-view table.vgl-t thead tr.vgl-hr--img{border-top:.0625rem solid var(--v-g200);border-radius:var(--v-r-l) var(--v-r-l) 0 0 !important}
+  .vgl-view table.vgl-t thead tr.vgl-hr--cta{border-bottom:.0625rem solid var(--v-g200);border-radius:0 0 var(--v-r-l) var(--v-r-l) !important}
+  .vgl-view table.vgl-t thead tr.vgl-hr>*,.vgl-view table.vgl-t thead tr.vgl-hr>:last-child,.vgl-view table.vgl-t thead tr.vgl-hr>td,.vgl-view table.vgl-t thead tr.vgl-hr:not(.vgl-hr--img)>th{background:transparent;border:0;border-radius:0;box-shadow:none}
 }

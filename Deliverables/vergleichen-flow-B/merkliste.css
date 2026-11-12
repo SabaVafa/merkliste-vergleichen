@@ -521,3 +521,17 @@
    .625 rem above and below; a lock hint under the heading keeps its own spacing. ==== */
 .mkl-group{padding-top:.625rem;padding-bottom:.625rem}
 .mkl-group__hint{margin:.375rem 0 0}
+
+/* ==== Picker note (12.11.): opened from the comparison with nothing in the list that fits — an info line above the
+   list in the toast / tooltip-header colour (DS teal-100), ink text, teal info icon. ==== */
+.mkl-picknote{display:flex;align-items:flex-start;gap:.5rem;margin:var(--sp-4,1rem) var(--sp-5,1.25rem) 0;padding:.75rem .875rem;border-radius:var(--r-l,.5rem);background:var(--color-teal-100,#E6EEEE);font-size:var(--text-body-sm,.875rem);line-height:1.45;color:var(--schwarz,#1A171B)}
+.mkl-picknote[hidden]{display:none}
+.mkl-picknote svg{flex:none;width:1.125rem;height:1.125rem;margin-top:.0625rem;color:var(--teal,#015253);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.mkl-picknote svg circle[r="0.6"]{fill:currentColor}
+.mkl-picknote b{font-weight:700}
+@media(max-width:47.99rem){.mkl-picknote{margin:var(--sp-3,.75rem) var(--sp-4,1rem) 0}}
+
+/* ==== Picker note neutral (12.11., user decision after the UI-standard check) ====
+   Side information takes no status colour: green (teal-100) reads as "success" and is the confirmation toast in the
+   same drawer. Now the neutral info style of the storage hint: DS paper grey #F5F6FA, teal info icon, ink text. ==== */
+.mkl-picknote{background:var(--paper-white,#F5F6FA)}

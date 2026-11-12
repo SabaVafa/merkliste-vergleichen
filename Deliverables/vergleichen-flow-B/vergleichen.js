@@ -621,7 +621,7 @@
       trayHint.innerHTML=IC_INFO+'Noch <b>'+need+'</b> Modell'+(need>1?'e':'')+' wählen, um zu vergleichen';
     }else if(n>=MAX){
       trayHint.classList.add('limit');
-      trayHint.innerHTML=IC_LIMIT+'Maximum erreicht – mehr als '+MAX+' Modelle sind nicht vergleichbar';
+      trayHint.innerHTML=IC_LIMIT+'<span><b>Maximum erreicht</b> <span class="vgl-tray__hd">– mehr als '+MAX+' Modelle sind nicht vergleichbar</span></span>';   /* colour on the icon only, text: bold headline + grey detail (12.11.) */
     }else{
       var more=MAX-n;
       trayHint.classList.add('ready');
@@ -1038,7 +1038,7 @@
         '<p class="vgl-empty__d">'+(items.length?'<b>'+esc(shopName(items[0]))+'</b> ist im Vergleich. ':'')+'Bis zu '+(['','eins','zwei','drei','vier','fünf','sechs'][MAX]||MAX)+' Modelle lassen sich gegenüberstellen.</p>'+
         '<div class="vgl-empty__act">'+
           '<button class="btn btn--primary vgl-empty__btn" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>'+
-          (nMk?'<button class="btn btn--secondary vgl-empty__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMk+')</button>':'')+
+          (window.MTZ_MKL?'<button class="btn btn--secondary vgl-empty__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste'+(nMk?' ('+nMk+')':'')+'</button>':'')+
         '</div>'+
         (lastCleared&&lastCleared.length?'<button class="vgl-empty__undo" type="button" data-vgl="undo-clear">'+IC_UNDO+'Vorherigen Vergleich wiederherstellen ('+lastCleared.length+' Modelle)</button>':'')+
       '</div>';
@@ -1056,11 +1056,13 @@
     var fz=note?'<section class="vgl-fz" aria-label="Hinweis zu den Daten"><p class="vgl-fz__note">'+IC_INFO+'<span>'+note+'</span></p></section>':'';
 
     /* ---- Table ---- */
-    var nMkl=n<MAX?mklCount():0;
+    /* "Aus der Merkliste" is always offered while there is room (12.11., user decision): with nothing to add it still
+       opens the Merkliste, which shows what is saved and "Zuletzt angesehen" to bookmark a model first */
+    var nMkl=n<MAX?mklCount():0,hasMkl=n<MAX&&!!window.MTZ_MKL;
     var lc={
       tile:n>=MAX?'<div class="vgl-lc__full" role="note">'+IC_OK+'<b>Maximale Anzahl erreicht</b><span>Es können bis zu '+MAX+' Modelle verglichen werden.'+(pick?' '+nv+' davon sind sichtbar – zum Wechseln den Namen wählen.':'')+'</span></div>':
         '<button class="vgl-addtile" type="button" data-vgl="add">'+IC_PLUS+'<span class="vgl-addtile__l">Modell hinzufügen</span><span class="vgl-addtile__n">noch '+(MAX-n)+' möglich</span></button>',
-      mkl:nMkl?'<button class="vgl-lc__mkl" type="button" data-vgl="addmkl" aria-label="Aus der Merkliste hinzufügen, '+nMkl+' Modell'+(nMkl===1?'':'e')+'">'+IC_BM+'<span>Aus der Merkliste</span></button>':''
+      mkl:hasMkl?'<button class="vgl-lc__mkl" type="button" data-vgl="addmkl" aria-label="'+(nMkl?'Aus der Merkliste hinzufügen, '+nMkl+' Modell'+(nMkl===1?'':'e'):'Merkliste öffnen – noch kein weiteres Modell dieser Kategorie gemerkt')+'">'+IC_BM+'<span>Aus der Merkliste</span></button>':''
     };
     var span=' colspan="'+(nv+1)+'" aria-colspan="'+(nv+1)+'"';
     function rowsHTML(list,kind){
@@ -1121,7 +1123,7 @@
       }).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
-    var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(nMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMkl+')</button>':'')+
+    var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(hasMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste'+(nMkl?' ('+nMkl+')':'')+'</button>':'')+
       '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;

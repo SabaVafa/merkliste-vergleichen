@@ -135,7 +135,7 @@
 
   /* ---- Chrome ---- */
   var hdrBtn, hdrBadge, scrim, drawer, titleEl, countEl, clearBtn, notice, listEl, emptyEl, footHint, cta, footEl, toastEl, toastT, liveEl;
-  var recentEl, toolsEl, shareBtn, askEl, popEl, sharedEl, sharedLink, hintEl;
+  var pickNote, recentEl, toolsEl, shareBtn, askEl, popEl, sharedEl, sharedLink, hintEl;
   var sharedList = null, sharedMode = false, openParts = {};   /* 09b: shared list (sessionStorage), expanded configuration rows */
   /* storage note (10.11.): icon + a bold statement + one explaining sentence; 14 px instead of 12 px grey caption */
   /* hint glyph (11.11., user decision): info circle = "Hinweis"; replaces the device icon. DS icon style: inline,
@@ -179,6 +179,7 @@
       '<div class="mkl-body">' +
         '<div class="mkl-shared" role="status" tabindex="-1" hidden></div>' +
         '<button class="mkl-link mkl-sharedlink" type="button" data-mkl="show-shared" hidden></button>' +
+        '<p class="mkl-picknote" role="status" hidden></p>' +
         '<ul class="mkl-list" role="list"></ul>' +
         '<section class="mkl-recent" aria-labelledby="mklRecentH" hidden><div class="mkl-recent__head"><h3 class="mkl-recent__h" id="mklRecentH">Zuletzt angesehen</h3><button class="mkl-link" type="button" data-mkl="recent-clear">Verlauf löschen</button></div><ul class="mkl-recent__list" role="list"></ul></section>' +
         '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol – sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
@@ -196,7 +197,7 @@
     notice.hidden = storageOk;
     toolsEl = drawer.querySelector('.mkl-tools'); shareBtn = drawer.querySelector('[data-mkl="share"]');
     askEl = drawer.querySelector('.mkl-shareask'); popEl = drawer.querySelector('.mkl-sharepop'); sharedEl = drawer.querySelector('.mkl-shared'); sharedLink = drawer.querySelector('.mkl-sharedlink');
-    hintEl = drawer.querySelector('.mkl-hint'); recentEl = drawer.querySelector('.mkl-recent');
+    hintEl = drawer.querySelector('.mkl-hint'); recentEl = drawer.querySelector('.mkl-recent'); pickNote = drawer.querySelector('.mkl-picknote');
     var gOf = function (t) { var g = t && t.closest && t.closest('.mkl-ghost'); return g ? g.getAttribute('data-ghost') : null; };
     /* hover pauses only when the pointer comes onto the undo row from outside: the row appears right under the cursor
        that clicked the bin, and that must not hold it open (12.11. bug: the first removal stayed far beyond its 3 s) */
@@ -535,7 +536,7 @@
   }
   function renderRecent(shared) {
     if (!recentEl) return;
-    var l = (shared || (pick && !pick.auto)) ? [] : recentShown();   /* hidden only in the explicit picker opened from the comparison */
+    var l = shared ? [] : recentShown();   /* also in the picker opened from the comparison (12.11.): bookmark a viewed model there, then add it */
     recentEl.hidden = !l.length;
     recentEl.querySelector('.mkl-recent__list').innerHTML = l.map(recentRowHTML).join('');
   }
@@ -652,6 +653,7 @@
   }
   function syncCmp() {
     if (pick) { syncPick(); return; }
+    if (pickNote) pickNote.hidden = true;
     var n = cmpSel.length, lock = n ? lensOfCmp(cmpSel[0]) : null, full = n >= CMP_MAX;
     listEl.querySelectorAll('.mkl-cmp').forEach(function (lab) {
       var inp = lab.querySelector('input'), id = inp.getAttribute('data-id'), on = cmpSel.indexOf(id) > -1;
@@ -697,7 +699,17 @@
     });
     cta.textContent = 'Hinzufügen';
     cta.disabled = n < 1;
-    setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' Modelle ausgewählt') : 'Keine Modelle ausgewählt',
+    /* nothing in the list fits this comparison (12.11., user: "it is not communicated"): say so above the list and in
+       the footer, instead of only greying out the checkboxes */
+    var cand = viewItems().filter(function (it) { var id = it.articleId || it.id; return (it.lens || LENS) === pick.lens && !it.configId && pick.inCmp.indexOf(id) < 0; }).length;
+    var others = {}; viewItems().forEach(function (it) { var l = it.lens || LENS; if (l !== pick.lens && LENSES[l]) others[LENSES[l].label] = 1; });
+    var otherTxt = Object.keys(others).join(' und ');
+    pickNote.hidden = cand > 0 || !viewItems().length;
+    if (!pickNote.hidden) pickNote.innerHTML = IC_INFO + '<span><b>Keine weiteren ' + esc(lab0) + ' in Ihrer Merkliste.</b> ' +
+      (otherTxt ? 'Verglichen werden nur Modelle einer Kategorie.' : 'Die gemerkten Modelle sind bereits im Vergleich.') +
+      (recentEl && !recentEl.hidden ? ' Unter „Zuletzt angesehen“ können Sie ein Modell merken und dann hinzufügen.' : '') + '</span>';
+    if (!cand && !n) setFoot('Nichts zum Hinzufügen', 'Merken Sie zuerst ' + ({ sprechanlage: 'eine Türsprechanlage', briefkasten: 'einen Briefkasten' }[pick.lens] || 'ein Modell dieser Kategorie') + '.');
+    else setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' Modelle ausgewählt') : 'Keine Modelle ausgewählt',
       free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
     fitDrawer();
