@@ -1276,3 +1276,25 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 .vgl-pin__name{-webkit-line-clamp:1;font-size:var(--v-fs-body);line-height:1.35}
 .vgl-pin__txt{gap:.125rem}
 @media(max-width:47.99rem){.vgl-pin__name{font-size:var(--v-fs-sm)}}
+
+/* ==== Product photo in add / remove toasts (12.11., user: "the same approach as Airbnb") — as in merkliste.css ==== */
+.vgl-toast__img{flex:none;display:flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;padding:.125rem;border-radius:var(--v-r-l);background:var(--v-white);box-shadow:inset 0 0 0 .0625rem var(--v-g200)}
+.vgl-toast__img img{max-width:100%;max-height:100%;object-fit:contain}
+.vgl-toast.has-img{padding-left:.5rem}
+
+/* ==== Tooltip term cells in the header colour (12.11., user decision): --color-teal-100 #E6EEEE like the tooltip
+   header and the notification toast (was paper grey #F5F6FA); ink 700 on it 15:1. ==== */
+.vgl-tip__row>b{background:var(--color-teal-100,#E6EEEE)}
+
+/* ==== Dividers in the sticky model strip (12.11., Lead Product Design) ====
+   One 1 px line at every column boundary — on exactly the x of the table's column lines below (the strip grid takes
+   the table's column widths), so the strip reads as the table's head; also between the section label and the first
+   model, where the table has its grey label column. Strip hairline colour (g200), inset .75 rem top and bottom so
+   they divide without boxing the floating strip in. Phones (no label slot, 1 rem column gap): between models only,
+   centred in the gap. ==== */
+.vgl-pin__col{position:relative}
+.vgl-pin__col::before{content:'';position:absolute;left:0;top:.75rem;bottom:.75rem;width:.0625rem;background:var(--v-g200)}
+@media(max-width:47.99rem){
+  .vgl-pin__col::before{left:-.5rem;top:.5rem;bottom:.5rem}
+  .vgl-pin__lc+.vgl-pin__col::before,.vgl-pin__row.no-lc .vgl-pin__col:first-of-type::before{display:none}
+}

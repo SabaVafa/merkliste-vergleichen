@@ -23,7 +23,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  var KEY = 'mtz_merkliste', LIMIT = 50, CMP_MAX = 4, CMP_MIN = 2, TOAST_MS = 5000;
+  var KEY = 'mtz_merkliste', LIMIT = 50, CMP_MAX = 4, CMP_MIN = 2, TOAST_MS = 5000, TOAST_UNDO_MS = 10000;   /* emptying the whole list: 10 s to undo (pauses on hover / focus) */
   var LENS = window.MTZ_LENS || 'sprechanlage';
   var BASE = window.MTZ_MKL_BASE || '';                 /* '' on the PLPs, '../' on pdp/index.html — stored paths are relative to vergleichen-flow-B */
   var PDP_URLS = { colson1: 'pdp/index.html' };         /* products that have a PDP in the prototype */
@@ -126,7 +126,6 @@
   var IC_INFO = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.6"/></svg>';
   var IC_LIMIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13.5"/><circle cx="12" cy="17" r="0.6"/></svg>';
   var IC_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
-  var IC_PRINT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
   var IC_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
   var IC_CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
   var IC_CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
@@ -135,8 +134,8 @@
   var reduced = function () { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 
   /* ---- Chrome ---- */
-  var hdrBtn, hdrBadge, scrim, drawer, titleEl, countEl, clearBtn, confirmEl, confirmQ, notice, listEl, emptyEl, footHint, cta, footEl, toastEl, toastT, liveEl;
-  var toolsEl, shareBtn, printBtn, askEl, popEl, sharedEl, sharedLink, hintEl;
+  var hdrBtn, hdrBadge, scrim, drawer, titleEl, countEl, clearBtn, notice, listEl, emptyEl, footHint, cta, footEl, toastEl, toastT, liveEl;
+  var recentEl, toolsEl, shareBtn, askEl, popEl, sharedEl, sharedLink, hintEl;
   var sharedList = null, sharedMode = false, openParts = {};   /* 09b: shared list (sessionStorage), expanded configuration rows */
   /* storage note (10.11.): icon + a bold statement + one explaining sentence; 14 px instead of 12 px grey caption */
   /* hint glyph (11.11., user decision): info circle = "Hinweis"; replaces the device icon. DS icon style: inline,
@@ -167,22 +166,21 @@
       '<div class="mkl-head">' +
         '<div class="mkl-head__row">' +
           '<h2 class="mkl-title" id="mklTitle" tabindex="-1">Merkliste <span class="mkl-count">(0)</span></h2>' +
+          '<div class="mkl-tools" role="group" aria-label="Merkliste weitergeben" hidden>' +   /* in the title row (12.11.): a row of its own for one link wasted space */
+            '<button class="mkl-tool" type="button" data-mkl="share" aria-label="Merkliste teilen">' + IC_SHARE + '<span class="mkl-tool__l">Teilen</span></button>' +
+          '</div>' +
           '<button class="mkl-link" type="button" data-mkl="clear" aria-label="Merkliste leeren" hidden><span class="mkl-w-hide">Merkliste leeren</span><span class="mkl-w-only">Leeren</span></button>' +
           '<button class="mkl-close" type="button" data-mkl="close" aria-label="Merkliste schließen">' + IC_X + '</button>' +
         '</div>' +
-        '<div class="mkl-tools" role="group" aria-label="Merkliste weitergeben" hidden>' +
-          '<button class="mkl-tool" type="button" data-mkl="share">' + IC_SHARE + '<span>Teilen</span></button>' +
-          '<button class="mkl-tool" type="button" data-mkl="print" title="Drucken oder im Druckdialog als PDF speichern">' + IC_PRINT + '<span>Drucken / PDF</span></button>' +
-        '</div>' +
         '<div class="mkl-shareask" role="group" aria-labelledby="mklAskQ" tabindex="-1" hidden><p class="mkl-shareask__q" id="mklAskQ"></p><div class="mkl-shareask__act"><button class="mkl-btn mkl-btn--neutral" type="button" data-mkl="share-plain">Ohne Gravurtext teilen</button><button class="mkl-link" type="button" data-mkl="share-full">Mit Gravurtext teilen</button><button class="mkl-link" type="button" data-mkl="share-no">Abbrechen</button></div></div>' +
         '<div class="mkl-sharepop" hidden><label class="mkl-sharepop__l" for="mklShareUrl">Link zur Merkliste</label><input class="mkl-sharepop__in" id="mklShareUrl" type="text" readonly><button class="mkl-link" type="button" data-mkl="sharepop-close">Schließen</button></div>' +
-        '<div class="mkl-confirm" hidden role="group" aria-label="Merkliste leeren bestätigen" tabindex="-1"><span class="mkl-confirm__q"></span><button class="mkl-btn" type="button" data-mkl="clear-yes">Ja, entfernen</button><button class="mkl-link" type="button" data-mkl="clear-no">Abbrechen</button></div>' +
         '<p class="mkl-notice" hidden>Die Merkliste kann auf diesem Gerät nicht gespeichert werden (Cookies/Speicher blockiert)</p>' +
       '</div>' +
       '<div class="mkl-body">' +
         '<div class="mkl-shared" role="status" tabindex="-1" hidden></div>' +
         '<button class="mkl-link mkl-sharedlink" type="button" data-mkl="show-shared" hidden></button>' +
         '<ul class="mkl-list" role="list"></ul>' +
+        '<section class="mkl-recent" aria-labelledby="mklRecentH" hidden><div class="mkl-recent__head"><h3 class="mkl-recent__h" id="mklRecentH">Zuletzt angesehen</h3><button class="mkl-link" type="button" data-mkl="recent-clear">Verlauf löschen</button></div><ul class="mkl-recent__list" role="list"></ul></section>' +
         '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol – sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
       '</div>' +
       '<div class="mkl-foot">' +
@@ -193,34 +191,43 @@
     '</div>');
     document.body.appendChild(drawer);
     titleEl = drawer.querySelector('.mkl-title'); countEl = drawer.querySelector('.mkl-count'); clearBtn = drawer.querySelector('[data-mkl="clear"]');
-    confirmEl = drawer.querySelector('.mkl-confirm'); confirmQ = drawer.querySelector('.mkl-confirm__q'); notice = drawer.querySelector('.mkl-notice');
+    notice = drawer.querySelector('.mkl-notice');
     listEl = drawer.querySelector('.mkl-list'); emptyEl = drawer.querySelector('.mkl-empty'); footHint = drawer.querySelector('.mkl-foot__hint'); cta = drawer.querySelector('[data-mkl="compare"]'); footEl = drawer.querySelector('.mkl-foot');
     notice.hidden = storageOk;
-    toolsEl = drawer.querySelector('.mkl-tools'); shareBtn = drawer.querySelector('[data-mkl="share"]'); printBtn = drawer.querySelector('[data-mkl="print"]');
+    toolsEl = drawer.querySelector('.mkl-tools'); shareBtn = drawer.querySelector('[data-mkl="share"]');
     askEl = drawer.querySelector('.mkl-shareask'); popEl = drawer.querySelector('.mkl-sharepop'); sharedEl = drawer.querySelector('.mkl-shared'); sharedLink = drawer.querySelector('.mkl-sharedlink');
-    hintEl = drawer.querySelector('.mkl-hint');
+    hintEl = drawer.querySelector('.mkl-hint'); recentEl = drawer.querySelector('.mkl-recent');
+    var gOf = function (t) { var g = t && t.closest && t.closest('.mkl-ghost'); return g ? g.getAttribute('data-ghost') : null; };
+    listEl.addEventListener('mouseover', function (e) { var id = gOf(e.target); if (id) ghostPause(id); });
+    listEl.addEventListener('mouseout', function (e) { var id = gOf(e.target); if (id && gOf(e.relatedTarget) !== id && gOf(document.activeElement) !== id) ghostResume(id); });
+    listEl.addEventListener('focusin', function (e) { var id = gOf(e.target); if (id && kbdNav) ghostPause(id); });
+    listEl.addEventListener('focusout', function (e) { var id = gOf(e.target); if (id && gOf(e.relatedTarget) !== id) { var gl = listEl.querySelector('.mkl-ghost[data-ghost="' + cssId(id) + '"]'); if (!(gl && gl.matches(':hover'))) ghostResume(id); } });
+    document.addEventListener('keydown', function () { kbdNav = true; }, true);
+    document.addEventListener('pointerdown', function () { kbdNav = false; }, true);
 
     drawer.addEventListener('click', function (e) {
       var a = e.target.closest('[data-mkl]');
       if (a) {
         var k = a.getAttribute('data-mkl');
         if (k === 'close' || k === 'back') { closeDrawer(); return; }
-        if (k === 'clear') { confirmQ.textContent = items.length + ' Artikel aus der Merkliste entfernen?'; confirmEl.hidden = false; confirmEl.focus(); return; }
-        if (k === 'clear-no') { confirmEl.hidden = true; clearBtn.focus(); return; }
-        if (k === 'clear-yes') { clearAll(); return; }
+        if (k === 'clear') { clearAll(); return; }   /* no confirmation step: emptied at once, undo in the toast (12.11., user decision) */
         if (k === 'compare') { startCompare(); return; }
         if (k === 'login') { e.preventDefault(); toast('Anmelden ist im Prototyp nicht verfügbar.', 'info'); return; }
         if (k === 'share') { askOrShare(); return; }
         if (k === 'share-plain' || k === 'share-full') { askEl.hidden = true; shareList(k === 'share-full'); shareBtn.focus(); return; }
         if (k === 'share-no') { askEl.hidden = true; shareBtn.focus(); return; }
         if (k === 'sharepop-close') { popEl.hidden = true; shareBtn.focus(); return; }
-        if (k === 'print') { printList(); return; }
+        if (k === 'recent-clear') { recentSave([]); render(); titleEl.focus(); live('Verlauf gelöscht.'); return; }
         if (k === 'take') { takeShared(); return; }
         if (k === 'show-own') { sharedMode = false; render(); titleEl.focus(); return; }
         if (k === 'show-shared') { sharedMode = true; render(); sharedEl.focus(); live('Geteilte Merkliste mit ' + sharedList.items.length + ' Artikeln geöffnet.'); return; }
       }
       var pb = e.target.closest('.mkl-item__more');
       if (pb) { var pid = pb.getAttribute('data-parts'); openParts[pid] = !openParts[pid]; render(); var nb2 = listEl.querySelector('.mkl-item__more[data-parts="' + pid.replace(/"/g, '') + '"]'); if (nb2) nb2.focus(); return; }
+      var ug = e.target.closest('[data-undo]');
+      if (ug) { ghostUndo(ug.getAttribute('data-undo')); return; }
+      var rs = e.target.closest('[data-rv-save]');
+      if (rs) { saveRecent(rs.getAttribute('data-rv-save')); return; }
       var tk = e.target.closest('[data-take]');
       if (tk) { takeOne(tk.getAttribute('data-take')); return; }
       var go = e.target.closest('.mkl-item__cta');
@@ -248,7 +255,7 @@
     });
     /* keyboard: Escape closes the drawer only (not an overlay beneath); Tab wraps inside */
     drawer.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); if (!askEl.hidden) { askEl.hidden = true; shareBtn.focus(); } else if (!popEl.hidden) { popEl.hidden = true; shareBtn.focus(); } else if (!confirmEl.hidden) { confirmEl.hidden = true; clearBtn.focus(); } else closeDrawer(); return; }
+      if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); if (!askEl.hidden) { askEl.hidden = true; shareBtn.focus(); } else if (!popEl.hidden) { popEl.hidden = true; shareBtn.focus(); } else closeDrawer(); return; }
       if (e.key !== 'Tab') return;
       var f = focusables(); if (!f.length) { e.preventDefault(); titleEl.focus(); return; }
       var first = f[0], last = f[f.length - 1], cur = document.activeElement;
@@ -279,10 +286,11 @@
     var v = window.MTZ_VGL;
     if (PDP || sharedMode || !v || typeof v.add !== 'function' || !v.isMode() || document.querySelector('.vgl-view.is-open')) return null;
     var sel = v.selected(), max = v.max || CMP_MAX;
-    return { lens: LENS, inCmp: sel, slots: Math.max(0, max - sel.length), onAdd: function (ids) {
+    return { auto: true, lens: LENS, inCmp: sel, slots: Math.max(0, max - sel.length), onAdd: function (ids) {
       var a = v.add(ids) || []; if (!a.length) return;
-      var n = v.selected().length, nm = a.length === 1 ? shortName(items.filter(function (it) { return (it.articleId || it.id) === a[0]; })[0] || { name: a[0] }).main : a.length + ' Modelle';
-      toast(nm + ' zum Vergleich hinzugefügt' + (n < CMP_MIN ? ' – wählen Sie noch ein Modell' : ''), 'ok');
+      var one = a.length === 1 ? items.filter(function (it) { return (it.articleId || it.id) === a[0]; })[0] : null;
+      var n = v.selected().length, nm = a.length === 1 ? shortName(one || { name: a[0] }).main : a.length + ' Modelle';
+      toast(nm + ' zum Vergleich hinzugefügt' + (n < CMP_MIN ? ' – wählen Sie noch ein Modell' : ''), 'ok', null, false, one && one.img);
       live(nm + ' zum Vergleich hinzugefügt. Vergleich: ' + n + ' Modell' + (n === 1 ? '' : 'e') + '.');
     } };
   }
@@ -305,7 +313,8 @@
     if (!isOpen) return;
     isOpen = false;
     if (pick) { pick = null; cmpSel = []; drawer.classList.remove('is-pick'); }
-    confirmEl.hidden = true; askEl.hidden = true; popEl.hidden = true;
+    askEl.hidden = true; popEl.hidden = true;
+    ghostClearAll();   /* pending removals become final */
     hideToast(); document.body.appendChild(toastEl);
     scrim.classList.remove('is-open'); drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden', 'true');
     if (hdrBtn) hdrBtn.setAttribute('aria-expanded', 'false');
@@ -317,18 +326,22 @@
 
   /* ---- Toast (one element, one action, 5 s, pause on hover/focus) ---- */
   var toastLeft = 0, toastStart = 0, toastPaused = false;
-  function toast(msg, type, action, quiet) {
+  /* img (12.11., user: "add the product images, the same approach as Airbnb"): a single product added or removed shows
+     its photo as a small tile in place of the status icon, so the visitor sees at once which model it was */
+  function toast(msg, type, action, quiet, img) {
     type = type || 'ok';
     toastEl.setAttribute('aria-live', quiet ? 'off' : 'polite');   /* spec 10 §4.4: announced once — the live region already spoke */
     var vt = document.querySelector('.vgl-toast.show'); if (vt) vt.classList.remove('show');   /* a Merkliste toast replaces a compare toast (§5.7) */
-    toastEl.className = 'mkl-toast t-' + type + (action ? ' has-act' : '') + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : ((pdpBarVisible && pdpBarVisible()) ? ' is-pdp-bar' : ''))));
-    toastEl.innerHTML = (type === 'limit' ? IC_LIMIT : (type === 'info' ? IC_INFO : IC_OK)) + '<span class="mkl-toast__msg">' + esc(msg) + '</span>' + (action ? '<button class="mkl-toast__act" type="button">' + esc(action.label) + '</button>' : '');
+    toastEl.className = 'mkl-toast t-' + type + (action ? ' has-act' : '') + (action && action.undo ? ' is-undo' : '') + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : ((pdpBarVisible && pdpBarVisible()) ? ' is-pdp-bar' : ''))));
+    toastEl.classList.toggle('has-img', !!img);
+    toastEl.innerHTML = (img ? '<span class="mkl-toast__img"><img src="' + esc(asset(img)) + '" alt=""></span>' : (type === 'limit' ? IC_LIMIT : (type === 'info' ? IC_INFO : IC_OK))) + '<span class="mkl-toast__msg">' + esc(msg) + '</span>' + (action ? '<button class="mkl-toast__act" type="button">' + esc(action.label) + '</button>' : '');
     if (action) toastEl.querySelector('.mkl-toast__act').addEventListener('click', function () { hideToast(); action.fn(); });
     toastEl.classList.add('show');
-    clearTimeout(toastT); toastPaused = false; toastLeft = TOAST_MS; toastStart = Date.now();
-    toastT = setTimeout(hideToast, TOAST_MS);
+    var ms = (action && action.ms) || TOAST_MS;
+    clearTimeout(toastT); toastPaused = false; toastLeft = ms; toastStart = Date.now();
+    toastT = setTimeout(hideToast, ms);
   }
-  function hideToast() { clearTimeout(toastT); toastEl.classList.remove('show'); }
+  function hideToast() { clearTimeout(toastT); toastEl.classList.remove('show'); rmBatch = null; }
   function pauseToast() { if (!toastEl.classList.contains('show') || toastPaused) return; toastPaused = true; clearTimeout(toastT); toastLeft = Math.max(800, toastLeft - (Date.now() - toastStart)); }
   function resumeToast() { if (!toastPaused) return; toastPaused = false; toastStart = Date.now(); toastT = setTimeout(hideToast, toastLeft); }
   function live(msg) { if (!liveEl) return; liveEl.textContent = ''; setTimeout(function () { liveEl.textContent = msg; }, 30); }
@@ -387,23 +400,97 @@
     if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }, true); live(m); return false; }
     var it = itemFrom(p, cardEl); items.push(it); save(); syncAll(); pulseBadge();
     live('Gemerkt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Gemerkt', 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
+    toast('Gemerkt', 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true, it.img);
     return true;
   }
+  /* Single removals (12.11., lead fullstack review): 10 s to undo like "Merkliste leeren"; removals made while their
+     undo toast is still up are collected, so "Rückgängig" brings all of them back to their places (before, each new
+     toast replaced the last one and only the most recent removal could be undone) */
+  var rmBatch = null;
   function removeItem(id, silent) {
     var i = indexOf(id); if (i < 0) return;
     var it = items[i]; items.splice(i, 1); cmpSel = cmpSel.filter(function (x) { return x !== id; }); save(); syncAll();
     live('Entfernt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
-    if (!silent) toast(it.configId ? 'Konfiguration aus der Merkliste entfernt' : 'Aus der Merkliste entfernt', 'ok', { label: 'Rückgängig', fn: function () { restore([{ item: it, index: i }]); } }, true);
+    if (silent) return;
+    if (!(rmBatch && toastEl.classList.contains('show') && toastEl.classList.contains('is-undo'))) rmBatch = [];
+    rmBatch.push({ item: it, index: i });
+    var b = rmBatch, n = b.length;
+    toast(n > 1 ? n + ' Artikel entfernt' : (it.configId ? 'Konfiguration aus der Merkliste entfernt' : 'Aus der Merkliste entfernt'), 'ok',
+      { label: 'Rückgängig', undo: true, ms: TOAST_UNDO_MS, fn: function () { restore(b.slice().reverse(), true); } }, true, n > 1 ? null : it.img);
+    rmBatch = b;   /* toast() replaced the content, the batch stays open while this toast shows */
   }
+  /* ---- Inline undo on a removed entry (12.11., user decision) ----
+     The bin removes the entry at once (count, badge, compare selection, storage), and a light-red layer slides over
+     the entry with only "Rückgängig" on it (12.11. revision: no icon, text or countdown bar) for 5 s; it slides in over
+     350 ms (decelerating). Hover, or keyboard focus, pauses the time. "Rückgängig" slides the layer away and puts the entry back on its place (anchored to its neighbours, so
+     several pending removals restore correctly in any order); when the time is up the entry collapses. Every entry
+     has its own layer and timer. Closing the drawer makes pending removals final. Removals made elsewhere (product
+     card, product page, comparison) keep the toast with "Rückgängig". */
+  var GHOST_MS = 3000, ghosts = {},   /* 3 s (user decision 12.11.; was 8 s, then 5 s) */
+  ghostSeq = 0, kbdNav = false;
+  function cssId(id) { return String(id).replace(/["\\]/g, ''); }
+  function ghostLeft(g) { return g.paused ? g.left : Math.max(0, g.left - (Date.now() - g.start)); }
+  function ghostRun(g) { g.paused = false; g.start = Date.now(); clearTimeout(g.t); g.t = setTimeout(function () { ghostEnd(g.item.id); }, g.left); }
+  function ghostBar() {}   /* no countdown bar any more (12.11.) */
+  function ghostPause(id) { var g = ghosts[id]; if (!g || g.paused) return; clearTimeout(g.t); g.left = Math.max(600, g.left - (Date.now() - g.start)); g.paused = true; ghostBar(id); }
+  function ghostResume(id) { var g = ghosts[id]; if (!g || !g.paused) return; ghostRun(g); ghostBar(id); }
+  function ghostClearAll() { Object.keys(ghosts).forEach(function (k) { clearTimeout(ghosts[k].t); }); ghosts = {}; }
   function removeFromRow(id, btn) {
-    var row = btn.closest('.mkl-item'), li = row && row.parentNode, next = li && li.nextElementSibling;
-    var focusId = next ? next.querySelector('.mkl-rm').getAttribute('data-id') : null;
-    var doIt = function () { removeItem(id); var nb = focusId && listEl.querySelector('.mkl-rm[data-id="' + focusId + '"]'); (nb || titleEl).focus(); };
-    if (row && !reduced()) { row.classList.add('is-leaving'); setTimeout(doIt, 120); } else doIt();
+    var i = indexOf(id); if (i < 0) return;
+    var it = items[i], aid = it.articleId || it.id, art = btn && btn.closest('.mkl-item');
+    var g = { h0: art ? art.offsetHeight : 0, item: it, index: i, prev: i > 0 ? items[i - 1].id : null, next: i < items.length - 1 ? items[i + 1].id : null, wasSel: cmpSel.indexOf(aid) > -1, left: GHOST_MS, seq: ++ghostSeq, shown: false, paused: false, start: Date.now() };
+    ghosts[id] = g;
+    removeItem(id, true);   /* no toast: the layer is the undo */
+    var nm = it.name || shortName(it).main;
+    live(nm + ' entfernt. Rückgängig möglich.');
+    var ub = listEl.querySelector('.mkl-ghost__undo[data-undo="' + cssId(id) + '"]');
+    if (ub) ub.focus({ preventScroll: true });
+    if (kbdNav) { g.paused = true; ghostBar(id); } else ghostRun(g);   /* keyboard: paused while focus is on "Rückgängig" */
   }
-  function restore(entries) {
-    entries.sort(function (a, b) { return a.index - b.index; }).forEach(function (e) { if (has(e.item.id)) return; if (items.length >= LIMIT) return; items.splice(Math.min(e.index, items.length), 0, e.item); });
+  function placeOf(g, list) {
+    var at = function (id) { if (!id) return -1; for (var k = 0; k < list.length; k++) if (list[k].id === id) return k; return -1; };
+    var n = at(g.next); if (n > -1) return n;
+    var p = at(g.prev); if (p > -1) return p + 1;
+    return Math.min(g.index, list.length);
+  }
+  function ghostUndo(id) {
+    var g = ghosts[id]; if (!g) return; clearTimeout(g.t);
+    var ov = listEl.querySelector('.mkl-ghost[data-ghost="' + cssId(id) + '"]');
+    var done = function () {
+      delete ghosts[id];
+      if (has(id)) { render(); return; }
+      if (isFull()) { render(); toast('Ihre Merkliste ist voll (' + LIMIT + ' Artikel).', 'limit'); return; }
+      items.splice(placeOf(g, items), 0, g.item);
+      var aid = g.item.articleId || g.item.id; if (g.wasSel && cmpSel.indexOf(aid) < 0) cmpSel.push(aid);
+      save(); syncAll(); pulseBadge();
+      live(shortName(g.item).main + ' wiederhergestellt. Merkliste: ' + items.length + ' Artikel');
+      var rb = listEl.querySelector('.mkl-rm[data-id="' + cssId(id) + '"]'); (rb || titleEl).focus({ preventScroll: true });
+    };
+    if (ov && !reduced()) { var ar = ov.closest('.mkl-item'); if (ar && g.h0) { ar.classList.remove('is-shrink'); ar.classList.add('is-grow'); } ov.classList.remove('is-enter'); ov.classList.add('is-leave'); setTimeout(done, 240); } else done();
+  }
+  function ghostEnd(id) {
+    var g = ghosts[id]; if (!g) return; clearTimeout(g.t);
+    var li = (listEl.querySelector('.mkl-ghost[data-ghost="' + cssId(id) + '"]') || {}).parentNode;
+    li = li && li.closest ? li.closest('li') : null;
+    var hadFocus = !!(li && li.contains(document.activeElement)), nextLi = li && li.nextElementSibling;
+    var nextId = nextLi && nextLi.querySelector('.mkl-rm') ? nextLi.querySelector('.mkl-rm').getAttribute('data-id') : null;
+    var fin = function () {
+      delete ghosts[id]; render();
+      if (hadFocus) { var nb = nextId && listEl.querySelector('.mkl-rm[data-id="' + cssId(nextId) + '"]'); (nb || titleEl).focus({ preventScroll: true }); }
+    };
+    if (li && !reduced()) { li.style.height = li.offsetHeight + 'px'; void li.offsetHeight; li.classList.add('is-collapsing'); li.style.height = '0px'; setTimeout(fin, 260); } else fin();
+  }
+  function ghostWrap(html, it) {
+    var g = it.__ghost, nm = it.name || shortName(it).main;   /* full shop title for the accessible names: the short name alone does not tell the variants apart */
+    var ov = '<div class="mkl-ghost' + (g.shown ? '' : ' is-enter') + '" role="group" aria-label="' + esc(nm) + ' entfernt" data-ghost="' + esc(it.id) + '">' +
+      '<button class="mkl-ghost__undo" type="button" data-undo="' + esc(it.id) + '" aria-label="' + esc(nm) + ' wiederherstellen">Rückgängig</button></div>';   /* only the undo (user: the state was too much) */
+    g.shown = true;
+    var shrink = !g.grown; g.grown = true;   /* the entry shrinks to the compact undo row once, on removal */
+    return html.replace('<article class="mkl-item', '<article style="--h0:' + (g.h0 || 0) + 'px" class="mkl-item is-ghost' + (shrink && g.h0 ? ' is-shrink' : '')).replace(/(<article[^>]*>)/, '$1<div class="mkl-ghost__under" inert aria-hidden="true">').replace('</article></li>', '</div>' + ov + '</article></li>');
+  }
+  function restore(entries, ordered) {
+    if (!ordered) entries.sort(function (a, b) { return a.index - b.index; });
+    entries.forEach(function (e) { if (has(e.item.id)) return; if (items.length >= LIMIT) return; items.splice(Math.min(e.index, items.length), 0, e.item); });
     save(); syncAll(); pulseBadge();
     live('Wiederhergestellt: ' + (entries.length === 1 ? shortName(entries[0].item).main : entries.length + ' Artikel') + '. Merkliste: ' + items.length + ' Artikel');
     if (isOpen) { var b = entries.length === 1 && listEl.querySelector('.mkl-rm[data-id="' + entries[0].item.id.replace(/"/g, '') + '"]'); (b || titleEl).focus(); }
@@ -411,9 +498,55 @@
   }
   function clearAll() {
     var snap = items.map(function (it, i) { return { item: it, index: i }; }), n = items.length;
-    items = []; cmpSel = []; confirmEl.hidden = true; save(); syncAll(); titleEl.focus();
-    live(n + ' Artikel entfernt. Merkliste: 0 Artikel');
-    toast(n + ' Artikel entfernt', 'ok', { label: 'Rückgängig', fn: function () { restore(snap); } });
+    items = []; cmpSel = []; save(); syncAll(); titleEl.focus();
+    live(n + ' Artikel entfernt. Merkliste: 0 Artikel. Rückgängig in der Meldung möglich.');
+    toast(n + ' Artikel entfernt', 'ok', { label: 'Rückgängig', ms: TOAST_UNDO_MS, fn: function () { restore(snap); } });
+    rmBatch = null;
+  }
+
+  /* ---- Zuletzt angesehen (12.11.) ----
+     Models the visitor opened in this session (product page, card title or image, "Zum Produkt" / "Konfigurieren" in
+     the comparison), newest first. Session only (sessionStorage, gone when the browser closes, no consent needed);
+     a snapshot like a Merkliste item, so a model seen on the other category page still renders. Shown below the saved
+     items, at most 4 and never one that is already saved; one click on "Merken" moves it into the list. On JTL this
+     reads the shop's own "zuletzt angesehen" data instead of keeping a second history. */
+  var RKEY = 'mtz_recent', RSHOW = 4, RMAX = 12;
+  function recentLoad() { try { var d = JSON.parse(sessionStorage.getItem(RKEY) || '[]'); return Array.isArray(d) ? d.filter(function (x) { return x && typeof x.id === 'string' && typeof x.name === 'string'; }) : []; } catch (e) { return []; } }
+  function recentSave(l) { try { if (l.length) sessionStorage.setItem(RKEY, JSON.stringify(l.slice(0, RMAX))); else sessionStorage.removeItem(RKEY); } catch (e) {} }
+  function recordView(id, cardEl) {
+    var p = BY_ID[String(id)]; if (!p) return;
+    var snap = itemFrom(p, cardEl); delete snap.addedAt; delete snap.priceAtAdd; snap.viewedAt = new Date().toISOString();
+    var l = recentLoad().filter(function (x) { return x.id !== snap.id; }); l.unshift(snap); recentSave(l);
+    if (isOpen) render();
+  }
+  function recentShown() { return recentLoad().filter(function (x) { return !has(x.id) && !ghosts[x.id]; }).slice(0, RSHOW); }
+  function recentRowHTML(it) {
+    var nm = shortName(it), price = typeof it.priceFrom === 'number' ? 'ab ' + euro(it.priceFrom) : '';
+    var ctaTxt = it.konfig ? 'Konfigurieren' : 'Zum Produkt', ctaHref = it.url && it.url !== '#' ? asset(it.url) : (it.konfig ? '#konfigurator' : '#produkt');
+    return '<li class="mkl-rv" data-id="' + esc(it.id) + '">' +
+      '<div class="mkl-rv__media"><img src="' + esc(asset(it.img)) + '" alt=""></div>' +
+      '<div class="mkl-rv__text"><div class="mkl-rv__name" title="' + esc(it.name) + '">' + esc(nm.main) + '</div>' +
+        (price ? '<div class="mkl-rv__price">' + esc(price) + '</div>' : '') +
+        '<a class="mkl-rv__cta" href="' + esc(ctaHref) + '">' + ctaTxt + IC_CHEV_R + '</a></div>' +
+      '<button class="mkl-rv__save" type="button" data-rv-save="' + esc(it.id) + '" aria-label="' + esc(nm.main) + ' merken">' + HEART + '<span>Merken</span></button>' +
+    '</li>';
+  }
+  function renderRecent(shared) {
+    if (!recentEl) return;
+    var l = (shared || (pick && !pick.auto)) ? [] : recentShown();   /* hidden only in the explicit picker opened from the comparison */
+    recentEl.hidden = !l.length;
+    recentEl.querySelector('.mkl-recent__list').innerHTML = l.map(recentRowHTML).join('');
+  }
+  function saveRecent(id) {
+    var snap = null; recentLoad().forEach(function (x) { if (x.id === id) snap = x; }); if (!snap || has(id)) return;
+    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', null, true); live(m); return; }
+    var btns = Array.prototype.slice.call(recentEl.querySelectorAll('[data-rv-save]')), at = btns.map(function (b) { return b.getAttribute('data-rv-save'); }).indexOf(id);
+    var it = {}; Object.keys(snap).forEach(function (k) { if (k !== 'viewedAt') it[k] = snap[k]; });
+    it.addedAt = new Date().toISOString(); it.priceAtAdd = typeof it.priceFrom === 'number' ? it.priceFrom : null;
+    items.push(it); save(); syncAll(); pulseBadge();
+    live('Gemerkt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
+    toast('Gemerkt', 'ok', null, true, it.img);
+    var nb = recentEl.querySelectorAll('[data-rv-save]'); (nb[Math.min(at, nb.length - 1)] || titleEl).focus();
   }
 
   /* ---- Drawer rendering ---- */
@@ -434,7 +567,7 @@
         (it.configExpired ? '<p class="mkl-item__expired">Konfiguration abgelaufen – Details siehe Zusammenfassung</p>' : (openStep ? '<p class="mkl-item__expired">Noch nicht vollständig – ' + esc(openStep) + ' offen</p>' : ''));
     }
     var avail = it.availability ? '<span class="mkl-item__avail">' + esc(it.availability) + '</span>' : '';
-    return '<li><article class="mkl-item' + (cfg ? ' mkl-item--cfg' : '') + '" data-id="' + esc(it.id) + '" data-lens="' + esc(it.lens) + '">' +
+    return (it.__ghost ? function (x) { return ghostWrap(x, it); } : function (x) { return x; })('<li><article class="mkl-item' + (cfg ? ' mkl-item--cfg' : '') + '" data-id="' + esc(it.id) + '" data-lens="' + esc(it.lens) + '">' +
       '<div class="mkl-item__media"><img src="' + esc(asset(it.img)) + '" alt=""></div>' +
       '<div class="mkl-item__text">' +
         (cfg ? '<span class="mkl-item__tag">Ihre Konfiguration' + (it.updatedAt ? ' · aktualisiert ' + esc(fmtDate(it.updatedAt)) : (it.addedAt ? ' · ' + esc(fmtDate(it.addedAt)) : '')) + '</span>' : '') +
@@ -451,7 +584,7 @@
             '<label class="mkl-cmp"><input type="checkbox" data-id="' + esc(cmpId) + '" data-lens="' + esc(it.lens) + '" aria-label="' + esc(nm.main) + ' zum Vergleich auswählen"><span class="mkl-cmp__box" aria-hidden="true">' + CHK + '</span><span class="mkl-cmp__t">Vergleichen</span></label>') +
         '</div>' +
       '</div>' +
-    '</article></li>';
+    '</article></li>');
   }
   /* rows grouped by category: the current page's category first; the lock hint sits once in the group head */
   function groupHTML(lens, rows, shared) {
@@ -466,16 +599,25 @@
     drawer.classList.toggle('is-shared', shared); drawer.classList.toggle('is-pick', !!pick);
     titleEl.firstChild.nodeValue = shared ? 'Geteilte Merkliste ' : 'Merkliste ';
     countEl.textContent = (!shared && n >= LIMIT) ? '(' + n + ' / ' + LIMIT + ')' : '(' + n + ')';
-    clearBtn.hidden = n === 0 || shared; if (clearBtn.hidden) confirmEl.hidden = true;
+    clearBtn.hidden = n === 0 || shared;
     toolsEl.hidden = n === 0 || shared; if (toolsEl.hidden) { askEl.hidden = true; popEl.hidden = true; }
     notice.hidden = storageOk;
     sharedEl.hidden = !shared; if (shared) sharedEl.innerHTML = bannerHTML();
     sharedLink.hidden = shared || !sharedList; if (!sharedLink.hidden) sharedLink.textContent = 'Geteilte Merkliste anzeigen (' + sharedList.items.length + ')';
     hintEl.innerHTML = shared ? SHARED_HINT : OWN_HINT; hintEl.hidden = n === 0; placeHint();
-    emptyEl.hidden = n > 0; listEl.hidden = n === 0; footEl.hidden = n === 0;
-    var byLens = {}, order = [LENS]; list.forEach(function (it) { var l = it.lens || LENS; if (!byLens[l]) { byLens[l] = []; if (order.indexOf(l) < 0) order.push(l); } byLens[l].push(it); });
+    var disp = list;
+    if (!shared) {
+      Object.keys(ghosts).forEach(function (k) { if (has(k)) { clearTimeout(ghosts[k].t); delete ghosts[k]; } });
+      disp = list.slice();
+      Object.keys(ghosts).map(function (k) { return ghosts[k]; }).sort(function (a, b) { return b.seq - a.seq; }).forEach(function (g) {
+        var o = {}; Object.keys(g.item).forEach(function (k) { o[k] = g.item[k]; }); o.__ghost = g; disp.splice(placeOf(g, disp), 0, o);
+      });
+    }
+    emptyEl.hidden = disp.length > 0; listEl.hidden = disp.length === 0; footEl.hidden = n === 0;
+    renderRecent(shared); emptyEl.classList.toggle('has-recent', !recentEl.hidden);
+    var byLens = {}, order = [LENS]; disp.forEach(function (it) { var l = it.lens || LENS; if (!byLens[l]) { byLens[l] = []; if (order.indexOf(l) < 0) order.push(l); } byLens[l].push(it); });
     var multi = order.filter(function (l) { return byLens[l]; }).length > 1;
-    listEl.innerHTML = multi ? order.filter(function (l) { return byLens[l]; }).map(function (l) { return groupHTML(l, byLens[l], shared); }).join('') : list.map(function (it) { return rowHTML(it, shared); }).join('');
+    listEl.innerHTML = multi ? order.filter(function (l) { return byLens[l]; }).map(function (l) { return groupHTML(l, byLens[l], shared); }).join('') : disp.map(function (it) { return rowHTML(it, shared); }).join('');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
     var valid = {}; list.forEach(function (it) { valid[it.articleId || it.id] = 1; });
     cmpSel = cmpSel.filter(function (id) { return valid[id]; });
@@ -646,7 +788,7 @@
     var obj = { v: 1, t: new Date().toISOString().slice(0, 10), i: items.map(function (it) { return packItem(it, withGravur); }) };
     encodeList(obj).then(function (payload) {
       var url = rootUrl() + LENSES[LENS].page + '#liste=' + payload;
-      if (url.length > 7000) { toast('Zu viele Artikel für einen Link.', 'limit', { label: 'Drucken / PDF', fn: printList }); return; }
+      if (url.length > 7000) { toast('Zu viele Artikel für einen Link.', 'limit'); return; }
       var mobile = false; try { mobile = window.matchMedia('(max-width:47.99rem)').matches; } catch (e) {}
       if (mobile && navigator.share) { navigator.share({ title: 'Meine Merkliste | Metzler', text: n + ' Artikel', url: url }).catch(function (err) { if (!err || err.name !== 'AbortError') copyLink(url, n); }); return; }
       copyLink(url, n);
@@ -692,7 +834,7 @@
     var it = copyShared(sit); if (!it) return;
     items.push(it); save(); syncAll(); pulseBadge();
     live('Übernommen: ' + nm + '. Merkliste: ' + items.length + ' Artikel');
-    toast('In Ihre Merkliste übernommen', 'ok', { label: 'Rückgängig', fn: function () { var i = indexOf(it.id); if (i > -1) { items.splice(i, 1); save(); syncAll(); } } });
+    toast('In Ihre Merkliste übernommen', 'ok', { label: 'Rückgängig', fn: function () { var i = indexOf(it.id); if (i > -1) { items.splice(i, 1); save(); syncAll(); } } }, false, it.img);
   }
   function takeShared() {
     if (!sharedList) return;
@@ -720,38 +862,6 @@
   /* =====================================================================
      09b P0-4 · Print / PDF: a separate document node, not the scrolling drawer
      ===================================================================== */
-  function printList() {
-    var list = viewItems(); if (!list.length) return;
-    var ds = new Date().toLocaleDateString('de-DE'), root = rootUrl();
-    var abs = function (u) { try { return new URL(u, root).href; } catch (e) { return u; } };
-    var byLens = {}, order = [LENS]; list.forEach(function (it) { var l = it.lens || LENS; if (!byLens[l]) { byLens[l] = []; if (order.indexOf(l) < 0) order.push(l); } byLens[l].push(it); });
-    var body = order.filter(function (l) { return byLens[l]; }).map(function (l) {
-      return '<section class="mkl-printdoc__sec"><h2>' + esc((LENSES[l] || LENSES[LENS]).label) + '</h2>' + byLens[l].map(function (it) {
-        var nm = shortName(it), cfg = !!it.configId, d = deltaHTML(it).replace(/<svg[\s\S]*?<\/svg>/, '');
-        var price = cfg ? '' : (typeof it.priceFrom === 'number' ? 'ab ' + euro(it.priceFrom) + (typeof it.uvp === 'number' && it.uvp > it.priceFrom ? ' · UVP ' + euro(it.uvp) : '') : '');
-        var shop = cfg ? (it.url && it.url !== '#' ? abs(it.url) : abs((LENSES[it.lens] || LENSES[LENS]).page)) : (it.url && it.url !== '#' ? abs(it.url) : abs((LENSES[it.lens] || LENSES[LENS]).page));
-        var step = cfg && !it.configExpired && it.configComplete === false ? cfgOpenStep(it.configState) : null;
-        return '<article class="mkl-printdoc__item"><div class="mkl-printdoc__img"><img src="' + esc(asset(it.img)) + '" alt=""></div><div class="mkl-printdoc__txt">' +
-          '<p class="mkl-printdoc__nm"><b>' + esc(nm.main) + '</b>' + (cfg ? ' · Ihre Konfiguration' : '') + '</p>' + (nm.sub ? '<p class="mkl-printdoc__sub">' + esc(nm.sub) + '</p>' : '') +
-          (price ? '<p>' + esc(price) + '</p>' : '') + d +
-          (cfg ? '<dl>' + (it.configSummary || []).map(function (x) { return '<dt>' + esc(x.label) + '</dt><dd>' + esc(x.value) + '</dd>'; }).join('') + '</dl>' +
-            '<p><b>Gesamt ' + euro(it.configTotal) + '</b>' + ((it.configQty || 1) > 1 ? ' · ' + it.configQty + ' Stück' : '') + '</p>' +
-            (it.configExpired ? '<p>Konfiguration abgelaufen</p>' : (step ? '<p>Noch nicht vollständig – ' + esc(step) + ' offen</p>' : '')) +
-            '<p>Referenz: ' + esc(it.configId) + '</p>' : '') +
-          '<p class="mkl-printdoc__url">Im Shop: ' + esc(shop) + '</p></div></article>';
-      }).join('') + '</section>';
-    }).join('');
-    var doc = h('<div class="mkl-printdoc"><header class="mkl-printdoc__head"><h1>Merkliste</h1><span>edelstahl-tuerklingel.de · Stand ' + ds + '</span></header>' + body +
-      '<footer class="mkl-printdoc__foot">Alle Preise inkl. 19 % USt., Stand ' + ds + '. Konfigurationen öffnen Sie im Shop über „Konfiguration öffnen“ auf diesem Gerät oder über den geteilten Link.</footer></div>');
-    document.body.appendChild(doc); document.body.classList.add('mkl-printing');
-    live('Druckansicht der Merkliste geöffnet.');
-    var done = false, cleanup = function () { if (done) return; done = true; window.removeEventListener('afterprint', cleanup); if (doc.parentNode) doc.parentNode.removeChild(doc); document.body.classList.remove('mkl-printing'); if (isOpen && printBtn && !toolsEl.hidden) printBtn.focus(); };
-    window.addEventListener('afterprint', cleanup);
-    try { window.print(); } catch (e) {}
-    setTimeout(cleanup, 1000);
-  }
-
-  /* ---- Handover to the compare flow (§3.5) ---- */
   function startCompare() {
     if (pick) { var add = cmpSel.slice(0, pick.slots), fn = pick.onAdd; if (!add.length) return; closeDrawer(); if (typeof fn === 'function') fn(add); return; }
     var ids = cmpSel.slice(0, CMP_MAX); if (ids.length < CMP_MIN) return;
@@ -838,7 +948,7 @@
     setCfgOfSession(sn.article, cid);
     save(); syncAll(); pulseBadge();
     live('Konfiguration gemerkt: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total) + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Konfiguration gemerkt' + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
+    toast('Konfiguration gemerkt' + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true, it.img);
   }
   function updateConfig(cid, sn) {
     var it = byId('cfg:' + cid); if (!it) { addConfig(sn); return; }
@@ -847,7 +957,7 @@
     it.updatedAt = new Date().toISOString(); it.configExpired = false; delete cfgLive[cid];
     save(); syncAll();   /* no badge pulse: the count is unchanged */
     live('Konfiguration aktualisiert: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total));
-    toast('Konfiguration aktualisiert' + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
+    toast('Konfiguration aktualisiert' + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true, it.img);
   }
   function syncPdpMarks() {
     if (!PDP || !pdpBtn || !window.MTZ_PDP) return;
@@ -978,7 +1088,12 @@
     window.addEventListener('storage', function (e) { if (e.key === KEY) { load(); refreshPrices(); syncAll(); live('Merkliste in einem anderen Tab geändert: ' + items.length + ' Artikel'); } });
     if (/[?&]merkliste=demo\b/.test(QS)) seedDemoConfig();
     syncAll();
-    if (PDP) initPdp();
+    if (PDP) { initPdp(); recordView(PDP.id, null); }
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('.pcard .pcard__title a, .pcard .pcard__img, [data-go]'); if (!t) return;
+      var card = t.closest('.pcard[data-id]'), id = card ? card.getAttribute('data-id') : t.getAttribute('data-go');
+      if (id) recordView(id, card);
+    }, true);
     /* arrived from the other PLP's Merkliste with ?vergleich=…&von=merkliste */
     var m = /[?&]vergleich=([^&#]+)/.exec(QS);
     if (m && /[?&]von=merkliste\b/.test(QS)) { var n = decodeURIComponent(m[1]).split(',').filter(function (id) { return BY_ID[id]; }).length; if (n >= CMP_MIN) setTimeout(function () { toast('Vergleich mit ' + n + ' Modellen aus Ihrer Merkliste', 'ok'); }, 300); }
@@ -990,6 +1105,6 @@
       pick = pk ? { lens: pk.lens || LENS, inCmp: (pk.inCmp || []).slice(), slots: Math.max(0, pk.slots || 0), onAdd: pk.onAdd } : null;
       if (pick) { cmpSel = []; sharedMode = false; }
       openDrawer();
-    }, close: closeDrawer, items: function () { return items.slice(); }, has: has, seedDemoConfig: seedDemoConfig, reload: function () { load(); refreshPrices(); syncAll(); }, print: function () { printList(); } };
+    }, close: closeDrawer, items: function () { return items.slice(); }, has: has, seedDemoConfig: seedDemoConfig, reload: function () { load(); refreshPrices(); syncAll(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

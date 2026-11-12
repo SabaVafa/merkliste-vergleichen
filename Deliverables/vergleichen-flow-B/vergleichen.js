@@ -160,7 +160,7 @@
   var IC_CHD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
   var liveEl,shareBtn,fromMkl=false,lastCleared=null,prevTitle=null;
   /* render state of the open comparison */
-  var cur=null,visCols=null,pendingCol=null,gShow=false,printing=false,lastRemoved=null,lastTier='';   /* gShow = Gemeinsamkeiten open */
+  var cur=null,visCols=null,pendingCol=null,gShow=false,printing=false,lastTier='';   /* gShow = Gemeinsamkeiten open */
   var MQ90=window.matchMedia?window.matchMedia('(min-width:90rem)'):null,MQ64=window.matchMedia?window.matchMedia('(min-width:64rem)'):null,MQ48=window.matchMedia?window.matchMedia('(min-width:48rem)'):null;
   function mq(m,fb){return m?m.matches:fb;}
 
@@ -209,7 +209,7 @@
     view.addEventListener('pointerover',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
     view.addEventListener('focusin',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
 
-    tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm)toggle(rm.getAttribute('data-rm'),false);});
+    tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm){var rid=rm.getAttribute('data-rm'),ri=selected.indexOf(rid);if(removeModel(rid,false)){var sl=tray.querySelectorAll('.vgl-slot__rm');(sl[Math.min(ri,sl.length-1)]||tray.querySelector('.vgl-tray__cta')||document.body).focus();}}});
     view.addEventListener('click',function(e){
       if(e.target.closest('.vgl-altc .pcard__title a'))e.preventDefault();
       if(addPanel&&!addPanel.contains(e.target)&&!(addAnchor&&addAnchor.contains(e.target)))closeAdd(false);   /* outside click closes the search */
@@ -242,7 +242,7 @@
         var aid=alt.getAttribute('data-alt');
         if(isFull()){toggle(aid,true);return;}
         alt.classList.add('is-added');alt.setAttribute('aria-disabled','true');alt.querySelector('.vgl-alt__l').textContent='Hinzugefügt';
-        setTimeout(function(){pendingCol=aid;if(toggle(aid,true)){var anm=shopName(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok');announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');flashCol(aid);}},reduced()?0:650);
+        setTimeout(function(){pendingCol=aid;if(toggle(aid,true)){var anm=shopName(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok',null,BY_ID[aid].img);announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');flashCol(aid);}},reduced()?0:650);
         return;}
       var rm=e.target.closest('[data-rm]');if(rm){removeColumn(rm.getAttribute('data-rm'));return;}
       var go=e.target.closest('[data-go]');
@@ -430,7 +430,7 @@
     var added=addIds(ids);
     if(!added.length)return;
     var nm=added.length===1?shopName(BY_ID[added[0]]):added.length+' Modelle';
-    toast(esc(nm)+' aus der Merkliste hinzugefügt.','ok');
+    toast(esc(nm)+' aus der Merkliste hinzugefügt.','ok',null,added.length===1?BY_ID[added[0]].img:null);
     announce(nm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');
     setTimeout(function(){focusIn('.vgl-ph__rm[data-rm="'+added[0]+'"]');},0);
   }
@@ -461,22 +461,40 @@
   function refName(id){if(cur){for(var i=0;i<cur.items.length;i++)if(cur.items[i].id===id)return cur.refs[i].n;}return BY_ID[id]?baseTitle(BY_ID[id]):id;}
   /* remove a column: focus moves to the next column's remove control (or the add control); 2 → 1 keeps the dialog open with the empty state;
      a toast offers "Rückgängig" (12a §7) */
-  function removeColumn(id){
-    var i=selected.indexOf(id);if(i<0)return;
+  /* Single removals (12.11., lead fullstack review) — column ×, and the × in the bottom bar (which had no undo at all):
+     10 s to undo; removals made while their undo toast is up are collected and "Rückgängig" restores all of them on
+     their places (before, a second removal replaced the first undo); removing the last model closes the dialog but
+     keeps the undo, which reopens the comparison. */
+  var rmBatch=null;
+  function removeModel(id,inView){
+    var i=selected.indexOf(id);if(i<0)return false;
     var nm=refName(id);
     toggle(id,false);
-    lastRemoved={id:id,i:i,nm:nm};
-    announce(nm+' entfernt. Vergleich mit '+selected.length+' Modell'+(selected.length===1?'':'en')+'.');
-    if(selected.length<1){closeView();return;}
-    toast(esc(nm)+' entfernt.','ok',{label:'Rückgängig',aria:nm+' wieder hinzufügen',fn:undoRemove});
+    if(!(rmBatch&&toastEl.classList.contains('show')&&toastEl.classList.contains('is-undo')))rmBatch=[];
+    rmBatch.push({id:id,i:i,nm:nm,view:!!inView});
+    var b=rmBatch,n=b.length;
+    announce((n>1?n+' Modelle':nm)+' entfernt. Vergleich mit '+selected.length+' Modell'+(selected.length===1?'':'en')+'. Rückgängig in der Meldung möglich.');
+    if(inView&&selected.length<1)closeView();
+    toast(n>1?n+' Modelle entfernt.':esc(nm)+' entfernt.','ok',{label:'Rückgängig',undo:true,aria:(n>1?n+' Modelle':nm)+' wieder hinzufügen',fn:function(){undoRemove(b);}},n>1?null:(BY_ID[id]&&BY_ID[id].img));
+    rmBatch=b;
+    return true;
+  }
+  function removeColumn(id){
+    var i=selected.indexOf(id);
+    if(!removeModel(id,true)||selected.length<1)return;
     var next=selected[Math.min(i,selected.length-1)];
     focusIn(selected.length>=MIN?'.vgl-ph__rm[data-rm="'+next+'"]':'[data-vgl="add"]');
   }
-  function undoRemove(){
-    var r=lastRemoved;lastRemoved=null;if(!r||selected.indexOf(r.id)>-1||isFull())return;
-    selected.splice(Math.min(r.i,selected.length),0,r.id);persist();pendingCol=r.id;syncAll();
-    announce(r.nm+' wieder im Vergleich.');
-    focusIn('.vgl-ph__rm[data-rm="'+r.id+'"]');
+  function undoRemove(b){
+    rmBatch=null;
+    var back=[];b.slice().reverse().forEach(function(r){if(selected.indexOf(r.id)>-1||isFull())return;selected.splice(Math.min(r.i,selected.length),0,r.id);back.push(r);});
+    if(!back.length)return;
+    persist();pendingCol=back[back.length-1].id;syncAll();
+    announce((back.length>1?back.length+' Modelle':back[0].nm)+' wieder im Vergleich.');
+    var fromView=b.some(function(r){return r.view;});
+    if(fromView&&!view.classList.contains('is-open')&&canCompare())openView();
+    if(view.classList.contains('is-open'))focusIn('.vgl-ph__rm[data-rm="'+back[back.length-1].id+'"]');
+    else{var sb=tray.querySelector('.vgl-slot__rm[data-rm="'+back[back.length-1].id+'"]');if(sb)sb.focus();}
   }
   /* "Vergleich leeren" inside the dialog: keeps the dialog open (empty state) and offers an inline undo */
   function clearView(){if(selected.length)lastCleared=selected.slice();   /* a second clear must not overwrite the undo with nothing */
@@ -537,19 +555,19 @@
   /* toast: inside the dialog while it is open (focus trap, never over the sticky head), on the page otherwise */
   var toastLeft=0,toastStart=0,toastPaused=false,toastLater=null;
   function toastSoon(m,type,action){clearTimeout(toastLater);toastLater=setTimeout(function(){toastLater=null;toast(m,type,action);},300);}   /* arrival notes wait for the dialog — and yield to any newer toast (CP4 M1) */
-  function toast(m,type,action){
+  function toast(m,type,action,img){   /* img: product photo in place of the status icon for single add/remove (12.11.) */
     if(toastLater){clearTimeout(toastLater);toastLater=null;}
     type=type||'ok';
-    var ic=type==='limit'?IC_LIMIT:(type==='info'?IC_INFO:IC_OK);
+    var ic=img?'<span class="vgl-toast__img"><img src="'+esc(img)+'" alt=""></span>':(type==='limit'?IC_LIMIT:(type==='info'?IC_INFO:IC_OK));
     var inView=view.classList.contains('is-open');
     var home=inView?view:document.body;if(toastEl.parentNode!==home)home.appendChild(toastEl);
-    toastEl.className='vgl-toast t-'+type+(action?' has-act':'')+(inView?' in-view':(tray.classList.contains('is-open')?' is-raised':''));
+    toastEl.className='vgl-toast t-'+type+(action?' has-act':'')+(action&&action.undo?' is-undo':'')+(img?' has-img':'')+(inView?' in-view':(tray.classList.contains('is-open')?' is-raised':''));
     toastEl.innerHTML=ic+'<span>'+m+'</span>'+(action?'<button class="vgl-toast__act" type="button"'+(action.aria?' aria-label="'+esc(action.aria)+'"':'')+'>'+esc(action.label)+'</button>':'');
     if(action)toastEl.querySelector('.vgl-toast__act').addEventListener('click',function(){hideToast();action.fn();});
     toastEl.classList.add('show');
-    clearTimeout(toastT);toastPaused=false;toastLeft=action?6000:4000;toastStart=Date.now();toastT=setTimeout(hideToast,toastLeft);
+    clearTimeout(toastT);toastPaused=false;toastLeft=action?(action.undo?10000:6000):4000;toastStart=Date.now();toastT=setTimeout(hideToast,toastLeft);   /* removals: 10 s to undo (12.11.) */
   }
-  function hideToast(){clearTimeout(toastT);toastEl.classList.remove('show');}
+  function hideToast(){clearTimeout(toastT);toastEl.classList.remove('show');rmBatch=null;}
   function pauseToast(){if(!toastEl.classList.contains('show')||toastPaused)return;toastPaused=true;clearTimeout(toastT);toastLeft=Math.max(800,toastLeft-(Date.now()-toastStart));}
   function resumeToast(){if(!toastPaused)return;toastPaused=false;toastStart=Date.now();toastT=setTimeout(hideToast,toastLeft);}
 
@@ -929,7 +947,7 @@
   }
   function ctaHTML(p,t,cls){
     var lbl=p.konfig?'Konfigurieren':'Zum Produkt',al=' aria-label="'+lbl+' – '+esc(t.t)+'"';
-    return PDP_URLS[p.id]?'<a class="vgl-cta'+(cls||'')+'" href="'+esc(PDP_URLS[p.id])+'" data-go="'+esc(p.id)+'"'+al+'>'+lbl+IC_CHR+'</a>':'<button class="vgl-cta'+(cls||'')+'" type="button" data-go'+al+'>'+lbl+IC_CHR+'</button>';
+    return PDP_URLS[p.id]?'<a class="vgl-cta'+(cls||'')+'" href="'+esc(PDP_URLS[p.id])+'" data-go="'+esc(p.id)+'"'+al+'>'+lbl+IC_CHR+'</a>':'<button class="vgl-cta'+(cls||'')+'" type="button" data-go="'+esc(p.id)+'"'+al+'>'+lbl+IC_CHR+'</button>';
   }
   function headHTML(c,lc){
     var items=c.items,vis=c.vis,n=items.length;
@@ -1259,7 +1277,7 @@
     lastFocus=document.activeElement;
     var an=analyzeAll(selected.map(function(id){return BY_ID[id];}));
     gShow=an.U.length===0;   /* Gemeinsamkeiten start closed, open when nothing differs */
-    visCols=null;pendingCol=null;lastCleared=null;lastRemoved=null;
+    visCols=null;pendingCol=null;lastCleared=null;rmBatch=null;
     view.classList.add('is-open');view.setAttribute('aria-hidden','false');document.body.classList.add('vgl-overlay');document.body.style.overflow='hidden';
     renderView();
     scrollEl.scrollTop=0;

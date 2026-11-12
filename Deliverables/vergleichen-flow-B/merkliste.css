@@ -57,9 +57,6 @@
 .mkl-close:hover{background:var(--graphite-100,#F0F0F0)}
 .mkl-close:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
 /* inline confirm for "Alle entfernen" */
-.mkl-confirm{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .75rem;margin-top:.5rem;padding:.5rem .75rem;border-radius:var(--r-m,.25rem);background:var(--paper-white,#F5F6FA);font-size:var(--text-body-sm,.875rem);color:var(--schwarz,#1A171B)}
-.mkl-confirm[hidden]{display:none}
-.mkl-confirm__q{flex:1 1 auto;font-weight:700}
 .mkl-btn{height:2.75rem;padding:0 .875rem;border-radius:var(--r-m,.25rem);border:.0625rem solid var(--red-default,#C90000);background:var(--white,#fff);color:var(--red-default,#C90000);font-family:inherit;font-size:.8125rem;font-weight:700;line-height:1;cursor:pointer}
 .mkl-btn:hover{background:var(--red-default,#C90000);color:var(--white,#fff)}
 .mkl-btn:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
@@ -162,7 +159,6 @@
 .mkl-drawer .mkl-toast{position:absolute;left:1rem;right:1rem;bottom:calc(var(--mkl-foot-h,4.5rem) + .75rem + env(safe-area-inset-bottom,0px));transform:translateY(.75rem);width:auto;max-width:none;z-index:5}
 .mkl-drawer .mkl-toast.show{transform:none}
 /* confirm group: focus lands on the question, not on the destructive button */
-.mkl-confirm:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
 /* footer carries the storage hint; hidden entirely while the list is empty */
 .mkl-foot[hidden]{display:none}
 .mkl-foot .mkl-hint{flex:1 1 100%;margin:0 0 .125rem}
@@ -200,7 +196,7 @@
    09b (2026-11-01) — share, print/PDF, price change, all positions,
    "Alle n auswählen". Layered over the rules above.
    ===================================================================== */
-/* head tools: Teilen · Drucken / PDF */
+/* head tools: Teilen (Drucken / PDF removed 12.11., user decision) */
 .mkl-tools{display:flex;flex-wrap:wrap;gap:0 var(--sp-4,1rem);margin-top:var(--sp-1,.25rem)}
 .mkl-tools[hidden]{display:none}
 .mkl-tool{display:inline-flex;align-items:center;gap:var(--sp-2,.5rem);min-height:2.75rem;padding:0;border:0;background:none;color:var(--teal,#015253);font-family:inherit;font-size:var(--text-body-sm,.875rem);font-weight:700;line-height:1;cursor:pointer}
@@ -255,27 +251,6 @@
   .mkl-shared{margin-inline:var(--sp-4,1rem)}
   .mkl-shared__take.btn{width:100%}
   .mkl-sharedlink{margin-inline:var(--sp-4,1rem)}
-}
-/* print document (built on demand by printList(), never visible on screen) */
-.mkl-printdoc{display:none}
-@media print{
-  @page{margin:1.5cm}
-  body.mkl-printing>*:not(.mkl-printdoc){display:none !important}
-  body.mkl-printing .mkl-printdoc{display:block;color:#000;font-size:10pt;line-height:1.4}
-  .mkl-printdoc__head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding-bottom:.5rem;border-bottom:.0625rem solid var(--graphite-300,#DADADA)}
-  .mkl-printdoc__head h1{margin:0;font-size:var(--text-h2,1.5rem)}
-  .mkl-printdoc__head span{font-size:var(--text-caption,.75rem)}
-  .mkl-printdoc__sec h2{margin:1rem 0 .5rem;font-size:var(--text-h4,1.125rem)}
-  .mkl-printdoc__item{display:flex;gap:.75rem;padding:.5rem 0;border-bottom:.0625rem solid var(--graphite-300,#DADADA);break-inside:avoid}
-  .mkl-printdoc__img{width:4rem;height:4rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff}
-  .mkl-printdoc__img img{max-width:100%;max-height:100%;object-fit:contain}
-  .mkl-printdoc__txt p{margin:0 0 .125rem}
-  .mkl-printdoc__sub,.mkl-printdoc__url{font-size:var(--text-caption,.75rem)}
-  .mkl-printdoc dl{display:grid;grid-template-columns:minmax(6rem,auto) 1fr;gap:.125rem .75rem;margin:.25rem 0}
-  .mkl-printdoc dt{color:var(--text-muted,#6A6A6A)}
-  .mkl-printdoc dd{margin:0}
-  .mkl-printdoc .mkl-item__delta{display:block;color:#000;margin:0 0 .125rem}
-  .mkl-printdoc__foot{margin-top:1rem;font-size:var(--text-caption,.75rem)}
 }
 @media(prefers-reduced-motion:reduce){.mkl-item__more svg{transition:none !important}}
 
@@ -412,8 +387,8 @@
 
 /* "Merkliste leeren" is destructive: on hover the same red as "Vergleich leeren" in the comparison strip (11.11., user
    decision) — DS --color-red-50 fill, --color-red-600 text (5.9:1, AA), 4 px radius, no underline. "Abbrechen" stays neutral. */
-.mkl-link[data-mkl="clear"]{border-radius:var(--r-m,.25rem)}
-.mkl-link[data-mkl="clear"]:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
+.mkl-link[data-mkl="clear"],.mkl-link[data-mkl="recent-clear"]{border-radius:var(--r-m,.25rem)}
+.mkl-link[data-mkl="clear"]:hover,.mkl-link[data-mkl="recent-clear"]:hover{background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320);text-decoration:none}
 
 /* ==== Footer status (11.11., user: "the info is not provided in a professional way") ====
    Was one 12 px grey sentence wrapping beside a disabled "Auswahl vergleichen (0)". Now a status block like a checkout
@@ -442,3 +417,101 @@
 .mkl-rm:hover::before{background:var(--color-red-50,#FFF0EF)}
 .mkl-link{font-size:var(--text-body-sm,.875rem)}
 @media(prefers-reduced-motion:reduce){.mkl-rm,.mkl-rm::before{transition:none}}
+
+/* ==== Zuletzt angesehen (12.11., Lead Product Design) ====
+   A secondary zone below the saved items: the paper-tone panel (8 px) like the "Ähnliche Modelle" zone in the
+   comparison, so viewed never reads as saved. Compact rows: 3.5 rem white image tile, name 14 / 700 (2 lines), price
+   14 px, "Zum Produkt" link; "Merken" with the bookmark glyph on the right (outline, teal). Empty Merkliste: the
+   empty message shrinks and the section takes the main role. ==== */
+.mkl-recent{margin:var(--sp-4,1rem) var(--sp-5,1.25rem) var(--sp-5,1.25rem);padding:var(--sp-4,1rem);border-radius:var(--r-l,.5rem);background:var(--paper-white,#F5F6FA)}
+.mkl-recent__head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.25rem}
+.mkl-recent__h{margin:0;font-size:var(--text-body,1rem);font-weight:700;line-height:1.3;color:var(--schwarz,#1A171B)}
+.mkl-recent__head .mkl-link{margin-right:-.5rem}
+.mkl-recent__list{list-style:none;margin:0;padding:0}
+.mkl-rv{display:grid;grid-template-columns:3.5rem minmax(0,1fr) auto;align-items:center;gap:.75rem;padding:.75rem 0;border-top:.0625rem solid var(--graphite-200,#E6E6E8)}
+.mkl-rv:first-child{border-top:0}
+.mkl-rv__media{display:flex;align-items:center;justify-content:center;width:3.5rem;height:3.5rem;padding:.25rem;border-radius:var(--r-l,.5rem);background:var(--white,#fff);box-shadow:inset 0 0 0 .0625rem var(--graphite-200,#E6E6E8)}
+.mkl-rv__media img{max-width:100%;max-height:100%;object-fit:contain}
+.mkl-rv__text{min-width:0}
+.mkl-rv__name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;font-size:var(--text-body-sm,.875rem);font-weight:700;line-height:1.35;color:var(--schwarz,#1A171B)}
+.mkl-rv__price{font-size:var(--text-body-sm,.875rem);line-height:1.4;color:var(--schwarz,#1A171B)}
+.mkl-rv__cta{display:inline-flex;align-items:center;gap:.125rem;min-height:1.75rem;font-size:var(--text-body-sm,.875rem);font-weight:700;color:var(--teal,#015253);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.mkl-rv__cta svg{width:1rem;height:1rem}
+.mkl-rv__save{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;padding:0 .5rem;border:0;background:none;font-family:inherit;font-size:var(--text-body-sm,.875rem);font-weight:700;color:var(--teal,#015253);cursor:pointer}
+.mkl-rv__save svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:1.6}
+.mkl-rv__save:hover span{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.mkl-rv__save:focus-visible,.mkl-rv__cta:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
+.mkl-empty.has-recent{padding:2rem 1.5rem 1rem}
+.mkl-empty.has-recent [data-mkl="back"]{display:none}
+@media(max-width:47.99rem){.mkl-recent{margin:var(--sp-3,.75rem) var(--sp-4,1rem) var(--sp-4,1rem);padding:var(--sp-3,.75rem)}.mkl-rv__save span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.mkl-rv__save{min-width:2.75rem;justify-content:center}}
+
+/* ==== Product photo in add / remove toasts (12.11., user: "the same approach as Airbnb") ====
+   A single product added or removed shows a 2.5 rem white image tile (8 px, hairline) in place of the status icon. ==== */
+.mkl-toast__img{flex:none;display:flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;padding:.125rem;border-radius:var(--r-l,.5rem);background:var(--white,#fff);box-shadow:inset 0 0 0 .0625rem var(--graphite-200,#E6E6E8)}
+.mkl-toast__img img{max-width:100%;max-height:100%;object-fit:contain}
+.mkl-toast.has-img{padding-left:.5rem}
+
+/* ==== "Teilen" in the title row (12.11., user decisions): alone in a row of its own it wasted a whole line, so it
+   sits between the title and "Merkliste leeren": Title (n) · Teilen · Merkliste leeren · ×. Phones show "Leeren";
+   below 22.5 rem "Teilen" becomes its icon (accessible name "Merkliste teilen"). ==== */
+.mkl-head__row .mkl-tools{flex:none;margin:0 .5rem 0 0}
+@media(max-width:47.99rem){.mkl-head__row .mkl-w-hide{display:none}.mkl-head__row .mkl-w-only{display:inline}.mkl-head__row .mkl-tools{margin-right:.25rem}}
+@media(max-width:22.49rem){.mkl-tool__l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.mkl-tool{min-width:2.75rem;justify-content:center}}
+
+/* ==== One delete hover for every removal (12.11., user decision) ====
+   "Verlauf löschen" uses the same red-50 fill / red-600 text / 4 px as "Merkliste leeren", "Vergleich leeren" and the
+   remove buttons (rule above, extended). ==== */
+
+/* ==== Inline undo layer on a removed entry (12.11., user decision) ====
+   DS delete colours (red-50 fill, red-600 text and icon); "Rückgängig" is the action, so teal (8.4:1 on red-50);
+   a 3 px red-600 bar along the bottom runs down over 8 s (paused on hover / keyboard focus). Slides in from the
+   right (200 ms), slides back out on undo; when the time is up the entry collapses (200 ms). ==== */
+.mkl-item.is-ghost{overflow:hidden}
+.mkl-ghost__under{display:contents}
+.mkl-ghost{position:absolute;inset:0;z-index:3;display:flex;align-items:center;gap:.75rem;padding:0 var(--sp-5,1.25rem);background:var(--color-red-50,#FFF0EF);color:var(--color-red-600,#B52320)}
+.mkl-ghost.is-enter{animation:mklGhostIn .2s ease-out}
+.mkl-ghost.is-leave{transform:translateX(100%);transition:transform .2s ease-in}
+@keyframes mklGhostIn{from{transform:translateX(100%)}to{transform:none}}
+.mkl-ghost__t{display:flex;align-items:center;gap:.5rem;flex:1 1 auto;min-width:0;font-size:var(--text-body-sm,.875rem);line-height:1.4}
+.mkl-ghost__t svg{flex:none;width:1.125rem;height:1.125rem}
+.mkl-ghost__t b{font-weight:700}
+.mkl-ghost__t>span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mkl-ghost__undo{flex:none;min-height:2.75rem;padding:0 .75rem;border:0;border-radius:var(--r-m,.25rem);background:none;font-family:inherit;font-size:var(--text-body-sm,.875rem);font-weight:700;color:var(--teal,#015253);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem;cursor:pointer}
+.mkl-ghost__undo:hover{text-decoration-thickness:.125rem}
+.mkl-ghost__undo:focus-visible{outline:.1875rem solid var(--teal,#015253);outline-offset:.125rem}
+.mkl-ghost__bar{position:absolute;left:0;right:0;bottom:0;height:.1875rem;background:var(--color-red-600,#B52320);transform-origin:left center;animation-name:mklGhostBar;animation-timing-function:linear;animation-fill-mode:forwards}
+.mkl-ghost__bar.is-paused{animation-play-state:paused}
+@keyframes mklGhostBar{from{transform:scaleX(var(--f,1))}to{transform:scaleX(0)}}
+.mkl-list>li.is-collapsing{overflow:hidden;opacity:0;transition:height .2s ease,opacity .2s ease}
+@media(prefers-reduced-motion:reduce){.mkl-ghost.is-enter{animation:none}.mkl-ghost.is-leave{transition:none}.mkl-ghost__bar{animation:none;transform:scaleX(var(--f,1))}.mkl-list>li.is-collapsing{transition:none}}
+
+/* ==== Undo layer, revision (12.11., user: "too much — just provide undo; the first move too fast, the finalising too
+   slow") ==== Only "Rückgängig", centred on the light-red layer. Slide-in 350 ms with a decelerating curve (was
+   200 ms), undo slide-out 240 ms; the entry closes after 5 s (was 8 s) in 260 ms. ==== */
+.mkl-ghost{justify-content:center;padding:0 var(--sp-5,1.25rem)}
+.mkl-ghost.is-enter{animation:mklGhostIn .35s cubic-bezier(.2,.7,.2,1)}
+.mkl-ghost.is-leave{transition:transform .24s ease-in}
+.mkl-list>li.is-collapsing{transition:height .26s ease,opacity .2s ease}
+@media(prefers-reduced-motion:reduce){.mkl-ghost.is-enter{animation:none}.mkl-ghost.is-leave{transition:none}.mkl-list>li.is-collapsing{transition:none}}
+
+/* ==== "Rückgängig" as a minimal white button (12.11., user decision) ====
+   White fill, 1 px DS red-600 border, red-600 label 14 / 700 (6.5:1), 4 px DS button radius, no underline; 2.5 rem
+   high on a 2.75 rem target. Hover: the border thickens to 2 px (inset, no layout shift). ==== */
+.mkl-ghost__undo{position:relative;min-height:2.5rem;padding:0 1rem;border:.0625rem solid var(--color-red-600,#B52320);border-radius:var(--r-m,.25rem);background:var(--white,#fff);color:var(--color-red-600,#B52320);text-decoration:none}
+.mkl-ghost__undo::before{content:'';position:absolute;left:0;right:0;top:50%;height:2.75rem;transform:translateY(-50%)}
+.mkl-ghost__undo:hover{text-decoration:none;box-shadow:inset 0 0 0 .0625rem var(--color-red-600,#B52320)}
+
+/* ==== Compact undo row (12.11., user idea) ====
+   On removal the entry shrinks from its own height to a 3.5 rem row (350 ms, same decelerating curve as the layer
+   sliding in), so the list moves once, smoothly; "Rückgängig" grows it back to its height (240 ms) while the layer
+   slides out; after 5 s the compact row closes. --h0 = the entry's height, measured on removal. ==== */
+.mkl-item.is-ghost{height:3.5rem;min-height:0}
+.mkl-item.is-ghost.is-shrink{animation:mklGhostShrink .35s cubic-bezier(.2,.7,.2,1)}
+.mkl-item.is-ghost.is-grow{height:var(--h0);transition:height .24s ease-in}
+@keyframes mklGhostShrink{from{height:var(--h0)}to{height:3.5rem}}
+@media(prefers-reduced-motion:reduce){.mkl-item.is-ghost.is-shrink{animation:none}.mkl-item.is-ghost.is-grow{transition:none}}
+
+/* ==== "Rückgängig" as a text link (12.11., user decision: "no button just a link"; replaces the white button) ====
+   No fill, no border; red-600 label 14 / 700, underlined (1 px, 2 px on hover); 44 px target via ::before. ==== */
+.mkl-ghost__undo,.mkl-ghost__undo:hover{min-height:2.75rem;padding:0 .5rem;border:0;border-radius:var(--r-m,.25rem);background:none;box-shadow:none;color:var(--color-red-600,#B52320);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.mkl-ghost__undo:hover{text-decoration-thickness:.125rem}

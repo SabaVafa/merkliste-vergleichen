@@ -207,3 +207,52 @@ Nutzerentscheidung: die Option wird nicht gebraucht. Entfernt im Gruppenkopf (be
 ## 21 · Fußzeile der Merkliste als Status (11.11.2026)
 
 Nutzer: „die Info ist nicht professionell dargestellt“. Vorher ein 12-px-Grausatz („Wählen Sie mindestens 2 Modelle derselben Kategorie“), zweizeilig umbrochen neben „Auswahl vergleichen (0)“. Jetzt ein Statusblock wie eine Bestellübersicht – Zeile 1 die Auswahl (14 px / 600, Schwarz), Zeile 2 der nächste Schritt (14 px, Grau 5,4 : 1); der Button heißt nur „Vergleichen“ (Auswahlmodus: „Hinzufügen“) und verweist per `aria-describedby` auf den Status, der Status wird per `aria-live` angesagt. Zustände: „Keine Modelle ausgewählt · 2 bis 4 Modelle einer Kategorie“ → „1 Modell ausgewählt · Noch mindestens 1 weiteres Modell“ → „2 Türsprechanlagen ausgewählt · Bis zu 2 weitere möglich“ → „4 … · Maximum von 4 Modellen erreicht“; andere Kategorie: „… · Der Vergleich öffnet bei Briefkästen“; Auswahlmodus: „… · Noch 2 Plätze im Vergleich frei“. Desktop: Status links (eine Zeile je Aussage), Button rechts in derselben Zeile; Handy: Status über dem vollbreiten Button. `merkliste.js?v=26`, `merkliste.css?v=25`.
+
+## 22 · „Zuletzt angesehen“ in der Merkliste (12.11.2026)
+
+Nutzerwunsch, Konzept Lead Product Design:
+- **Was zählt als angesehen:** Aufruf der Produktseite, Klick auf Titel oder Bild einer Produktkarte (PLP und „Ähnliche Modelle“), „Zum Produkt“ / „Konfigurieren“ im Vergleich. Neueste zuerst, bis zu 12 gespeichert.
+- **Speicher:** nur für die Sitzung (`sessionStorage` `mtz_recent`), beim Schließen des Browsers weg – keine Einwilligung nötig. Eintrag als Momentaufnahme wie ein Merkliste-Eintrag, damit ein Modell von der anderen Kategorieseite ebenfalls erscheint.
+- **Darstellung:** eigener Bereich unter den gemerkten Artikeln, Papiergrau-Fläche (8 px) – angesehen wirkt nie wie gemerkt. Höchstens 4 Modelle, nie ein bereits gemerktes. Zeile: Bildkachel, Name (2 Zeilen), Preis, „Zum Produkt“ / „Konfigurieren“; rechts „Merken“ mit Lesezeichen (ein Klick übernimmt das Modell in die Liste). „Verlauf löschen“ leert den Bereich.
+- **Leere Merkliste:** der Hinweis wird kürzer, „Zurück zu …“ entfällt, der Bereich übernimmt die Hauptrolle.
+- **Ausgeblendet** in der geteilten Ansicht und im Auswahl-Modus, wenn der Vergleich die Merkliste öffnet.
+- **JTL:** den shopeigenen „zuletzt angesehen“-Bestand lesen statt einen zweiten Verlauf zu führen.
+
+## 23 · „Drucken / PDF“ entfernt, „Teilen“ rechts (12.11.2026)
+
+Nutzerentscheidung: die Merkliste bietet nur noch „Teilen“ – in der Titelzeile zwischen Titel und „Merkliste leeren“ (eine eigene Zeile für einen Link verschenkte Platz); am Telefon „Leeren“, unter 22,5 rem „Teilen“ als Symbol. Druckfunktion, Druckdokument und der Ersatz-Hinweis „Drucken / PDF“ bei zu langen Links sind entfernt.
+
+## 24 · Produktbild in Meldungen (12.11.2026)
+
+Nutzerwunsch („wie Airbnb“): Meldungen zu genau einem Produkt zeigen statt des Status-Symbols das Produktfoto als kleine Kachel (2,5 rem, weiß, 8 px) – Gemerkt, Aus der Merkliste entfernt, Konfiguration gemerkt/aktualisiert, In Ihre Merkliste übernommen, zum Vergleich hinzugefügt; im Vergleich „… hinzugefügt“ und „… entfernt“. Meldungen zu mehreren Artikeln behalten das Symbol.
+
+Versionen: `merkliste.js?v=32`, `merkliste.css?v=31`, `vergleichen.js?v=119`, `vergleichen.css?v=159`.
+
+## 25 · „Merkliste leeren“ ohne Rückfrage, mit Rückgängig (12.11.2026)
+
+Nutzerentscheidung: statt der Rückfrage („3 Artikel aus der Merkliste entfernen?“ – „Ja, entfernen“ / „Abbrechen“) leert „Merkliste leeren“ die Liste sofort; die Meldung „3 Artikel entfernt“ bietet „Rückgängig“ und bleibt dafür 10 s stehen (sonst 5 s; pausiert bei Hover und Fokus). Screenreader hören „… Rückgängig in der Meldung möglich“. Rückfrage-Bereich samt Stilen entfernt. `merkliste.js?v=33`, `merkliste.css?v=32`.
+
+## 26 · Einzelnes Entfernen: Zeit zum Rückgängigmachen, Sammel-Rückgängig, einheitliches Hover (12.11.2026)
+
+Lead-Fullstack-Prüfung auf Nutzerwunsch:
+- **10 s zum Rückgängigmachen** auch beim einzelnen Entfernen (vorher 5 s), wie bei „Merkliste leeren“; pausiert bei Hover und Fokus.
+- **Sammel-Rückgängig:** vorher ersetzte jede neue Meldung die vorige, nur das zuletzt Entfernte war wiederherstellbar. Jetzt werden Entfernungen, solange ihre Meldung steht, gesammelt („2 Artikel entfernt“ – Rückgängig) und kehren an ihre alten Plätze zurück (geprüft: 4 Artikel, 1. und 3. entfernt → Reihenfolge wieder wie vorher). Eine einzelne Entfernung zeigt das Produktbild.
+- **Einheitliches Hover für jedes Entfernen:** „Verlauf löschen“ jetzt wie „Merkliste leeren“ (rote Fläche, roter Text). Geprüft: Merkliste leeren, Zeile entfernen, Verlauf löschen, Spalten-×, Vergleich leeren (Vergleich und Leiste), × in der Leiste – alle `--color-red-50` / `--color-red-600`.
+- **„Teilen“ in der Titelzeile** (Titel · Teilen · Merkliste leeren · ×): eine eigene Zeile für einen Link verschenkte Platz; Telefon „Leeren“, unter 22,5 rem „Teilen“ als Symbol (Name „Merkliste teilen“).
+- Versionen: `merkliste.js?v=35`, `merkliste.css?v=34`.
+
+## 27 · Rückgängig direkt am Eintrag (12.11.2026)
+
+Nutzerentscheidung: der Papierkorb an einem Merkliste-Eintrag zeigt keine Meldung mehr, sondern legt eine hellrote Ebene über den Eintrag (schiebt sich in 200 ms von rechts herein): „<voller Shop-Titel> entfernt · Rückgängig“, unten ein 3-px-Balken, der in 8 s abläuft.
+- Entfernt ist sofort (Zähler, Kopf-Badge, Vergleichsauswahl, Speicher); die Ebene bietet nur den Rückweg. Die Liste springt nicht – die Ebene hat die Höhe des Eintrags.
+- Hover pausiert den Ablauf, ebenso Tastaturfokus (bei Mausklick läuft er weiter, damit die Ebene nicht ewig stehen bleibt).
+- „Rückgängig“: Ebene gleitet hinaus, der Eintrag steht wieder an seinem Platz (an den Nachbarn verankert, auch bei mehreren offenen Entfernungen in beliebiger Reihenfolge), ein gesetzter Vergleichshaken ist wieder gesetzt; Fokus auf seinen Papierkorb.
+- Zeit abgelaufen: der Eintrag klappt in 200 ms zu; hatte er den Fokus, geht er zum nächsten Eintrag.
+- Jeder Eintrag hat seine eigene Ebene und Zeit. Schließen der Merkliste macht offene Entfernungen endgültig.
+- Farben: DS-Lösch-Farben (`--color-red-50` Fläche, `--color-red-600` Text, Symbol und Balken), „Rückgängig“ als Aktion in Teal (8,4 : 1). Screenreader: „… entfernt. Rückgängig möglich.“ / „… wiederhergestellt.“ Bei „Bewegung reduzieren“ ohne Schieben, Balken steht.
+- Entfernen an anderer Stelle (Lesezeichen auf Karte oder PDP, Vergleich, untere Leiste) behält die Meldung mit Rückgängig; „Merkliste leeren“ ebenfalls.
+- Versionen: `merkliste.js?v=37`, `merkliste.css?v=35`.
+- **Nachtrag (12.11., Nutzer: „zu viel – nur Rückgängig; der erste Schritt zu schnell, das Abschließen zu langsam“):** die Ebene zeigt nur noch „Rückgängig“ (mittig; kein Symbol, kein Text, kein Ablaufbalken – Screenreader hören weiterhin „… entfernt. Rückgängig möglich.“, die Schaltfläche heißt „<Titel> wiederherstellen“). Hereinschieben 350 ms mit abbremsender Kurve (vorher 200 ms), Zuklappen nach 5 s (vorher 8 s) in 260 ms. `merkliste.js?v=38`, `merkliste.css?v=36`.
+- **Nachtrag 2 (12.11., Nutzerentscheidung):** „Rückgängig“ als schlichte weiße Schaltfläche mit dünnem rotem Rand (1 px `--color-red-600`), Beschriftung rot 14 px / 700, 4 px Radius, ohne Unterstreichung; Hover: Rand 2 px. `merkliste.css?v=37`.
+- **Nachtrag 3 (12.11., Nutzeridee):** der entfernte Eintrag schrumpft beim Entfernen von seiner Höhe auf eine kompakte 3,5-rem-Zeile mit „Rückgängig“ (350 ms, gleiche abbremsende Kurve wie das Hereinschieben) – die Liste rückt einmal ruhig nach; „Rückgängig“ lässt ihn wieder auf volle Höhe wachsen (240 ms); nach 5 s klappt die kompakte Zeile zu. `merkliste.js?v=39`, `merkliste.css?v=38`.
+- **Nachtrag 4 (12.11., Nutzerentscheidung):** „Rückgängig“ als Textlink statt Schaltfläche (rot `--color-red-600`, 700, unterstrichen; Hover dickere Unterstreichung), die kompakte Zeile verschwindet nach 3 s (Hover und Tastaturfokus pausieren weiterhin). `merkliste.js?v=40`, `merkliste.css?v=39`.
