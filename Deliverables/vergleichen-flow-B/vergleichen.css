@@ -1228,3 +1228,11 @@ table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:top}
 .vgl-view .vgl-ph__rm:hover{background:transparent;color:var(--color-red-600,#B52320)}
 .vgl-view .vgl-ph__rm:hover::before{background:var(--color-red-50,#FFF0EF)}   /* same delete hover as "Vergleich leeren" / Merkliste "Leeren": red-50 fill, red-600, 4 px */
 @media(prefers-reduced-motion:reduce){.vgl-view .vgl-ph__rm,.vgl-view .vgl-ph__rm::before{transition:none}}
+
+/* ==== Rows centred vertically (12.11., user: "all the content center align vertically") ====
+   Was baseline alignment: in rows of different content height the label and the values drifted apart (Farben label
+   8 px above the swatch row's middle, Namensschild / Gewicht / Abmessungen 11 px). Now every label and value cell of
+   the table (Unterschiede, Nicht für alle gepflegt, Gemeinsamkeiten) is centred in its row, and the (i) button is
+   centred on the label block instead of its first line. Section headers are not affected. ==== */
+table.vgl-t tbody tr:not(.vgl-sec__h)>th,table.vgl-t tbody tr:not(.vgl-sec__h)>td,table.vgl-t .vgl-sec--s td.vgl-val--mark{vertical-align:middle}
+table.vgl-t tbody th[scope="row"] .rh__row .rh__w,table.vgl-t .vgl-sec--s th[scope="row"] .rh__row .rh__w{top:50%;transform:translateY(-50%)}   /* centred on the label block */

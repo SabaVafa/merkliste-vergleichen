@@ -983,7 +983,7 @@
   /* colours: one slot per colour of the whole comparison, same order in every column; a colour a model lacks is an empty outlined slot */
   function colorsHTML(cs,all){
     var sw='<span class="vgl-sw" aria-hidden="true">'+all.filter(function(c){return cs.indexOf(c)>-1&&SW[c];}).map(function(c){return '<span title="'+SWL[c]+'" style="background:'+SW[c]+'"></span>';}).join('')+'</span>';
-    return sw+'<span class="vgl-swc">'+cs.length+' Farbe'+(cs.length===1?'':'n')+'<span class="vgl-visually-hidden">: '+esc(cs.map(cname).join(', '))+'</span></span>';
+    return sw+'<span class="vgl-visually-hidden">'+esc(cs.map(cname).join(', '))+'</span>';   /* no visible "n Farben" count (12.11., user decision); the names stay for screen readers */
   }
   function cellHTML(d,i,p,isb,attr,ctx){
     var row=d.row,v=d.vals[i],t=d.texts[i],inner;ctx=ctx||{};
