@@ -134,8 +134,8 @@
   var tabletMq = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
   function set(){
     if (mobileMq.matches) input.placeholder = 'Produkte suchen…';
-    else if (tabletMq.matches) input.placeholder = 'Suchen — Türklingel, Briefkasten…';
-    else input.placeholder = 'Suchen — Türklingel, Briefkasten, Sprechanlage…';
+    else if (tabletMq.matches) input.placeholder = 'Suchen – Türklingel, Briefkasten…';
+    else input.placeholder = 'Suchen – Türklingel, Briefkasten, Sprechanlage…';
   }
   set(); mobileMq.addEventListener('change', set); tabletMq.addEventListener('change', set);
 })();

@@ -498,7 +498,7 @@
     b.innerHTML =
       '<picture>' +
         '<source media="(max-width: 767px)" srcset="Banner/promo-briefkasten-mobile.png">' +
-        '<img src="Banner/promo-briefkasten-desktop.png" alt="Original Metzler Briefkästen — Vergleichssieger bei Vergleich.org. Langlebig & wetterfest, minimalistisches Design, sicheres Schließsystem, individuelle Gravur, flexibel montierbar." loading="lazy">' +
+        '<img src="Banner/promo-briefkasten-desktop.png" alt="Original Metzler Briefkästen – Vergleichssieger bei Vergleich.org. Langlebig & wetterfest, minimalistisches Design, sicheres Schließsystem, individuelle Gravur, flexibel montierbar." loading="lazy">' +
       '</picture>';
     return b;
   }

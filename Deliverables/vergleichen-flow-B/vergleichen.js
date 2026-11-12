@@ -22,7 +22,7 @@
   var SW = {anthrazit:'#383E42',braun:'#5A3B29',edelstahl:'linear-gradient(135deg,#e9ebee,#a7adb4 55%,#d6d9dd)',eisenglimmer:'linear-gradient(135deg,#3a3d40,#23262a)',grau:'#B9BCC0',schwarz:'#1A171B',weiss:'#FFFFFF',wunschfarbe:'conic-gradient(from 90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)'};
   var SWL = {anthrazit:'Anthrazit',braun:'Braun',edelstahl:'Edelstahl',eisenglimmer:'Eisenglimmer',grau:'Grau',schwarz:'Schwarz',weiss:'Weiß',wunschfarbe:'Wunschfarbe'};
   function konfigOf(p){return !!p.briefkasten||p.klingel==='flex'||/SDM10|modular|Paketbox|Standbriefkast/i.test(p.name);}   /* CTA wording only (Konfigurieren / Zum Produkt) */
-  function euro(n){return (typeof n==='number')?n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.').replace(/\.(\d{2})$/,',$1')+' €':'—';}
+  function euro(n){return (typeof n==='number')?n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.').replace(/\.(\d{2})$/,',$1')+' €':'–';}
 
   var SRC=(window.MTZ_PRODUCTS||[]), BY_ID={};
   function designOf(p){var parts=String(p.name||'').split('|').map(function(s){return s.trim();}).filter(Boolean);return parts.length>1?parts[parts.length-1]:'–';}
@@ -67,12 +67,12 @@
     {key:'system',label:'System',cls:'T',akk:'das System',dat:'im System',nom:'das System',get:g('system'),hint:'IP-System: die Außenstation läuft über Ihr Heimnetzwerk und braucht dort eine Netzwerkverbindung. 2-Draht-BUS: Übertragung über eine zweiadrige Leitung – eine vorhandene Klingelleitung lässt sich weiter nutzen.'},
     {key:'klingel',label:'Anzahl Klingeltaster',lst:'Tasteranzahl',cls:'T',akk:'die Tasteranzahl',dat:'in der Tasteranzahl',nom:'die Tasteranzahl',get:g('klingel'),hint:'Ein Klingeltaster je Wohneinheit. „Flexibel (1–500)": laut Shop für 1 bis 500 Parteien wählbar.'},
     {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist dauerhaft in das Schild graviert – bei einer Namensänderung braucht es ein neues Schild. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen und lässt sich selbst austauschen. Digital: Namen werden elektronisch hinterlegt, kein graviertes Schild.'},
-    {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A." heißt: im Shop nicht gepflegt — nicht „nicht vorhanden".'},
+    {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A." heißt: im Shop nicht gepflegt – nicht „nicht vorhanden".'},
     {key:'kombi',label:'Mit Briefkasten/Paketbox',lst:'Briefkasten/Paketbox',cls:'T',akk:'die Kombination mit Briefkasten/Paketbox',dat:'bei Briefkasten/Paketbox',nom:'die Kombination mit Briefkasten/Paketbox',get:g('kombi'),hint:'Kombination aus Video-Türsprechanlage und Briefkasten bzw. Paketbox in einem Artikel.'},
-    {key:'kamera',label:'Kameraauflösung',cls:'T',akk:'die Kameraauflösung',dat:'in der Kameraauflösung',nom:'die Kameraauflösung',na:isAudio,get:g('kamera'),hint:'Auflösung des Kamerabilds — Full HD (1920 × 1080) entspricht 2 MP.'+SRC_DESC},
+    {key:'kamera',label:'Kameraauflösung',cls:'T',akk:'die Kameraauflösung',dat:'in der Kameraauflösung',nom:'die Kameraauflösung',na:isAudio,get:g('kamera'),hint:'Auflösung des Kamerabilds – Full HD (1920 × 1080) entspricht 2 MP.'+SRC_DESC},
     {key:'nachtsicht',label:'Nachtsicht',cls:'T',akk:'die Nachtsicht',dat:'in der Nachtsicht',nom:'die Nachtsicht',na:isAudio,bool:true,get:g('nachtsicht'),hint:'Bild auch bei Dunkelheit.'+SRC_DESC+' „k. A.": in der Beschreibung nicht erwähnt.'},
-    {key:'sichtwinkel',label:'Sichtwinkel',cls:'T',akk:'den Sichtwinkel',dat:'im Sichtwinkel',nom:'der Sichtwinkel',na:isAudio,get:g('sichtwinkel'),hint:'Erfassungsbereich der Kamera.'+SRC_DESC+' Ob horizontal, vertikal oder diagonal gemessen, ist dort nicht angegeben — daher ohne Bestwert.'},
-    {key:'schutzart',label:'Schutzart (IP)',lst:'Schutzart',cls:'T',akk:'die Schutzart',dat:'in der Schutzart',nom:'die Schutzart',better:'maxnum',get:g('schutzart'),hint:'Schutz gegen Staub und Wasser — IP65 = staubdicht und strahlwassergeschützt.'+SRC_DESC},
+    {key:'sichtwinkel',label:'Sichtwinkel',cls:'T',akk:'den Sichtwinkel',dat:'im Sichtwinkel',nom:'der Sichtwinkel',na:isAudio,get:g('sichtwinkel'),hint:'Erfassungsbereich der Kamera.'+SRC_DESC+' Ob horizontal, vertikal oder diagonal gemessen, ist dort nicht angegeben – daher ohne Bestwert.'},
+    {key:'schutzart',label:'Schutzart (IP)',lst:'Schutzart',cls:'T',akk:'die Schutzart',dat:'in der Schutzart',nom:'die Schutzart',better:'maxnum',get:g('schutzart'),hint:'Schutz gegen Staub und Wasser – IP65 = staubdicht und strahlwassergeschützt.'+SRC_DESC},
     {key:'schlagfestigkeit',label:'Schlagfestigkeit (IK)',lst:'Schlagfestigkeit',cls:'T',akk:'die Schlagfestigkeit',dat:'in der Schlagfestigkeit',nom:'die Schlagfestigkeit',better:'maxnum',get:g('schlagfestigkeit'),hint:'Schutz gegen Stöße (IK07 bis IK10, höher = robuster).'+SRC_DESC},
     {key:'abmessungen',label:'Abmessungen (B × H × T)',lst:'Maßen',cls:'F',fin:'Maßen',fdat:'in den Maßen',fbei:'bei den Maßen',nom:'die Maße',pl:true,get:g('abmessungen'),hint:'Außenmaße der Außenstation laut Shop, in cm.'},
     {key:'gewicht',label:'Gewicht',cls:'F',fin:'Gewicht',fdat:'im Gewicht',fbei:'beim Gewicht',nom:'das Gewicht',get:g('gewicht'),hint:'Artikelgewicht laut Shop. „je nach Ausführung": für die Farbvarianten sind unterschiedliche Gewichte hinterlegt.'},
@@ -82,13 +82,13 @@
   var ROWS_BK=[
     {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist dauerhaft in das Schild graviert – bei einer Namensänderung braucht es ein neues Schild. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen und lässt sich selbst austauschen. Ohne Gravur: ohne Namensschild.'},
     {key:'colors',label:'Farben',cls:'A',akk:'die Farben',dat:'in den Farben',nom:'die Farben',pl:true,swatches:true,hint:'Alle im Shop angebotenen Farbausführungen.'},
-    {key:'faecher',label:'Fächer / Parteien',lst:'Fächerzahl',cls:'T',akk:'die Fächerzahl',dat:'in der Fächerzahl',nom:'die Fächerzahl',get:g('faecher'),hint:'Anzahl der Briefkastenfächer — ein Fach je Partei.'},
+    {key:'faecher',label:'Fächer / Parteien',lst:'Fächerzahl',cls:'T',akk:'die Fächerzahl',dat:'in der Fächerzahl',nom:'die Fächerzahl',get:g('faecher'),hint:'Anzahl der Briefkastenfächer – ein Fach je Partei.'},
     {key:'zeitungsfach',label:'Zeitungsfach',cls:'T',akk:'das Zeitungsfach',dat:'im Zeitungsfach',nom:'das Zeitungsfach',get:g('zeitungsfach'),hint:'Integriert: fest verbaut. Optional: als Zubehör erhältlich. Ohne: kein Zeitungsfach.'},
     {key:'klingelsys',label:'Klingel / Sprechanlage',cls:'T',akk:'die Klingel / Sprechanlage',dat:'bei Klingel / Sprechanlage',nom:'die Klingel / Sprechanlage',get:g('klingelsys'),hint:'Enthält der Artikel eine Klingel oder Video-Türsprechanlage? Sets sind preislich nicht direkt mit Einzelbriefkästen vergleichbar.'},
     {key:'montage',label:'Montageart',cls:'T',set:true,akk:'die Montageart',dat:'in der Montageart',nom:'die Montageart',get:g('montage'),hint:'Aufputz: an der Wand. Standmontage: freistehend. Unterputz: in der Wand bzw. als Mauerdurchwurf – braucht eine passende Öffnung in der Wand. Zaunmontage: am Zaun.'},
     {key:'abmessungen',label:'Abmessungen (B × H × T)',lst:'Maßen',cls:'F',fin:'Maßen',fdat:'in den Maßen',fbei:'bei den Maßen',nom:'die Maße',pl:true,get:g('abmessungen'),hint:'Außenmaße laut Shop, in cm.'},
     {key:'gewicht',label:'Gewicht',cls:'F',fin:'Gewicht',fdat:'im Gewicht',fbei:'beim Gewicht',nom:'das Gewicht',get:g('gewicht'),hint:'Artikelgewicht laut Shop. „je nach Ausführung": für die Farbvarianten sind unterschiedliche Gewichte hinterlegt.'},
-    {key:'material',label:'Material',cls:'F',set:true,fin:'Material',fdat:'im Material',fbei:'beim Material',nom:'das Material',get:g('material'),hint:'Im Shop für alle Ausführungen gemeinsam gepflegt — das Material der einzelnen Farbe bzw. Front kann abweichen.'}
+    {key:'material',label:'Material',cls:'F',set:true,fin:'Material',fdat:'im Material',fbei:'beim Material',nom:'das Material',get:g('material'),hint:'Im Shop für alle Ausführungen gemeinsam gepflegt – das Material der einzelnen Farbe bzw. Front kann abweichen.'}
   ];
 
   /* Meaning lines under the values were moved into the row's (i) explanation (10.11., user decision): one place per
@@ -99,7 +99,7 @@
     var miss=items.filter(function(p){return !p.shop;});
     if(!miss.length)return '';
     var nm=miss.map(function(p){return '„'+esc(shopName(p))+'“';}).join(', ');
-    return nm+(miss.length>1?' sind':' ist')+' im Shop-Export'+(STAND?' vom '+STAND:'')+' nicht enthalten — dafür zeigt der Vergleich keine Merkmale („k. A.“).';
+    return nm+(miss.length>1?' sind':' ist')+' im Shop-Export'+(STAND?' vom '+STAND:'')+' nicht enthalten – dafür zeigt der Vergleich keine Merkmale („k. A.“).';
   }
 
   var LENSES={
@@ -583,7 +583,7 @@
       trayHint.innerHTML=IC_INFO+'Noch <b>'+need+'</b> Modell'+(need>1?'e':'')+' wählen, um zu vergleichen';
     }else if(n>=MAX){
       trayHint.classList.add('limit');
-      trayHint.innerHTML=IC_LIMIT+'Maximum erreicht — mehr als '+MAX+' Modelle sind nicht vergleichbar';
+      trayHint.innerHTML=IC_LIMIT+'Maximum erreicht – mehr als '+MAX+' Modelle sind nicht vergleichbar';
     }else{
       var more=MAX-n;
       trayHint.classList.add('ready');
@@ -1219,10 +1219,10 @@
   var coach,coachProg,coachStep,coachTitle,coachText,coachBack,coachNext,spotEl,curStep=0;
   var STEPS=[
     {k:'Schritt 1 / 6',t:'Ruhezustand',x:'Zunächst ist der Vergleich reduziert: auf den Produktkarten sind <b>keine Auswahlfelder</b> sichtbar. In der Ergebnisleiste lädt die Schaltfläche „Vergleichen" dazu ein, den Vergleich zu starten.',target:function(){return barBtn;}},
-    {k:'Schritt 2 / 6',t:'Vergleich starten',x:'Ein Klick auf „Vergleichen" aktiviert den Vergleichsmodus — <b>jetzt erscheint auf jeder Produktkarte ein „Vergleichen"-Feld</b>. Wählen Sie damit 2–4 Modelle.',target:function(){return cardToggle(TRIO[0])||barBtn;}},
-    {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Modelle markiert sind, wird „Vergleich anzeigen (3)" <b>aktiv</b> (grün) — in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
-    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben die Modelle, darunter die Unterschiede — die wichtigsten zuerst, mit ihrer Bedeutung direkt am Wert —, dann die Gemeinsamkeiten (zugeklappt). '+LENS.step4,target:function(){return null;}},
-    {k:'Schritt 5 / 6',t:'Gemeinsamkeiten',x:'Die Gemeinsamkeiten sind zu Beginn zugeklappt. „Anzeigen" blendet sie ein — dann zeigt die Tabelle alle Merkmale.',target:function(){return view.querySelector('[data-vgl="common"]');}},
+    {k:'Schritt 2 / 6',t:'Vergleich starten',x:'Ein Klick auf „Vergleichen" aktiviert den Vergleichsmodus – <b>jetzt erscheint auf jeder Produktkarte ein „Vergleichen"-Feld</b>. Wählen Sie damit 2–4 Modelle.',target:function(){return cardToggle(TRIO[0])||barBtn;}},
+    {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Modelle markiert sind, wird „Vergleich anzeigen (3)" <b>aktiv</b> (grün) – in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
+    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben die Modelle, darunter die Unterschiede – die wichtigsten zuerst, mit ihrer Bedeutung direkt am Wert –, dann die Gemeinsamkeiten (zugeklappt). '+LENS.step4,target:function(){return null;}},
+    {k:'Schritt 5 / 6',t:'Gemeinsamkeiten',x:'Die Gemeinsamkeiten sind zu Beginn zugeklappt. „Anzeigen" blendet sie ein – dann zeigt die Tabelle alle Merkmale.',target:function(){return view.querySelector('[data-vgl="common"]');}},
     {k:'Schritt 6 / 6',t:'Weiter im Kauf',x:'Aus dem Vergleich geht es direkt weiter: <b>Konfigurieren</b> bzw. <b>Zum Produkt</b> (kein Direktkauf, da individualisierbar), Artikel entfernen oder weitere hinzufügen. Das ist der komplette Ablauf.',target:function(){return null;},last:true}
   ];
   function cardToggle(id){var c=document.querySelector('.pcard[data-id="'+id+'"] .vgl-toggle');return c;}

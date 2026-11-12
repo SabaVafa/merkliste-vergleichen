@@ -69,7 +69,7 @@
       </button>
       <div class="header__search">
         <svg><use href="#i-search"/></svg>
-        <input type="search" placeholder="Suchen — Türklingel, Briefkasten, Sprechanlage…" />
+        <input type="search" placeholder="Suchen – Türklingel, Briefkasten, Sprechanlage…" />
       </div>
       <div class="header__icons">
         <a class="icon-btn" href="#" aria-label="Mein Konto"><img src="Home/ICONS/profile.svg" alt="" /></a>
@@ -288,7 +288,7 @@
     <aside class="brand">
       <div class="brand-head">
         <h1>Sprechen Sie<br>mit einem <em>Experten</em></h1>
-        <p class="lede">Persönliche Beratung, technischer Support und Metzler Partnerbetriebe — wir sind für Sie da.</p>
+        <p class="lede">Persönliche Beratung, technischer Support und Metzler Partnerbetriebe – wir sind für Sie da.</p>
       </div>
       <div class="brand-foot">
         <span class="label">Hotline</span>
@@ -646,8 +646,8 @@
 
 <script src="vergleich-daten.js?v=4"></script><!-- Vergleichsdaten aus dem Shop-Export (tools/build_vergleich_daten.py) — vor den Karten: liefert auch deren Shop-Werte -->
 <script src="sprechanlage.js?v=99"></script>
-<script src="vergleichen.js?v=105"></script><!-- Vergleichen add-on + flow -->
-<script src="merkliste.js?v=26"></script><!-- Merkliste add-on -->
+<script src="vergleichen.js?v=106"></script><!-- Vergleichen add-on + flow -->
+<script src="merkliste.js?v=27"></script><!-- Merkliste add-on -->
 <script>
   /* ===== Header behaviour (ported from home design system) ===== */
   (function(){
@@ -769,8 +769,8 @@
     var tabletMq = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
     function set(){
       if (mobileMq.matches) input.placeholder = 'Produkte suchen…';
-      else if (tabletMq.matches) input.placeholder = 'Suchen — Türklingel, Briefkasten…';
-      else input.placeholder = 'Suchen — Türklingel, Briefkasten, Sprechanlage…';
+      else if (tabletMq.matches) input.placeholder = 'Suchen – Türklingel, Briefkasten…';
+      else input.placeholder = 'Suchen – Türklingel, Briefkasten, Sprechanlage…';
     }
     set(); mobileMq.addEventListener('change', set); tabletMq.addEventListener('change', set);
   })();

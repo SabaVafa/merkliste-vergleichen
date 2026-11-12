@@ -70,7 +70,7 @@
       </button>
       <div class="header__search">
         <svg><use href="#i-search"/></svg>
-        <input type="search" placeholder="Suchen — Türklingel, Briefkasten, Sprechanlage…" />
+        <input type="search" placeholder="Suchen – Türklingel, Briefkasten, Sprechanlage…" />
       </div>
       <div class="header__icons">
         <a class="icon-btn" href="#" aria-label="Mein Konto"><img src="Home/ICONS/profile.svg" alt="" /></a>
@@ -376,7 +376,7 @@
         <div class="faq__list">
           <details class="faq__item" name="faq" open>
             <summary class="faq__q">Welche Arten von Briefkästen gibt es?<span class="faq__q-icon"><svg><use href="#i-chevron-down"/></svg></span></summary>
-            <div class="faq__a">Aufputz- und Unterputz-Briefkästen, freistehende Standbriefkästen, Zaun- und Mauerdurchwurf-Briefkästen sowie Mehrfamilien-Anlagen. Welche Variante passt, hängt von Ihrer Montagesituation ab — die Filter links helfen bei der Eingrenzung.</div>
+            <div class="faq__a">Aufputz- und Unterputz-Briefkästen, freistehende Standbriefkästen, Zaun- und Mauerdurchwurf-Briefkästen sowie Mehrfamilien-Anlagen. Welche Variante passt, hängt von Ihrer Montagesituation ab – die Filter links helfen bei der Eingrenzung.</div>
           </details>
           <details class="faq__item" name="faq">
             <summary class="faq__q">Was ist der Unterschied zwischen V2A und V4A Edelstahl?<span class="faq__q-icon"><svg><use href="#i-chevron-down"/></svg></span></summary>
@@ -384,7 +384,7 @@
           </details>
           <details class="faq__item" name="faq">
             <summary class="faq__q">Kann mein Briefkasten Rost ansetzen?<span class="faq__q-icon"><svg><use href="#i-chevron-down"/></svg></span></summary>
-            <div class="faq__a">Massiver Edelstahl rostet nicht — die Oberfläche passiviert sich selbst. Flugrost durch fremde Eisenpartikel lässt sich mit einem Edelstahlreiniger einfach entfernen. Eine Nachbehandlung ist nicht nötig.</div>
+            <div class="faq__a">Massiver Edelstahl rostet nicht – die Oberfläche passiviert sich selbst. Flugrost durch fremde Eisenpartikel lässt sich mit einem Edelstahlreiniger einfach entfernen. Eine Nachbehandlung ist nicht nötig.</div>
           </details>
           <details class="faq__item" name="faq">
             <summary class="faq__q">Wie lange dauert eine individuelle Lasergravur?<span class="faq__q-icon"><svg><use href="#i-chevron-down"/></svg></span></summary>
@@ -528,9 +528,9 @@
 </footer>
 
 <script src="vergleich-daten.js?v=4"></script><!-- Vergleichsdaten aus dem Shop-Export (tools/build_vergleich_daten.py) — vor den Karten: liefert auch deren Shop-Werte -->
-<script src="plp.js?v=6"></script>
-<script src="vergleichen.js?v=105"></script><!-- Vergleichen add-on + flow (Version B) -->
-<script src="merkliste.js?v=26"></script><!-- Merkliste add-on -->
+<script src="plp.js?v=7"></script>
+<script src="vergleichen.js?v=106"></script><!-- Vergleichen add-on + flow (Version B) -->
+<script src="merkliste.js?v=27"></script><!-- Merkliste add-on -->
 <script>
   /* ===== Header behaviour (ported from home design system) ===== */
   (function(){
@@ -652,8 +652,8 @@
     var tabletMq = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
     function set(){
       if (mobileMq.matches) input.placeholder = 'Produkte suchen…';
-      else if (tabletMq.matches) input.placeholder = 'Suchen — Türklingel, Briefkasten…';
-      else input.placeholder = 'Suchen — Türklingel, Briefkasten, Sprechanlage…';
+      else if (tabletMq.matches) input.placeholder = 'Suchen – Türklingel, Briefkasten…';
+      else input.placeholder = 'Suchen – Türklingel, Briefkasten, Sprechanlage…';
     }
     set(); mobileMq.addEventListener('change', set); tabletMq.addEventListener('change', set);
   })();

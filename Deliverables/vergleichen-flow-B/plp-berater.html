@@ -579,7 +579,7 @@
     station:{q:"Welche Türstation soll integriert sein?",type:"single",req:true,vis:function(a){return a.combo==="briefkasten"&&(a.parties==="1"||a.parties==="2");},opts:[
       {v:"vdm10",ol:"Standard-Video (VDM10)",od:"Kamera, App, FRITZ!Box"},
       {v:"sdm10",ol:"Touch-Display & Gesichtserkennung (SDM10)",od:"biometrisch entsperren"}]},
-    access:{q:"Wie möchten Sie schlüssellos öffnen?",en:"Keyless entry — multiple choice. App is always included.",type:"multi",vis:function(a){return a.bau!=="bus"&&a.combo!=="briefkasten";},opts:[
+    access:{q:"Wie möchten Sie schlüssellos öffnen?",en:"Keyless entry – multiple choice. App is always included.",type:"multi",vis:function(a){return a.bau!=="bus"&&a.combo!=="briefkasten";},opts:[
       {v:"rfid",ol:"RFID-Karte / -Chip",od:"Transponder"},
       {v:"pin",ol:"PIN-Code",od:"Zahlencode am Gerät",media:"video"},
       {v:"fingerprint",ol:"Fingerabdruck",od:"nur Niko",media:"video"},

@@ -112,7 +112,7 @@
     return { main: parts[0] || it.name || '', sub: parts.slice(1).join(' · ') };
   }
   function fmtDate(iso) { try { return new Date(iso).toLocaleDateString('de-DE'); } catch (e) { return ''; } }
-  function euro(n) { return (typeof n === 'number') ? n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace(/\.(\d{2})$/, ',$1') + ' €' : '—'; }
+  function euro(n) { return (typeof n === 'number') ? n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace(/\.(\d{2})$/, ',$1') + ' €' : '–'; }
 
   /* ---- DOM helpers + icons ---- */
   function h(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
@@ -183,7 +183,7 @@
         '<div class="mkl-shared" role="status" tabindex="-1" hidden></div>' +
         '<button class="mkl-link mkl-sharedlink" type="button" data-mkl="show-shared" hidden></button>' +
         '<ul class="mkl-list" role="list"></ul>' +
-        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol — sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
+        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol – sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
       '</div>' +
       '<div class="mkl-foot">' +
         '<p class="mkl-hint">' + OWN_HINT + '</p>' +
@@ -364,7 +364,7 @@
     btn.classList.toggle('is-on', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     btn.setAttribute('aria-label', on ? nm + ' aus der Merkliste entfernen' : nm + ' merken');
-    btn.setAttribute('title', on ? 'Gemerkt — aus der Merkliste entfernen' : 'Merken');
+    btn.setAttribute('title', on ? 'Gemerkt – aus der Merkliste entfernen' : 'Merken');
     var lim = !on && isFull();
     btn.classList.toggle('is-limit', lim);
     if (lim) btn.setAttribute('aria-disabled', 'true'); else btn.removeAttribute('aria-disabled');
@@ -430,7 +430,7 @@
       cfgHtml = (lines.length ? '<p class="mkl-item__cfg"' + (op && all.length > 3 ? ' hidden' : '') + '>' + lines.join(' · ') + '</p>' : '') +
         (all.length > 3 ? '<dl class="mkl-item__parts" id="' + sid + '"' + (op ? '' : ' hidden') + '>' + all.map(function (l) { return '<dt>' + esc(l.label) + '</dt><dd' + (/noch zu wählen/.test(l.value) ? ' class="is-open"' : '') + '>' + esc(l.value) + '</dd>'; }).join('') + '</dl>' +
           '<button class="mkl-item__more" type="button" aria-expanded="' + op + '" aria-controls="' + sid + '" data-parts="' + esc(it.id) + '">' + (op ? 'Weniger anzeigen' : 'Alle Positionen anzeigen (' + all.length + ')') + IC_CHEV + '</button>' : '') +
-        (it.configExpired ? '<p class="mkl-item__expired">Konfiguration abgelaufen — Details siehe Zusammenfassung</p>' : (openStep ? '<p class="mkl-item__expired">Noch nicht vollständig — ' + esc(openStep) + ' offen</p>' : ''));
+        (it.configExpired ? '<p class="mkl-item__expired">Konfiguration abgelaufen – Details siehe Zusammenfassung</p>' : (openStep ? '<p class="mkl-item__expired">Noch nicht vollständig – ' + esc(openStep) + ' offen</p>' : ''));
     }
     var avail = it.availability ? '<span class="mkl-item__avail">' + esc(it.availability) + '</span>' : '';
     return '<li><article class="mkl-item' + (cfg ? ' mkl-item--cfg' : '') + '" data-id="' + esc(it.id) + '" data-lens="' + esc(it.lens) + '">' +
@@ -446,7 +446,7 @@
       '<div class="mkl-item__actions">' +
         '<a class="mkl-item__cta" href="' + esc(ctaHref) + '"><span>' + ctaTxt + '</span>' + IC_CHEV_R + '</a>' +
         '<div class="mkl-item__sec">' +
-          (cfg ? '<span class="mkl-item__cfgnote">Vergleich auf Modellebene — über das Basismodell</span>' :
+          (cfg ? '<span class="mkl-item__cfgnote">Vergleich auf Modellebene – über das Basismodell</span>' :
             '<label class="mkl-cmp"><input type="checkbox" data-id="' + esc(cmpId) + '" data-lens="' + esc(it.lens) + '" aria-label="' + esc(nm.main) + ' zum Vergleich auswählen"><span class="mkl-cmp__box" aria-hidden="true">' + CHK + '</span><span class="mkl-cmp__t">Vergleichen</span></label>') +
         '</div>' +
       '</div>' +
@@ -517,7 +517,7 @@
     });
     listEl.querySelectorAll('.mkl-group').forEach(function (g) {
       var hint = g.querySelector('.mkl-group__hint'), other = !!(lock && g.getAttribute('data-lens') !== lock);
-      hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie — Ihre Auswahl läuft bei ' + (LENSES[lock] || LENSES[LENS]).label;
+      hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie – Ihre Auswahl läuft bei ' + (LENSES[lock] || LENSES[LENS]).label;
     });
     /* footer status (11.11., user: "not professional"): what is selected (bold) + what comes next (muted); the
        button just says "Vergleichen" */
@@ -548,7 +548,7 @@
     });
     listEl.querySelectorAll('.mkl-group').forEach(function (g) {
       var hint = g.querySelector('.mkl-group__hint'), other = g.getAttribute('data-lens') !== pick.lens;
-      hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie — Ihr Vergleich läuft bei ' + lab0;
+      hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie – Ihr Vergleich läuft bei ' + lab0;
     });
     cta.textContent = 'Hinzufügen';
     cta.disabled = n < 1;
@@ -675,7 +675,7 @@
   }
   function takeHTML(it, nm) {
     var on = !!ownFor(it);
-    return '<button class="mkl-mark mkl-mark--row' + (on ? ' is-on' : '') + '" type="button" data-take="' + esc(it.id) + '" aria-pressed="' + on + '" aria-label="' + esc(nm.main) + (on ? ' aus meiner Merkliste entfernen' : ' in meine Merkliste übernehmen') + '" title="' + (on ? 'In Ihrer Merkliste — entfernen' : 'In meine Merkliste übernehmen') + '"><span class="mkl-mark__disc">' + HEART + '</span></button>';
+    return '<button class="mkl-mark mkl-mark--row' + (on ? ' is-on' : '') + '" type="button" data-take="' + esc(it.id) + '" aria-pressed="' + on + '" aria-label="' + esc(nm.main) + (on ? ' aus meiner Merkliste entfernen' : ' in meine Merkliste übernehmen') + '" title="' + (on ? 'In Ihrer Merkliste – entfernen' : 'In meine Merkliste übernehmen') + '"><span class="mkl-mark__disc">' + HEART + '</span></button>';
   }
   function copyShared(sit) {
     var it = JSON.parse(JSON.stringify(sit));
@@ -735,7 +735,7 @@
           (price ? '<p>' + esc(price) + '</p>' : '') + d +
           (cfg ? '<dl>' + (it.configSummary || []).map(function (x) { return '<dt>' + esc(x.label) + '</dt><dd>' + esc(x.value) + '</dd>'; }).join('') + '</dl>' +
             '<p><b>Gesamt ' + euro(it.configTotal) + '</b>' + ((it.configQty || 1) > 1 ? ' · ' + it.configQty + ' Stück' : '') + '</p>' +
-            (it.configExpired ? '<p>Konfiguration abgelaufen</p>' : (step ? '<p>Noch nicht vollständig — ' + esc(step) + ' offen</p>' : '')) +
+            (it.configExpired ? '<p>Konfiguration abgelaufen</p>' : (step ? '<p>Noch nicht vollständig – ' + esc(step) + ' offen</p>' : '')) +
             '<p>Referenz: ' + esc(it.configId) + '</p>' : '') +
           '<p class="mkl-printdoc__url">Im Shop: ' + esc(shop) + '</p></div></article>';
       }).join('') + '</section>';
@@ -837,7 +837,7 @@
     setCfgOfSession(sn.article, cid);
     save(); syncAll(); pulseBadge();
     live('Konfiguration gemerkt: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total) + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Konfiguration gemerkt' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
+    toast('Konfiguration gemerkt' + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
   }
   function updateConfig(cid, sn) {
     var it = byId('cfg:' + cid); if (!it) { addConfig(sn); return; }
@@ -846,7 +846,7 @@
     it.updatedAt = new Date().toISOString(); it.configExpired = false; delete cfgLive[cid];
     save(); syncAll();   /* no badge pulse: the count is unchanged */
     live('Konfiguration aktualisiert: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total));
-    toast('Konfiguration aktualisiert' + (storageOk ? '' : ' — nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
+    toast('Konfiguration aktualisiert' + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true);
   }
   function syncPdpMarks() {
     if (!PDP || !pdpBtn || !window.MTZ_PDP) return;
@@ -856,7 +856,7 @@
     var shortL = st.on ? 'Gemerkt' : 'Merken', shortAlt = st.on ? 'Merken' : 'Gemerkt';
     var aria = label + ': ' + nm + (st.s1 && colour ? ', ' + colour : '');   /* starts with the visible label (WCAG 2.5.3) */
     var lim = !st.on && !st.changed && isFull();
-    var extraTitle = lim ? 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).' : (st.changed ? 'Geändert seit dem Merken — erneut merken, um zu aktualisieren' : (st.on ? 'Aus der Merkliste entfernen' : ''));
+    var extraTitle = lim ? 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).' : (st.changed ? 'Geändert seit dem Merken – erneut merken, um zu aktualisieren' : (st.on ? 'Aus der Merkliste entfernen' : ''));
     [pdpBtn, pdpBar].forEach(function (b) {
       if (!b) return;
       b.classList.toggle('is-on', st.on); b.setAttribute('aria-pressed', st.on ? 'true' : 'false'); b.setAttribute('aria-label', aria);
@@ -884,11 +884,11 @@
     if (!fromShare) { if (colourGone) { it.configExpired = true; save(); } else { setCfgOfSession(sn.article, cid); it.configExpired = false; cfgLive[cid] = sn.total; } }
     var lines = (it.configSummary || []).slice(0, 3).map(function (l) { return esc(l.label) + ': ' + esc(l.value); }), more = (it.configSummary || []).length - lines.length;
     var notes = [];
-    if (colourGone) notes.push('Diese Farbe ist nicht mehr verfügbar — bitte wählen Sie eine Farbe.');
-    if (missing.length) notes.push('Nicht mehr verfügbar: ' + esc(missing.join(', ')) + ' — bitte neu wählen');
+    if (colourGone) notes.push('Diese Farbe ist nicht mehr verfügbar – bitte wählen Sie eine Farbe.');
+    if (missing.length) notes.push('Nicht mehr verfügbar: ' + esc(missing.join(', ')) + ' – bitte neu wählen');
     var open = colourGone ? null : window.MTZ_PDP.firstOpen(); if (open) notes.push('Noch offen: ' + esc(open));
     if (!colourGone && typeof it.configTotal === 'number' && Math.abs(sn.total - it.configTotal) > 0.004) notes.push('Preis aktualisiert: ' + euro(it.configTotal) + ' → ' + euro(sn.total));
-    var title = colourGone ? 'Konfiguration abgelaufen — Zusammenfassung siehe Merkliste' : (fromShare ? 'Geteilte' : 'Gespeicherte') + ' Konfiguration vom ' + fmtDate(it.updatedAt || it.addedAt);
+    var title = colourGone ? 'Konfiguration abgelaufen – Zusammenfassung siehe Merkliste' : (fromShare ? 'Geteilte' : 'Gespeicherte') + ' Konfiguration vom ' + fmtDate(it.updatedAt || it.addedAt);
     pdpBand = h('<div class="mkl-pdp-band" id="mklPdpBand" role="status" tabindex="-1">' +
       '<span class="mkl-pdp-band__glyph" aria-hidden="true">' + HEART + '</span>' +
       '<div class="mkl-pdp-band__text"><span class="mkl-pdp-band__title">' + title + '</span>' +
@@ -912,7 +912,7 @@
     pdpBtn = h(pdpBtnHTML(' mkl-pdp-media', false));
     if (stage) stage.appendChild(pdpBtn); else buy.appendChild(pdpBtn);
     pdpBtn.addEventListener('click', function () { pressPdp(pdpBtn); });
-    pdpRow = h('<div class="mkl-pdp-row" id="mklPdpRow" hidden><p class="mkl-pdp-changed" id="mklPdpChanged" hidden>Geändert seit dem Merken — erneut merken, um zu aktualisieren</p></div>');
+    pdpRow = h('<div class="mkl-pdp-row" id="mklPdpRow" hidden><p class="mkl-pdp-changed" id="mklPdpChanged" hidden>Geändert seit dem Merken – erneut merken, um zu aktualisieren</p></div>');
     buy.insertAdjacentElement('afterend', pdpRow);
     pdpChanged = pdpRow.querySelector('.mkl-pdp-changed');
     var details = document.getElementById('bStickyDetails');
