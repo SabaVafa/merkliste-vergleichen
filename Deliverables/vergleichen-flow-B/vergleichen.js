@@ -1,12 +1,11 @@
 /* ============================================================
-   Metzler — Vergleichen add-on + guided flow (PLP Türsprechanlagen / Briefkästen)
+   Metzler — Vergleichen add-on (PLP Türsprechanlagen / Briefkästen)
    Shows the COMPLETE journey end-to-end:
      0 Ruhezustand  → "Vergleichen" control disabled (nothing selected)
      1 mark 1 item  → tray appears, still not enough (need ≥2)
      2 mark ≥2      → control ACTIVATES
      3 open         → comparison: Fazit → Modellköpfe → Unterschiede → offen → Gemeinsamkeiten
      4 only-diffs   → Gemeinsamkeiten collapsed (default)
-   A guided tour ("Flow ansehen") narrates and drives all of it.
    Decoupled layer; reads window.MTZ_PRODUCTS + window.MTZ_VGL_DATA; PLP files untouched.
    Redesign 12 (12a UX / 12b UI, 05.11.2026): verdict templates F0–F6, counting rule U/O/G,
    one sticky identity row, column picker below 64 rem — no horizontal scrolling.
@@ -103,8 +102,8 @@
   }
 
   var LENSES={
-    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,trio:['kai1','colson1','sdm10x'],step4:'„–" heißt: trifft nicht zu (z. B. Kamera bei Audio-Modellen), „k. A.": im Shop nicht gepflegt.',srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A." = im Shop nicht gepflegt · „–" = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
-    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,trio:['siebert','ebenhard','hermann'],designFirst:true,step4:'In jedem Abschnitt steht die Funktion zuerst, dann Namensschild und Material, Farben, zuletzt Maße und Gewicht.',srcNote:'„k. A." = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
+    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A." = im Shop nicht gepflegt · „–" = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
+    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,designFirst:true,srcNote:'„k. A." = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
   };
   var LENS=LENSES[window.MTZ_LENS]||LENSES.sprechanlage;
   var ROWS=LENS.rows;
@@ -1212,68 +1211,6 @@
     if(fromPop!==true){try{var st=history.state;if(st&&st.mtzVgl&&!st.arrived)history.back();else history.replaceState(null,'',pageUrl([]));}catch(e){}}
   }
 
-  /* =========================================================
-     Guided flow tour
-     ========================================================= */
-  var TRIO=LENS.trio;  // lens demo set (all on page 1): Sprechanlagen = Audio · VDM10 · SDM10X, Briefkästen = Siebert · Ebenhard · Hermann
-  var coach,coachProg,coachStep,coachTitle,coachText,coachBack,coachNext,spotEl,curStep=0;
-  var STEPS=[
-    {k:'Schritt 1 / 6',t:'Ruhezustand',x:'Zunächst ist der Vergleich reduziert: auf den Produktkarten sind <b>keine Auswahlfelder</b> sichtbar. In der Ergebnisleiste lädt die Schaltfläche „Vergleichen" dazu ein, den Vergleich zu starten.',target:function(){return barBtn;}},
-    {k:'Schritt 2 / 6',t:'Vergleich starten',x:'Ein Klick auf „Vergleichen" aktiviert den Vergleichsmodus – <b>jetzt erscheint auf jeder Produktkarte ein „Vergleichen"-Feld</b>. Wählen Sie damit 2–4 Modelle.',target:function(){return cardToggle(TRIO[0])||barBtn;}},
-    {k:'Schritt 3 / 6',t:'Ab zwei Artikeln aktiv',x:'Sobald zwei oder mehr Modelle markiert sind, wird „Vergleich anzeigen (3)" <b>aktiv</b> (grün) – in der Ergebnisleiste und in der Auswahlleiste unten.',target:function(){return barBtn;}},
-    {k:'Schritt 4 / 6',t:'Gegenüberstellung',x:'Ein Klick öffnet die Gegenüberstellung: oben die Modelle, darunter die Unterschiede – die wichtigsten zuerst, mit ihrer Bedeutung direkt am Wert –, dann die Gemeinsamkeiten (zugeklappt). '+LENS.step4,target:function(){return null;}},
-    {k:'Schritt 5 / 6',t:'Gemeinsamkeiten',x:'Die Gemeinsamkeiten sind zu Beginn zugeklappt. „Anzeigen" blendet sie ein – dann zeigt die Tabelle alle Merkmale.',target:function(){return view.querySelector('[data-vgl="common"]');}},
-    {k:'Schritt 6 / 6',t:'Weiter im Kauf',x:'Aus dem Vergleich geht es direkt weiter: <b>Konfigurieren</b> bzw. <b>Zum Produkt</b> (kein Direktkauf, da individualisierbar), Artikel entfernen oder weitere hinzufügen. Das ist der komplette Ablauf.',target:function(){return null;},last:true}
-  ];
-  function cardToggle(id){var c=document.querySelector('.pcard[data-id="'+id+'"] .vgl-toggle');return c;}
-  function clearSpot(){if(spotEl){spotEl.classList.remove('vgl-spot');spotEl=null;}}
-  function spot(el){clearSpot();if(!el)return;spotEl=el;el.classList.add('vgl-spot');try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
-
-  function applyState(step){
-    closeView(true);   /* no history.back() here: its late popstate closed the comparison the next step opens */
-    setMode(step>=1);                          /* step 1+ = compare mode on → card fields visible */
-    selected = step>=2 ? TRIO.slice() : [];    /* models get marked from step 3 (index 2) */
-    selected = selected.filter(function(id){return BY_ID[id];});
-    persist(); syncAll();
-    if(step>=3){ openView(); }
-  }
-  function buildCoach(){
-    var fab=h('<button class="vgl-tourfab" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor" stroke="none"/></svg>Vergleichen-Flow ansehen</button>');
-    fab.addEventListener('click',function(){startTour();});
-    document.body.appendChild(fab);
-    coach=h('<div class="vgl-coach" role="dialog" aria-modal="false" aria-label="Vergleichen-Flow">'+
-      '<div class="vgl-coach__top"><div class="vgl-coach__prog" style="width:0"></div></div>'+
-      '<div class="vgl-coach__body">'+
-        '<div class="vgl-coach__step"></div>'+
-        '<div class="vgl-coach__title"></div>'+
-        '<div class="vgl-coach__text"></div>'+
-        '<div class="vgl-coach__foot">'+
-          '<button class="vgl-coach__x" type="button" data-c="close">Tour beenden</button>'+
-          '<span class="spacer"></span>'+
-          '<button class="vgl-coach__btn" type="button" data-c="back">Zurück</button>'+
-          '<button class="vgl-coach__btn vgl-coach__btn--primary" type="button" data-c="next">Weiter</button>'+
-        '</div>'+
-      '</div></div>');
-    document.body.appendChild(coach);
-    coachProg=coach.querySelector('.vgl-coach__prog');coachStep=coach.querySelector('.vgl-coach__step');
-    coachTitle=coach.querySelector('.vgl-coach__title');coachText=coach.querySelector('.vgl-coach__text');
-    coachBack=coach.querySelector('[data-c="back"]');coachNext=coach.querySelector('[data-c="next"]');
-    coach.addEventListener('click',function(e){var b=e.target.closest('[data-c]');if(!b)return;var k=b.getAttribute('data-c');if(k==='close')endTour();if(k==='back')goTo(curStep-1);if(k==='next'){if(curStep>=STEPS.length-1)endTour();else goTo(curStep+1);}});
-  }
-  function startTour(){curStep=0;coach.classList.add('is-open');goTo(0);}
-  function endTour(){clearSpot();coach.classList.remove('is-open');}
-  function goTo(i){
-    curStep=Math.max(0,Math.min(STEPS.length-1,i));
-    var s=STEPS[curStep];
-    applyState(curStep);
-    coachProg.style.width=Math.round((curStep)/(STEPS.length-1)*100)+'%';
-    coachStep.textContent=s.k;coachTitle.textContent=s.t;coachText.innerHTML=s.x;
-    coachBack.style.visibility=curStep===0?'hidden':'visible';
-    coachNext.textContent=s.last?'Fertig':'Weiter';
-    clearSpot();
-    setTimeout(function(){var el=s.target&&s.target();if(el)spot(el);},80);
-  }
-
   /* ---- Public hook for the Merkliste add-on (05_Merkliste §3.5) ----
      compare(ids): replaces the selection with the valid ids of this lens (max 4), persists it,
      enters compare mode (body.vgl-mode → card checkboxes appear, same gating as the toolbar
@@ -1304,7 +1241,7 @@
     /* ?vergleich=id,id (shared link, reload, Merkliste handover) */
     var arr=null;
     try{var qm=/[?&]vergleich=([^&#]+)/.exec(location.search);if(qm)arr={raw:decodeURIComponent(qm[1]).split(',').map(function(x){return x.trim();}).filter(Boolean),fromMkl:/[?&]von=merkliste\b/.test(location.search)};}catch(e){}
-    buildChrome(); buildCoach(); injectBarButton();
+    buildChrome(); injectBarButton();
     var grid=document.getElementById('productGrid');
     if(grid){scanCards();new MutationObserver(function(){scanCards();injectBarButton();}).observe(grid,{childList:true});}
     syncAll();
