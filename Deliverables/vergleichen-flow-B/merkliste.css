@@ -515,3 +515,9 @@
    No fill, no border; red-600 label 14 / 700, underlined (1 px, 2 px on hover); 44 px target via ::before. ==== */
 .mkl-ghost__undo,.mkl-ghost__undo:hover{min-height:2.75rem;padding:0 .5rem;border:0;border-radius:var(--r-m,.25rem);background:none;box-shadow:none;color:var(--color-red-600,#B52320);text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
 .mkl-ghost__undo:hover{text-decoration-thickness:.125rem}
+
+/* ==== Category heading centred in its band (12.11., user: "titles vertically centre aligned") ====
+   Was 16 px above / 4 px below the text, so "BRIEFKÄSTEN (3)" sat 5.5 px below the middle of the grey band. Now even
+   .625 rem above and below; a lock hint under the heading keeps its own spacing. ==== */
+.mkl-group{padding-top:.625rem;padding-bottom:.625rem}
+.mkl-group__hint{margin:.375rem 0 0}

@@ -198,8 +198,10 @@
     askEl = drawer.querySelector('.mkl-shareask'); popEl = drawer.querySelector('.mkl-sharepop'); sharedEl = drawer.querySelector('.mkl-shared'); sharedLink = drawer.querySelector('.mkl-sharedlink');
     hintEl = drawer.querySelector('.mkl-hint'); recentEl = drawer.querySelector('.mkl-recent');
     var gOf = function (t) { var g = t && t.closest && t.closest('.mkl-ghost'); return g ? g.getAttribute('data-ghost') : null; };
-    listEl.addEventListener('mouseover', function (e) { var id = gOf(e.target); if (id) ghostPause(id); });
-    listEl.addEventListener('mouseout', function (e) { var id = gOf(e.target); if (id && gOf(e.relatedTarget) !== id && gOf(document.activeElement) !== id) ghostResume(id); });
+    /* hover pauses only when the pointer comes onto the undo row from outside: the row appears right under the cursor
+       that clicked the bin, and that must not hold it open (12.11. bug: the first removal stayed far beyond its 3 s) */
+    listEl.addEventListener('mouseover', function (e) { var id = gOf(e.target), from = e.relatedTarget; if (id && from && from.isConnected && gOf(from) !== id) ghostPause(id); });
+    listEl.addEventListener('mouseout', function (e) { var id = gOf(e.target); if (id && gOf(e.relatedTarget) !== id && !(kbdNav && gOf(document.activeElement) === id)) ghostResume(id); });   /* focus put on "Rückgängig" by the script after a mouse click must not hold the row */
     listEl.addEventListener('focusin', function (e) { var id = gOf(e.target); if (id && kbdNav) ghostPause(id); });
     listEl.addEventListener('focusout', function (e) { var id = gOf(e.target); if (id && gOf(e.relatedTarget) !== id) { var gl = listEl.querySelector('.mkl-ghost[data-ghost="' + cssId(id) + '"]'); if (!(gl && gl.matches(':hover'))) ghostResume(id); } });
     document.addEventListener('keydown', function () { kbdNav = true; }, true);
