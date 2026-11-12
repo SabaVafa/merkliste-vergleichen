@@ -66,11 +66,11 @@
     {key:'system',label:'System',cls:'T',akk:'das System',dat:'im System',nom:'das System',get:g('system'),hint:'IP-System: die Außenstation läuft über Ihr Heimnetzwerk und braucht dort eine Netzwerkverbindung. 2-Draht-BUS: Übertragung über eine zweiadrige Leitung – eine vorhandene Klingelleitung lässt sich weiter nutzen.'},
     {key:'klingel',label:'Anzahl Klingeltaster',lst:'Tasteranzahl',cls:'T',akk:'die Tasteranzahl',dat:'in der Tasteranzahl',nom:'die Tasteranzahl',get:g('klingel'),hint:'Ein Klingeltaster je Wohneinheit. „Flexibel (1–500)“: laut Shop für 1 bis 500 Parteien wählbar.'},
     {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist dauerhaft in das Schild graviert – bei einer Namensänderung braucht es ein neues Schild. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen und lässt sich selbst austauschen. Digital: Namen werden elektronisch hinterlegt, kein graviertes Schild.'},
-    {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A.“ heißt: im Shop nicht gepflegt – nicht „nicht vorhanden“.'},
+    {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A.“: im Shop nicht gepflegt – nicht „nicht vorhanden“.'},
     {key:'kombi',label:'Mit Briefkasten/Paketbox',lst:'Briefkasten/Paketbox',cls:'T',akk:'die Kombination mit Briefkasten/Paketbox',dat:'bei Briefkasten/Paketbox',nom:'die Kombination mit Briefkasten/Paketbox',get:g('kombi'),hint:'Kombination aus Video-Türsprechanlage und Briefkasten bzw. Paketbox in einem Artikel.'},
     {key:'kamera',label:'Kameraauflösung',cls:'T',akk:'die Kameraauflösung',dat:'in der Kameraauflösung',nom:'die Kameraauflösung',na:isAudio,get:g('kamera'),hint:'Auflösung des Kamerabilds – Full HD (1920 × 1080) entspricht 2 MP.'+SRC_DESC},
     {key:'nachtsicht',label:'Nachtsicht',cls:'T',akk:'die Nachtsicht',dat:'in der Nachtsicht',nom:'die Nachtsicht',na:isAudio,bool:true,get:g('nachtsicht'),hint:'Bild auch bei Dunkelheit.'+SRC_DESC+' „k. A.“: in der Beschreibung nicht erwähnt.'},
-    {key:'sichtwinkel',label:'Sichtwinkel',cls:'T',akk:'den Sichtwinkel',dat:'im Sichtwinkel',nom:'der Sichtwinkel',na:isAudio,get:g('sichtwinkel'),hint:'Erfassungsbereich der Kamera.'+SRC_DESC+' Ob horizontal, vertikal oder diagonal gemessen, ist dort nicht angegeben – daher ohne Bestwert.'},
+    {key:'sichtwinkel',label:'Sichtwinkel',cls:'T',akk:'den Sichtwinkel',dat:'im Sichtwinkel',nom:'der Sichtwinkel',na:isAudio,get:g('sichtwinkel'),hint:'Erfassungsbereich der Kamera.'+SRC_DESC+' Ob horizontal, vertikal oder diagonal gemessen, ist in der Beschreibung nicht angegeben – daher ohne Bestwert.'},
     {key:'schutzart',label:'Schutzart (IP)',lst:'Schutzart',cls:'T',akk:'die Schutzart',dat:'in der Schutzart',nom:'die Schutzart',better:'maxnum',get:g('schutzart'),hint:'Schutz gegen Staub und Wasser – IP65 = staubdicht und strahlwassergeschützt.'+SRC_DESC},
     {key:'schlagfestigkeit',label:'Schlagfestigkeit (IK)',lst:'Schlagfestigkeit',cls:'T',akk:'die Schlagfestigkeit',dat:'in der Schlagfestigkeit',nom:'die Schlagfestigkeit',better:'maxnum',get:g('schlagfestigkeit'),hint:'Schutz gegen Stöße (IK07 bis IK10, höher = robuster).'+SRC_DESC},
     {key:'abmessungen',label:'Abmessungen (B × H × T)',lst:'Maßen',cls:'F',fin:'Maßen',fdat:'in den Maßen',fbei:'bei den Maßen',nom:'die Maße',pl:true,get:g('abmessungen'),hint:'Außenmaße der Außenstation laut Shop, in cm.'},
@@ -521,10 +521,13 @@
   function placeTips(){if(viewBody)Array.prototype.forEach.call(viewBody.querySelectorAll('.vgl-ib'),placeTip);}
   function placeTip(b){
     var t=b.nextElementSibling;if(!t||!t.classList.contains('vgl-tip'))return;
-    t.style.left='';var rp=remPx(),vw=document.documentElement.clientWidth,r=t.getBoundingClientRect(),dx=0;
-    if(r.right>vw-rp)dx=vw-rp-r.right;
+    t.style.left='';var rp=remPx(),vw=document.documentElement.clientWidth,r=t.getBoundingClientRect(),bc=b.getBoundingClientRect(),dx=bc.left+bc.width/2-r.left-rp;   /* pointer 1 rem in from the tip's left edge */
+    if(r.right+dx>vw-rp)dx=vw-rp-r.right;
     if(r.left+dx<rp)dx=rp-r.left;
     if(dx)t.style.left=(dx/rp).toFixed(3)+'rem';
+    /* pointer: on the (i)'s centre, wherever the tip was shifted to (kept 1 rem inside the corners) */
+    var br=b.getBoundingClientRect(),tr=t.getBoundingClientRect(),x=br.left+br.width/2-tr.left;
+    t.style.setProperty('--tip-x',(Math.max(rp,Math.min(tr.width-rp,x))/rp).toFixed(3)+'rem');
   }
   function mklCount(){try{if(!window.MTZ_MKL)return 0;return window.MTZ_MKL.items().filter(function(it){return it.lens===(window.MTZ_LENS||'sprechanlage')&&!it.configId&&BY_ID[it.articleId||it.id]&&selected.indexOf(it.articleId||it.id)<0;}).length;}catch(e){return 0;}}
 
@@ -976,11 +979,20 @@
   /* row label: plain text; when there is a definition, an (i) icon button after it opens the toggletip (user decision 06.11.: icon, not underline) */
   /* hint text → light toggletip content: "Term: definition." lists become one line per term with the term in bold;
      a split only happens where the next sentence starts with a short term + colon (so "z. B." stays intact) */
+  /* (12.11., Lead Product Design) three layers: the lead sentence · the table values it explains, each as a value tag
+     (quotes dropped – the tag marks the literal) with its meaning below · the data source as a footnote band.
+     Quoted terms may contain periods („k. A.“), so they are matched as a whole. */
+  var SRC_TXT=SRC_DESC.trim();
   function hintHTML(h){
-    var parts=String(h).split(/\.\s+(?=[A-ZÄÖÜ0-9„"][^.:]{0,40}:)/);
-    if(parts.length<2)return esc(h);
-    return parts.map(function(t,i){t=t.replace(/\.$/,'')+'.';var m=t.match(/^([^:]{1,40}):\s*(.*)$/);
-      return '<span class="vgl-tip__row">'+(m?'<b>'+esc(m[1])+'</b><span>'+esc(m[2].charAt(0).toUpperCase()+m[2].slice(1))+'</span>':'<span class="vgl-tip__full">'+esc(t)+'</span>')+'</span>';}).join('');
+    h=String(h);var src=h.indexOf(SRC_TXT)>-1;if(src)h=h.replace(SRC_TXT,'').replace(/\s{2,}/g,' ').trim();
+    var lead=[],defs=[],tail=[];
+    h.split(/\.\s+(?=(?:„[^“]{1,30}“|[A-ZÄÖÜ0-9"][^.:]{0,40}):)/).forEach(function(t){
+      t=t.replace(/\.$/,'')+'.';var m=t.match(/^(„[^“]{1,30}“|[^:„]{1,40}):\s*(.*)$/);
+      if(m)defs.push('<span class="vgl-tip__def"><span class="vgl-tip__val">'+esc(m[1].replace(/^„|“$/g,''))+'</span><span class="vgl-tip__mean">'+esc(m[2].charAt(0).toUpperCase()+m[2].slice(1))+'</span></span>');
+      else(defs.length?tail:lead).push(esc(t));
+    });
+    return (lead.length?'<span class="vgl-tip__lead">'+lead.join(' ')+'</span>':'')+(defs.length?'<span class="vgl-tip__defs">'+defs.join('')+'</span>':'')+
+      (tail.length?'<span class="vgl-tip__lead">'+tail.join(' ')+'</span>':'')+(src?'<span class="vgl-tip__src">Quelle: Produktbeschreibung im Shop (nicht als Merkmal gepflegt)</span>':'');
   }
   function tipHTML(row){
     return row.hint?'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+'<span class="vgl-tip__h">'+IC_INFO+'<span>'+esc(row.label)+'</span></span><span class="vgl-tip__b">'+hintHTML(row.hint)+'</span></span></span>':'';

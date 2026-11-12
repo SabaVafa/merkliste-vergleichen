@@ -1369,3 +1369,30 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   .vgl-view table.vgl-t thead tr.vgl-hr--cta{border-bottom:.0625rem solid var(--v-g200);border-radius:0 0 var(--v-r-l) var(--v-r-l) !important}
   .vgl-view table.vgl-t thead tr.vgl-hr>*,.vgl-view table.vgl-t thead tr.vgl-hr>:last-child,.vgl-view table.vgl-t thead tr.vgl-hr>td,.vgl-view table.vgl-t thead tr.vgl-hr:not(.vgl-hr--img)>th{background:transparent;border:0;border-radius:0;box-shadow:none}
 }
+
+/* ==== (i) explanation popover (12.11., Lead Product Design: "the modals need to be enhanced") ====
+   Before: a mini table inside the tooltip – terms in tinted cells as heavy as the header, a cramped meaning column
+   that hyphenated mid-word ("Par-teien"), the source note mixed into the definition, nothing tying it to its (i).
+   Now three calm layers in one 20 rem column (~45 characters a line):
+   1 header band (feature name, teal-100) with a pointer onto the (i) that opened it (--tip-x, set in placeTip);
+   2 the lead sentence, then each table value as a value tag (DS --radius-sm 2 px, graphite-100, ink 700) with its
+     meaning below in body text – no mid-word hyphenation, balanced line breaks;
+   3 "Quelle: …" as a caption footnote on paper grey for values read from the product description (#6A6A6A 5:1, AA).
+   The old .vgl-tip__row term-table rules above no longer match anything. ==== */
+.vgl-tip{width:max-content;max-width:min(20rem,calc(100vw - 2rem));overflow:visible;border-color:var(--v-g300);line-height:1.5}   /* outline g300 like the model picker, so the pointer reads */
+.vgl-tip::before{content:"";position:absolute;top:-.3125rem;left:calc(var(--tip-x,.625rem) - .3125rem);width:.625rem;height:.625rem;background:var(--color-teal-100,#E6EEEE);border-top:.0625rem solid var(--v-g300);border-left:.0625rem solid var(--v-g300);border-top-left-radius:.125rem;transform:rotate(45deg)}
+.vgl-tip__h{position:relative;padding:.625rem .875rem;border-radius:calc(var(--v-r-l) - .0625rem) calc(var(--v-r-l) - .0625rem) 0 0}
+.vgl-tip__b{display:block;padding:0;color:var(--v-ink);hyphens:manual;text-wrap:pretty}
+.vgl-tip__lead{display:block;padding:.625rem .875rem}
+.vgl-tip__defs{display:flex;flex-direction:column;gap:.75rem;padding:.75rem .875rem .875rem}
+.vgl-tip__lead+.vgl-tip__defs,.vgl-tip__defs+.vgl-tip__lead{border-top:.0625rem solid var(--v-g100)}
+.vgl-tip__def{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem}
+.vgl-tip__val{padding:.0625rem .375rem;border-radius:.125rem;background:var(--v-g100);font-weight:700;line-height:1.45;color:var(--v-ink)}
+.vgl-tip__mean{display:block}
+.vgl-tip__src{display:block;padding:.5rem .875rem;border-top:.0625rem solid var(--v-g100);border-radius:0 0 calc(var(--v-r-l) - .0625rem) calc(var(--v-r-l) - .0625rem);background:var(--v-paper);font-size:var(--v-fs-cap);line-height:1.45;color:var(--v-muted)}
+
+/* ==== Tray: × on the thumbnails no longer cut off (12.11., user report) ====
+   The slot row scrolls sideways (overflow-x:auto), which makes it clip vertically too – the × discs sit .375 rem above
+   and right of each thumbnail and lost their top half. The row gets room for the disc plus its focus ring on top and
+   at the end; negative margins keep the tray height unchanged. ==== */
+.vgl-tray__slots{padding:.75rem .75rem .125rem .125rem;margin:-.625rem 0 0}
