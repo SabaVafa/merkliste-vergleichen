@@ -638,7 +638,7 @@
     var texts = []; items.forEach(function (it) { var g = gravurOf(it); if (g && texts.indexOf(g) < 0) texts.push(g); });
     if (!texts.length) { shareList(false); return; }
     popEl.hidden = true;
-    askEl.querySelector('.mkl-shareask__q').textContent = 'Ihr Gravurtext („' + texts.join('", „') + '") ist Teil der Konfiguration. Soll er im Link enthalten sein?';
+    askEl.querySelector('.mkl-shareask__q').textContent = 'Ihr Gravurtext („' + texts.join('“, „') + '“) ist Teil der Konfiguration. Soll er im Link enthalten sein?';
     askEl.hidden = false; askEl.focus();
   }
   function shareList(withGravur) {
@@ -742,7 +742,7 @@
       }).join('') + '</section>';
     }).join('');
     var doc = h('<div class="mkl-printdoc"><header class="mkl-printdoc__head"><h1>Merkliste</h1><span>edelstahl-tuerklingel.de · Stand ' + ds + '</span></header>' + body +
-      '<footer class="mkl-printdoc__foot">Alle Preise inkl. 19 % USt., Stand ' + ds + '. Konfigurationen öffnen Sie im Shop über „Konfiguration öffnen" auf diesem Gerät oder über den geteilten Link.</footer></div>');
+      '<footer class="mkl-printdoc__foot">Alle Preise inkl. 19 % USt., Stand ' + ds + '. Konfigurationen öffnen Sie im Shop über „Konfiguration öffnen“ auf diesem Gerät oder über den geteilten Link.</footer></div>');
     document.body.appendChild(doc); document.body.classList.add('mkl-printing');
     live('Druckansicht der Merkliste geöffnet.');
     var done = false, cleanup = function () { if (done) return; done = true; window.removeEventListener('afterprint', cleanup); if (doc.parentNode) doc.parentNode.removeChild(doc); document.body.classList.remove('mkl-printing'); if (isOpen && printBtn && !toolsEl.hidden) printBtn.focus(); };

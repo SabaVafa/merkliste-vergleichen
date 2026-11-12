@@ -23,7 +23,7 @@
 .mkl-pdp-row[hidden]{display:none}
 
 /* ---- Merken control: ghost button, bookmark glyph + label ---- */
-.mkl-pdp-save{position:relative;display:inline-flex;align-items:center;gap:var(--sp-2);height:2.75rem;min-height:2.75rem;padding:0 var(--sp-4) 0 var(--sp-3);border:.0625rem solid var(--graphite-300);border-radius:var(--r-m);background:var(--white);color:var(--schwarz);font-family:inherit;font-size:.875rem;font-weight:600;line-height:1;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s,color .15s}
+.mkl-pdp-save{position:relative;display:inline-flex;align-items:center;gap:var(--sp-2);height:2.75rem;min-height:2.75rem;padding:0 var(--sp-4) 0 var(--sp-3);border:.0625rem solid var(--graphite-300);border-radius:var(--r-m);background:var(--white);color:var(--schwarz);font-family:inherit;font-size:.875rem;font-weight:700;line-height:1;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s,color .15s}
 .mkl-pdp-save__glyph{display:flex;width:1.5rem;height:1.5rem;flex-shrink:0;transition:transform .12s}
 .mkl-pdp-save svg{width:1.5rem;height:1.5rem;display:block}
 .mkl-pdp-save svg path{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linejoin:round;transition:fill .15s}
@@ -50,8 +50,8 @@
 .mkl-pdp-band__text{display:flex;flex-direction:column;gap:.125rem;min-width:0}
 .mkl-pdp-band__title{font-size:.875rem;font-weight:700;line-height:1.35}
 .mkl-pdp-band__sub{font-size:.75rem;line-height:1.4;color:var(--text-muted);overflow-wrap:anywhere}
-.mkl-pdp-band__sub b{font-weight:600;color:var(--schwarz)}
-.mkl-pdp-band__act{min-height:2.75rem;margin:-.5rem 0;padding:0 var(--sp-2);border:0;background:none;color:var(--teal);font-family:inherit;font-size:.875rem;font-weight:600;text-decoration:underline;white-space:nowrap;cursor:pointer}
+.mkl-pdp-band__sub b{font-weight:700;color:var(--schwarz)}
+.mkl-pdp-band__act{min-height:2.75rem;margin:-.5rem 0;padding:0 var(--sp-2);border:0;background:none;color:var(--teal);font-family:inherit;font-size:.875rem;font-weight:700;text-decoration:underline;white-space:nowrap;cursor:pointer}
 .mkl-pdp-band__act:hover{color:var(--teal-600)}
 .mkl-pdp-band__act:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem;border-radius:var(--r-s)}
 .mkl-pdp-band__x{width:2.75rem;height:2.75rem;margin:-.5rem -.5rem -.5rem 0;border:0;background:none;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:var(--r-pill)}
@@ -89,7 +89,7 @@
 /* ---- 09b P0-10: "Zurück zum Vergleich" in the breadcrumb row (only when the visitor came from a comparison) ---- */
 .crumb .container.mkl-has-return{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4)}
 .crumb .container.mkl-has-return>ol{flex:1 1 auto;min-width:0}
-.crumb .mkl-return{display:inline-flex;align-items:center;gap:var(--sp-1);min-height:2.75rem;flex:0 0 auto;color:var(--teal);font-size:var(--text-body-sm);font-weight:600;text-decoration:none;white-space:nowrap}
+.crumb .mkl-return{display:inline-flex;align-items:center;gap:var(--sp-1);min-height:2.75rem;flex:0 0 auto;color:var(--teal);font-size:var(--text-body-sm);font-weight:700;text-decoration:none;white-space:nowrap}
 .crumb .mkl-return svg{width:1rem;height:1rem}
 .crumb .mkl-return:hover{color:var(--teal);text-decoration:underline}
 .crumb .mkl-return:focus-visible{outline:.1875rem solid var(--teal);outline-offset:.125rem;border-radius:var(--r-s)}
@@ -143,7 +143,7 @@
    idle  = a grey tonal chip (like an inactive segment), graphite ink
    saved = the white "thumb" inside the tonal track (like the active view), teal ink + filled glyph
    No frame, no teal block. Phones: one tonal chip; saved = teal-75 tone. */
-.pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{padding:.25rem;border:0;border-radius:var(--radius-lg);background:var(--graphite-100);font-weight:600}   /* 36px = height of the Fotos|3D switch */
+.pdp-media__stage .mkl-pdp-media,.pdp-media__stage .mkl-pdp-media:hover,.pdp-media__stage .mkl-pdp-media.is-on,.pdp-media__stage .mkl-pdp-media.is-on:hover{padding:.25rem;border:0;border-radius:var(--radius-lg);background:var(--graphite-100);font-weight:700}   /* 36px = height of the Fotos|3D switch */
 .mkl-pdp-media__seg{height:1.75rem;padding:0 .7rem;border-radius:var(--radius);transition:background-color .16s ease,color .16s ease,box-shadow .16s ease}
 .mkl-pdp-media:active .mkl-pdp-media__seg{background:var(--graphite-200)}
 .mkl-pdp-media.is-on .mkl-pdp-media__seg,.mkl-pdp-media.is-on:active .mkl-pdp-media__seg{background:var(--white);color:var(--teal);box-shadow:var(--shadow-sm)}

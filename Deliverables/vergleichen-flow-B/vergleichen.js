@@ -64,17 +64,17 @@
   var ROWS_SPRECH=[
     {key:'typ',label:'Typ',cls:'T',akk:'den Typ',dat:'im Typ',nom:'der Typ',get:g('typ'),hint:'Video: Kamera an der Außenstation. Audio: Sprechverbindung ohne Kamera.'},
     {key:'system',label:'System',cls:'T',akk:'das System',dat:'im System',nom:'das System',get:g('system'),hint:'IP-System: die Außenstation läuft über Ihr Heimnetzwerk und braucht dort eine Netzwerkverbindung. 2-Draht-BUS: Übertragung über eine zweiadrige Leitung – eine vorhandene Klingelleitung lässt sich weiter nutzen.'},
-    {key:'klingel',label:'Anzahl Klingeltaster',lst:'Tasteranzahl',cls:'T',akk:'die Tasteranzahl',dat:'in der Tasteranzahl',nom:'die Tasteranzahl',get:g('klingel'),hint:'Ein Klingeltaster je Wohneinheit. „Flexibel (1–500)": laut Shop für 1 bis 500 Parteien wählbar.'},
+    {key:'klingel',label:'Anzahl Klingeltaster',lst:'Tasteranzahl',cls:'T',akk:'die Tasteranzahl',dat:'in der Tasteranzahl',nom:'die Tasteranzahl',get:g('klingel'),hint:'Ein Klingeltaster je Wohneinheit. „Flexibel (1–500)“: laut Shop für 1 bis 500 Parteien wählbar.'},
     {key:'namensschild',label:'Namensschild',cls:'A',akk:'das Namensschild',dat:'im Namensschild',nom:'das Namensschild',get:g('namensschild'),hint:'Lasergraviert: der Name ist dauerhaft in das Schild graviert – bei einer Namensänderung braucht es ein neues Schild. Austauschbar (Papiereinleger): der Name steht auf einem eingelegten Papierstreifen und lässt sich selbst austauschen. Digital: Namen werden elektronisch hinterlegt, kein graviertes Schild.'},
-    {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A." heißt: im Shop nicht gepflegt – nicht „nicht vorhanden".'},
+    {key:'zutritt',label:'Türöffner-Bedienung',cls:'T',set:true,akk:'die Türöffner-Bedienung',dat:'in der Türöffner-Bedienung',nom:'die Türöffner-Bedienung',get:g('zutritt'),hint:'Schlüsselloses Öffnen an der Außenstation, z. B. per RFID, PIN-Code, Fingerprint oder Gesichtserkennung. „k. A.“ heißt: im Shop nicht gepflegt – nicht „nicht vorhanden“.'},
     {key:'kombi',label:'Mit Briefkasten/Paketbox',lst:'Briefkasten/Paketbox',cls:'T',akk:'die Kombination mit Briefkasten/Paketbox',dat:'bei Briefkasten/Paketbox',nom:'die Kombination mit Briefkasten/Paketbox',get:g('kombi'),hint:'Kombination aus Video-Türsprechanlage und Briefkasten bzw. Paketbox in einem Artikel.'},
     {key:'kamera',label:'Kameraauflösung',cls:'T',akk:'die Kameraauflösung',dat:'in der Kameraauflösung',nom:'die Kameraauflösung',na:isAudio,get:g('kamera'),hint:'Auflösung des Kamerabilds – Full HD (1920 × 1080) entspricht 2 MP.'+SRC_DESC},
-    {key:'nachtsicht',label:'Nachtsicht',cls:'T',akk:'die Nachtsicht',dat:'in der Nachtsicht',nom:'die Nachtsicht',na:isAudio,bool:true,get:g('nachtsicht'),hint:'Bild auch bei Dunkelheit.'+SRC_DESC+' „k. A.": in der Beschreibung nicht erwähnt.'},
+    {key:'nachtsicht',label:'Nachtsicht',cls:'T',akk:'die Nachtsicht',dat:'in der Nachtsicht',nom:'die Nachtsicht',na:isAudio,bool:true,get:g('nachtsicht'),hint:'Bild auch bei Dunkelheit.'+SRC_DESC+' „k. A.“: in der Beschreibung nicht erwähnt.'},
     {key:'sichtwinkel',label:'Sichtwinkel',cls:'T',akk:'den Sichtwinkel',dat:'im Sichtwinkel',nom:'der Sichtwinkel',na:isAudio,get:g('sichtwinkel'),hint:'Erfassungsbereich der Kamera.'+SRC_DESC+' Ob horizontal, vertikal oder diagonal gemessen, ist dort nicht angegeben – daher ohne Bestwert.'},
     {key:'schutzart',label:'Schutzart (IP)',lst:'Schutzart',cls:'T',akk:'die Schutzart',dat:'in der Schutzart',nom:'die Schutzart',better:'maxnum',get:g('schutzart'),hint:'Schutz gegen Staub und Wasser – IP65 = staubdicht und strahlwassergeschützt.'+SRC_DESC},
     {key:'schlagfestigkeit',label:'Schlagfestigkeit (IK)',lst:'Schlagfestigkeit',cls:'T',akk:'die Schlagfestigkeit',dat:'in der Schlagfestigkeit',nom:'die Schlagfestigkeit',better:'maxnum',get:g('schlagfestigkeit'),hint:'Schutz gegen Stöße (IK07 bis IK10, höher = robuster).'+SRC_DESC},
     {key:'abmessungen',label:'Abmessungen (B × H × T)',lst:'Maßen',cls:'F',fin:'Maßen',fdat:'in den Maßen',fbei:'bei den Maßen',nom:'die Maße',pl:true,get:g('abmessungen'),hint:'Außenmaße der Außenstation laut Shop, in cm.'},
-    {key:'gewicht',label:'Gewicht',cls:'F',fin:'Gewicht',fdat:'im Gewicht',fbei:'beim Gewicht',nom:'das Gewicht',get:g('gewicht'),hint:'Artikelgewicht laut Shop. „je nach Ausführung": für die Farbvarianten sind unterschiedliche Gewichte hinterlegt.'},
+    {key:'gewicht',label:'Gewicht',cls:'F',fin:'Gewicht',fdat:'im Gewicht',fbei:'beim Gewicht',nom:'das Gewicht',get:g('gewicht'),hint:'Artikelgewicht laut Shop. „je nach Ausführung“: für die Farbvarianten sind unterschiedliche Gewichte hinterlegt.'},
     {key:'colors',label:'Farben',cls:'A',akk:'die Farben',dat:'in den Farben',nom:'die Farben',pl:true,swatches:true,hint:'Alle im Shop angebotenen Farbausführungen.'}
   ];
   /* Briefkästen: the lens order (Design first) holds inside each section U / O / G */
@@ -86,7 +86,7 @@
     {key:'klingelsys',label:'Klingel / Sprechanlage',cls:'T',akk:'die Klingel / Sprechanlage',dat:'bei Klingel / Sprechanlage',nom:'die Klingel / Sprechanlage',get:g('klingelsys'),hint:'Enthält der Artikel eine Klingel oder Video-Türsprechanlage? Sets sind preislich nicht direkt mit Einzelbriefkästen vergleichbar.'},
     {key:'montage',label:'Montageart',cls:'T',set:true,akk:'die Montageart',dat:'in der Montageart',nom:'die Montageart',get:g('montage'),hint:'Aufputz: an der Wand. Standmontage: freistehend. Unterputz: in der Wand bzw. als Mauerdurchwurf – braucht eine passende Öffnung in der Wand. Zaunmontage: am Zaun.'},
     {key:'abmessungen',label:'Abmessungen (B × H × T)',lst:'Maßen',cls:'F',fin:'Maßen',fdat:'in den Maßen',fbei:'bei den Maßen',nom:'die Maße',pl:true,get:g('abmessungen'),hint:'Außenmaße laut Shop, in cm.'},
-    {key:'gewicht',label:'Gewicht',cls:'F',fin:'Gewicht',fdat:'im Gewicht',fbei:'beim Gewicht',nom:'das Gewicht',get:g('gewicht'),hint:'Artikelgewicht laut Shop. „je nach Ausführung": für die Farbvarianten sind unterschiedliche Gewichte hinterlegt.'},
+    {key:'gewicht',label:'Gewicht',cls:'F',fin:'Gewicht',fdat:'im Gewicht',fbei:'beim Gewicht',nom:'das Gewicht',get:g('gewicht'),hint:'Artikelgewicht laut Shop. „je nach Ausführung“: für die Farbvarianten sind unterschiedliche Gewichte hinterlegt.'},
     {key:'material',label:'Material',cls:'F',set:true,fin:'Material',fdat:'im Material',fbei:'beim Material',nom:'das Material',get:g('material'),hint:'Im Shop für alle Ausführungen gemeinsam gepflegt – das Material der einzelnen Farbe bzw. Front kann abweichen.'}
   ];
 
@@ -102,8 +102,8 @@
   }
 
   var LENSES={
-    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A." = im Shop nicht gepflegt · „–" = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
-    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,designFirst:true,srcNote:'„k. A." = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
+    sprechanlage:{label:'Türsprechanlagen',enrich:enrichSprech,rows:ROWS_SPRECH,srcNote:'Kamera- und Schutzwerte laut Produktbeschreibung · „k. A.“ = im Shop nicht gepflegt · „–“ = trifft nicht zu',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe und Gravur legen Sie auf der Produktseite bzw. in der Konfiguration fest.'},
+    briefkasten:{label:'Briefkästen',enrich:enrichBK,rows:ROWS_BK,designFirst:true,srcNote:'„k. A.“ = im Shop nicht gepflegt',priceNote:'„ab“-Preise gelten für die Standardausführung; Farbe, Gravur, Ständer und Erweiterungen legen Sie im Konfigurator fest.'}
   };
   var LENS=LENSES[window.MTZ_LENS]||LENSES.sprechanlage;
   var ROWS=LENS.rows;
@@ -610,7 +610,7 @@
       trayHint.innerHTML=IC_OK+'Bereit zum Vergleichen · bis zu '+more+' weitere möglich';
     }
     traySlots.innerHTML='';
-    selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">×</button></div>'));});
+    selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">'+IC_X+'</button></div>'));});
     trayPad();
   }
   /* the page keeps room for the tray (last card row, pagination, footer stay reachable); alerts lift exactly above it.
