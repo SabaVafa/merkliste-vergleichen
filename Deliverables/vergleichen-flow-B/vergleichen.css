@@ -1407,3 +1407,20 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   .vgl-view__scroll-in>table.vgl-t{margin-top:1.25rem}
   .vgl-view__scroll-in>.vgl-mbar+table.vgl-t{margin-top:.5rem}
 }
+
+/* ==== Spacing by proximity (13.11., Lead Product Design: "adjusted proportionally considering proximity") ====
+   One step between siblings, twice that between groups:
+   · the comparison (model card, Unterschiede, Nicht für alle gepflegt, Gemeinsamkeiten) is one group – 24 px between
+     all its cards (was 24 / 32 / 32), 20 px on phones (was 20 / 24 / 24);
+   · "Ähnliche Modelle" is a different group (suggestions, not compared) – 48 px above it = 2 × 24 (phones 40);
+   · inside every card one inset: 16 px from the frame – the Ähnliche Modelle card had 24 / 24 / 32, so its title sat
+     8 px right of every other section title; title → product cards 16 px like title → rows in the tables
+     (phones: 12 px inset and 12 px under the title, like the table cards there). ==== */
+.vgl-view table.vgl-t tbody.vgl-sec tr.vgl-sec__h th:nth-child(n){padding-top:1.5rem}
+.vgl-view .vgl-alts{margin-top:3rem;padding:1rem}
+.vgl-view .vgl-alts__h{margin-bottom:1rem}
+@media(max-width:47.99rem){
+  .vgl-view table.vgl-t tbody.vgl-sec tr.vgl-sec__h th:nth-child(n){padding-top:1.25rem}
+  .vgl-view .vgl-alts{margin-top:2.5rem;padding:.75rem}   /* phone card inset 12 px, as in the tables */
+  .vgl-view .vgl-alts__h{margin-bottom:.75rem}
+}
