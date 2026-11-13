@@ -546,3 +546,9 @@
    touching. Below the note now the same gap as above it: 16 px, on phones 12 px. ==== */
 .mkl-picknote:not([hidden])+.mkl-list{margin-top:var(--sp-4,1rem)}
 @media(max-width:47.99rem){.mkl-picknote:not([hidden])+.mkl-list{margin-top:var(--sp-3,.75rem)}}
+
+/* ==== "Zuletzt angesehen" full width (13.11., user decision) ====
+   Was an inset card (16/20 px margin, 8 px radius). Now a full-width paper band like the category headings: no margin,
+   no radius, its content on the drawer's content edge (20 px, phones 16 px), 16 px above and below (phones 12 px). ==== */
+.mkl-recent{margin:0;padding:var(--sp-4,1rem) var(--sp-5,1.25rem);border-radius:0}
+@media(max-width:47.99rem){.mkl-recent{margin:0;padding:var(--sp-3,.75rem) var(--sp-4,1rem)}}
