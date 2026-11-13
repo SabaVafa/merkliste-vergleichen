@@ -562,3 +562,7 @@
   .mkl-drawer .mkl-foot__hint{flex:1 1 9rem}   /* summary and button share one row, as on desktop */
   .mkl-drawer .mkl-cta{flex:0 0 auto;margin-left:auto}
 }
+
+/* ==== Bookmarks only on the product page (13.11., user decision): "Zuletzt angesehen" has no "Merken" button any
+   more – the row is picture, name, price and the way back to the product. ==== */
+.mkl-rv{grid-template-columns:3.5rem minmax(0,1fr)}

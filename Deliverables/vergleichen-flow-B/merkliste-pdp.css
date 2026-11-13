@@ -199,3 +199,11 @@
 .mkl-pdp-save.is-on:not(.mkl-pdp-media):hover,#pdpStickyBar .mkl-pdp-bar.is-on:hover{background:var(--color-teal-50);border-color:var(--teal);color:var(--teal)}
 .mkl-pdp-save.is-limit:hover{background:var(--white);border-color:var(--graphite-300)}
 @media(prefers-reduced-motion:reduce){.pdp-media__stage .mkl-pdp-media,.mkl-mark__disc{transition:none !important}}
+
+/* ==== Merken waits for the colour (13.11., user decision) ====
+   Before a colour is chosen there is nothing to bookmark. Same inactive look as the full-list state (is-limit), but
+   it still answers a click – it leads to the swatches – so the cursor stays a pointer. ==== */
+.mkl-pdp-save.is-wait{color:var(--text-muted);border-color:var(--graphite-300);background:var(--white);opacity:.6}
+.mkl-pdp-save.is-wait:hover{background:var(--white);border-color:var(--graphite-300);color:var(--text-muted)}
+.mkl-pdp-media.is-wait{opacity:.6}
+.mkl-pdp-media.is-wait .mkl-pdp-media__seg,.mkl-pdp-media.is-wait:hover .mkl-pdp-media__seg{color:var(--graphite-700);background:none}

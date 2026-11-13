@@ -309,9 +309,6 @@ table.vgl-t .vgl-hr--cta>*{padding-top:.75rem;padding-bottom:.5rem}
 /* (a) actions: Merken left, remove right — bare muted icons, 2.75 rem targets, no hover change */
 .vgl-ph__bar{display:flex;align-items:center;justify-content:space-between;height:2.75rem;margin:0 -.625rem}
 .vgl-ph__media{position:relative;width:2.75rem;height:2.75rem}
-.vgl-ph__bar .mkl-mark--ov{top:0;left:0}
-.vgl-ph__bar .mkl-mark--ov:not(.is-on),.vgl-ph__bar .mkl-mark--ov:not(.is-on):hover{color:var(--v-muted)}
-.vgl-ph__bar .mkl-mark--ov .mkl-mark__disc,.vgl-ph__bar .mkl-mark--ov:hover .mkl-mark__disc{background:transparent}
 .vgl-ph__rm{flex:none;width:2.75rem;height:2.75rem;padding:0;border:0;background:transparent;color:var(--v-muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .vgl-ph__rm svg{width:1.125rem;height:1.125rem}
 /* (b) photo tile: paper surface, no border; the label column holds an "add" tile of the same size */

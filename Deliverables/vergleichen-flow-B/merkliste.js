@@ -182,7 +182,7 @@
         '<p class="mkl-picknote" role="status" hidden></p>' +
         '<ul class="mkl-list" role="list"></ul>' +
         '<section class="mkl-recent" aria-labelledby="mklRecentH" hidden><div class="mkl-recent__head"><h3 class="mkl-recent__h" id="mklRecentH">Zuletzt angesehen</h3><button class="mkl-link" type="button" data-mkl="recent-clear">Verlauf löschen</button></div><ul class="mkl-recent__list" role="list"></ul></section>' +
-        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Merken Sie Modelle mit dem Lesezeichen-Symbol – sie bleiben auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
+        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Wählen Sie auf der Produktseite eine Farbe und merken Sie Ihre Konfiguration – sie bleibt auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
       '</div>' +
       '<div class="mkl-foot">' +
         '<p class="mkl-hint">' + OWN_HINT + '</p>' +
@@ -229,8 +229,6 @@
       if (pb) { var pid = pb.getAttribute('data-parts'); openParts[pid] = !openParts[pid]; render(); var nb2 = listEl.querySelector('.mkl-item__more[data-parts="' + pid.replace(/"/g, '') + '"]'); if (nb2) nb2.focus(); return; }
       var ug = e.target.closest('[data-undo]');
       if (ug) { ghostUndo(ug.getAttribute('data-undo')); return; }
-      var rs = e.target.closest('[data-rv-save]');
-      if (rs) { saveRecent(rs.getAttribute('data-rv-save')); return; }
       var tk = e.target.closest('[data-take]');
       if (tk) { takeOne(tk.getAttribute('data-take')); return; }
       var go = e.target.closest('.mkl-item__cta');
@@ -349,44 +347,10 @@
   function resumeToast() { if (!toastPaused) return; toastPaused = false; toastStart = Date.now(); toastT = setTimeout(hideToast, toastLeft); }
   function live(msg) { if (!liveEl) return; liveEl.textContent = ''; setTimeout(function () { liveEl.textContent = msg; }, 30); }
 
-  /* ---- Hearts: PLP cards + compare overlay columns ---- */
-  function heartHTML(extra) { return '<button class="mkl-mark' + (extra || '') + '" type="button" aria-pressed="false"><span class="mkl-mark__disc">' + HEART + '</span></button>'; }
-  function injectCardHeart(cardEl) {
-    if (cardEl.querySelector('.mkl-mark')) return;
-    var id = cardEl.dataset.id; if (!id || !BY_ID[id]) return;
-    var media = cardEl.querySelector('.pcard__media') || cardEl;
-    var btn = h(heartHTML('')); btn.setAttribute('data-mkl-id', id);
-    btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); pressHeart(btn, id, cardEl); });
-    media.appendChild(btn);
-    syncHeart(btn, id);
-  }
-  function scanCards() { var grid = document.getElementById('productGrid'); if (!grid) return; grid.querySelectorAll('.pcard[data-id]').forEach(injectCardHeart); }
-  function injectOverlayHearts() {
-    document.querySelectorAll('.vgl-altc .pcard[data-id]').forEach(injectCardHeart);   /* Ähnliche Modelle = PLP cards (12.11.) */
-    document.querySelectorAll('.vgl-ph__media').forEach(function (media) {
-      if (media.querySelector('.mkl-mark')) return;
-      var rm = media.querySelector('[data-rm]'); var id = rm && rm.getAttribute('data-rm'); if (!id || !BY_ID[id]) return;
-      var btn = h(heartHTML(' mkl-mark--ov')); btn.setAttribute('data-mkl-id', id);
-      btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); pressHeart(btn, id, null); });
-      media.appendChild(btn);
-      syncHeart(btn, id);
-    });
-  }
-  function pressHeart(btn, id, cardEl) {
-    if (!reduced()) { btn.classList.add('is-pressed'); setTimeout(function () { btn.classList.remove('is-pressed'); }, 120); }
-    if (has(id)) removeItem(id); else addItem(id, cardEl);
-  }
-  function syncHeart(btn, id) {
-    var on = has(id), nm = shortName(byId(id) || BY_ID[id] && { name: BY_ID[id].name, lens: LENS } || { name: id }).main;
-    btn.classList.toggle('is-on', on);
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    btn.setAttribute('aria-label', on ? nm + ' aus der Merkliste entfernen' : nm + ' merken');
-    btn.setAttribute('title', on ? 'Gemerkt – aus der Merkliste entfernen' : 'Merken');
-    var lim = !on && isFull();
-    btn.classList.toggle('is-limit', lim);
-    if (lim) btn.setAttribute('aria-disabled', 'true'); else btn.removeAttribute('aria-disabled');
-  }
-  function syncHearts() { document.querySelectorAll('.mkl-mark[data-mkl-id]').forEach(function (b) { syncHeart(b, b.getAttribute('data-mkl-id')); }); }
+  /* ---- Where a bookmark is made (13.11., user decision) ----
+     Only on the product page, once a colour is chosen: a bookmark is always a concrete build (model + colour + options),
+     never a bare model. The bookmark icons on the PLP cards, in the comparison columns, on "Ähnliche Modelle" and in
+     "Zuletzt angesehen" are gone; items saved earlier as bare models stay in the list and keep working. */
   function syncHeader() {
     if (!hdrBtn) return;
     var n = items.length;
@@ -395,7 +359,7 @@
     hdrBtn.setAttribute('aria-label', 'Merkliste, ' + n + ' Artikel');
   }
   function pulseBadge() { if (!hdrBadge || reduced()) return; hdrBadge.classList.remove('is-pulse'); void hdrBadge.offsetWidth; hdrBadge.classList.add('is-pulse'); setTimeout(function () { hdrBadge.classList.remove('is-pulse'); }, 220); }
-  function syncAll() { syncHearts(); syncHeader(); if (isOpen) render(); if (PDP) syncPdpMarks(); }
+  function syncAll() { syncHeader(); if (isOpen) render(); if (PDP) syncPdpMarks(); }
 
   /* ---- Mutations ---- */
   function addItem(id, cardEl) {
@@ -511,7 +475,8 @@
      Models the visitor opened in this session (product page, card title or image, "Zum Produkt" / "Konfigurieren" in
      the comparison), newest first. Session only (sessionStorage, gone when the browser closes, no consent needed);
      a snapshot like a Merkliste item, so a model seen on the other category page still renders. Shown below the saved
-     items, at most 4 and never one that is already saved; one click on "Merken" moves it into the list. On JTL this
+     items, at most 4 and never one that is already saved; "Konfigurieren" / "Zum Produkt" leads back to the product
+     page, where it can be bookmarked once a colour is chosen (13.11.). On JTL this
      reads the shop's own "zuletzt angesehen" data instead of keeping a second history. */
   var RKEY = 'mtz_recent', RSHOW = 4, RMAX = 12;
   function recentLoad() { try { var d = JSON.parse(sessionStorage.getItem(RKEY) || '[]'); return Array.isArray(d) ? d.filter(function (x) { return x && typeof x.id === 'string' && typeof x.name === 'string'; }) : []; } catch (e) { return []; } }
@@ -531,25 +496,13 @@
       '<div class="mkl-rv__text"><div class="mkl-rv__name" title="' + esc(it.name) + '">' + esc(nm.main) + '</div>' +
         (price ? '<div class="mkl-rv__price">' + esc(price) + '</div>' : '') +
         '<a class="mkl-rv__cta" href="' + esc(ctaHref) + '">' + ctaTxt + IC_CHEV_R + '</a></div>' +
-      '<button class="mkl-rv__save" type="button" data-rv-save="' + esc(it.id) + '" aria-label="' + esc(nm.main) + ' merken">' + HEART + '<span>Merken</span></button>' +
     '</li>';
   }
   function renderRecent(shared) {
     if (!recentEl) return;
-    var l = shared ? [] : recentShown();   /* also in the picker opened from the comparison (12.11.): bookmark a viewed model there, then add it */
+    var l = shared ? [] : recentShown();
     recentEl.hidden = !l.length;
     recentEl.querySelector('.mkl-recent__list').innerHTML = l.map(recentRowHTML).join('');
-  }
-  function saveRecent(id) {
-    var snap = null; recentLoad().forEach(function (x) { if (x.id === id) snap = x; }); if (!snap || has(id)) return;
-    if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', null, true); live(m); return; }
-    var btns = Array.prototype.slice.call(recentEl.querySelectorAll('[data-rv-save]')), at = btns.map(function (b) { return b.getAttribute('data-rv-save'); }).indexOf(id);
-    var it = {}; Object.keys(snap).forEach(function (k) { if (k !== 'viewedAt') it[k] = snap[k]; });
-    it.addedAt = new Date().toISOString(); it.priceAtAdd = typeof it.priceFrom === 'number' ? it.priceFrom : null;
-    items.push(it); save(); syncAll(); pulseBadge();
-    live('Gemerkt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Gemerkt', 'ok', null, true, it.img);
-    var nb = recentEl.querySelectorAll('[data-rv-save]'); (nb[Math.min(at, nb.length - 1)] || titleEl).focus();
   }
 
   /* ---- Drawer rendering ---- */
@@ -583,8 +536,7 @@
       '<div class="mkl-item__actions">' +
         '<a class="mkl-item__cta" href="' + esc(ctaHref) + '"><span>' + ctaTxt + '</span>' + IC_CHEV_R + '</a>' +
         '<div class="mkl-item__sec">' +
-          (cfg ? '<span class="mkl-item__cfgnote">Vergleich auf Modellebene – über das Basismodell</span>' :
-            '<label class="mkl-cmp"><input type="checkbox" data-id="' + esc(cmpId) + '" data-lens="' + esc(it.lens) + '" aria-label="' + esc(nm.main) + ' zum Vergleich auswählen"><span class="mkl-cmp__box" aria-hidden="true">' + CHK + '</span><span class="mkl-cmp__t">Vergleichen</span></label>') +
+          ('<label class="mkl-cmp"><input type="checkbox" data-id="' + esc(cmpId) + '" data-lens="' + esc(it.lens) + '" aria-label="' + esc(nm.main) + ' zum Vergleich auswählen"><span class="mkl-cmp__box" aria-hidden="true">' + CHK + '</span><span class="mkl-cmp__t">Vergleichen</span></label>') +
         '</div>' +
       '</div>' +
     '</article></li>');
@@ -701,14 +653,14 @@
     cta.disabled = n < 1;
     /* nothing in the list fits this comparison (12.11., user: "it is not communicated"): say so above the list and in
        the footer, instead of only greying out the checkboxes */
-    var cand = viewItems().filter(function (it) { var id = it.articleId || it.id; return (it.lens || LENS) === pick.lens && !it.configId && pick.inCmp.indexOf(id) < 0; }).length;
+    var cand = viewItems().filter(function (it) { var id = it.articleId || it.id; return (it.lens || LENS) === pick.lens && pick.inCmp.indexOf(id) < 0; }).length;
     var others = {}; viewItems().forEach(function (it) { var l = it.lens || LENS; if (l !== pick.lens && LENSES[l]) others[LENSES[l].label] = 1; });
     var otherTxt = Object.keys(others).join(' und ');
     pickNote.hidden = cand > 0 || !viewItems().length;
     if (!pickNote.hidden) pickNote.innerHTML = IC_INFO + '<span><b>Keine weiteren ' + esc(lab0) + ' in Ihrer Merkliste.</b> ' +
       (otherTxt ? 'Verglichen werden nur Modelle einer Kategorie.' : 'Die gemerkten Modelle sind bereits im Vergleich.') +
-      (recentEl && !recentEl.hidden ? ' Unter „Zuletzt angesehen“ können Sie ein Modell merken und dann hinzufügen.' : '') + '</span>';
-    if (!cand && !n) setFoot('Nichts zum Hinzufügen', 'Merken Sie zuerst ' + ({ sprechanlage: 'eine Türsprechanlage', briefkasten: 'einen Briefkasten' }[pick.lens] || 'ein Modell dieser Kategorie') + '.');
+      ' Weitere Modelle merken Sie auf ihrer Produktseite, sobald Sie eine Farbe gewählt haben.</span>';
+    if (!cand && !n) setFoot('Nichts zum Hinzufügen', 'Merken Sie zuerst ' + ({ sprechanlage: 'eine Türsprechanlage', briefkasten: 'einen Briefkasten' }[pick.lens] || 'ein Modell dieser Kategorie') + ' auf der Produktseite.');
     else setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' Modelle ausgewählt') : 'Keine Modelle ausgewählt',
       free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
@@ -928,7 +880,7 @@
   /* Z-state of the page (07a §2) */
   function pdpState() {
     var sn = pdpSnap();
-    if (!sn.finish) return { s1: false, on: has(PDP.id), sn: sn, changed: false };
+    if (!sn.finish) return { s1: false, on: false, sn: sn, changed: false };   /* no colour yet: nothing to bookmark (13.11.) */
     var hh = cfgHash(sn), hit = findCfgByHash(hh), sess = cfgOfSession()[sn.article] || null, sessItem = sess ? byId('cfg:' + sess) : null;
     return { s1: true, on: !!hit, hit: hit, sn: sn, hash: hh, sessId: sessItem ? sess : null, changed: !hit && !!sessItem };
   }
@@ -948,11 +900,18 @@
     pdpLast = btn;
     if (!reduced()) { btn.classList.add('is-pressed'); setTimeout(function () { btn.classList.remove('is-pressed'); }, 120); }
     var st = pdpState(), was = st.on;
-    if (!st.s1) { if (st.on) removeItem(PDP.id); else addItem(PDP.id, null); }
-    else if (st.on) removeItem(st.hit.id);
+    if (!st.s1) { askColour(); return; }
+    if (st.on) removeItem(st.hit.id);
     else if (st.changed) updateConfig(st.sessId, st.sn);
     else addConfig(st.sn);
     if (!was && btn.classList.contains('is-on')) stampPdp();
+  }
+  /* 13.11. (user): bookmarking starts with the colour. Before that the control looks inactive but still answers: it
+     takes the visitor to the swatches (highlighted, first swatch focused) and says why */
+  function askColour() {
+    var sw = document.getElementById('pdpSwatches');
+    if (sw) { sw.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); hintSwatches(); var f = sw.querySelector('.pdp-swatch'); if (f) f.focus({ preventScroll: true }); }
+    toast('Bitte wählen Sie zuerst eine Farbe – dann können Sie Ihre Konfiguration merken.', 'info');
   }
   function addConfig(sn) {
     if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }, true); live(m); return; }
@@ -979,9 +938,10 @@
     var label = st.s1 ? (st.on ? 'Konfiguration gemerkt' : 'Konfiguration merken') : (st.on ? 'Gemerkt' : 'Merken');
     var alt = st.s1 ? (st.on ? 'Konfiguration merken' : 'Konfiguration gemerkt') : (st.on ? 'Merken' : 'Gemerkt');
     var shortL = st.on ? 'Gemerkt' : 'Merken', shortAlt = st.on ? 'Merken' : 'Gemerkt';
-    var aria = label + ': ' + nm + (st.s1 && colour ? ', ' + colour : '');   /* starts with the visible label (WCAG 2.5.3) */
-    var lim = !st.on && !st.changed && isFull();
-    var extraTitle = lim ? 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).' : (st.changed ? 'Geändert seit dem Merken – erneut merken, um zu aktualisieren' : (st.on ? 'Aus der Merkliste entfernen' : ''));
+    var wait = !st.s1;
+    var aria = label + ': ' + nm + (st.s1 && colour ? ', ' + colour : '') + (wait ? ' – zuerst eine Farbe wählen' : '');   /* starts with the visible label (WCAG 2.5.3) */
+    var lim = !wait && !st.on && !st.changed && isFull();
+    var extraTitle = wait ? 'Zuerst eine Farbe wählen' : lim ? 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).' : (st.changed ? 'Geändert seit dem Merken – erneut merken, um zu aktualisieren' : (st.on ? 'Aus der Merkliste entfernen' : ''));
     [pdpBtn, pdpBar].forEach(function (b) {
       if (!b) return;
       b.classList.toggle('is-on', st.on); b.setAttribute('aria-pressed', st.on ? 'true' : 'false'); b.setAttribute('aria-label', aria);
@@ -989,7 +949,7 @@
       var l = b.querySelector('.mkl-pdp-save__label'); l.textContent = label; l.setAttribute('data-alt', alt);
       var s = b.querySelector('.mkl-pdp-save__short'); if (s) { s.textContent = shortL; s.setAttribute('data-alt', shortAlt); }
       b.classList.toggle('is-changed', !!st.changed); if (st.changed) b.setAttribute('aria-describedby', 'mklPdpChanged'); else b.removeAttribute('aria-describedby');
-      b.classList.toggle('is-limit', lim); if (lim) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
+      b.classList.toggle('is-limit', lim); b.classList.toggle('is-wait', wait); if (lim || wait) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
     });
     pdpChanged.hidden = !st.changed; pdpRow.hidden = !st.changed;   /* the caption row only exists while it has something to say (no empty gap in the checkout stack) */
     if (pdpBand && !(st.on && st.hit && st.hit.configId === bandCfgId) && !(bandHash && st.hash === bandHash)) removeBand();   /* the band describes the restored build; the first change turns it into the caption */
@@ -1088,15 +1048,6 @@
     }
     if (!window.MTZ_PRODUCTS) return setTimeout(init, 50);
     indexProducts(); load(); refreshPrices(); loadShared(); buildChrome();
-    var grid = document.getElementById('productGrid');
-    if (grid) { scanCards(); new MutationObserver(scanCards).observe(grid, { childList: true }); }
-    /* compare overlay: decorate every product column with a bookmark whenever it (re)renders */
-    var tries = 0; (function watchOverlay() {
-      var body = document.querySelector('[data-vgl="body"]');
-      if (!body) { if (tries++ < 40) setTimeout(watchOverlay, 50); return; }
-      injectOverlayHearts();
-      new MutationObserver(injectOverlayHearts).observe(body, { childList: true, subtree: true });
-    })();
     window.addEventListener('resize', function () { if (!isOpen) return; placeHint(); try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {} fitDrawer(); });   /* rotation re-checks the drawer layout */
     /* cross-tab: another tab changed the list */
     window.addEventListener('storage', function (e) { if (e.key === KEY) { load(); refreshPrices(); syncAll(); live('Merkliste in einem anderen Tab geändert: ' + items.length + ' Artikel'); } });

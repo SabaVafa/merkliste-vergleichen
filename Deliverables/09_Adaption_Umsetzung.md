@@ -281,3 +281,16 @@ Der Bereich war eine eingerückte Karte (16 / 20 px Außenabstand, 8 px Radius) 
 ## 32 · Responsive-Audit der Merkliste (13.11.2026)
 
 Gemessen in 11 Breiten von 320 bis 2560 px, Telefon hoch und quer: kein Überlauf, keine abgeschnittenen Texte, alle Ziele mindestens 24 px, keine Schrift unter 12 px in der Merkliste; Meldungen liegen in allen Breiten über der Vergleichsleiste. Behoben: auf niedrigen Bildschirmen (Telefon quer, 320–375 px Höhe) blieben zwischen Kopf und Fuß nur 127 px für die Liste. Unter 30 rem Höhe ist der Kopf kompakt, der Hinweis „Auf diesem Gerät gespeichert“ entfällt dort (er steht auch im Leerzustand), Auswahl-Zusammenfassung und „Vergleichen“ stehen in einer Zeile – die Liste bekommt 194 px (568 × 320) bzw. 234 px (740 × 360). `merkliste.css?v=47`.
+
+## 33 · Merken nur auf der Produktseite, nach der Farbwahl (13.11.2026, Nutzerentscheidung)
+
+Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe + Optionen), nie ein Modell ohne Farbe.
+
+- **Produktseite:** „Merken“ an der Galerie und in der festen Kaufleiste bleibt sichtbar, wirkt aber inaktiv, solange keine Farbe gewählt ist (`aria-disabled`, Name „Merken: … – zuerst eine Farbe wählen“). Ein Klick führt zu den Farbfeldern, hebt sie kurz hervor, setzt den Fokus auf das erste Feld und meldet „Bitte wählen Sie zuerst eine Farbe – dann können Sie Ihre Konfiguration merken.“ Mit der Farbe wird daraus „Konfiguration merken“ wie bisher.
+- **Entfernt:** das Lesezeichen auf den Produktkarten der Kategorieseiten, in den Spalten des Vergleichs, auf „Ähnliche Modelle“ und „Merken“ in „Zuletzt angesehen“. Die Zeilen in „Zuletzt angesehen“ führen weiter mit „Konfigurieren“ / „Zum Produkt“ zur Produktseite. Die Dateien der Kategorieseite bleiben unverändert – das Lesezeichen kam aus `merkliste.js`.
+- **Vergleich aus der Merkliste:** gemerkte Konfigurationen haben jetzt selbst das Feld „Vergleichen“ (verglichen wird das Modell). Vorher waren sie davon ausgenommen – sonst bliebe der Vergleich aus der Merkliste leer. Zwei Konfigurationen desselben Modells zählen als ein Modell.
+- **Texte:** Leerzustand „Wählen Sie auf der Produktseite eine Farbe und merken Sie Ihre Konfiguration …“; in der Auswahl für den Vergleich „Weitere Modelle merken Sie auf ihrer Produktseite, sobald Sie eine Farbe gewählt haben.“
+- **Bleibt:** früher gemerkte Modelle ohne Farbe bleiben in der Liste und funktionieren weiter; „Übernehmen“ aus einer geteilten Merkliste kopiert vorhandene Einträge und bleibt.
+- **Prototyp-Grenze:** nur die VDM10 2.0 Colson hat eine Produktseite. Im Prototyp lässt sich deshalb nur dieses Modell neu merken; ein Vergleich aus der Merkliste mit zwei Modellen braucht im Prototyp einen früher gemerkten Eintrag. Im Shop hat jedes Modell seine Produktseite.
+
+`merkliste.js?v=48`, `merkliste.css?v=48`, `merkliste-pdp.css?v=24`, `vergleichen.js?v=130`, `vergleichen.css?v=180`.

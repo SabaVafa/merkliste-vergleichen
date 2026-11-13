@@ -322,7 +322,7 @@
   var addPanel=null,addAnchor=null,addActive=-1,addMkl=false;
   function norm(s){return String(s||'').toLowerCase().replace(/ä/g,'a').replace(/ö/g,'o').replace(/ü/g,'u').replace(/ß/g,'ss');}
   function reviewsOf(id){for(var i=0;i<SRC.length;i++)if(SRC[i].id===id)return SRC[i].reviews||0;return 0;}
-  function mklIdsHere(){try{return window.MTZ_MKL?window.MTZ_MKL.items().filter(function(it){return it.lens===LENSKEY&&!it.configId;}).map(function(it){return it.articleId||it.id;}):[];}catch(e){return [];}}
+  function mklIdsHere(){try{var seen={};return window.MTZ_MKL?window.MTZ_MKL.items().filter(function(it){return it.lens===LENSKEY;}).map(function(it){return it.articleId||it.id;}).filter(function(id){return seen[id]?false:(seen[id]=1);}):[];}catch(e){return [];}}   /* a saved build counts as its model (13.11.: bookmarks are builds) */
   function addGroups(q){
     var pool=Object.keys(BY_ID).map(function(id){return BY_ID[id];}).filter(function(p){return selected.indexOf(p.id)<0;});
     if(addMkl){var ids=mklIdsHere();pool=pool.filter(function(p){return ids.indexOf(p.id)>-1;});}
@@ -538,7 +538,7 @@
     /* taller than the room on either side (e.g. 320 px landscape): capped to that room, scrolls inside when tapped open */
     var room=Math.max(above,below)-1.5*rp;if(tr.height>room){t.classList.add('is-clamp');t.style.maxHeight=(Math.max(room,6*rp)/rp).toFixed(3)+'rem';}
   }
-  function mklCount(){try{if(!window.MTZ_MKL)return 0;return window.MTZ_MKL.items().filter(function(it){return it.lens===(window.MTZ_LENS||'sprechanlage')&&!it.configId&&BY_ID[it.articleId||it.id]&&selected.indexOf(it.articleId||it.id)<0;}).length;}catch(e){return 0;}}
+  function mklCount(){try{if(!window.MTZ_MKL)return 0;var seen={};return window.MTZ_MKL.items().filter(function(it){var id=it.articleId||it.id;if(it.lens!==(window.MTZ_LENS||'sprechanlage')||!BY_ID[id]||selected.indexOf(id)>-1||seen[id])return false;return (seen[id]=1);}).length;}catch(e){return 0;}}
 
   /* toolbar control — rest: "Vergleichen" (starts compare mode → card fields appear);
      in mode: "Vergleich anzeigen (n)", grey until ≥2, teal + opens comparison from 2. */
@@ -967,7 +967,7 @@
     function td(inner,extra){return '<td class="vgl-hc'+(extra||'')+'" role="cell">'+inner+'</td>';}
     var lcEmpty='<td class="vgl-lc" role="cell"></td>';
     return '<thead role="rowgroup">'+
-      /* (a) photo tile with the actions in its corners (Merken left — merkliste.js fills .vgl-ph__media —, remove right);
+      /* (a) photo tile with remove in its corner (the bookmark left it 13.11. – bookmarks are made on the product page);
              the photo is inset, so the icons never sit on it. The label column's "add" slot spans the whole header
              (an empty product slot) instead of leaving three empty cells under it. */
       row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick?'<span class="vgl-pill" aria-hidden="true">'+(i+1)+' / '+n+'</span>':'')+'</div>');}).join(''))+
