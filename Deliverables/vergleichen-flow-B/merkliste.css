@@ -535,3 +535,14 @@
    Side information takes no status colour: green (teal-100) reads as "success" and is the confirmation toast in the
    same drawer. Now the neutral info style of the storage hint: DS paper grey #F5F6FA, teal info icon, ink text. ==== */
 .mkl-picknote{background:var(--paper-white,#F5F6FA)}
+
+/* ==== Phone: header on the content edge (13.11., gap audit) ====
+   On phones the group headings, items, "Zuletzt angesehen" and the footer start 16 px from the edge, the header still
+   used the desktop 20 px – title and content were 4 px apart. Now 16 px, and the × moves onto the delete icons' axis. ==== */
+@media(max-width:47.99rem){.mkl-head{padding-left:var(--sp-4,1rem);padding-right:var(--sp-4,1rem)}}
+
+/* ==== Picker note clear of the list (13.11., gap audit) ====
+   In pick mode the note card ended flush on the first grey group heading ("Briefkästen (2)") – two grey surfaces
+   touching. Below the note now the same gap as above it: 16 px, on phones 12 px. ==== */
+.mkl-picknote:not([hidden])+.mkl-list{margin-top:var(--sp-4,1rem)}
+@media(max-width:47.99rem){.mkl-picknote:not([hidden])+.mkl-list{margin-top:var(--sp-3,.75rem)}}

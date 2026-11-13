@@ -265,3 +265,11 @@ Nutzerwunsch: „BRIEFKÄSTEN (3)“ / „TÜRSPRECHANLAGEN (n)“ saßen 5,5 px
 ## 29 · Auswahl aus der Merkliste: erklärt, wenn nichts passt (12.11.2026)
 
 Nutzerwunsch: öffnet der Vergleich die Merkliste und keiner der gemerkten Artikel passt (nur andere Kategorie, nur Konfigurationen oder alles schon im Vergleich), waren die Haken nur ausgegraut. Jetzt steht über der Liste ein neutraler Hinweis (Papiergrau #F5F6FA wie der Speicherhinweis, Info-Symbol in Teal; zunächst Hellteal, auf Nutzerwunsch geändert – Grün steht für Bestätigungen): „**Keine weiteren Türsprechanlagen in Ihrer Merkliste.** Verglichen werden nur Modelle einer Kategorie.“ (Nachsatz zu den gemerkten Briefkästen auf Nutzerwunsch entfernt) (bzw. „Die gemerkten Modelle sind bereits im Vergleich.“), ergänzt um „Unter „Zuletzt angesehen“ können Sie ein Modell merken und dann hinzufügen.“, wenn es den Bereich gibt. Fuß: „Nichts zum Hinzufügen – Merken Sie zuerst eine Türsprechanlage.“ (Briefkästen: „… einen Briefkasten.“). Gibt es passende Modelle, bleibt alles wie bisher. `merkliste.js?v=46`, `merkliste.css?v=42`.
+
+## 30 · Abstände in der Merkliste geprüft (13.11.2026)
+
+Nach dem Abstand über der Kopfkarte im Vergleich wurden alle Abstände der Merkliste nachgemessen – Desktop (1560 px) und Telefon (375 px), normale Ansicht und Auswahl für den Vergleich.
+
+- **Stimmt bereits:** die Kategorie-Überschrift beginnt direkt unter der Kopfzeile (ein Listenkopf, keine Karte). Einträge haben oben und unten 16 px (Telefon 12 px), Bild und Text 16 px Abstand, darunter die Aktionszeile mit 8 px. Die Karte „Zuletzt angesehen“ hat 16 px über und 20 px unter sich (Telefon 12/16 px) und 16 px Innenabstand. Im Fuß stehen Hinweisband und Inhalt 12 px auseinander, der Rand unten beträgt 12 px. Am Desktop liegen alle Inhalte auf derselben Kante (20 px).
+- **Korrigiert – Kopfzeile am Telefon:** Titel und × saßen mit 20 px vom Rand, alle Inhalte darunter mit 16 px – der Titel stand 4 px versetzt. Jetzt 16 px; das × liegt damit genau über den Papierkorb-Symbolen. `merkliste.css?v=43`.
+- **Korrigiert – Hinweis in der Auswahl:** die Hinweiskarte („Keine weiteren Briefkästen …“) lag ohne Abstand auf der grauen Kategorie-Überschrift. Darunter jetzt derselbe Abstand wie darüber: 16 px, am Telefon 12 px. `merkliste.css?v=44`.
