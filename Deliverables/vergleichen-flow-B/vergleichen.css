@@ -1396,3 +1396,14 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    and right of each thumbnail and lost their top half. The row gets room for the disc plus its focus ring on top and
    at the end; negative margins keep the tray height unchanged. ==== */
 .vgl-tray__slots{padding:.75rem .75rem .125rem .125rem;margin:-.625rem 0 0}
+
+/* ==== Air above the model header card (13.11., Lead Product Design, user decision) ====
+   The header card started flush under the title bar (0 px; its top line doubled the bar's hairline, its top corners
+   were lost) while every other card has 24 px of page grey around it – it read as content scrolled under the bar.
+   Now the same gap as between the cards: 24 px desktop, 20 px on phones. On phones with the status line above the
+   card ("2 von 3 Modellen sichtbar" · Hinzufügen) that line belongs to the card, so 8 px between them. ==== */
+.vgl-view__scroll-in>table.vgl-t{margin-top:1.5rem}
+@media(max-width:47.99rem){
+  .vgl-view__scroll-in>table.vgl-t{margin-top:1.25rem}
+  .vgl-view__scroll-in>.vgl-mbar+table.vgl-t{margin-top:.5rem}
+}
