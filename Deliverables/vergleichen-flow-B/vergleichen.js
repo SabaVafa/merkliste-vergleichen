@@ -138,7 +138,10 @@
   function h(html){var d=document.createElement('div');d.innerHTML=html.trim();return d.firstChild;}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   var CHK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
-  var SCALE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M4 6h6M4 12h6M4 18h6M20 8l-3-3-3 3M17 5v9"/></svg>';
+  /* "Vergleichen" icon (13.11., lead UI, user choice A): two opposing arrows – the common shop "compare" glyph, built
+     from the DS arrow-right/arrow-left geometry (24 grid, 1.8 stroke, round caps and joins, currentColor). Replaces lines
+     + up arrow, the common "sort" glyph, which read as "Sortieren" next to the sort control. */
+  var SCALE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/></svg>';
   var IC_INFO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"/></svg>';
   var IC_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8.4 12.5 11 15 16 9.5"/></svg>';
   /* warning glyph (10.11., user decision): triangle filled with the DS --status-warning orange, "!" in ink — dark on
