@@ -23,7 +23,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  var KEY = 'mtz_merkliste', LIMIT = 50, CMP_MAX = 4, CMP_MIN = 2, TOAST_MS = 5000, TOAST_UNDO_MS = 10000;   /* emptying the whole list: 10 s to undo (pauses on hover / focus) */
+  var KEY = 'mtz_merkliste', LIMIT = 50, CMP_MAX = 3, CMP_MIN = 2, TOAST_MS = 5000, TOAST_UNDO_MS = 10000;   /* emptying the whole list: 10 s to undo (pauses on hover / focus) */
   var LENS = window.MTZ_LENS || 'sprechanlage';
   var BASE = window.MTZ_MKL_BASE || '';                 /* '' on the PLPs, '../' on pdp/index.html — stored paths are relative to vergleichen-flow-B */
   var PDP_URLS = { colson1: 'pdp/index.html' };         /* products that have a PDP in the prototype */
@@ -186,7 +186,7 @@
       '</div>' +
       '<div class="mkl-foot">' +
         '<p class="mkl-hint">' + OWN_HINT + '</p>' +
-        '<p class="mkl-foot__hint" id="mkl-foot-status" aria-live="polite"><b class="mkl-foot__s">Keine Modelle ausgewählt</b><span class="mkl-foot__d">2 bis 4 Modelle einer Kategorie</span></p>' +
+        '<p class="mkl-foot__hint" id="mkl-foot-status" aria-live="polite"><b class="mkl-foot__s">Keine Modelle ausgewählt</b><span class="mkl-foot__d">' + CMP_MIN + ' bis ' + CMP_MAX + ' Modelle einer Kategorie</span></p>' +
         '<button class="mkl-cta" type="button" data-mkl="compare" aria-describedby="mkl-foot-status" disabled>Vergleichen</button>' +
       '</div>' +
     '</div>');
@@ -676,7 +676,7 @@
         : n < CMP_MIN ? 'Noch mindestens 1 weiteres Modell'
         : lock && lock !== LENS ? 'Der Vergleich öffnet bei ' + lab
         : full ? 'Maximum von ' + CMP_MAX + ' Modellen erreicht'
-        : 'Bis zu ' + (CMP_MAX - n) + ' weitere möglich');
+        : (CMP_MAX - n === 1 ? '1 weiteres' : 'Bis zu ' + (CMP_MAX - n) + ' weitere') + ' möglich');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
     fitDrawer();
   }

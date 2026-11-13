@@ -12,7 +12,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  var MAX = 4, MIN = 2;
+  var MAX = 3, MIN = 2;   /* 13.11., user: at most 3 models – every column stays readable, also on tablets */
   /* 09b P0-1: one slot per category in localStorage (survives tabs/sessions, 30 days); compare MODE stays per session (cards stay hidden until "Vergleichen") */
   var KEY = 'mtz_vgl', OLDKEY = 'mtz_vgl_flow', MODEKEY = 'mtz_vgl_mode', TTL = 30 * 864e5, LENSKEY = window.MTZ_LENS || 'sprechanlage';
   var PAGES = { sprechanlage: 'index.html', briefkasten: 'briefkasten.html' };
@@ -556,7 +556,7 @@
     setMode(true);syncAll();var gr=document.getElementById('productGrid');if(gr)try{gr.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}
     var n=selected.length;
     if(n)toast('Ihre letzte Auswahl ist wieder da ('+(n>1?n+' Modelle':'1 Modell')+').','info',{label:'Leeren',fn:function(){clearAll();if(barBtn)barBtn.focus();}});
-    else toast('Wählen Sie 2 bis 4 Modelle zum Vergleich.','info');
+    else toast('Wählen Sie '+MIN+' bis '+MAX+' Modelle zum Vergleich.','info');
   }
   function exitMode(){
     var snap=selected.slice();
@@ -637,7 +637,7 @@
     }else{
       var more=MAX-n;
       trayHint.classList.add('ready');
-      trayHint.innerHTML=IC_OK+'Bereit zum Vergleichen · bis zu '+more+' weitere möglich';
+      trayHint.innerHTML=IC_OK+'Bereit zum Vergleichen · '+(more===1?'1 weiteres':'bis zu '+more+' weitere')+' möglich';
     }
     traySlots.innerHTML='';
     selected.forEach(function(id){var p=BY_ID[id];traySlots.appendChild(h('<div class="vgl-slot"><img src="'+esc(p.img)+'" alt="'+esc(p.name)+'"><button class="vgl-slot__rm" type="button" data-rm="'+id+'" aria-label="'+esc(p.name)+' aus Vergleich entfernen">'+IC_X+'</button></div>'));});
@@ -921,7 +921,7 @@
   /* =========================================================
      Render (12b): bar · Fazit · [Bildleiste] · table (sticky head, U / O / G) · [Alternativen] · source · [Aktionszeile]
      ========================================================= */
-  function maxCols(){return printing?MAX:(mq(MQ64,true)?4:(mq(MQ48,true)?3:2));}
+  function maxCols(){return printing?MAX:Math.min(MAX,mq(MQ64,true)?4:(mq(MQ48,true)?3:2));}
   function tierKey(){return maxCols()+'|'+mq(MQ90,true)+'|'+mq(MQ64,true)+'|'+mq(MQ48,true);}
   /* visible columns (Spaltenwahl, 12a §6.2): the selection order when everything fits; otherwise the user's choice, start = first ones */
   function syncVis(items,maxC){
@@ -1330,7 +1330,7 @@
   }
 
   /* ---- Public hook for the Merkliste add-on (05_Merkliste §3.5) ----
-     compare(ids): replaces the selection with the valid ids of this lens (max 4), persists it,
+     compare(ids): replaces the selection with the valid ids of this lens (max MAX), persists it,
      enters compare mode (body.vgl-mode → card checkboxes appear, same gating as the toolbar
      button), syncs bar/tray/cards and opens the comparison from 2 models. Returns the count. */
   function setSelection(ids){
