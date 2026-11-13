@@ -907,10 +907,12 @@
     if (!was && btn.classList.contains('is-on')) stampPdp();
   }
   /* 13.11. (user): bookmarking starts with the colour. Before that the control looks inactive but still answers: it
-     takes the visitor to the swatches (highlighted, first swatch focused) and says why */
+     takes the visitor to the swatches (highlighted, the swatch group focused) and says why. The group, not the first
+     swatch: a focused swatch previews its name in the "Farbe:" label, and on a phone that focus stays until the next
+     tap, so the label read "Anthrazit RAL 7016" while nothing was chosen (mobile check 13.11.) */
   function askColour() {
     var sw = document.getElementById('pdpSwatches');
-    if (sw) { sw.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); hintSwatches(); var f = sw.querySelector('.pdp-swatch'); if (f) f.focus({ preventScroll: true }); }
+    if (sw) { sw.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); hintSwatches(); if (!sw.hasAttribute('tabindex')) sw.setAttribute('tabindex', '-1'); sw.focus({ preventScroll: true }); }
     toast('Bitte wählen Sie zuerst eine Farbe – dann können Sie Ihre Konfiguration merken.', 'info');
   }
   function addConfig(sn) {

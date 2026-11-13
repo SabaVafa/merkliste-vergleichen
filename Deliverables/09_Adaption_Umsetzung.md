@@ -294,3 +294,10 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Prototyp-Grenze:** nur die VDM10 2.0 Colson hat eine Produktseite. Im Prototyp lässt sich deshalb nur dieses Modell neu merken; ein Vergleich aus der Merkliste mit zwei Modellen braucht im Prototyp einen früher gemerkten Eintrag. Im Shop hat jedes Modell seine Produktseite.
 
 `merkliste.js?v=48`, `merkliste.css?v=48`, `merkliste-pdp.css?v=24`, `vergleichen.js?v=130`, `vergleichen.css?v=180`.
+
+## 34 · Mobil-Check „Merken“ und Beispielprodukt verknüpft (13.11.2026)
+- **Mobil (375 px) geprüft:** Schaltfläche oben und Lesezeichen in der Kaufleiste warten auf die Farbe, führen zu den Farben und sagen warum; nach der Farbwahl wird gemerkt („Gemerkt“, Zähler +1, Hinweis über der Kaufleiste). Kein seitliches Scrollen.
+- **Korrigiert:** „Merken“ ohne Farbe setzte den Fokus auf die erste Farbe – die Farbvorschau schrieb dann „Farbe: Anthrazit RAL 7016“, obwohl nichts gewählt war (auf dem Telefon bis zum nächsten Tippen). Jetzt bekommt die Farbgruppe den Fokus (`tabindex="-1"`, ohne Rahmen; die Farben blinken kurz auf); Tab führt zur ersten Farbe.
+- **Beispielprodukt (Nutzerwunsch):** die VDM10 2.0 Colson steht auf der Türsprechanlagen-Seite jetzt an erster Stelle; Titel und Bild der Karte öffnen die Produktseite (`pdp` im Produkteintrag von `sprechanlage.js`). In „Ähnliche Modelle“ im Vergleich öffnet das Bild nichts. Der Brotkrumen „Sprechanlagen“ auf der Produktseite führt zurück zur Liste. So lassen sich Merken (Produktseite) und Vergleichen (Liste) im selben Durchlauf zeigen.
+
+`merkliste.js?v=49`, `merkliste-pdp.css?v=25`, `sprechanlage.js?v=104`.

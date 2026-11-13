@@ -129,8 +129,10 @@
          the same shop article (dominik1 = Maxior 1 Taster, domaudio1 = ADM10 Dominik, …). ---- */
   var SALE = { type: 'sale', text: '−15 %' };
   var PRODUCTS = [
+    /* 13.11. (user): the sample product with a product page in the prototype goes first, and its card links there –
+       so Merken (on the PDP, after a colour) and Vergleichen (on the PLP) can be tried together */
+    { id:'colson1', name:'VDM10 2.0 Video-Türsprechanlage | 1 Klingeltaster | Colson', price:594.15, uvp:699, ab:true, rating:4.5, reviews:65, badge:SALE, sw:'7016 9016 9007 703 9005 es ltb wf', pdp:'pdp/index.html' },
     { id:'sdm10x', name:'Türsprechanlage mit Kamera | Gesichtserkennung | Touch-Display | Live-HD-Video | Ein- und Mehrfamilien | SDM10X', price:1266.5, uvp:1490, ab:true, rating:4.5, reviews:9, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
-    { id:'colson1', name:'VDM10 2.0 Video-Türsprechanlage | 1 Klingeltaster | Colson', price:594.15, uvp:699, ab:true, rating:4.5, reviews:65, badge:SALE, sw:'7016 9016 9007 703 9005 es ltb wf' },
     { id:'dominik1', name:'XDM10 Video-Türsprechanlage mit austauschbarem Namensschild | 2-Draht-BUS | 1 Klingeltaster | Maxior', price:764.15, uvp:899, ab:true, rating:4.5, reviews:2, badge:SALE, sw:'7016 9016 9007 703 9005 wf', awards:['reddot','gda-medaille'] },
     { id:'horizon', name:'VDM10 2.0 modulare Video-Türsprechanlage | Ein- und Mehrfamilien | Horizon', price:849.15, uvp:999, ab:true, rating:5, reviews:25, badge:SALE, sw:'7016 9016 9007 703 9005 es wf' },
     { id:'sdm10h', name:'Türsprechanlage mit Kamera | Gesichtserkennung | Touch-Display | Hausnummer beleuchtet | Live-HD-Video | Ein- und Mehrfamilien | SDM10H', price:1351.5, uvp:1590, ab:true, rating:5, reviews:2, badge:SALE, sw:'7016 es wf' },
@@ -493,12 +495,18 @@
           '<span class="pcard__brand">Metzler</span>' +
           rating +
         '</div>' +
-        '<h3 class="pcard__title"><a href="#">' + p.name + '</a></h3>' +
+        '<h3 class="pcard__title"><a href="' + (p.pdp || '#') + '">' + p.name + '</a></h3>' +
         '<div class="pcard__footer">' +
           priceRow +
           colorRow(p.sw) +
         '</div>' +
       '</div>';
+    /* the picture opens the product page too, as on the live card; the title link stays the one keyboard / screen-reader
+       route (no second tab stop). Not inside the comparison's "Ähnliche Modelle", where the card only adds a model. */
+    if (p.pdp) {
+      var img = c.querySelector('.pcard__img'); img.style.cursor = 'pointer';
+      img.addEventListener('click', function () { if (!c.closest('.vgl-altc')) location.href = p.pdp; });
+    }
     return c;
   }
   window.MTZ_PLP_CARD = card;   /* read-only hook: the comparison's "Ähnliche Modelle" render the same card (12.11.) */

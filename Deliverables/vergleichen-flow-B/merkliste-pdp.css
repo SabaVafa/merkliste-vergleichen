@@ -207,3 +207,7 @@
 .mkl-pdp-save.is-wait:hover{background:var(--white);border-color:var(--graphite-300);color:var(--text-muted)}
 .mkl-pdp-media.is-wait{opacity:.6}
 .mkl-pdp-media.is-wait .mkl-pdp-media__seg,.mkl-pdp-media.is-wait:hover .mkl-pdp-media__seg{color:var(--graphite-700);background:none}
+
+/* The swatch group takes focus when "Merken" asks for a colour first (tabindex -1, never in the tab order); the
+   highlight pulse on the swatches marks the place, so no ring around the whole group. */
+#pdpSwatches[tabindex="-1"]:focus{outline:none}
