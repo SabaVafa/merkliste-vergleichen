@@ -418,3 +418,11 @@
   .qa-notice-mobile__body { font-size: 0.8125rem; line-height: 1.5; color: var(--color-graphite-800); margin: 6px 0 0; padding-left: 26px; }
   .qa-notice-mobile__body strong { color: var(--color-digital-black); font-weight: 700; }
 }
+
+/* ==== Responsive audit, part 2 (13.11.): header count badge 10 → 12 px; breadcrumb, footer hotline, legal links and the top-bar guarantee link get a
+   24 px tap area via an invisible ::after (WCAG 2.5.8) – nothing moves. The breadcrumb row scrolls sideways and would
+   clip the taller area, so it gets 2 px of room above and below that its negative margin takes back. ==== */
+.icon-btn .badge { font-size: 12px; }
+.crumb ol { padding-block: 0.125rem; margin-block: -0.125rem; }
+.crumb a, .footer__hotline-num, .footer__legal-links a, .topbar__claims a { position: relative; }
+.crumb a::after, .footer__hotline-num::after, .footer__legal-links a::after, .topbar__claims a::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5rem; transform: translateY(-50%); }

@@ -651,8 +651,9 @@
   /* ---- Mobile filter drawer ---- */
   function wireDrawer() {
     var panel = $('#filters'), backdrop = $('#filtersBackdrop');
-    function open() { panel.classList.add('is-open'); backdrop.hidden = false; document.body.style.overflow = 'hidden'; }
-    function close() { panel.classList.remove('is-open'); backdrop.hidden = true; document.body.style.overflow = ''; }
+    /* focus moves into the panel and back to "Filter" (13.11., responsive audit); the closed panel is hidden in plp.css */
+    function open() { panel.classList.add('is-open'); backdrop.hidden = false; document.body.style.overflow = 'hidden'; var x = $('#closeFilters'); if (x) x.focus(); }
+    function close() { if (!panel.classList.contains('is-open')) return; panel.classList.remove('is-open'); backdrop.hidden = true; document.body.style.overflow = ''; var b = $('#openFilters'); if (b && b.offsetParent) b.focus(); }
     $('#openFilters').addEventListener('click', open);
     $('#closeFilters').addEventListener('click', close);
     backdrop.addEventListener('click', close);

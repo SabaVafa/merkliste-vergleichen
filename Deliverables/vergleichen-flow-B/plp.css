@@ -1586,3 +1586,30 @@
   /* "Filter" is the only entry to the filters on phones: 2.75 rem target (was 34 px) */
   .catalog__filter-btn { height: 2.75rem; }
 }
+
+/* ==== Closed filter drawer out of reach (13.11., responsive audit) ====
+   Below 1024 px the closed drawer was only moved off-screen: its 35 filters stayed in the tab order, so keyboard users
+   tabbed into controls they could not see (WCAG 2.4.3 / 2.4.7). It is now hidden once the slide-out has finished and
+   visible from the first frame of opening – the motion is unchanged. ==== */
+@media (max-width: 1023px) {
+  .filters { visibility: hidden; transition: transform 0.3s cubic-bezier(.22,1,.36,1), visibility 0s linear 0.3s; }
+  .filters.is-open { visibility: visible; transition-delay: 0s; }
+}
+
+/* ==== Responsive audit, part 2 (13.11., user: "fix all … follow the live shop to keep the same layout") ====
+   Values taken from edelstahl-tuerklingel.de (read-only, 375 px): feature pills 12 px ("pcard__pill"), "ab" and UVP
+   13.6 px, "POWERED BY" 12 px on desktop. Only the text that was below 12 px changes; layout, card and hover stay.
+   1 Phone cards: system and feature pills 11 → 12 px like the live pills; "ab" and UVP 10–11.3 → 12 px (live 13.6 px,
+     kept just below our 12.9 px price so the price stays the strongest figure).
+   2 "POWERED BY" chip 11 → 12 px (live desktop value).
+   3 Header count badge 10 → 12 px.
+   4 Small text links get a 24 px tap area (WCAG 2.5.8) without moving anything: an invisible ::after over the link –
+     "+ n weitere" (18 px), breadcrumb (21 px), footer hotline numbers (21 px), footer legal links (18 px), the guarantee claim in the top bar (18 px). ==== */
+@media (max-width: 767px) {
+  .pcard__sys, .pcard__feat { font-size: 12px; }
+  .pcard__uvp, .pcard__ab { font-size: 12px; }
+}
+.hero-chip { font-size: 12px; }
+.icon-btn .badge { font-size: 12px; }
+.pcard__more, .crumb a, .footer__hotline-num, .footer__legal-links a, .topbar__claims a { position: relative; }
+.pcard__more::after, .crumb a::after, .footer__hotline-num::after, .footer__legal-links a::after, .topbar__claims a::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5rem; transform: translateY(-50%); }

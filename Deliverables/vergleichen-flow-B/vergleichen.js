@@ -173,7 +173,7 @@
         '</div>'+
         '<div class="vgl-tray__slots"></div>'+
         '<div class="vgl-tray__actions">'+
-          '<button class="vgl-link vgl-tray__clear" type="button" data-vgl="reset">'+IC_TRASH+'<span class="vgl-m-hide">Vergleich leeren</span><span class="vgl-m-only">Leeren</span></button>'+
+          '<button class="vgl-link vgl-tray__clear" type="button" data-vgl="reset" aria-label="Vergleich leeren">'+IC_TRASH+'<span class="vgl-m-hide">Vergleich leeren</span><span class="vgl-m-only">Leeren</span></button>'+
           '<button class="vgl-tray__cta" type="button" data-vgl="open" disabled>Vergleichen</button>'+
         '</div>'+
       '</div></div>');
@@ -521,13 +521,19 @@
   function placeTips(){if(viewBody)Array.prototype.forEach.call(viewBody.querySelectorAll('.vgl-ib'),placeTip);}
   function placeTip(b){
     var t=b.nextElementSibling;if(!t||!t.classList.contains('vgl-tip'))return;
-    t.style.left='';var rp=remPx(),vw=document.documentElement.clientWidth,r=t.getBoundingClientRect(),bc=b.getBoundingClientRect(),dx=bc.left+bc.width/2-r.left-rp;   /* pointer 1 rem in from the tip's left edge */
+    t.style.left='';t.style.maxHeight='';t.classList.remove('is-up','is-clamp');var rp=remPx(),vw=document.documentElement.clientWidth,r=t.getBoundingClientRect(),bc=b.getBoundingClientRect(),dx=bc.left+bc.width/2-r.left-rp;   /* pointer 1 rem in from the tip's left edge */
     if(r.right+dx>vw-rp)dx=vw-rp-r.right;
     if(r.left+dx<rp)dx=rp-r.left;
     if(dx)t.style.left=(dx/rp).toFixed(3)+'rem';
     /* pointer: on the (i)'s centre, wherever the tip was shifted to (kept 1 rem inside the corners) */
     var br=b.getBoundingClientRect(),tr=t.getBoundingClientRect(),x=br.left+br.width/2-tr.left;
     t.style.setProperty('--tip-x',(Math.max(rp,Math.min(tr.width-rp,x))/rp).toFixed(3)+'rem');
+    /* (13.11., responsive audit) short screens – landscape phones: opens upwards when it does not fit below the (i)
+       and there is more room above */
+    var lim=view.querySelector(view.classList.contains('is-pinned')?'.vgl-pin__in':'.vgl-view__bar'),vh=innerHeight,below=vh-br.bottom,above=br.top-(lim?lim.getBoundingClientRect().bottom:0);
+    if(tr.height+rp>below&&above>below)t.classList.add('is-up');
+    /* taller than the room on either side (e.g. 320 px landscape): capped to that room, scrolls inside when tapped open */
+    var room=Math.max(above,below)-1.5*rp;if(tr.height>room){t.classList.add('is-clamp');t.style.maxHeight=(Math.max(room,6*rp)/rp).toFixed(3)+'rem';}
   }
   function mklCount(){try{if(!window.MTZ_MKL)return 0;return window.MTZ_MKL.items().filter(function(it){return it.lens===(window.MTZ_LENS||'sprechanlage')&&!it.configId&&BY_ID[it.articleId||it.id]&&selected.indexOf(it.articleId||it.id)<0;}).length;}catch(e){return 0;}}
 

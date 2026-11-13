@@ -552,3 +552,13 @@
    no radius, its content on the drawer's content edge (20 px, phones 16 px), 16 px above and below (phones 12 px). ==== */
 .mkl-recent{margin:0;padding:var(--sp-4,1rem) var(--sp-5,1.25rem);border-radius:0}
 @media(max-width:47.99rem){.mkl-recent{margin:0;padding:var(--sp-3,.75rem) var(--sp-4,1rem)}}
+
+/* ==== Short screens (13.11., responsive audit): on a landscape phone (568 × 320) header and footer left 127 px for
+   the list. Below 30 rem height the header is compact and the "saved on this device" note is left out (it is also in
+   the empty state), so the list gets ~250 px. ==== */
+@media(max-height:30rem){
+  .mkl-head{padding-top:.25rem;padding-bottom:.25rem}
+  .mkl-foot .mkl-hint{display:none}
+  .mkl-drawer .mkl-foot__hint{flex:1 1 9rem}   /* summary and button share one row, as on desktop */
+  .mkl-drawer .mkl-cta{flex:0 0 auto;margin-left:auto}
+}

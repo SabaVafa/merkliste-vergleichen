@@ -3321,3 +3321,8 @@ body.is-scrolled #quickbar {
    positioned ancestor below the scroller, escaped the overflow clip and widened the page → horizontal page scroll at every
    width (scrollWidth 857–1777 px). Anchoring it to its seal keeps it inside the card; nothing visible changes. */
 .rvw-verified { position: relative; }
+
+/* ==== Responsive audit, part 2 (13.11.): rating link (22 px), "So bewerten wir" (20 px), "Mehr lesen" (20 px) and
+   "Alle Bewertungen" (21 px) get a 24 px tap area via an invisible ::after (WCAG 2.5.8) – no visual change. ==== */
+.bx-cred__rate, .rvw-howto__link, .rvw-review__more, .rvw-list__more { position: relative; }
+.bx-cred__rate::after, .rvw-howto__link::after, .rvw-review__more::after, .rvw-list__more::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5rem; transform: translateY(-50%); }

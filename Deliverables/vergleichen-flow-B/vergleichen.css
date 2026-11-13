@@ -1424,3 +1424,47 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   .vgl-view .vgl-alts{margin-top:2.5rem;padding:.75rem}   /* phone card inset 12 px, as in the tables */
   .vgl-view .vgl-alts__h{margin-bottom:.75rem}
 }
+
+/* ==== Responsive audit (13.11., lead fullstack: 320–2560 px, phones in portrait and landscape) ====
+   1 Tray on phones: from 360 px the status shared its row with the buttons and got ~100 px – "Vergleich (2) / max. 4"
+     and the hint broke into 4–5 lines. Now always two rows: the status across, then thumbnails + buttons (DOM and focus
+     order unchanged). "Leeren" is the trash icon alone (name "Vergleich leeren"), the button 12 px narrower inside:
+     3 thumbnails and a cut-off 4th at 360–413 px, all 4 from 414 px; the row scrolls without a scrollbar.
+   2 Comparison bar on phones: the × sat right after "Vergleich (3)" – the rule pulling it to the actions also applied
+     when the phone hides them. Now on the right edge.
+   3 Model names in the narrow phone columns broke inside words without a hyphen ("Gesichtserkennu|ng"); German
+     hyphenation now (html lang="de").
+   4 (i) explanations open upwards when they do not fit below (landscape phones: 47 px were cut off).
+   5 Demo link above the grid 20 → 24 px tall (WCAG 2.5.8 target size). ==== */
+@media(max-width:47.99rem){
+  .vgl-tray__status{flex:1 1 100%}
+  .vgl-tray__slots{order:0;flex:1 1 0;min-width:0}
+  .vgl-tray__actions{margin-left:auto}
+  .vgl-view .vgl-bar__act+.vgl-close{margin-left:auto}
+  .vgl-view .vgl-ph__t{hyphens:auto;-webkit-hyphens:auto}
+}
+@media(max-width:47.99rem){
+  .vgl-tray .vgl-tray__clear{width:2.75rem;padding:0;justify-content:center}
+  .vgl-tray .vgl-tray__clear .vgl-m-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .vgl-tray .vgl-tray__cta{padding:0 .75rem}
+  .vgl-tray__slots{scrollbar-width:none}   /* the cut-off next thumbnail shows that the row scrolls */
+  .vgl-tray__slots::-webkit-scrollbar{display:none}
+}
+.vgl-tip.is-up{top:auto;bottom:calc(100% + .5rem)}
+.vgl-tip.is-up::before{top:auto;bottom:-.3125rem;border:0;border-right:.0625rem solid var(--v-g300);border-bottom:.0625rem solid var(--v-g300);border-radius:0 0 .125rem 0;background:var(--v-white)}
+.vgl-tip.is-up:has(.vgl-tip__src)::before{background:var(--v-paper)}
+.vgl-lens{padding:.1875rem 0}
+
+/* ==== Tray on tablets (13.11., responsive audit) ====
+   768–1023 px: status (~300 px, no shrink), "Vergleich leeren" (154 px) and the button left the thumbnails 73 px –
+   not even one 52 px thumbnail was fully visible. Here the status may wrap in 12 rem and the clear button uses its
+   short label "Leeren", so all four thumbnails fit from 768 px. ==== */
+@media(min-width:48rem) and (max-width:63.99rem){
+  .vgl-tray__status{flex:0 1 12rem;min-width:0}
+  .vgl-tray .vgl-m-hide{display:none}
+  .vgl-tray .vgl-m-only{display:inline}
+  .vgl-tray__inner{gap:.75rem}
+}
+.vgl-tip.is-clamp{overflow-y:auto;overscroll-behavior:contain}
+.vgl-tip.is-clamp::before{display:none}   /* a scrolling box clips the pointer; the tip still opens at its (i) */
+.vgl-ib.is-open+.vgl-tip.is-clamp{pointer-events:auto}

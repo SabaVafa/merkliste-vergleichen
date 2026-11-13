@@ -277,3 +277,7 @@ Nach dem Abstand über der Kopfkarte im Vergleich wurden alle Abstände der Merk
 ## 31 · „Zuletzt angesehen“ über die volle Breite (13.11.2026, Nutzerentscheidung)
 
 Der Bereich war eine eingerückte Karte (16 / 20 px Außenabstand, 8 px Radius) und wirkte neben den randlosen Kategorie-Überschriften wie ein Fremdkörper. Jetzt ein Band in Papiergrau über die volle Breite der Merkliste: ohne Außenabstand und Radius, der Inhalt auf der Inhaltskante der Merkliste (20 px, Telefon 16 px), oben und unten 16 px (Telefon 12 px). Es schließt direkt an den letzten Eintrag an, bei leerer Merkliste direkt an die Kopfzeile. Geprüft bei 1440 px und 375 px: Überschrift und Bilder auf derselben Kante wie der Titel, „Merken“ und „Verlauf löschen“ rechts bündig mit dem Inhalt, kein seitlicher Überlauf. `merkliste.css?v=45`.
+
+## 32 · Responsive-Audit der Merkliste (13.11.2026)
+
+Gemessen in 11 Breiten von 320 bis 2560 px, Telefon hoch und quer: kein Überlauf, keine abgeschnittenen Texte, alle Ziele mindestens 24 px, keine Schrift unter 12 px in der Merkliste; Meldungen liegen in allen Breiten über der Vergleichsleiste. Behoben: auf niedrigen Bildschirmen (Telefon quer, 320–375 px Höhe) blieben zwischen Kopf und Fuß nur 127 px für die Liste. Unter 30 rem Höhe ist der Kopf kompakt, der Hinweis „Auf diesem Gerät gespeichert“ entfällt dort (er steht auch im Leerzustand), Auswahl-Zusammenfassung und „Vergleichen“ stehen in einer Zeile – die Liste bekommt 194 px (568 × 320) bzw. 234 px (740 × 360). `merkliste.css?v=47`.
