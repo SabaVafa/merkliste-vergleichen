@@ -1709,4 +1709,22 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    "Zum Vergleich hinzufügen" broke into two lines in the 10.5 rem strip card; phones show "Hinzufügen" (the word of
    "+ Hinzufügen" above the comparison), screen readers hear "Hinzufügen zum Vergleich". One line is only 1.2 rem
    tall, so the control keeps a 2.75 rem target. ==== */
-@media(max-width:47.99rem){.vgl-view .vgl-altc .vgl-alt__add{min-height:2.75rem;margin-top:0}}
+@media(max-width:47.99rem){.vgl-view .vgl-altc .vgl-alt__add{min-height:2.75rem;margin:-.75rem 0}}
+
+/* ==== Strip spacing (17.11., user: "adjust the paddings and gaps to be consistent") ====
+   · The add action's 2.75 rem target centred a 1.2 rem line, so ~1.25 rem of air stood above "+ Hinzufügen" and
+     ~1.75 rem below it, against the card's .5 rem row gap. The target now overlaps its neighbours (negative block
+     margin = (2.75 − 1.25) / 2), so the label sits one .5 rem gap under the colours and the PLP card's 1 rem bottom
+     padding follows it – the same rhythm as every other row of the card.
+   · The cards are 45 vw wide (max 13 rem) instead of a fixed 10.5 rem: the PLP card's type scales with the viewport
+     (clamp(…, 3vw, …)), so on wider phones a fixed card clipped "1.351,50 €" (440 px: 4 px past the edge). Like the PLP's
+     two-up grid, the card now grows with the screen; ~1.8 cards stay visible. ==== */
+@media(max-width:47.99rem){.vgl-view .vgl-alts__list:has(.vgl-altc){grid-auto-columns:min(45vw,13rem)}}
+
+/* ==== "Vergleichen" on the strip cards (17.11., user: "the label is vague … they may think it will be transferred to the
+   cart") ====
+   Next to a price, a bare "Hinzufügen" reads as "add to cart". Phones now show the PLP's own word for it, "Vergleichen",
+   with the PLP's compare icon (opposing arrows, as on the "Vergleichen" button); the icon still turns into the check
+   once added. The plus used to turn 90° on hover – the arrows stay level; added: they shrink away for the check. ==== */
+.vgl-alt__add:hover:not([disabled]) .vgl-alt__plus{transform:none}
+.vgl-alt__add.is-added .vgl-alt__plus{transform:scale(0)}

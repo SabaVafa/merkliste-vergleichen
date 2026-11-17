@@ -414,3 +414,10 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Kurzes Label auf dem Handy** (Nutzer: „for small screens we need a shorter version of the link“): „Zum Vergleich hinzufügen“ brach in der 10,5-rem-Karte auf zwei Zeilen; auf dem Handy steht „+ Hinzufügen“ (wie „+ Hinzufügen“ über dem Vergleich), Screenreader hören „Hinzufügen zum Vergleich“. Fläche 2,75 rem hoch. Ab 768 px bleibt „Zum Vergleich hinzufügen“.
 
 `vergleichen.js?v=143`, `vergleichen.css?v=203`.
+
+## 49 · Ähnliche Modelle: Abstände, Kartenbreite, „Vergleichen“ (17.11.2026, Nutzer: „adjust the paddings and gaps to be consistent“, „the label is vague … they may think it will be transferred to the cart“)
+- **Abstände:** Die 2,75-rem-Fläche des Buttons zentrierte eine 1,2-rem-Zeile – über dem Label standen ~1,25 rem, darunter ~1,75 rem, sonst 0,5 rem zwischen den Kartenzeilen. Die Fläche überlappt jetzt ihre Nachbarn (negativer Block-Abstand), sichtbar steht das Label einen 0,5-rem-Abstand unter den Farben, darunter das 1-rem-Innenpolster der PLP-Karte (gemessen: 9 px darüber). Tippfläche bleibt 44 px.
+- **Kartenbreite:** Die Schrift der PLP-Karte skaliert mit der Bildschirmbreite (clamp mit vw); eine feste 10,5-rem-Karte schnitt bei breiteren Handys den Preis ab (440 px: „1.351,50 €“ 4 px über dem Rand). Die Karten sind jetzt 45 vw breit (höchstens 13 rem) – wie das zweispaltige PLP-Raster wachsen sie mit; ~1,8 Karten bleiben sichtbar. Alle Preise passen (375 und 440 px geprüft).
+- **„Vergleichen“ statt „Hinzufügen“ (UX-Entscheidung):** Neben einem Preis liest sich „Hinzufügen“ wie „in den Warenkorb“. Auf dem Handy steht jetzt das Wort der PLP für diese Handlung, „Vergleichen“, mit dem Vergleichs-Symbol der PLP (gegenläufige Pfeile, wie am Button „Vergleichen“); nach dem Hinzufügen wird es zum Haken („Hinzugefügt“). Screenreader: „Vergleichen – in den Vergleich aufnehmen“. Desktop: „Zum Vergleich hinzufügen“, ebenfalls mit den Pfeilen. Die Pfeile drehen sich beim Hover nicht mehr (vorher das Plus um 90°).
+
+`vergleichen.js?v=144`, `vergleichen.css?v=205`.
