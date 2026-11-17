@@ -445,3 +445,9 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Bitte im Gerätemodus mit „Disable cache“ neu laden (Strg + Umschalt + R), damit der aktuelle Stand geladen wird.
 
 `merkliste.css?v=49`.
+
+## 53 · „Zuletzt angesehen“: die ganze Zeile öffnet das Modell (17.11.2026, Nutzer: „pressing the products must take them to the pdp“)
+- Vorher führte nur der Textlink „Konfigurieren“ weiter; Foto, Name und Preis reagierten nicht. Jetzt ist die ganze Zeile die Fläche (die Fläche des Links ist über die Zeile gespannt – ein Ziel, ein Tab-Halt); beim Hover unterstreicht sich der Name.
+- Colson (einzige Produktseite im Prototyp) → `pdp/index.html` (geprüft: Tippen aufs Foto öffnet die PDP). Modelle ohne Produktseite im Prototyp (z. B. SDM10X, Horizon) melden wie im Vergleich „Im Prototyp ohne Konfigurator.“ / „… ohne Produktseite.“ statt eines toten Links (`#konfigurator`). Im Shop führt jede Zeile auf ihre Produktseite.
+
+`merkliste.js?v=58`, `merkliste.css?v=50`.

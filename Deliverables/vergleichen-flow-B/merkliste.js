@@ -220,6 +220,7 @@
         if (k === 'share-plain' || k === 'share-full') { askEl.hidden = true; shareList(k === 'share-full'); shareBtn.focus(); return; }
         if (k === 'share-no') { askEl.hidden = true; shareBtn.focus(); return; }
         if (k === 'sharepop-close') { popEl.hidden = true; shareBtn.focus(); return; }
+        if (k === 'rv-noproto') { toast('Im Prototyp ohne ' + (/Konfigurieren/.test(a.textContent) ? 'Konfigurator' : 'Produktseite') + '.', 'info'); return; }
         if (k === 'recent-clear') { recentSave([]); render(); titleEl.focus(); live('Verlauf gelöscht.'); return; }
         if (k === 'take') { takeShared(); return; }
         if (k === 'show-own') { sharedMode = false; render(); titleEl.focus(); return; }
@@ -490,12 +491,16 @@
   function recentShown() { return recentLoad().filter(function (x) { return !has(x.id) && !ghosts[x.id]; }).slice(0, RSHOW); }
   function recentRowHTML(it) {
     var nm = shortName(it), price = typeof it.priceFrom === 'number' ? 'ab ' + euro(it.priceFrom) : '';
-    var ctaTxt = it.konfig ? 'Konfigurieren' : 'Zum Produkt', ctaHref = it.url && it.url !== '#' ? asset(it.url) : (it.konfig ? '#konfigurator' : '#produkt');
+    /* the whole row opens the model (17.11., user: "pressing the products must take them to the pdp") – the CTA's hit area
+       is stretched over the row; a model without a product page in the prototype says so, as in the comparison */
+    var ctaTxt = it.konfig ? 'Konfigurieren' : 'Zum Produkt', real = it.url && it.url !== '#';
+    var cta = real ? '<a class="mkl-rv__cta" href="' + esc(asset(it.url)) + '" aria-label="' + ctaTxt + ' – ' + esc(nm.main) + '">' + ctaTxt + IC_CHEV_R + '</a>'
+      : '<button class="mkl-rv__cta" type="button" data-mkl="rv-noproto" aria-label="' + ctaTxt + ' – ' + esc(nm.main) + '">' + ctaTxt + IC_CHEV_R + '</button>';
     return '<li class="mkl-rv" data-id="' + esc(it.id) + '">' +
       '<div class="mkl-rv__media"><img src="' + esc(asset(it.img)) + '" alt=""></div>' +
       '<div class="mkl-rv__text"><div class="mkl-rv__name" title="' + esc(it.name) + '">' + esc(nm.main) + '</div>' +
         (price ? '<div class="mkl-rv__price">' + esc(price) + '</div>' : '') +
-        '<a class="mkl-rv__cta" href="' + esc(ctaHref) + '">' + ctaTxt + IC_CHEV_R + '</a></div>' +
+        cta + '</div>' +
     '</li>';
   }
   function renderRecent(shared) {

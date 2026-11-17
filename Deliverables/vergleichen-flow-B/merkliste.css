@@ -578,3 +578,11 @@
 .mkl-drawer.is-open{display:flex;transition:transform .22s ease,visibility 0s,display 0s;transition-behavior:allow-discrete}
 @starting-style{.mkl-drawer.is-open{transform:translateX(100%)}}
 @media(prefers-reduced-motion:reduce){.mkl-drawer,.mkl-drawer.is-open{transition:none}}
+
+/* ==== Zuletzt angesehen: the whole row opens the model (17.11., user: "pressing the products must take them to the pdp") ====
+   The CTA's hit area is stretched over the row (photo, name, price, CTA) – one target, one tab stop. Hover: the name
+   underlines like the CTA. A model without a product page in the prototype keeps a button that says so. ==== */
+.mkl-rv{position:relative}
+.mkl-rv__cta::after{content:'';position:absolute;inset:0}
+button.mkl-rv__cta{padding:0;border:0;background:none;font-family:inherit;cursor:pointer}
+.mkl-rv:hover .mkl-rv__name{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
