@@ -487,3 +487,21 @@ Die Blätter des Vergleichs auf dem Handy („Auswahl ändern“, Modellsuche) s
 - **Trennlinie (Nutzer: „between the title/subtitle section, we need a divider“):** Unter Titel und Untertitel von „Modelle für die Ansicht wählen“ trennt eine durchgehende Linie (Graphite-200, volle Blattbreite) den Kopf von der Produktliste, wie im Kopf des PDP-Blatts; 12 px Abstand darüber und darunter.
 
 `vergleichen.js?v=159`, `vergleichen.css?v=225`.
+
+## 57 · Responsive-Audit des Vergleichs auf kleinen Bildschirmen (17.11.2026, Nutzer: „audit the responsiveness fully to make sure on small screens sth like the following doesn't happen“ – Erklärungsbox über der Tabelle bei 332 px)
+Geprüft mit einem Prüfskript (seitliches Überlaufen, Elemente außerhalb des Bildschirms, Überdeckungen, Wörter ohne Trennstrich getrennt) bei 320 × 568, 332, 360, 375, 390, 440, quer 568 × 320 und 740 × 360 sowie Tablet 768 × 1024 – je Seite: Tabelle mit geöffneten Gemeinsamkeiten, jede (i)-Erklärung einzeln geöffnet, mitlaufende Modellleiste, Blatt „Auswahl ändern“. Dazu Produktliste mit Vergleichsleiste, Merkliste und Produktseite bei 320 px.
+
+Behoben:
+- **(i)-Erklärungen auf dem Handy öffnen sich jetzt in der Zeile:** Die schwebende Box lag über genau den Werten, die sie erklärt, und über den Zeilen darunter. Unter 48 rem erscheint der Text als Kasten direkt unter der Merkmal-Überschrift und schiebt die Werte nach unten – nichts wird verdeckt, nichts läuft aus dem Bild. Gleiches Aussehen wie die Box am Desktop, ohne ihren Titel (die Überschrift steht darüber). Erneutes Tippen, ein anderes (i), Escape oder Tippen daneben schließt; der Fokus bleibt auf dem (i). Gilt auch für die Gemeinsamkeiten (volle Breite). Tablet und Desktop behalten die Box.
+- **Wörter ohne Trennstrich getrennt:** „KAMERAAUFLÖSU / NG“ (320–340 px) und „Gesichtserkennun / g“ (Tablet). Die automatische Silbentrennung greift nicht in jedem Browser; lange Zusammensetzungen in Überschriften und Werten haben jetzt weiche Trennstellen an der Wortfuge (Kamera-auflösung, Gesichts-erkennung, Klingel-taster, Namens-schild, Durchwurf-briefkasten …). Der Strich erscheint nur, wo die Zeile wirklich bricht.
+- **Mitlaufende Modellleiste:** Bei 320–340 px und auf dem Tablet lief „Zum Produkt ›“ neben Foto und Name über seine Spalte bis an den Bildschirmrand. Bis 64 rem steht der Link jetzt in einer eigenen Zeile unter Foto und Name, mit voller Spaltenbreite – in allen Spalten auf einer Höhe.
+- **Leiste erschien nicht:** Bei schnellem Wischen (und quer, wo die Zeile mit „Zum Produkt“ unter dem sichtbaren Bereich beginnt) sprang die Zeile in einem Schritt von unterhalb nach oberhalb des Bildes – die Leiste blieb aus. Die Lage wird jetzt zusätzlich beim Scrollen geprüft.
+- **Blätter quer:** Bei 568 × 320 blieben der Produktliste im Blatt 69 px; auf niedrigen Bildschirmen darf das Blatt jetzt fast die volle Höhe nutzen (Liste 132 px, scrollt).
+- **Merkliste über das Kopf-Symbol im Vergleichsmodus:** zeigte die Auswahl-Ansicht aus dem Vergleich („Aus der Merkliste wählen“, Werkzeuge ausgeblendet, „bis zu 0 Modelle“). Diese Ansicht gilt jetzt nur, wenn die Merkliste aus dem Vergleich geöffnet wird; über das Kopf-Symbol ist es wieder die Merkliste mit ihren Werkzeugen und Vergleichs-Kästchen.
+
+Bewusst unverändert (geprüft, kein Fehler): angeschnittenes drittes Vorschaubild in der Vergleichsleiste bei 320 px (zeigt, dass die Reihe scrollt); auf der Produktliste die Gestaltung des PLP-Prototyps (Karten-Link über die ganze Karte, scrollbare Merkmal-Zeile, Rabatt-Plakette auf dem Foto, lange Kartentitel); auf der Produktseite die Leiste unten über den Fotos und die Pfeile der Bewertungsgalerie (PDP-Prototyp).
+
+## 58 · Leerer Vergleich: „Vorherigen Vergleich wiederherstellen“ (17.11.2026, Nutzer: „enhance the marked section“)
+Auf dem Handy war der Link so breit wie die Knöpfe: kleines Symbol ganz links, der Text mittig über zwei Zeilen, dicht unter „Aus der Merkliste“. Jetzt ein eigener ruhiger Block unter einer feinen Linie: mittig, das Symbol direkt vor dem Text, darunter grau die Anzahl („3 Modelle“). Wiederherstellen unverändert (Fokus auf die erste Spalte).
+
+`vergleichen.js?v=164`, `vergleichen.css?v=234`, `merkliste.js?v=60`.

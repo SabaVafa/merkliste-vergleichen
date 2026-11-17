@@ -1774,7 +1774,15 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 .vgl-vis__go{width:100%;margin-top:.25rem;justify-content:center;text-align:center}
 .vgl-vis__go:disabled{opacity:.5;cursor:not-allowed}
 .vgl-view .vgl-pin__line .vgl-cta{white-space:nowrap}   /* "Zum Produkt ›" in the sticky strip on one line (17.11. mobile check) */
-@media(max-width:47.99rem) and (min-height:30.01rem){.vgl-view .vgl-pin__name{min-height:2.6em}}   /* names take two lines, so both "Zum Produkt" sit at one height */
+@media(max-width:63.99rem) and (min-height:30.01rem){
+  /* responsive audit 17.11. (phones and tablets up to 64 rem): beside photo + name only ~5 rem were left at 320–340 px and "Zum Produkt ›" ran past its
+     column to the screen edge. Photo and name share the first line, the link gets the full column width below; the
+     first line is always the photo's height, so both links sit at one height */
+  .vgl-view .vgl-pin__col{display:grid;grid-template-columns:2.25rem minmax(0,1fr);column-gap:.5rem;row-gap:.25rem;align-items:center}
+  .vgl-view .vgl-pin__txt,.vgl-view .vgl-pin__line{display:contents}
+  .vgl-view .vgl-pin__name{grid-column:2;min-height:0}
+  .vgl-view .vgl-pin__line .vgl-cta{grid-column:1 / -1;justify-self:start}
+}
 @media print{.vgl-mbar__vis{display:none !important}}
 
 /* ==== Bottom sheets on phones: smooth in and out (17.11., user: "enhance the expand / collapse behavior to make it
@@ -1794,3 +1802,33 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 @media(prefers-reduced-motion:reduce){
   .vgl-pick.is-sheet,.vgl-addsearch.is-sheet,.vgl-addsearch__scrim{animation:none;transition:none}
 }
+/* short landscape phones (responsive audit 17.11.: at 568 × 320 the 70 vh sheet left 69 px for the product list) – the
+   sheet may take the screen up to a 1 rem gap, the list scrolls inside */
+@media(max-height:30rem){.vgl-pick.is-sheet,.vgl-addsearch.is-sheet{max-height:calc(100vh - 1rem);max-height:calc(100dvh - 1rem)}}
+
+/* ==== (i) explanations on phones open inline (17.11., responsive audit; user screenshot at 332 px: the floating box
+   covered the values it explains and the next rows) ====
+   < 48 rem the toggletip is not shown; tapping (i) inserts the same text as a box under the caption, in the flow: the
+   values move down, nothing is covered, nothing can run off-screen. Same look as the desktop box without its title
+   (the caption above names it). ==== */
+@media(max-width:47.99rem){
+  .vgl-view .vgl-tip{display:none !important}
+  .vgl-tipin{display:block;grid-column:1 / -1;margin:.625rem 0 .25rem;overflow:hidden;border:.0625rem solid var(--v-g300);border-radius:var(--v-r-l);background:var(--v-white);font-size:var(--v-fs-sm);font-weight:400;line-height:1.5;letter-spacing:normal;text-transform:none;text-align:left;white-space:normal;color:var(--v-ink);animation:vglfade .2s ease}
+  .vgl-tipin .vgl-tip__b{font-size:var(--v-fs-sm)}
+}
+@media(max-width:47.99rem) and (prefers-reduced-motion:reduce){.vgl-tipin{animation:none}}
+/* long German captions (e.g. "Kameraauflösung" at 320–340 px) break with a hyphen instead of mid-word */
+.vgl-view table.vgl-t .rh__l{hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word}
+
+/* ==== Empty comparison: "Vorherigen Vergleich wiederherstellen" (17.11., user: "enhance the marked section") ====
+   On phones the link was stretched like the buttons: a tiny icon at the far left, the label centred over two lines, tight
+   under "Aus der Merkliste". Now its own quiet block under a hairline: centred, the icon beside the label, the count on a
+   muted second line. ==== */
+.vgl-view .vgl-empty .vgl-empty__restore{flex-basis:100%;align-self:stretch;display:flex;justify-content:center;margin-top:.75rem;padding-top:1rem;border-top:.0625rem solid var(--v-g200)}
+.vgl-view .vgl-empty .vgl-empty__restore .vgl-empty__undo{display:block;width:auto;max-width:100%;margin:0;padding:.375rem .5rem;text-align:center;line-height:1.45}
+.vgl-view .vgl-empty .vgl-empty__restore .vgl-empty__undo svg{display:inline-block;width:1.125rem;height:1.125rem;margin:0 .375rem 0 0;vertical-align:-.25rem}
+.vgl-empty__undo-t{display:inline}
+.vgl-empty__undo-l{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+.vgl-empty__undo-n{display:block;margin-top:.125rem;font-weight:400;color:var(--v-muted)}
+.vgl-empty__undo:hover{text-decoration:none}
+.vgl-empty__undo:active .vgl-empty__undo-l{color:var(--v-ink)}

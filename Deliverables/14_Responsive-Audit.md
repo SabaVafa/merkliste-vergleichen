@@ -97,3 +97,5 @@ Ohne Befund geprüft:
 | `merkliste.css` | Block „16 · Responsive-Audit“ | 17 (index, briefkasten, pdp) |
 
 **Nachtrag 17.11.2026:** Für das Responsive-Verhalten gilt jetzt vollständig der PLP-Prototyp (https://sabavafa.github.io/product-listing-page/). Die sichtbaren Änderungen dieses Audits in `plp.css` (44-px-Flächen für „Filter“ und Schließen, 12-px-Textwerte aus Teil 2) sind zurückgenommen; behalten sind nur Korrekturen ohne sichtbare Wirkung (scrollbares Filter-Sheet, Tab-Reihenfolge, unsichtbare Tippflächen). Details: `09_Adaption_Umsetzung.md` §38.
+
+**Nachtrag 17.11.2026 (2):** Zweiter Audit kleiner Bildschirme (320–440 px, quer, Tablet) mit Prüfskript: (i)-Erklärungen öffnen sich auf dem Handy in der Zeile statt als Box über der Tabelle, weiche Trennstellen für lange Zusammensetzungen, „Zum Produkt“ in der mitlaufenden Leiste in eigener Zeile bis 64 rem, Leiste erscheint auch nach schnellem Wischen, höhere Blätter quer, Merkliste über das Kopf-Symbol wieder als Merkliste. Details: `09_Adaption_Umsetzung.md` §57.

@@ -249,7 +249,7 @@
         if(k==='print'){printView();}
         if(k==='common'){gShow=!gShow;onCommon();}
         return;}
-      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();ti.classList.toggle('is-dismissed',was);if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}   /* pressed again: closed, and hover / focus no longer hold it open (17.11.) */
+      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();ti.classList.toggle('is-dismissed',was);if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');tipInline(ti);}return;}   /* pressed again: closed, and hover / focus no longer hold it open (17.11.) */
       var alt=e.target.closest('[data-alt]');if(alt){
         if(alt.classList.contains('is-added'))return;
         var aid=alt.getAttribute('data-alt');
@@ -591,7 +591,16 @@
     toast(free>0?'Wählen Sie '+(free===1?'ein weiteres Modell':'bis zu '+free+' weitere Modelle')+' auf den Karten – „Vergleichen“ führt zurück zum Vergleich.':'Der Vergleich ist vollständig.','info');
   }
   /* (i) toggletip: click/Enter opens a real tooltip node (aria-describedby), Escape closes it first */
-  function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');}}
+  function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');o.removeAttribute('aria-controls');}var p=view.querySelector('.vgl-tipin');if(p)p.remove();}
+  /* Phones (17.11., responsive audit – the floating box covered the very values it explains and the rows below): the
+     explanation opens inline under the caption and pushes the values down; a second tap, another (i), Escape or a tap
+     elsewhere closes it. Tablet/desktop keep the floating toggletip. */
+  function tipInline(b){
+    if(mq(MQ48,true))return;
+    var t=b.nextElementSibling,body=t&&t.querySelector('.vgl-tip__b'),row=b.closest('.rh__row');if(!body||!row)return;
+    var p=h('<span class="vgl-tipin" id="vglTipIn"><span class="vgl-tip__b">'+body.innerHTML+'</span></span>');
+    row.parentNode.insertBefore(p,row.nextSibling);b.setAttribute('aria-controls','vglTipIn');
+  }
   /* Responsive audit 14 (07.11.): the tip opens under its (i) and is shifted sideways only as far as needed to keep
      1 rem from both viewport edges (Gemeinsamkeiten grid at the right edge, phones); its width is capped in CSS */
   /* all tips are pre-placed on render/resize too: an unplaced hidden tip still widened the scroll area (scrollWidth) */
@@ -1091,8 +1100,19 @@
   function tipHTML(row){
     return row.hint?'<span class="rh__w"><button class="vgl-i vgl-ib" type="button" aria-label="Erklärung: '+esc(row.label)+'" aria-expanded="false" aria-describedby="vgl-tip-'+row.key+'">'+IC_INFO+'</button><span class="vgl-tip" role="tooltip" id="vgl-tip-'+row.key+'">'+'<span class="vgl-tip__h">'+IC_INFO+'<span>'+esc(row.label)+'</span></span><span class="vgl-tip__b">'+hintHTML(row.hint)+'</span></span></span>':'';
   }
+  /* soft hyphens at the joints of long compounds (17.11., responsive audit): at 320–340 px "Kameraauflösung" broke as
+     "KAMERAAUFLÖSU / NG" – hyphens:auto has no German dictionary for the caps captions in every browser */
+  /* soft hyphens at the joints of long compounds (17.11., responsive audit): at 320–340 px "Kameraauflösung" broke as
+     "KAMERAAUFLÖSU / NG", at 768 px "Gesichtserkennun / g" – hyphens:auto has no German dictionary in every browser.
+     Captions and values; the visible hyphen only appears where a line actually breaks. */
+  var SHY={};['Kamera|auflösung','Klingel|taster','Namens|schild','Namens|schildern','Schlag|festigkeit','Tür|öffner','Zeitungs|fach','Sprech|anlage',
+    'Gesichts|erkennung','Papier|einleger','Papier|streifen','Durchwurf|briefkasten','Mauer|durchwurf','Wand|briefkasten','Stand|briefkasten','Zaun|briefkasten',
+    'Einzel|briefkästen','Briefkasten|fächer','Briefkasten|typ','Edelstahl|blende','Edelstahl|leiste','Video|sprechanlage','Tür|sprechanlage','Tür|sprechanlagen',
+    'Tür|sprechsäule','Mehrfamilien|haus','Personalisier|bar','Standard|ausführung','Farb|ausführungen','Pulver|beschichtet','Netzwerk|verbindung',
+    'Klingel|leitung','Erfassungs|bereich','Artikel|gewicht'].forEach(function(w){SHY[w.replace('|','').toLowerCase()]=w.indexOf('|');});
+  function shy(t){return t.replace(/[A-Za-zÄÖÜäöüß]{9,}/g,function(w){var k=SHY[w.toLowerCase()];return k?w.slice(0,k)+'&shy;'+w.slice(k):w;});}
   function labelHTML(row){
-    var l='<span class="rh__l">'+esc(row.label).replace(/\//g,'/<wbr>').replace(/\(([^)]*)\)/,'<span class="rh__nw">($1)</span>')+'</span>';
+    var l='<span class="rh__l">'+shy(esc(row.label)).replace(/\//g,'/<wbr>').replace(/\(([^)]*)\)/,'<span class="rh__nw">($1)</span>')+'</span>';
     if(!row.hint)return l;
     return '<span class="rh__row">'+l+tipHTML(row)+'</span>';
   }
@@ -1114,9 +1134,9 @@
     if(isUnk(t))inner=unkHTML(t);
     else if(row.swatches)inner=colorsHTML(p.colors||[],ctx.allColors||p.colors||[]);
     else if(row.key==='abmessungen')inner=dimHTML(t);
-    else if(row.set&&Array.isArray(v))inner=v.length?'<span class="vgl-lines">'+v.map(function(x){return '<span>'+esc(x)+'</span>';}).join('')+'</span>':'<span class="vgl-no">Keine</span>';
+    else if(row.set&&Array.isArray(v))inner=v.length?'<span class="vgl-lines">'+v.map(function(x){return '<span>'+shy(esc(x))+'</span>';}).join('')+'</span>':'<span class="vgl-no">Keine</span>';
     else if(row.bool)inner=v===true?'<span class="vgl-yes">'+CHK+'Ja</span>':'<span class="vgl-no">Nein</span>';
-    else inner=esc(t);
+    else inner=shy(esc(t));
     if(isb)inner+=' <span class="vgl-best">Bestwert</span>';
     return '<td class="vgl-val'+(isUnk(t)?' na':'')+'" role="cell"'+(attr||'')+'>'+inner+'</td>';
   }
@@ -1146,7 +1166,7 @@
           '<button class="btn btn--primary vgl-empty__btn" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>'+
           (window.MTZ_MKL&&nMk?'<button class="btn btn--secondary vgl-empty__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMk+')</button>':'')+
         '</div>'+
-        (lastCleared&&lastCleared.length?'<button class="vgl-empty__undo" type="button" data-vgl="undo-clear">'+IC_UNDO+'Vorherigen Vergleich wiederherstellen ('+lastCleared.length+' Modelle)</button>':'')+
+        (lastCleared&&lastCleared.length?'<div class="vgl-empty__restore"><button class="vgl-empty__undo" type="button" data-vgl="undo-clear">'+IC_UNDO+'<span class="vgl-empty__undo-t"><span class="vgl-empty__undo-l">Vorherigen Vergleich wiederherstellen</span><span class="vgl-empty__undo-n">'+lastCleared.length+' Modelle</span></span></button></div>':'')+
       '</div>';
       return;
     }
@@ -1308,7 +1328,12 @@
     var cta=viewBody.querySelector('.vgl-hr--cta');if(!cta||!window.IntersectionObserver)return;
     pinIO=new IntersectionObserver(function(es){var e=es[es.length-1];var out=!e.isIntersecting&&e.boundingClientRect.top<(e.rootBounds?e.rootBounds.top:0);view.classList.toggle('is-pinned',out&&!printing);syncPinSec();},{root:scrollEl,threshold:0});
     pinIO.observe(cta);
-    if(!scrollEl._vglSec){scrollEl._vglSec=1;scrollEl.addEventListener('scroll',function(){if(secRaf)return;secRaf=requestAnimationFrame(function(){secRaf=0;syncPinSec();});},{passive:true});}
+    /* responsive audit 17.11.: a fast fling (or a short landscape screen, where the CTA row starts below the fold) can carry
+       the row from below to above the view in one frame – it never intersects, the observer stays silent and the strip
+       never shows. The scroll handler re-checks the row's position as well. */
+    if(!scrollEl._vglSec){scrollEl._vglSec=1;scrollEl.addEventListener('scroll',function(){if(secRaf)return;secRaf=requestAnimationFrame(function(){secRaf=0;
+      var c=viewBody.querySelector('.vgl-hr--cta');if(c&&!printing)view.classList.toggle('is-pinned',c.getBoundingClientRect().bottom<=scrollEl.getBoundingClientRect().top);
+      syncPinSec();});},{passive:true});}
   }
   /* Responsive audit (2026-11-02): the bar wraps only when its row would overflow. Runs on render and resize, never on scroll. */
   function fitHeader(){

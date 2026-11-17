@@ -557,12 +557,15 @@
   function render() {
     var shared = !!(sharedMode && sharedList), list = viewItems(), n = list.length;
     var ae = document.activeElement, keep = (ae && listEl.contains(ae)) ? (ae.getAttribute('data-parts') ? '.mkl-item__more[data-parts="' + ae.getAttribute('data-parts').replace(/"/g, '') + '"]' : (ae.getAttribute('data-take') ? '[data-take="' + ae.getAttribute('data-take').replace(/"/g, '') + '"]' : null)) : null;
-    drawer.classList.toggle('is-shared', shared); drawer.classList.toggle('is-pick', !!pick);
     /* opened from the comparison (17.11., UX review): a picker – its own title and what to do; the Merkliste's own tools
-       (share, empty, remove, open, sign-in hint, recently viewed) are hidden in CSS (.is-pick) */
-    titleEl.firstChild.nodeValue = shared ? 'Geteilte Merkliste ' : (pick ? 'Aus der Merkliste wählen ' : 'Merkliste ');
-    countEl.hidden = !!pick;
-    pickSub.hidden = !pick; if (pick) pickSub.textContent = 'Wählen Sie ' + (pick.slots === 1 ? 'ein Modell' : 'bis zu ' + pick.slots + ' Modelle') + ' für Ihren Vergleich.';
+       (share, empty, remove, open, sign-in hint, recently viewed) are hidden in CSS (.is-pick). Not when the header icon
+       opens it while the category page is in compare mode (pick.auto, responsive audit 17.11.): that is the visitor's
+       Merkliste – with its tools – and its compare boxes; it read "Aus der Merkliste wählen … bis zu 0 Modelle". */
+    var picker = !!pick && !pick.auto;
+    drawer.classList.toggle('is-shared', shared); drawer.classList.toggle('is-pick', picker);
+    titleEl.firstChild.nodeValue = shared ? 'Geteilte Merkliste ' : (picker ? 'Aus der Merkliste wählen ' : 'Merkliste ');
+    countEl.hidden = picker;
+    pickSub.hidden = !picker; if (picker) pickSub.textContent = 'Wählen Sie ' + (pick.slots === 1 ? 'ein Modell' : 'bis zu ' + pick.slots + ' Modelle') + ' für Ihren Vergleich.';
     countEl.textContent = (!shared && n >= LIMIT) ? '(' + n + ' / ' + LIMIT + ')' : '(' + n + ')';
     clearBtn.hidden = n === 0 || shared;
     toolsEl.hidden = n === 0 || shared; if (toolsEl.hidden) { askEl.hidden = true; popEl.hidden = true; }
