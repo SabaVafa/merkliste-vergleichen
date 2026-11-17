@@ -469,6 +469,21 @@
   }
   /* Ähnliche Modelle strip (phones): the DS arrow pair moves one card per press; at either end its arrow turns
      aria-disabled (not disabled – focus stays on it); the pair hides when nothing scrolls (desktop grid) */
+  /* Ähnliche Modelle (17.11., user: "the same elements must be aligned"): the PLP card's rows differ in height from card
+     to card (no rating → shorter brand row, two- vs three-line title), so titles and prices stood at different heights.
+     The variable rows get the tallest card's height – in the grid and in the phone strip; re-run when the width changes. */
+  function alignAltCards(){
+    var l=viewBody.querySelector('.vgl-alts__list');if(!l)return;
+    var run=function(){['.pcard__tags','.pcard__top','.pcard__title'].forEach(function(sel){
+      var els=l.querySelectorAll('.vgl-altc '+sel),mx=0;
+      Array.prototype.forEach.call(els,function(e){e.style.minHeight='';});
+      Array.prototype.forEach.call(els,function(e){mx=Math.max(mx,e.getBoundingClientRect().height);});
+      Array.prototype.forEach.call(els,function(e){e.style.minHeight=(mx/remPx()).toFixed(3)+'rem';});
+    });};
+    run();
+    if(window.ResizeObserver){var w=l.clientWidth;new ResizeObserver(function(){if(l.clientWidth!==w){w=l.clientWidth;run();}}).observe(l);}
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(run);
+  }
   function bindAltNav(){
     var l=viewBody.querySelector('.vgl-alts__list'),nav=viewBody.querySelector('.vgl-alts__nav');if(!l||!nav)return;
     var bs=nav.querySelectorAll('[data-altnav]');
@@ -1189,7 +1204,7 @@
     var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(grow?'<div class="vgl-actrow__grow">'+grow+'</div>':'')+'</div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
-    fillAltCards();bindAltNav();
+    fillAltCards();bindAltNav();alignAltCards();
     lockHead();placePin();fitHeader();fitPeek();placeTips();watchPin();
   }
   /* collapsed Gemeinsamkeiten = a full section bar: heading + count + the shared features named (info scent) + "Anzeigen" */

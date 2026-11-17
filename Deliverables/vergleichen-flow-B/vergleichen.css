@@ -1728,3 +1728,24 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    once added. The plus used to turn 90° on hover – the arrows stay level; added: they shrink away for the check. ==== */
 .vgl-alt__add:hover:not([disabled]) .vgl-alt__plus{transform:none}
 .vgl-alt__add.is-added .vgl-alt__plus{transform:scale(0)}
+
+/* ==== Thumbnails in the sticky model strip on phones (17.11., user: "what if we add a smaller version of the product
+   images") ====
+   The strip only showed name + CTA on phones; while scrolling a long table the model is recognised faster by its
+   photo. The desktop tile comes back at 2.25 rem (white, hairline, 8 px corners as on desktop), .5 rem before the
+   text. Beside it a name has ~6.5 rem, so "VDM10 2.0 Horizon" was cut – names may take two lines now and the strip
+   is 4 rem tall (one-line names stay centred). Short landscape screens keep the photo hidden. ==== */
+@media(max-width:47.99rem) and (min-height:30.01rem){
+  .vgl-view .vgl-pin__col{gap:.5rem}
+  .vgl-view .vgl-pin__img{display:flex;width:2.25rem;height:2.25rem}
+  .vgl-view .vgl-pin__in{height:4rem}
+  .vgl-view .vgl-pin__name{-webkit-line-clamp:2;line-height:1.3}
+}
+
+/* ==== Ähnliche Modelle: same elements on the same line (17.11., user: "the same elements must be aligned") ====
+   The script gives the pill, brand/rating and title rows the tallest card's height. The price block no longer sinks to
+   the card bottom (the PLP footer's margin-top:auto put a card without colour swatches 38 px lower) – it follows the
+   title, the free space goes below it and the compare action sits at the bottom. Result: pills, brand, title, price, colours and the action
+   line up across all cards (grid and phone strip). Comparison only – the PLP card itself is unchanged. ==== */
+.vgl-view .vgl-altc .pcard__footer{margin-top:0;margin-bottom:auto}   /* the free space goes below the price block, so the action keeps its own (negative) margins */
+.vgl-view .vgl-altc .pcard__top{align-items:center}
