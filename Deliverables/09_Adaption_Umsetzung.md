@@ -505,3 +505,9 @@ Bewusst unverändert (geprüft, kein Fehler): angeschnittenes drittes Vorschaubi
 Auf dem Handy war der Link so breit wie die Knöpfe: kleines Symbol ganz links, der Text mittig über zwei Zeilen, dicht unter „Aus der Merkliste“. Jetzt ein eigener ruhiger Block unter einer feinen Linie: mittig, das Symbol direkt vor dem Text, darunter grau die Anzahl („3 Modelle“). Wiederherstellen unverändert (Fokus auf die erste Spalte).
 
 `vergleichen.js?v=164`, `vergleichen.css?v=234`, `merkliste.js?v=60`.
+
+## 59 · Ähnliche Modelle: Karussell bis 64 rem (17.11.2026, Nutzer: „make sure that the recommended products are not wrapped on small screens and they get a carousel“)
+Zwischen 48 und 64 rem (Tablet, schmale Fenster – Screenshot bei 812 px) standen die vier Karten in zwei Spalten: zwei Reihen übergroßer Karten (je 345 px). Jetzt gilt dort dasselbe Band wie auf dem Handy: eine Reihe, die seitlich scrollt und Karte für Karte einrastet, bis an den Rand des Panels, die DS-Pfeile neben der Überschrift (gesperrt am Anfang/Ende). Karten 15 rem breit – ~2,7 sichtbar, die angeschnittene zeigt „weiter“. Ab 64 rem passen die höchstens vier Alternativen in eine Reihe; die Pfeile blenden sich dort aus, weil nichts scrollt.
+- Geprüft: 768, 812, 1000 px (eine Reihe, Pfeil scrollt eine Karte, kein seitliches Überlaufen der Seite), 1024 px (Raster, eine Reihe, keine Pfeile).
+
+`vergleichen.css?v=235`.

@@ -1832,3 +1832,19 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 .vgl-empty__undo-n{display:block;margin-top:.125rem;font-weight:400;color:var(--v-muted)}
 .vgl-empty__undo:hover{text-decoration:none}
 .vgl-empty__undo:active .vgl-empty__undo-l{color:var(--v-ink)}
+
+/* ==== Ähnliche Modelle on tablets / narrow windows = the same strip (17.11., user: "make sure that the recommended products
+   are not wrapped on small screens and they get a carousel") ====
+   48–64 rem showed a 2-column grid: four cards wrapped into two rows of oversized cards (812 px: 345 px each). Now the
+   phone strip – one row, snap to the start edge, bleeding to the panel's 1 rem inset, DS arrows beside the heading. Cards
+   15 rem wide, so ~2.7 show and the cut-off one says "more". From 64 rem the four alternatives (ALT_MAX) fit one row. ==== */
+@media(min-width:48rem) and (max-width:63.99rem){
+  .vgl-view .vgl-alts__list:has(.vgl-altc){display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:15rem;gap:1rem;align-items:stretch;
+    margin:0 -1rem;padding:0 1rem .25rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:1rem;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .vgl-view .vgl-alts__list:has(.vgl-altc)::-webkit-scrollbar{display:none}
+  .vgl-view .vgl-alts__list>.vgl-altc{scroll-snap-align:start}
+  .vgl-alts__nav:not([hidden]){display:flex}
+  .vgl-alts__hd{margin-bottom:1rem}
+  .vgl-alts__hd .vgl-alts__h{margin:0}
+}
