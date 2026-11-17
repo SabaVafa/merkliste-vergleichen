@@ -1704,3 +1704,9 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    they carry the DS teal-50 tint (#F2F6F6, --color-teal-50), so each card reads as title + content. Frame, radius and
    hairline stay; the Gemeinsamkeiten bar keeps the tint on hover and when closed. All widths. ==== */
 .vgl-view .vgl-sec--u tr.vgl-sec__h .vgl-sec__in,.vgl-view .vgl-sec--o tr.vgl-sec__h .vgl-sec__in,.vgl-view .vgl-gdisc,.vgl-view .vgl-gdisc:hover{background:var(--color-teal-50,#F2F6F6)}
+
+/* ==== Short add label in the strip cards (17.11., user: "for small screens we need a shorter version of the link") ====
+   "Zum Vergleich hinzufügen" broke into two lines in the 10.5 rem strip card; phones show "Hinzufügen" (the word of
+   "+ Hinzufügen" above the comparison), screen readers hear "Hinzufügen zum Vergleich". One line is only 1.2 rem
+   tall, so the control keeps a 2.75 rem target. ==== */
+@media(max-width:47.99rem){.vgl-view .vgl-altc .vgl-alt__add{min-height:2.75rem;margin-top:0}}

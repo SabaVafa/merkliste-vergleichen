@@ -407,3 +407,10 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Geprüft bei 375 px als Touch-Gerät (kein Hover): Pfeile 35 × 35 px, Chevron 10 px; Hover-Regeln aus, Drück-Regeln aktiv.
 
 `vergleichen.js?v=141`, `vergleichen.css?v=202`.
+
+## 48 · Ähnliche Modelle ohne Zusatzfeld (17.11.2026, Nutzer: „do not add the extra sections!“)
+- Die Karten unter „Ähnliche Modelle“ trugen über dem Preis ein graues Feld mit dem abweichenden Merkmal (z. B. „Anzahl Klingeltaster 7“). Es ist entfernt – die Karte ist jetzt genau die PLP-Karte (Referenz), nur mit „Zum Vergleich hinzufügen“ am Fuß. Alle Breiten.
+
+- **Kurzes Label auf dem Handy** (Nutzer: „for small screens we need a shorter version of the link“): „Zum Vergleich hinzufügen“ brach in der 10,5-rem-Karte auf zwei Zeilen; auf dem Handy steht „+ Hinzufügen“ (wie „+ Hinzufügen“ über dem Vergleich), Screenreader hören „Hinzufügen zum Vergleich“. Fläche 2,75 rem hoch. Ab 768 px bleibt „Zum Vergleich hinzufügen“.
+
+`vergleichen.js?v=143`, `vergleichen.css?v=203`.
