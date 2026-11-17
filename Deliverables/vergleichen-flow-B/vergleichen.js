@@ -443,7 +443,13 @@
     var nm=added.length===1?shopName(BY_ID[added[0]]):added.length+' Modelle';
     toast(esc(nm)+' aus der Merkliste hinzugefügt.','ok',null,added.length===1?BY_ID[added[0]].img:null);
     announce(nm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');
-    setTimeout(function(){focusIn('.vgl-ph__rm[data-rm="'+added[0]+'"]');},0);
+    /* focus on the new model's name (17.11.): it went to the column's remove button – Enter would undo the add */
+    setTimeout(function(){
+      var rm=view.querySelector('.vgl-ph__rm[data-rm="'+added[0]+'"]'),cell=rm&&rm.closest('td'),img=view.querySelector('tr.vgl-hr--img'),row=view.querySelector('tr.vgl-hr--name');
+      var k=cell&&img?Array.prototype.filter.call(img.children,function(c){return !c.classList.contains('vgl-lc');}).indexOf(cell):-1;   /* the add cell spans the image row only */
+      var t=k>-1&&row&&row.children[k]?row.children[k].querySelector('.vgl-ph__pick,.vgl-ph__title'):null;
+      if(t){if(!/BUTTON/.test(t.tagName))t.setAttribute('tabindex','-1');t.focus();}else focusIn('.vgl-ph__rm[data-rm="'+added[0]+'"]');
+    },0);
   }
   function announce(m){if(!liveEl)return;liveEl.textContent='';setTimeout(function(){liveEl.textContent=m;},30);}
   function firstShown(sel){var l=view.querySelectorAll(sel);for(var i=0;i<l.length;i++)if(l[i].getClientRects().length)return l[i];return null;}
@@ -1104,7 +1110,7 @@
         '<p class="vgl-empty__d">'+(items.length?'<b>'+esc(shopName(items[0]))+'</b> ist im Vergleich. ':'')+'Bis zu '+(['','eins','zwei','drei','vier','fünf','sechs'][MAX]||MAX)+' Modelle lassen sich gegenüberstellen.</p>'+
         '<div class="vgl-empty__act">'+
           '<button class="btn btn--primary vgl-empty__btn" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>'+
-          (window.MTZ_MKL?'<button class="btn btn--secondary vgl-empty__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste'+(nMk?' ('+nMk+')':'')+'</button>':'')+
+          (window.MTZ_MKL&&nMk?'<button class="btn btn--secondary vgl-empty__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste ('+nMk+')</button>':'')+
         '</div>'+
         (lastCleared&&lastCleared.length?'<button class="vgl-empty__undo" type="button" data-vgl="undo-clear">'+IC_UNDO+'Vorherigen Vergleich wiederherstellen ('+lastCleared.length+' Modelle)</button>':'')+
       '</div>';
@@ -1124,11 +1130,13 @@
     /* ---- Table ---- */
     /* "Aus der Merkliste" is always offered while there is room (12.11., user decision): with nothing to add it still
        opens the Merkliste, which shows what is saved and "Zuletzt angesehen" to bookmark a model first */
-    var nMkl=n<MAX?mklCount():0,hasMkl=n<MAX&&!!window.MTZ_MKL;
+    /* "Aus der Merkliste" (17.11., UX review): only when the Merkliste holds a model of this category that is not compared
+       yet – it led into an empty Merkliste otherwise – and always with the number, so the visitor knows what waits */
+    var nMkl=n<MAX?mklCount():0,hasMkl=nMkl>0;
     var lc={
       tile:n>=MAX?'<div class="vgl-lc__full" role="note">'+IC_OK+'<b>Maximale Anzahl erreicht</b><span>Es können bis zu '+MAX+' Modelle verglichen werden.'+(pick?' '+nv+' davon sind sichtbar – zum Wechseln den Namen wählen.':'')+'</span></div>':
         '<button class="vgl-addtile" type="button" data-vgl="add">'+IC_PLUS+'<span class="vgl-addtile__l">Modell hinzufügen</span><span class="vgl-addtile__n">noch '+(MAX-n)+' möglich</span></button>',
-      mkl:hasMkl?'<button class="vgl-lc__mkl" type="button" data-vgl="addmkl" aria-label="'+(nMkl?'Aus der Merkliste hinzufügen, '+nMkl+' Modell'+(nMkl===1?'':'e'):'Merkliste öffnen – noch kein weiteres Modell dieser Kategorie gemerkt')+'">'+IC_BM+'<span>Aus der Merkliste</span></button>':''
+      mkl:hasMkl?'<button class="vgl-lc__mkl" type="button" data-vgl="addmkl">'+IC_BM+'<span>Aus der Merkliste ('+nMkl+')</span></button>':''
     };
     var span=' colspan="'+(nv+1)+'" aria-colspan="'+(nv+1)+'"';
     function rowsHTML(list,kind){

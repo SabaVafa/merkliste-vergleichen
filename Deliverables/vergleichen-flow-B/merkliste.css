@@ -586,3 +586,22 @@
 .mkl-rv__cta::after{content:'';position:absolute;inset:0}
 button.mkl-rv__cta{padding:0;border:0;background:none;font-family:inherit;cursor:pointer}
 .mkl-rv:hover .mkl-rv__name{text-decoration:underline;text-decoration-thickness:.0625rem;text-underline-offset:.1875rem}
+
+/* ==== "Aus der Merkliste" from the comparison = a focused picker (17.11., UX review: "make sure it is logical and user
+   friendly") ====
+   It opened the full Merkliste: title "Merkliste (n)", share, "Merkliste leeren", a trash and "Konfigurieren" on every
+   row, the sign-in hint, recently viewed – one could delete or navigate away mid-task, and the task itself was only
+   named in the footer. In pick mode now: title "Aus der Merkliste wählen" with one line saying how many models fit;
+   the Merkliste's own tools are hidden; the whole row selects the model (the checkbox label's hit area is stretched over
+   the row – keyboard and screen readers unchanged), a selected row is tinted teal-50; models already compared ("Im
+   Vergleich") and other categories stay locked with their hint; the footer keeps the live status and "Vergleichen". ==== */
+.mkl-picksub{margin:.25rem 0 0;font-size:var(--text-body-sm,.875rem);line-height:1.45;color:var(--text-muted,#6A6A6A)}
+.mkl-drawer.is-pick .mkl-tools,.mkl-drawer.is-pick [data-mkl="clear"],.mkl-drawer.is-pick .mkl-rm,.mkl-drawer.is-pick .mkl-item__cta,
+.mkl-drawer.is-pick .mkl-hint,.mkl-drawer.is-pick .mkl-recent,.mkl-drawer.is-pick .mkl-sharedlink{display:none !important}
+.mkl-drawer.is-pick .mkl-item{padding-right:var(--sp-5,1.25rem)}
+.mkl-drawer.is-pick .mkl-cmp{position:static}
+.mkl-drawer.is-pick .mkl-cmp::after{content:'';position:absolute;inset:0}
+.mkl-drawer.is-pick .mkl-item__more{position:relative;z-index:1}
+.mkl-drawer.is-pick .mkl-item:has(.mkl-cmp:not(.is-disabled):not(.is-in)){cursor:pointer}
+.mkl-drawer.is-pick .mkl-item:has(.mkl-cmp:not(.is-disabled):not(.is-in)):hover{background:var(--paper-white,#F5F6FA)}
+.mkl-drawer.is-pick .mkl-item:has(.mkl-cmp:not(.is-in) input:checked){background:var(--color-teal-50,#F2F6F6)}

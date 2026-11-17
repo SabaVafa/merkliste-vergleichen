@@ -451,3 +451,14 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Colson (einzige Produktseite im Prototyp) → `pdp/index.html` (geprüft: Tippen aufs Foto öffnet die PDP). Modelle ohne Produktseite im Prototyp (z. B. SDM10X, Horizon) melden wie im Vergleich „Im Prototyp ohne Konfigurator.“ / „… ohne Produktseite.“ statt eines toten Links (`#konfigurator`). Im Shop führt jede Zeile auf ihre Produktseite.
 
 `merkliste.js?v=58`, `merkliste.css?v=50`.
+
+## 54 · „Aus der Merkliste“ im Vergleich – UX-Prüfung (17.11.2026, Nutzer: „check the aus der merkliste behavior in the vergleich page to make sure it is logical and user friendly“)
+Durchgespielt mit drei Ständen der Merkliste: leer · passendes Modell + bereits verglichenes Modell + Briefkasten · nur andere Kategorie bzw. nur Verglichenes.
+- **Sackgasse:** Der Button stand immer da; ohne passendes Modell öffnete er die allgemeine Ansicht „Ihre Merkliste ist leer“ („Zurück zu Türsprechanlagen“, „Zuletzt angesehen“ mit Links weg vom Vergleich). Jetzt erscheint „Aus der Merkliste“ nur, wenn die Merkliste mindestens ein Modell dieser Kategorie enthält, das noch nicht im Vergleich ist – auf allen Wegen (Kachel auf dem Desktop, Aktion am Ende auf dem Handy, leerer Vergleich).
+- **Anzahl sichtbar:** Auf dem Desktop stand die Zahl nur im Screenreader-Namen. Jetzt überall „Aus der Merkliste (1)“.
+- **Gezielte Auswahl statt ganzer Merkliste:** Der Dialog öffnete wie die Merkliste („Merkliste (3)“, Teilen, Merkliste leeren, Papierkorb und „Konfigurieren“ je Zeile, Anmelde-Hinweis, Zuletzt angesehen) – man konnte mitten im Vorgang löschen oder wegnavigieren; die Aufgabe stand nur in der Fußzeile. Jetzt: Titel „Aus der Merkliste wählen“, darunter „Wählen Sie ein Modell / bis zu n Modelle für Ihren Vergleich.“; die Werkzeuge der Merkliste sind ausgeblendet.
+- **Ganze Zeile wählt:** Ein Tippen auf Foto, Name oder Preis kreuzt das Modell an (Fläche des Checkbox-Labels über die Zeile gespannt, Tastatur und Screenreader unverändert); gewählte Zeile Teal-50. Bereits verglichene Modelle („Im Vergleich“) und andere Kategorien bleiben gesperrt mit Hinweis; Fußzeile: Status („1 Modell ausgewählt · Vergleich vollständig – maximal 3 Modelle“) und „Vergleichen“ (gesperrt bis zur Auswahl).
+- **Fokus danach:** lag auf „× aus dem Vergleich entfernen“ der neuen Spalte – Enter hätte das Hinzufügen rückgängig gemacht. Jetzt auf dem Namen des neuen Modells; Hinweis „… aus der Merkliste hinzugefügt.“ bleibt.
+- Geprüft: Desktop 1440 px und Handy 375 px.
+
+`vergleichen.js?v=147`, `merkliste.js?v=59`, `merkliste.css?v=51`.

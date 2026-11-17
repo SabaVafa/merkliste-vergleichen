@@ -135,7 +135,7 @@
 
   /* ---- Chrome ---- */
   var hdrBtn, hdrBadge, scrim, drawer, titleEl, countEl, clearBtn, notice, listEl, emptyEl, footHint, cta, footEl, toastEl, toastT, liveEl;
-  var pickNote, recentEl, toolsEl, shareBtn, askEl, popEl, sharedEl, sharedLink, hintEl;
+  var pickSub, pickNote, recentEl, toolsEl, shareBtn, askEl, popEl, sharedEl, sharedLink, hintEl;
   var sharedList = null, sharedMode = false, openParts = {};   /* 09b: shared list (sessionStorage), expanded configuration rows */
   /* storage note (10.11.): icon + a bold statement + one explaining sentence; 14 px instead of 12 px grey caption */
   /* hint glyph (11.11., user decision): info circle = "Hinweis"; replaces the device icon. DS icon style: inline,
@@ -174,6 +174,7 @@
         '</div>' +
         '<div class="mkl-shareask" role="group" aria-labelledby="mklAskQ" tabindex="-1" hidden><p class="mkl-shareask__q" id="mklAskQ"></p><div class="mkl-shareask__act"><button class="mkl-btn mkl-btn--neutral" type="button" data-mkl="share-plain">Ohne Gravurtext teilen</button><button class="mkl-link" type="button" data-mkl="share-full">Mit Gravurtext teilen</button><button class="mkl-link" type="button" data-mkl="share-no">Abbrechen</button></div></div>' +
         '<div class="mkl-sharepop" hidden><label class="mkl-sharepop__l" for="mklShareUrl">Link zur Merkliste</label><input class="mkl-sharepop__in" id="mklShareUrl" type="text" readonly><button class="mkl-link" type="button" data-mkl="sharepop-close">Schließen</button></div>' +
+        '<p class="mkl-picksub" id="mklPickSub" hidden></p>' +
         '<p class="mkl-notice" hidden>Die Merkliste kann auf diesem Gerät nicht gespeichert werden (Cookies/Speicher blockiert)</p>' +
       '</div>' +
       '<div class="mkl-body">' +
@@ -197,7 +198,7 @@
     notice.hidden = storageOk;
     toolsEl = drawer.querySelector('.mkl-tools'); shareBtn = drawer.querySelector('[data-mkl="share"]');
     askEl = drawer.querySelector('.mkl-shareask'); popEl = drawer.querySelector('.mkl-sharepop'); sharedEl = drawer.querySelector('.mkl-shared'); sharedLink = drawer.querySelector('.mkl-sharedlink');
-    hintEl = drawer.querySelector('.mkl-hint'); recentEl = drawer.querySelector('.mkl-recent'); pickNote = drawer.querySelector('.mkl-picknote');
+    pickSub = drawer.querySelector('.mkl-picksub'); hintEl = drawer.querySelector('.mkl-hint'); recentEl = drawer.querySelector('.mkl-recent'); pickNote = drawer.querySelector('.mkl-picknote');
     var gOf = function (t) { var g = t && t.closest && t.closest('.mkl-ghost'); return g ? g.getAttribute('data-ghost') : null; };
     /* hover pauses only when the pointer comes onto the undo row from outside: the row appears right under the cursor
        that clicked the bin, and that must not hold it open (12.11. bug: the first removal stayed far beyond its 3 s) */
@@ -557,7 +558,11 @@
     var shared = !!(sharedMode && sharedList), list = viewItems(), n = list.length;
     var ae = document.activeElement, keep = (ae && listEl.contains(ae)) ? (ae.getAttribute('data-parts') ? '.mkl-item__more[data-parts="' + ae.getAttribute('data-parts').replace(/"/g, '') + '"]' : (ae.getAttribute('data-take') ? '[data-take="' + ae.getAttribute('data-take').replace(/"/g, '') + '"]' : null)) : null;
     drawer.classList.toggle('is-shared', shared); drawer.classList.toggle('is-pick', !!pick);
-    titleEl.firstChild.nodeValue = shared ? 'Geteilte Merkliste ' : 'Merkliste ';
+    /* opened from the comparison (17.11., UX review): a picker – its own title and what to do; the Merkliste's own tools
+       (share, empty, remove, open, sign-in hint, recently viewed) are hidden in CSS (.is-pick) */
+    titleEl.firstChild.nodeValue = shared ? 'Geteilte Merkliste ' : (pick ? 'Aus der Merkliste wählen ' : 'Merkliste ');
+    countEl.hidden = !!pick;
+    pickSub.hidden = !pick; if (pick) pickSub.textContent = 'Wählen Sie ' + (pick.slots === 1 ? 'ein Modell' : 'bis zu ' + pick.slots + ' Modelle') + ' für Ihren Vergleich.';
     countEl.textContent = (!shared && n >= LIMIT) ? '(' + n + ' / ' + LIMIT + ')' : '(' + n + ')';
     clearBtn.hidden = n === 0 || shared;
     toolsEl.hidden = n === 0 || shared; if (toolsEl.hidden) { askEl.hidden = true; popEl.hidden = true; }
