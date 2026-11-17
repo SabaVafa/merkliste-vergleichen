@@ -462,3 +462,15 @@ Durchgespielt mit drei Ständen der Merkliste: leer · passendes Modell + bereit
 - Geprüft: Desktop 1440 px und Handy 375 px.
 
 `vergleichen.js?v=147`, `merkliste.js?v=59`, `merkliste.css?v=51`.
+
+## 55 · Handy mit drei Modellen: Paar-Vergleich (17.11.2026, Nutzer-Entscheidung „A“)
+Ausgangslage: Auf dem Handy passen zwei Spalten; bei drei Modellen war eins verborgen und wurde über den Namen gewechselt („2 von 3 Modellen sichtbar – zum Wechseln den Namen antippen“). Eine Wisch-Variante (zwei Spalten plus angeschnittene dritte) wurde verworfen – oben scrollte es seitlich, unten nicht.
+- **Immer zwei vollständige Spalten**, nichts angeschnitten, kein seitliches Scrollen. Das Maximum bleibt auf allen Geräten 3.
+- **Modellwahl über den Fotos:** drei Schaltflächen mit Vorschaubild und Kurzname (Design-Name, z. B. „Horizon“, „Colson“ – „VDM10 2.0 …“ war doppelt); die beiden angezeigten Teal umrandet (`aria-pressed`), das dritte ruhig. Ein Tippen auf das dritte tauscht es in die rechte Spalte.
+- **Tausch je Spalte:** auf jedem Foto ein Chip „⇄ Colson“ (Vergleichen-Pfeile) – ersetzt genau diese Spalte durch das verborgene Modell. Tippfläche 2,75 rem hoch.
+- **Auswertung für das angezeigte Paar:** Unterschiede, „Nicht für alle gepflegt“ und Gemeinsamkeiten werden für die zwei sichtbaren Modelle berechnet („gilt für beide angezeigten Modelle“); „Bestwert“ ebenfalls nur zwischen den beiden. Die Zeilenunterschrift „Unterschied bei: …“ (verwies auf das verborgene Modell) entfällt.
+- Nach dem Tausch bleibt die Leseposition; der Fokus bleibt auf dem benutzten Bedienelement; Screenreader hören „Spalte n zeigt jetzt … Unterschiede gelten für die beiden angezeigten Modelle.“
+- Unverändert: zwei Modelle auf dem Handy (keine Modellwahl, „Modell hinzufügen“ bleibt), Tablet und Desktop (alle Spalten, Auswertung über alle Modelle). Druck blendet Modellwahl und Chips aus.
+- Geprüft: 375 px und 440 px (Türsprechanlagen und Briefkästen), 2 Modelle auf dem Handy, Desktop 1440 px.
+
+`vergleichen.js?v=150`, `vergleichen.css?v=211`.

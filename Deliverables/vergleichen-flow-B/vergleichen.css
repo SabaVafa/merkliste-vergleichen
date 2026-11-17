@@ -382,7 +382,6 @@ tr.vgl-sec__h th{padding:2.25rem 0 .75rem;border-bottom:.0625rem solid var(--v-g
 /* rows: label column + values, one hairline */
 table.vgl-t tbody tr:not(.vgl-sec__h)>*{border-bottom:.0625rem solid var(--v-g100);vertical-align:baseline}   /* label and value share the first baseline */
 table.vgl-t .rh{font-size:var(--v-fs-sm);font-weight:700;line-height:1.5;color:var(--v-ink)}
-.vgl-rowcap{display:block;margin-top:.125rem;font-size:var(--v-fs-cap);font-weight:400;color:var(--v-muted)}
 /* label with a definition: (i) icon button after the label opens the toggletip; Escape closes */
 .rh__w{position:relative;display:inline-block}
 .vgl-tip{position:absolute;left:0;top:calc(100% + .5rem);z-index:20;width:min(17rem,calc(100vw - 2rem));padding:.625rem .75rem;border-radius:var(--v-r-m);background:var(--v-ink);color:var(--v-white);font-size:var(--v-fs-sm);font-weight:400;line-height:1.45;white-space:normal;box-shadow:var(--v-shadow-tip);opacity:0;visibility:hidden;transform:translateY(-.1875rem);transition:opacity .14s,transform .14s;pointer-events:none}
@@ -1749,3 +1748,25 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    line up across all cards (grid and phone strip). Comparison only – the PLP card itself is unchanged. ==== */
 .vgl-view .vgl-altc .pcard__footer{margin-top:0;margin-bottom:auto}   /* the free space goes below the price block, so the action keeps its own (negative) margins */
 .vgl-view .vgl-altc .pcard__top{align-items:center}
+
+/* ==== Phones with three models: compare a pair (17.11., user decision "A") ====
+   Two full columns, nothing cut off, nothing sideways. Above the photos a selector shows all three models (thumbnail +
+   short name); the two on screen are teal-framed, the third is quiet – a tap swaps it into the right-hand column. On each
+   photo tile a "⇄ <model>" chip swaps that column for the model not on screen. The sections (Unterschiede · Nicht für
+   alle gepflegt · Gemeinsamkeiten) are worked out for the pair on screen. ==== */
+.vgl-pair{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;width:100%;padding:.25rem 0}
+.vgl-pair__m{display:flex;align-items:center;gap:.375rem;min-width:0;min-height:2.75rem;padding:.25rem .375rem;border:.0625rem solid var(--v-g200);border-radius:var(--v-r-m);background:var(--v-white);font-family:inherit;font-size:var(--v-fs-cap);font-weight:700;line-height:1.25;color:var(--v-muted);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vgl-pair__m.is-on{border:.125rem solid var(--v-teal);padding:calc(.25rem - .0625rem) calc(.375rem - .0625rem);color:var(--v-ink);cursor:default}
+.vgl-pair__m:not(.is-on):active{background:var(--v-teal-100)}
+.vgl-pair__m:focus-visible{outline:.125rem solid var(--v-teal);outline-offset:.125rem}
+.vgl-pair__img{flex:none;display:flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:var(--v-r-m);background:var(--v-white);box-shadow:inset 0 0 0 .0625rem var(--v-g200);overflow:hidden}
+.vgl-pair__img img{max-width:100%;max-height:100%;object-fit:contain}
+.vgl-pair__t{min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.vgl-mbar--pair{padding-top:.5rem}
+.vgl-swap{position:absolute;left:.5rem;bottom:.5rem;z-index:2;display:inline-flex;align-items:center;gap:.25rem;max-width:calc(100% - 1rem);min-height:1.75rem;padding:0 .5rem;border:.0625rem solid var(--v-teal);border-radius:var(--v-r-m);background:var(--v-white);font-family:inherit;font-size:var(--v-fs-cap);font-weight:700;color:var(--v-teal);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vgl-swap::before{content:'';position:absolute;inset:-.5rem -.25rem}
+.vgl-swap svg{flex:none;width:.875rem;height:.875rem}
+.vgl-swap span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vgl-swap:active{background:var(--v-teal);color:var(--v-white)}
+.vgl-swap:focus-visible{outline:.125rem solid var(--v-teal);outline-offset:.125rem}
+@media print{.vgl-pair,.vgl-swap{display:none !important}}

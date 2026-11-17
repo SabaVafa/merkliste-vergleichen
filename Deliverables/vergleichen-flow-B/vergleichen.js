@@ -229,6 +229,8 @@
       var opt=e.target.closest('[data-addid]');if(opt){chooseAdd(opt.getAttribute('data-addid'));return;}
       var po=e.target.closest('[data-pickid]');if(po){choosePick(po.getAttribute('data-pickid'));return;}
       var pb=e.target.closest('[data-pick]');if(pb){if(pickEl&&pickBtn===pb)closePick(true);else openPick(pb);return;}
+      var pp=e.target.closest('[data-pairpick]');if(pp){if(pp.getAttribute('aria-pressed')!=='true')swapIn(visCols.length-1,pp.getAttribute('data-pairpick'));return;}
+      var sw=e.target.closest('[data-swapcol]');if(sw&&cur&&cur.hidden.length){swapIn(+sw.getAttribute('data-swapcol'),cur.items[cur.hidden[0]].id);return;}
       var a=e.target.closest('[data-vgl]');
       if(a&&a.getAttribute('data-vgl')==='body')a=null;   /* the body container carries data-vgl too */
       if(a){var k=a.getAttribute('data-vgl');
@@ -789,12 +791,15 @@
     var r={};base.forEach(function(i){r[i]=numRange(texts[i]);});
     return base.some(function(i){if(texts[i].indexOf(VAR)<0||!r[i])return false;return base.some(function(j){return j!==i&&r[j]&&r[i][0]<=r[j][1]&&r[j][0]<=r[i][1];});});
   }
-  function analyzeAll(items){
-    var base=items.map(function(p,i){return p.shop?i:-1;}).filter(function(i){return i>-1;});
-    if(base.length<2)base=items.map(function(p,i){return i;});
+  /* only (optional): the indices of the models on screen – phones compare a pair (17.11., user decision "A") and the
+     sections then say what differs between exactly these two */
+  function analyzeAll(items,only){
+    var pool=only||items.map(function(p,i){return i;});
+    var base=pool.filter(function(i){return items[i].shop;});
+    if(base.length<2)base=pool.slice();
     var rows=[],U=[],O=[],G=[];
     ROWS.forEach(function(row){
-      if(!rowHas(row,items))return;   /* no compared model has a value → hidden, not counted */
+      if(!rowHas(row,pool.map(function(i){return items[i];})))return;   /* no compared model has a value → hidden, not counted */
       var vals=items.map(function(p){return cellVal(p,row);});
       var texts=vals.map(function(v){return disp(v,row);});
       var keys=vals.map(function(v,i){return canon(v,texts[i]);});
@@ -993,7 +998,7 @@
   function nameCell(p,i,k,c){
     var t=c.titles[i];
     /* title and star rating share one line (wrap below only when the column is too narrow) */
-    return '<div class="vgl-ph__nameline">'+(c.pick?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+titleHTML(t,IC_CHD)+'</button>':'<div class="vgl-ph__title">'+titleHTML(t)+'</div>')+starsHTML(p,'side')+'</div>';
+    return '<div class="vgl-ph__nameline">'+(false?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+titleHTML(t,IC_CHD)+'</button>':'<div class="vgl-ph__title">'+titleHTML(t)+'</div>')+starsHTML(p,'side')+'</div>';
   }
   /* star rating as on the live PLP card (full / half / empty, review count); the line is reserved in every column */
   /* where: 'side' = right end of the title line (wide columns), 'row' = own line under the title (tight columns) */
@@ -1021,7 +1026,7 @@
       /* (a) photo tile with remove in its corner (the bookmark left it 13.11. – bookmarks are made on the product page);
              the photo is inset, so the icons never sit on it. The label column's "add" slot spans the whole header
              (an empty product slot) instead of leaving three empty cells under it. */
-      row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick?'<span class="vgl-pill" aria-hidden="true">'+(i+1)+' / '+n+'</span>':'')+'</div>');}).join(''))+
+      row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick&&c.hidden.length?'<button class="vgl-swap" type="button" data-swapcol="'+vis.indexOf(i)+'" aria-label="Statt '+esc(t.t)+': '+esc(c.titles[c.hidden[0]].t)+' anzeigen">'+SCALE+'<span>'+esc(c.refs[c.hidden[0]].n)+'</span></button>':'')+'</div>');}).join(''))+
       /* (b) names = the column headers */
       row('name','',vis.map(function(i,k){return '<th class="vgl-hc" scope="col" role="columnheader" data-id="'+esc(items[i].id)+'">'+nameCell(items[i],i,k,c)+'</th>';}).join(''))+
       /* (c) price + UVP on one line */
@@ -1118,10 +1123,15 @@
     }
     var an=analyzeAll(items),titles=titlesOf(items),refs=refsOf(items,titles),vd=verdict(items,an,refs);
     var maxC=maxCols(),pick=items.length>maxC,vis=syncVis(items,maxC),nv=vis.length,n=items.length;
-    var c=cur={items:items,an:an,titles:titles,refs:refs,vd:vd,vis:vis,pick:pick};
+    /* Pair mode (phones with three models – 17.11., user decision "A"): two full columns; a selector above the photos shows
+       all models and swaps one in, each photo tile swaps its column for the model not on screen. The sections compare
+       exactly the pair on screen. Replaces "tap the name to switch". */
+    if(pick)an=analyzeAll(items,vis);
+    var hidden=items.map(function(p,i){return i;}).filter(function(i){return vis.indexOf(i)<0;});
+    var c=cur={items:items,an:an,titles:titles,refs:refs,vd:vd,vis:vis,pick:pick,hidden:hidden};
     var gOpen=printing||gShow;
     var allColors=[];items.forEach(function(p){(p.colors||[]).forEach(function(cl){if(allColors.indexOf(cl)<0)allColors.push(cl);});});
-    var forAll=n===2?'gilt für beide Modelle':'gilt für alle '+n+' Modelle';
+    var forAll=pick?'gilt für beide angezeigten Modelle':(n===2?'gilt für beide Modelle':'gilt für alle '+n+' Modelle');
 
     /* only the data notice for a model without shop data (no summary sentence, user decision 06.11.) */
     var note=guardsData(items);
@@ -1141,10 +1151,10 @@
     var span=' colspan="'+(nv+1)+'" aria-colspan="'+(nv+1)+'"';
     function rowsHTML(list,kind){
       return byRelevance(list).map(function(d){
-        var row=d.row,capt='';
-        if(kind==='U'&&pick){var vk=vis.map(function(i){return d.keys[i];});if(vk.every(function(x){return x===vk[0];})){var hid=an.base.filter(function(i){return vis.indexOf(i)<0&&d.keys[i]!==vk[0];});if(hid.length)capt='Unterschied bei: '+hid.map(function(i){return refs[i].n;}).join(', ');}}
-        var th='<th class="rh" scope="row" role="rowheader">'+labelHTML(row)+(capt?'<span class="vgl-rowcap">'+esc(capt)+'</span>':'')+'</th>';
-        var bi=kind==='U'?bestIdx(row,d.vals,d.texts):[];
+        var row=d.row;
+        var th='<th class="rh" scope="row" role="rowheader">'+labelHTML(row)+'</th>';
+        /* pair mode: "Bestwert" between the two models on screen */
+        var bi=kind!=='U'?[]:(pick?bestIdx(row,vis.map(function(i){return d.vals[i];}),vis.map(function(i){return d.texts[i];})).map(function(k){return vis[k];}):bestIdx(row,d.vals,d.texts));
         var ctx={allColors:allColors};
         return '<tr role="row" data-key="'+row.key+'">'+th+vis.map(function(i){return cellHTML(d,i,items[i],bi.indexOf(i)>-1,'',ctx);}).join('')+'</tr>';
       }).join('');
@@ -1186,7 +1196,12 @@
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
     /* phones (Responsive audit 14): the label column with the add slot is hidden there, so one line above the header carries
        "Modell hinzufügen" and — when not all models fit — how many are visible and how to switch (CSS shows it < 48 rem only) */
-    var mbar=(pick||n<MAX)?'<div class="vgl-mbar">'+(pick?'<p class="vgl-mbar__t"><b>'+nv+' von '+n+' Modellen sichtbar</b> – zum Wechseln den Namen antippen.</p>':'')+
+    var pairSel=pick?'<div class="vgl-pair" role="group" aria-label="Angezeigte Modelle: '+nv+' von '+n+'">'+items.map(function(p,i){
+        var on=vis.indexOf(i)>-1;
+        return '<button class="vgl-pair__m'+(on?' is-on':'')+'" type="button" data-pairpick="'+esc(p.id)+'" aria-pressed="'+on+'"'+(on?'':' aria-label="'+esc(titles[i].t)+' anzeigen – ersetzt '+esc(titles[vis[nv-1]].t)+'"')+'>'+
+          '<span class="vgl-pair__img"><img src="'+esc(p.img)+'" alt="" width="32" height="32" decoding="async"></span><span class="vgl-pair__t">'+esc(refs[i].n)+'</span></button>';
+      }).join('')+'</div>':'';
+    var mbar=(pick||n<MAX)?'<div class="vgl-mbar'+(pick?' vgl-mbar--pair':'')+'">'+pairSel+
       (n<MAX?'<button class="vgl-tb vgl-tb--teal vgl-mbar__add" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+'</div>':'';
     var table=mbar+'<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
 
@@ -1345,6 +1360,14 @@
     pickEl.remove();pickEl=null;
     var b=pickBtn;pickBtn=null;
     if(b){b.setAttribute('aria-expanded','false');if(refocus&&document.contains(b))b.focus();}
+  }
+  /* pair mode: put model id into column col, keep the reading position; focus stays on the control that was used */
+  function swapIn(col,id){
+    if(!visCols||col<0||col>=visCols.length||visCols[col]===id)return;
+    var st=scrollEl.scrollTop,ae=document.activeElement,pair=ae&&ae.hasAttribute&&ae.hasAttribute('data-pairpick');
+    visCols[col]=id;renderView();scrollEl.scrollTop=st;
+    var f=pair?view.querySelector('[data-pairpick="'+id+'"]'):view.querySelector('[data-swapcol="'+col+'"]');if(f)f.focus({preventScroll:true});
+    announce('Spalte '+(col+1)+' zeigt jetzt '+refName(id)+'. Unterschiede gelten für die beiden angezeigten Modelle.');
   }
   function choosePick(id){
     var col=pickCol,was=visCols[col];
