@@ -301,3 +301,11 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Beispielprodukt (Nutzerwunsch):** die VDM10 2.0 Colson steht auf der Türsprechanlagen-Seite jetzt an erster Stelle; Titel und Bild der Karte öffnen die Produktseite (`pdp` im Produkteintrag von `sprechanlage.js`). In „Ähnliche Modelle“ im Vergleich öffnet das Bild nichts. Der Brotkrumen „Sprechanlagen“ auf der Produktseite führt zurück zur Liste. So lassen sich Merken (Produktseite) und Vergleichen (Liste) im selben Durchlauf zeigen.
 
 `merkliste.js?v=49`, `merkliste-pdp.css?v=25`, `sprechanlage.js?v=104`.
+
+## 35 · „Merken“ vor der Farbwahl öffnet die Farbwahl (13.11.2026, Lead UX)
+- **Problem:** ein ausgegrautes „Merken“ wirkt kaputt; die Erklärung kam erst nach dem Klick, als Hinweis weit weg vom Finger, und auf dem Desktop scrollte die Seite oft gar nicht sichtbar.
+- **Lösung:** „Merken“ sieht ohne Farbe aus wie immer und öffnet direkt am Knopf ein kleines Fenster „Farbe wählen und merken“ mit allen Farben der Seite. Ein Klick auf eine Farbe setzt sie auf der Seite (Bild, Titel, Preis, Kaufknopf) und merkt die Konfiguration im selben Schritt („Konfiguration gemerkt · Zur Merkliste“). Die Antwort auf „Warum geht das nicht?“ ist damit der Weg nach vorn. Die Farbfelder der Seite bleiben der Hauptweg.
+- **Details:** gleiche Lösung für den Knopf in der Galerie und das Lesezeichen in der Kaufleiste (öffnet nach oben). Die Zeile unten nennt die Farbe unter Maus oder Tastaturfokus (nicht beim automatischen Fokus beim Öffnen – das sähe gewählt aus). Pfeiltasten bewegen durch die Farben, Esc schließt und gibt den Fokus an „Merken“ zurück; Klick daneben oder Scrollen aus dem Bild schließt. „Wunschfarbe nach RAL · + 49,00 €“ setzt die Wunschfarbe und führt zum RAL-Wähler – gemerkt wird erst mit RAL-Ton (vorher zählte „Wunschfarbe“ ohne Ton schon als Farbe). Ist die Farbe schon gemerkt, sagt das ein Hinweis statt eines Doppels; eine frühere Konfiguration derselben Farbe wird nie überschrieben.
+- **Barrierefreiheit:** „Merken“ ist nicht mehr `aria-disabled`, sondern `aria-haspopup="dialog"` mit `aria-expanded`; Name „Merken: VDM10 2.0 Video-Türsprechanlage – Farbe wählen“. Die Farbfelder haben je den Farbnamen als Namen.
+
+`merkliste.js?v=52`, `merkliste-pdp.css?v=26`.

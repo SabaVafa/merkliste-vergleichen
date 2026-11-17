@@ -200,13 +200,27 @@
 .mkl-pdp-save.is-limit:hover{background:var(--white);border-color:var(--graphite-300)}
 @media(prefers-reduced-motion:reduce){.pdp-media__stage .mkl-pdp-media,.mkl-mark__disc{transition:none !important}}
 
-/* ==== Merken waits for the colour (13.11., user decision) ====
-   Before a colour is chosen there is nothing to bookmark. Same inactive look as the full-list state (is-limit), but
-   it still answers a click – it leads to the swatches – so the cursor stays a pointer. ==== */
-.mkl-pdp-save.is-wait{color:var(--text-muted);border-color:var(--graphite-300);background:var(--white);opacity:.6}
-.mkl-pdp-save.is-wait:hover{background:var(--white);border-color:var(--graphite-300);color:var(--text-muted)}
-.mkl-pdp-media.is-wait{opacity:.6}
-.mkl-pdp-media.is-wait .mkl-pdp-media__seg,.mkl-pdp-media.is-wait:hover .mkl-pdp-media__seg{color:var(--graphite-700);background:none}
+/* ==== Merken before a colour (13.11., lead UX) ====
+   The button keeps its normal look – it works: it opens the colour panel (.mkl-cpop) at the button. ==== */
+
+/* ---- Colour panel: popover anchored to the Merken button (8 px radius like every popover) ---- */
+.mkl-cpop{position:fixed;z-index:965;width:min(20rem,calc(100vw - 2rem));box-sizing:border-box;padding:var(--sp-4);border:1px solid var(--graphite-200);border-radius:var(--radius-lg);background:var(--white);box-shadow:var(--shadow-lift);color:var(--schwarz);opacity:0;transform:translateY(-.25rem);transition:opacity .16s ease,transform .16s ease}
+.mkl-cpop.is-up{transform:translateY(.25rem)}
+.mkl-cpop.is-in{opacity:1;transform:none}
+.mkl-cpop__head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-2)}
+.mkl-cpop__t{margin:0;font-size:1rem;font-weight:700;line-height:1.3}
+.mkl-cpop__x{display:inline-flex;flex-shrink:0;align-items:center;justify-content:center;width:2rem;height:2rem;margin:-.375rem -.375rem 0 0;padding:0;border:0;border-radius:var(--radius);background:none;color:var(--graphite-700);cursor:pointer}
+.mkl-cpop__x:hover{background:var(--color-paper);color:var(--schwarz)}
+.mkl-cpop__x svg{width:1.25rem;height:1.25rem}
+.mkl-cpop__d{margin:.25rem 0 var(--sp-3);font-size:.875rem;line-height:1.4;color:var(--text-muted)}
+.mkl-cpop__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-2)}
+.mkl-cpop__sw{display:block;aspect-ratio:1;min-height:2.75rem;padding:.125rem;border:1px solid var(--graphite-300);border-radius:var(--radius);background:var(--white);cursor:pointer;overflow:hidden}
+.mkl-cpop__sw img{display:block;width:100%;height:100%;object-fit:cover;border-radius:calc(var(--radius) - .0625rem)}
+.mkl-cpop__sw:hover{border-color:var(--teal)}
+.mkl-cpop__sw:focus-visible,.mkl-cpop__x:focus-visible{outline:.125rem solid var(--teal);outline-offset:.125rem}
+.mkl-cpop__name{min-height:1.25rem;margin:var(--sp-3) 0 0;font-size:.875rem;font-weight:500;line-height:1.4}
+@media(prefers-reduced-motion:reduce){.mkl-cpop{transition:none}}
+@media print{.mkl-cpop{display:none !important}}
 
 /* The swatch group takes focus when "Merken" asks for a colour first (tabindex -1, never in the tab order); the
    highlight pulse on the swatches marks the place, so no ring around the whole group. */
