@@ -427,3 +427,21 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Gleiche Elemente auf gleicher Höhe (Ähnliche Modelle):** Bei der Videosäule SDM10S (keine Bewertung, keine Farbfelder) stand der Titel 9 px höher und der Preis 38 px tiefer als bei den anderen Karten. Jetzt erhalten die Zeilen Pills, Marke/Bewertung und Titel die Höhe der höchsten Karte (Skript, auch nach Breitenänderung); der Preisblock sinkt nicht mehr an den Kartenboden, der freie Raum steht darunter, „Vergleichen“ / „Zum Vergleich hinzufügen“ am Kartenfuß. Gemessen: Desktop 1440 px und Handy 375 px – Marke, Titel, Preis, Farben und Aktion in allen vier Karten auf derselben Höhe. Nur im Vergleich – die PLP-Karte selbst bleibt unverändert.
 
 `vergleichen.js?v=145`, `vergleichen.css?v=209`.
+
+## 51 · Ein Label je Handlung: „Modell hinzufügen“ und „Vergleichen“ (17.11.2026, Nutzerfrage: „now we have 3 different labels … which one is the best?“ – Entscheidung: anwenden)
+- **Befund:** drei Labels für das Ergänzen des Vergleichs – „+ Hinzufügen“ (über dem Vergleich), „Modell hinzufügen“ (Ende, leerer Zustand, Hinzufügen-Kachel), „Vergleichen“ / „Zum Vergleich hinzufügen“ (Karten Ähnliche Modelle). Dahinter stehen zwei Handlungen.
+- **Allgemein (noch kein Produkt gewählt, öffnet die Auswahl): „Modell hinzufügen“** – nennt das Objekt, kann nicht als Warenkorb gelesen werden. Jetzt überall: Link über dem Vergleich (vorher „+ Hinzufügen“), Button am Ende, leerer Zustand, Kachel auf dem Desktop.
+- **Dieses Produkt in den Vergleich (auf einer Produktkarte): „Vergleichen“** – das Wort der PLP-Karte für dieselbe Handlung, mit dem Vergleichs-Symbol der PLP; auf allen Breiten (Desktop vorher „Zum Vergleich hinzufügen“). Screenreader: „Vergleichen – in den Vergleich aufnehmen“. Nach dem Hinzufügen: Haken + „Hinzugefügt“.
+- **Merkliste, „Aus der Merkliste“:** Der Bestätigen-Button nach dem Ankreuzen („Vergleichen“-Checkboxen) heißt jetzt „Vergleichen“ (vorher „Hinzufügen“); Fußzeile ohne passende Modelle: „Keine Modelle zum Vergleichen“ (vorher „Nichts zum Hinzufügen“).
+- Kein nacktes „Hinzufügen“ mehr. Geprüft bei 375 und 1440 px.
+
+`vergleichen.js?v=146`, `merkliste.js?v=57`.
+
+## 52 · Prüfung auf 440 × 956 (iPhone 16 Pro Max), geschlossene Merkliste aus dem Layout (17.11.2026, Nutzer: „check the prototype on the following screen“)
+- **Befund des Nutzers:** In den Chrome-Gerätetools (iPhone 16 Pro Max) war der Vergleich rechts abgeschnitten (Papierkorb, ×, zweite Spalte). Der Screenshot zeigte noch „+ H…“ – also einen älteren, zwischengespeicherten Stand.
+- **Nachgestellt bei 440 × 956:** Seite und Vergleich exakt 440 px, Zoom 1, nichts ragt über den Rand. Einziges Element jenseits des Bildschirms überhaupt: die geschlossene Merkliste, aus dem Bild geschoben (x 440–880, `visibility:hidden` lässt sie im Layout). Mobile Browser können für solchen Inhalt den Layout-Viewport verbreitern – der fixierte Vergleich wird dann breiter als der Bildschirm.
+- **Absicherung:** Die geschlossene Merkliste ist jetzt `display:none`, sobald sie hinausgeglitten ist (diskreter `display`-Übergang), und gleitet über `@starting-style` wieder von rechts herein – Bewegung unverändert. Geprüft: geschlossen `display:none`, offen 0–440 px, Fokus auf dem Titel, nach dem Schließen wieder `display:none`.
+- **Durchgang 440 × 956:** PLP (Sprechanlagen, Briefkästen) ohne Überlauf, Vergleichsleiste unten 440 px; Vergleich: Kopfleiste (Link, Drucken, Papierkorb, × bis genau 440 px), „+ Modell hinzufügen“, Spalten, ⓘ in einer Spalte, Haken der Gemeinsamkeiten in einer Spalte, Erklärung öffnet im Bild und schließt beim zweiten Drücken, Ähnliche Modelle (4 Karten à 198 px, Preise passen, „Vergleichen“, Pfeile), Aktionen am Ende; drei Briefkästen (2 von 3 sichtbar, Modellwechsel); PDP: „Merken“ öffnet das Farb-Sheet (volle Breite, 70 % Höhe), Wahl merkt die Konfiguration.
+- Bitte im Gerätemodus mit „Disable cache“ neu laden (Strg + Umschalt + R), damit der aktuelle Stand geladen wird.
+
+`merkliste.css?v=49`.

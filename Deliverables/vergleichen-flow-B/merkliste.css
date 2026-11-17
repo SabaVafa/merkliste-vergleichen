@@ -566,3 +566,15 @@
 /* ==== Bookmarks only on the product page (13.11., user decision): "Zuletzt angesehen" has no "Merken" button any
    more – the row is picture, name, price and the way back to the product. ==== */
 .mkl-rv{grid-template-columns:3.5rem minmax(0,1fr)}
+
+/* ==== Closed drawer out of the layout (17.11., user: check on a 440 × 956 phone – the comparison showed cut off on the
+   right) ====
+   Closed, the drawer sat translated off-screen at x 440–880 (visibility:hidden still keeps it in the layout) – the only
+   element anywhere reaching past the screen edge. Mobile browsers can widen the layout viewport for such content, and
+   the fixed comparison then grows wider than the screen. Now the closed drawer is display:none once its slide-out has
+   finished (discrete display transition) and slides in from the right again via @starting-style – the motion is
+   unchanged; browsers without allow-discrete simply skip the slide. ==== */
+.mkl-drawer{display:none;transition:transform .22s ease,visibility 0s linear .22s,display 0s linear .22s;transition-behavior:allow-discrete}
+.mkl-drawer.is-open{display:flex;transition:transform .22s ease,visibility 0s,display 0s;transition-behavior:allow-discrete}
+@starting-style{.mkl-drawer.is-open{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){.mkl-drawer,.mkl-drawer.is-open{transition:none}}

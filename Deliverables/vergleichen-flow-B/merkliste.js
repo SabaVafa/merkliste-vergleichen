@@ -649,7 +649,7 @@
       var hint = g.querySelector('.mkl-group__hint'), other = g.getAttribute('data-lens') !== pick.lens;
       hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie – Ihr Vergleich läuft bei ' + lab0;
     });
-    cta.textContent = 'Hinzufügen';
+    cta.textContent = 'Vergleichen';   /* 17.11.: the ticked models go into the comparison – the word of the checkboxes and the tray, no bare "Hinzufügen" */
     cta.disabled = n < 1;
     /* nothing in the list fits this comparison (12.11., user: "it is not communicated"): say so above the list and in
        the footer, instead of only greying out the checkboxes */
@@ -660,7 +660,7 @@
     if (!pickNote.hidden) pickNote.innerHTML = IC_INFO + '<span><b>Keine weiteren ' + esc(lab0) + ' in Ihrer Merkliste.</b> ' +
       (otherTxt ? 'Verglichen werden nur Modelle einer Kategorie.' : 'Die gemerkten Modelle sind bereits im Vergleich.') +
       ' Weitere Modelle merken Sie auf ihrer Produktseite, sobald Sie eine Farbe gewählt haben.</span>';
-    if (!cand && !n) setFoot('Nichts zum Hinzufügen', 'Merken Sie zuerst ' + ({ sprechanlage: 'eine Türsprechanlage', briefkasten: 'einen Briefkasten' }[pick.lens] || 'ein Modell dieser Kategorie') + ' auf der Produktseite.');
+    if (!cand && !n) setFoot('Keine Modelle zum Vergleichen', 'Merken Sie zuerst ' + ({ sprechanlage: 'eine Türsprechanlage', briefkasten: 'einen Briefkasten' }[pick.lens] || 'ein Modell dieser Kategorie') + ' auf der Produktseite.');
     else setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' Modelle ausgewählt') : 'Keine Modelle ausgewählt',
       free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}

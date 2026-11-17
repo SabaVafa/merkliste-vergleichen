@@ -1179,7 +1179,7 @@
     /* phones (Responsive audit 14): the label column with the add slot is hidden there, so one line above the header carries
        "Modell hinzufügen" and — when not all models fit — how many are visible and how to switch (CSS shows it < 48 rem only) */
     var mbar=(pick||n<MAX)?'<div class="vgl-mbar">'+(pick?'<p class="vgl-mbar__t"><b>'+nv+' von '+n+' Modellen sichtbar</b> – zum Wechseln den Namen antippen.</p>':'')+
-      (n<MAX?'<button class="vgl-tb vgl-tb--teal vgl-mbar__add" type="button" data-vgl="add" aria-label="Modell hinzufügen">'+IC_PLUS+'Hinzufügen</button>':'')+'</div>':'';
+      (n<MAX?'<button class="vgl-tb vgl-tb--teal vgl-mbar__add" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+'</div>':'';
     var table=mbar+'<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
 
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
@@ -1188,13 +1188,13 @@
       '<div class="vgl-alts__nav" role="group" aria-label="Ähnliche Modelle blättern" hidden><button class="vgl-navbtn" type="button" data-altnav="-1" aria-label="Vorherige Modelle" aria-controls="vglAltList">'+IC_NAVL+'</button><button class="vgl-navbtn" type="button" data-altnav="1" aria-label="Weitere Modelle" aria-controls="vglAltList">'+IC_NAVR+'</button></div></div><ul class="vgl-alts__list" id="vglAltList">'+
       alts.map(function(o){
         var why=o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'';
-        /* phones (17.11., user: shorter label – then: "Hinzufügen" is vague next to a price, it reads like the cart): the
-           PLP's own word and icon for comparing – "Vergleichen" with the opposing arrows (as the PLP's "Vergleichen"
-           button); screen readers hear "Vergleichen – in den Vergleich aufnehmen". Desktop keeps "Zum Vergleich hinzufügen". */
-        var add='<button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l"><span class="vgl-m-hide">Zum Vergleich hinzufügen</span><span class="vgl-m-only">Vergleichen<span class="vgl-visually-hidden"> – in den Vergleich aufnehmen</span></span></span></button>';
+        /* Labels (17.11., user decision): one label per action – a product card puts THIS product into the comparison:
+           "Vergleichen" with the PLP's compare icon (the PLP card's own word for it), at every width; the general action
+           (no product chosen) is "Modell hinzufügen". No bare "Hinzufügen" (next to a price it reads like the cart). */
+        var add='<button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Vergleichen<span class="vgl-visually-hidden"> – in den Vergleich aufnehmen</span></span></button>';
         /* the PLP card as it is – no extra differences box on it (17.11., user: "do not add the extra sections!") */
         if(window.MTZ_PLP_CARD)return '<li class="vgl-altc" data-altc="'+esc(o.p.id)+'">'+add+'</li>';
-        return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div>'+(o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'')+'<div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Zum Vergleich hinzufügen</span></button></div></li>';
+        return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div>'+(o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'')+'<div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Vergleichen<span class="vgl-visually-hidden"> – in den Vergleich aufnehmen</span></span></button></div></li>';
       }).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
