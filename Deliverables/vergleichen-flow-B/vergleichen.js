@@ -192,7 +192,7 @@
         '<button class="vgl-back" type="button" data-vgl="back" aria-label="Zurück zur Merkliste" hidden>'+IC_CHL+'<span class="vgl-back__l">Merkliste</span></button>'+
         '<h2 class="vgl-view__title" id="vglTitle" tabindex="-1">Vergleich <span data-vgl="count">(0)</span></h2>'+
         '<div class="vgl-bar__act">'+
-          '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share" title="Link zu diesem Vergleich kopieren">'+IC_LINK+'<span class="vgl-share__l">Link kopieren</span></button>'+
+          '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share" title="Link zu diesem Vergleich kopieren">'+IC_LINK+'<span class="vgl-share__l"><span class="vgl-m-hide">Link kopieren</span><span class="vgl-m-only">Teilen</span></span></button>'+
           '<span class="vgl-bar__sep" aria-hidden="true"></span>'+
           '<button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button>'+
           '<span class="vgl-bar__sep" aria-hidden="true"></span>'+
@@ -312,7 +312,7 @@
   }
   function shareDone(btn){
     var l=btn.querySelector('.vgl-share__l'),ic=btn.querySelector('svg'),oldL=l.innerHTML,oldIc=ic.outerHTML;
-    btn.classList.add('is-done');l.textContent='Link kopiert';ic.outerHTML=IC_OK;
+    btn.classList.add('is-done');l.textContent=(window.matchMedia&&matchMedia('(max-width:47.99rem)').matches)?'Kopiert':'Link kopiert';ic.outerHTML=IC_OK;   /* phones: short, the bar stays on one line (toast says it in full) */
     clearTimeout(btn._t);btn._t=setTimeout(function(){btn.classList.remove('is-done');l.innerHTML=oldL;var c=btn.querySelector('svg');if(c)c.outerHTML=oldIc;},2000);
     announce('Link zum Vergleich kopiert.');
     toast('Link zum Vergleich kopiert.','ok');
@@ -1177,11 +1177,10 @@
       }).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
-    /* phones (17.11., lead UX): two groups instead of one wrapping line of five mixed links – grow the comparison (DS
-       secondary buttons, full width), then the utilities in one quiet row; "Vergleich leeren" last, set apart */
+    /* phones (17.11., lead UX): only growing the comparison stays at the end (DS secondary buttons, full width) –
+       "Teilen", "Drucken" and "Vergleich leeren" sit in the top bar (17.11., user decisions) */
     var grow=(n<MAX?'<button class="btn btn--secondary vgl-actrow__btn" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(hasMkl?'<button class="btn btn--secondary vgl-actrow__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste'+(nMkl?' ('+nMkl+')':'')+'</button>':'');
-    var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(grow?'<div class="vgl-actrow__grow">'+grow+'</div>':'')+
-      '<div class="vgl-actrow__util"><button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div></div>';
+    var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(grow?'<div class="vgl-actrow__grow">'+grow+'</div>':'')+'</div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
     fillAltCards();bindAltNav();

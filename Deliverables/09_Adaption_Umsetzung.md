@@ -380,3 +380,23 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Geprüft bei 375 und 457 px; Desktop unverändert (1280 px: Raster mit 4 Karten, keine Pfeile, Werkzeugleiste statt Aktionsbereich).
 
 `vergleichen.js?v=138`, `vergleichen.css?v=195`.
+
+## 44 · Vergleich auf dem Handy – Seitenaktionen oben, Trennlinie unter dem Merkmal (17.11.2026, Nutzer: „place the marked links at the top“, „leeren must be placed at the far top bar“, „not having a divider doesn't look professional“)
+- **Teilen, Drucken, Vergleich leeren in der Kopfleiste:** Auf dem Handy war die Werkzeugleiste der Kopfleiste ausgeblendet; Teilen, Drucken und Leeren gab es nur ganz unten. Jetzt stehen sie oben neben dem Titel: „Vergleich (2) · [Link] [Drucker] [Papierkorb] · ×“ – von überall erreichbar. Drei beschriftete Buttons passen neben dem Titel nicht, daher Symbol-Buttons mit 2,75 rem Fläche; Namen („Teilen“, „Drucken“, „Vergleich leeren“) bleiben für Screenreader. Nach dem Kopieren zeigt der Button den Haken, der Hinweis sagt „Link zum Vergleich kopiert.“ Desktop behält die beschriftete Leiste („Link kopieren“, „Drucken“, „Vergleich leeren“).
+- **Aktionen am Ende:** nur noch „Modell hinzufügen“ und „Aus der Merkliste“ (DS-Sekundärbuttons).
+- **Trennlinie unter dem Merkmal:** Die Beschriftung schwebte zwischen zwei Zeilen. Jetzt eine Haarlinie unter jeder Beschriftung, eingerückt wie der Inhalt (0,75 rem: vom Anfang der Beschriftung bis zum Ende des ⓘ); die Spaltenlinie zwischen den Modellen beginnt an ihr. Werte 0,5 rem darunter. Gemeinsamkeiten (Merkmal und Wert in einer Zeile) behalten nur ihre Zeilenlinie.
+
+`vergleichen.js?v=140`, `vergleichen.css?v=198`.
+
+## 45 · Einheitlicher Hover für alle Symbole der Kopfleiste (17.11.2026, Nutzer: „hovering the trash … consistent with the prototype“, „all icons at the far top must have hover effect consistently“)
+- **Muster aus dem Prototyp:** Symbol-Buttons (Entfernen auf der Modellkachel, Entfernen in der Merkliste) zeigen beim Hover ein 4-px-Quadrat hinter dem Symbol, eingerückt in die Bedienfläche. Jetzt haben alle Symbole der Kopfleiste dasselbe 36-px-Quadrat:
+  - Teilen (Link), Drucken, Schließen ×: Graphite-100-Fläche, Symbol schwarz (Paper war auf der weißen Leiste kaum sichtbar);
+  - Vergleich leeren (Papierkorb): DS-Löschen-Hover – Red-50-Fläche, Red-600-Symbol, wie der Papierkorb in der Vergleichsleiste und „Leeren“ in der Merkliste.
+- Gemessen bei 375 px mit echtem Zeiger: alle vier Quadrate 36 px, 4 px Radius. Auf dem Desktop behalten Teilen, Drucken und Leeren ihre Beschriftung und den Hover über den ganzen Button; das × bekommt dasselbe Quadrat. Fokusrahmen (Teal) bleibt.
+
+`vergleichen.css?v=200`.
+
+## 46 · Titelleisten der Abschnitte in Teal-50 (17.11.2026, Nutzer: „let's make the title sections F2F6F6“)
+- Die Titelleisten „Unterschiede“, „Nicht für alle gepflegt“ und „Gemeinsamkeiten“ waren weiß wie ihre Zeilen. Jetzt tragen sie DS Teal-50 (#F2F6F6, `--color-teal-50` aus dem Metzler Design System / PDP), so liest sich jede Karte als Titel + Inhalt. Rahmen, Radius und Haarlinie bleiben; „Gemeinsamkeiten“ behält den Ton beim Hover und eingeklappt. Alle Breiten.
+
+`vergleichen.css?v=201`.
