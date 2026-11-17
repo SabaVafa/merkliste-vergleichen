@@ -1465,3 +1465,27 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 .vgl-tip.is-clamp{overflow-y:auto;overscroll-behavior:contain}
 .vgl-tip.is-clamp::before{display:none}   /* a scrolling box clips the pointer; the tip still opens at its (i) */
 .vgl-ib.is-open+.vgl-tip.is-clamp{pointer-events:auto}
+
+/* ==== Comparison on phones, lead design pass (17.11., user: "enhance the mobile version") ====
+   Desktop is unchanged. Below 48 rem:
+   1 Gemeinsamkeiten: one line per feature – label (with its ⓘ) left, the shared value with one green check right.
+     The row of checks under every model (88–108 px per feature) carried no information on a phone: the section already
+     says the features apply to all models. ~3 rem per feature now.
+   2 The opened Gemeinsamkeiten heading kept an empty line (the hidden feature preview still took its row).
+   3 Row dividers run across the full row – they broke at the gap between the model columns. ==== */
+.vgl-gval__mk,.vgl-gval--bool{display:none}
+@media(max-width:47.99rem){
+  /* 1 */
+  table.vgl-t .vgl-sec--s tr.vgl-gx:not([hidden]){display:block}
+  table.vgl-t .vgl-sec--s tr.vgl-gx>td.vgl-val--mark{display:none}
+  table.vgl-t .vgl-sec--s tr.vgl-gx>th.rh:nth-child(n){display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:.25rem 1rem;padding:.75rem}   /* a long label + long value: the value takes its own line, right-aligned */
+  table.vgl-t .vgl-sec--s tr.vgl-gx .rh__row{flex:0 1 auto;min-width:0}
+  table.vgl-t .vgl-sec--s tr.vgl-gx .vgl-gval{display:inline-flex;align-items:flex-start;gap:.375rem;flex:0 1 auto;min-width:0;margin:0 0 0 auto;text-align:right;font-size:var(--v-fs-sm);line-height:1.5;color:var(--v-ink)}
+  table.vgl-t .vgl-sec--s tr.vgl-gx .vgl-gval__mk{display:inline-flex;flex:none;height:1.3125rem;align-items:center;color:var(--v-green)}
+  table.vgl-t .vgl-sec--s tr.vgl-gx .vgl-gval__mk svg{width:1rem;height:1rem}
+  /* 2 */
+  .vgl-gdisc[aria-expanded="true"] .vgl-gdisc__peek{display:none}
+  /* 3 */
+  table.vgl-t tbody tr:not(.vgl-sec__h):not(:last-child):has(>td.vgl-val){background-image:linear-gradient(var(--v-g100),var(--v-g100));background-repeat:no-repeat;background-position:0 100%;background-size:100% .0625rem}   /* the cells keep their own line; this fills the gap between them */
+  table.vgl-t .vgl-sec--s tr.vgl-gx>th.rh:nth-child(n){border-bottom:.0625rem solid var(--v-g100) !important}
+}

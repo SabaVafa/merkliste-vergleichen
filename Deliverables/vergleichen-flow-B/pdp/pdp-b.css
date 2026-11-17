@@ -3326,3 +3326,19 @@ body.is-scrolled #quickbar {
    "Alle Bewertungen" (21 px) get a 24 px tap area via an invisible ::after (WCAG 2.5.8) – no visual change. ==== */
 .bx-cred__rate, .rvw-howto__link, .rvw-review__more, .rvw-list__more { position: relative; }
 .bx-cred__rate::after, .rvw-howto__link::after, .rvw-review__more::after, .rvw-list__more::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5rem; transform: translateY(-50%); }
+
+/* ==== Colour window on phones = bottom-up sheet (17.11., user: "on mobile it is a bottom up window", as in the PDP
+   prototype) ====
+   Below 48 rem the labelled colour list (#colorwin) rises from the bottom instead of sliding in from the right:
+   full width, up to 70 % of the screen (the page stays visible above it), 12 px top corners, the soft upward shadow and
+   the dimmed (not blurred) backdrop of the page's own sheet (.sheet__panel). The list scrolls inside; backdrop, close, Esc and focus return are unchanged.
+   Desktop keeps the side window. ==== */
+@media (max-width: 47.9375rem) {
+  .colorwin__panel { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: auto; max-height: 70vh; max-height: 70dvh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: 0 -0.25rem 1.25rem rgba(20,22,25,0.14);
+    transform: translateY(100%); transition: transform .3s cubic-bezier(.4, 0, 1, 1); }
+  .colorwin.is-open .colorwin__panel { transform: none; transition: transform .44s cubic-bezier(.16, 1, .3, 1); }
+  .colorwin__backdrop { background: rgba(20,22,25,0.45); -webkit-backdrop-filter: none; backdrop-filter: none; }   /* dimmed, not blurred – like the page's own sheet */
+  .colorwin__head { padding: 1rem 1.25rem; }
+  .colorwin__title { font-size: 1.125rem; }
+}

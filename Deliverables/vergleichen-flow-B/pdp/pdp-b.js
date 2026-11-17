@@ -2667,18 +2667,10 @@ var MZSwipe = (function () {
   }
 
   var lastFocus = null, onDone = null;
-  /* optional line under the title – says why the window opened when another control opens it (e.g. "Merken") */
-  var panel = win.querySelector('.colorwin__panel'), headText = win.querySelector('.colorwin__headtext'), note = null;
-  function setNote(msg) {
-    if (!note && msg && headText) { note = document.createElement('p'); note.className = 'colorwin__note'; note.id = 'colorwinNote'; headText.appendChild(note); }
-    if (!note) return;
-    note.textContent = msg || ''; note.hidden = !msg;
-    if (msg) panel.setAttribute('aria-describedby', 'colorwinNote'); else panel.removeAttribute('aria-describedby');
-  }
-  function open(opener, msg, cb) {
+  function open(opener, cb) {
     if (win.classList.contains('is-open')) return;
     win.classList.add('is-open'); win.setAttribute('aria-hidden', 'false');
-    setExpanded('true'); setNote(msg); onDone = cb || null;
+    setExpanded('true'); onDone = cb || null;
     lock(); lastFocus = opener || triggers[0]; markRows();
     var target = win.querySelector('.colorwin__row.is-selected') || rows[0];
     if (target) target.focus({ preventScroll: true });
@@ -2728,7 +2720,7 @@ var MZSwipe = (function () {
   });
   if (link) link.addEventListener('click', function () { win.classList.contains('is-open') ? close() : open(link); });
   if (card) card.addEventListener('click', function () { win.classList.contains('is-open') ? close() : open(card); });
-  if (window.MTZ_PDP) window.MTZ_PDP.colours = open;   /* (opener, note, callback(picked)) */
+  if (window.MTZ_PDP) window.MTZ_PDP.colours = open;   /* (opener, callback(picked)) */
   win.addEventListener('click', function (e) { if (e.target.closest('[data-cw-close]')) close(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && win.classList.contains('is-open')) close(); });
 

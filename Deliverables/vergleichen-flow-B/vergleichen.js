@@ -1016,7 +1016,7 @@
     var s=String(t),v=s.indexOf(VAR)>-1;s=s.replace(VAR,'').replace(/ cm$/,'');
     var ax=s.split(' × ');if(ax.length!==3)return esc(t);
     var L=['B','H','T'],known=[],unk=[];
-    ax.forEach(function(a,k){if(a==='k. A.')unk.push(L[k]+' <span class="vgl-ka"><span aria-hidden="true">k. A.</span><span class="vgl-visually-hidden">keine Angabe im Shop</span></span>');else known.push(L[k]+'&nbsp;'+esc(a));});
+    ax.forEach(function(a,k){if(a==='k. A.')unk.push(L[k]+'&nbsp;<span class="vgl-ka"><span aria-hidden="true">k. A.</span><span class="vgl-visually-hidden">keine Angabe im Shop</span></span>');else known.push(L[k]+'&nbsp;'+esc(a));});
     return known.join(' · ')+(known.length?'&nbsp;cm':'')+(unk.length?(known.length?' · ':'')+unk.join(' · '):'')+(v?esc(VAR):'');
   }
   /* colours: one slot per colour of the whole comparison, same order in every column; a colour a model lacks is an empty outlined slot */
@@ -1115,7 +1115,11 @@
           else val=esc(t);
         }
         var mark='<span class="vgl-mark">'+CHK+'<span class="vgl-visually-hidden">Ja</span></span>';
-        return '<tr role="row" data-key="'+row.key+'" class="vgl-gx" id="vglG'+k+'"'+(gOpen?'':' hidden')+'><th class="rh" scope="row" role="rowheader">'+labelHTML(row)+(val?'<span class="vgl-gval">'+val+'</span>':'')+'</th>'+vis.map(function(){return '<td class="vgl-val vgl-val--mark" role="cell">'+mark+'</td>';}).join('')+'</tr>';
+        /* phones (17.11., lead design): one line per feature – label left, the shared value with one check right; the per-model
+           check columns give way there. A feature without a value text (e.g. Nachtsicht) reads "Ja" on phones only. */
+        var mk='<span class="vgl-gval__mk" aria-hidden="true">'+CHK+'</span>';
+        var gval=val?'<span class="vgl-gval">'+mk+'<span class="vgl-gval__t">'+val+'</span></span>':'<span class="vgl-gval vgl-gval--bool">'+mk+'<span class="vgl-gval__t">Ja</span></span>';
+        return '<tr role="row" data-key="'+row.key+'" class="vgl-gx" id="vglG'+k+'"'+(gOpen?'':' hidden')+'><th class="rh" scope="row" role="rowheader">'+labelHTML(row)+gval+'</th>'+vis.map(function(){return '<td class="vgl-val vgl-val--mark" role="cell">'+mark+'</td>';}).join('')+'</tr>';
       }).join('');
     }
     var tbody='<tbody class="vgl-sec vgl-sec--u" role="rowgroup">'+secHead('<span class="vgl-sec__t">Unterschiede</span> <span class="vgl-sec__n">'+an.U.length+'</span>')+

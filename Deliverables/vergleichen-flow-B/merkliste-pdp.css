@@ -201,9 +201,8 @@
 @media(prefers-reduced-motion:reduce){.pdp-media__stage .mkl-pdp-media,.mkl-mark__disc{transition:none !important}}
 
 /* ==== Merken before a colour (13.11., lead UX) ====
-   The button keeps its normal look – it works: it opens the page's colour window (#colorwin) with this line under the
-   title, saying the build is bookmarked with the colour picked there. ==== */
-.colorwin__note{margin:.25rem 0 0;font-size:.875rem;line-height:1.4;color:var(--text-muted)}
+   The button keeps its normal look – it works: it opens the page's colour window (#colorwin), unchanged from the PDP
+   prototype. ==== */
 
 /* The swatch group takes focus when "Merken" asks for a colour first (tabindex -1, never in the tab order); the
    highlight pulse on the swatches marks the place, so no ring around the whole group. */

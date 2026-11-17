@@ -918,15 +918,15 @@
   /* ---- "Merken" before a colour opens the page's colour window (13.11., lead UX; user: the existing side window, no
      extra panel) ----
      A greyed "Merken" only explained itself after a press. Now it is a normal button that answers with the way forward:
-     the page's labelled side window "Farbe wählen" opens, with a line saying the build is bookmarked with the colour
-     picked there. The pick runs through the page's swatches (picture, title, price, buy button follow) and the build is
+     the page's labelled side window "Farbe wählen" opens – exactly as in the PDP prototype (17.11., user: no extra line
+     in it); the "Konfiguration gemerkt" toast confirms the save. The pick runs through the page's swatches (picture, title, price, buy button follow) and the build is
      bookmarked in the same step; closing without a pick saves nothing. "Wunschfarbe nach RAL" needs its RAL tone, so
      that row leads to the RAL picker. Same for the gallery button and the sticky-bar echo. */
   var pickFor = null;
   function openPick(btn) {
     if (!window.MTZ_PDP.colours) { askColour(); return; }
     pickFor = btn; btn.setAttribute('aria-expanded', 'true');
-    window.MTZ_PDP.colours(btn, 'Gemerkt wird Ihre Konfiguration – mit der Farbe, die Sie hier wählen.', function (picked) {
+    window.MTZ_PDP.colours(btn, function (picked) {
       pickFor = null; btn.setAttribute('aria-expanded', 'false');
       if (picked) choosePick(btn);
     });

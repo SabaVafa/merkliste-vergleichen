@@ -334,3 +334,20 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Behalten (unsichtbar, ändert am Bild nichts):** Filter-Sheet bis zum Bildschirmrand gestreckt, damit es in sich scrollt – im Prototyp ist es auf dem Handy 1379 px hoch bei 812 px Bildschirm, die unteren Filter sind nicht erreichbar; geschlossener Filter-Drawer nicht in der Tab-Reihenfolge; unsichtbare 24-px-Tippflächen für kleine Textlinks. Ebenso die nicht-responsiven Punkte: ausgeblendete leere Filteroptionen, Checkbox-Radius 4 px (DS).
 
 `plp.css?v=271`.
+
+## 39 · Farbfenster auf dem Handy wie im PDP-Prototyp (17.11.2026, Nutzerentscheidung)
+- **Keine Zusatzzeile:** Die Zeile „Gemerkt wird Ihre Konfiguration – mit der Farbe, die Sie hier wählen.“ aus §36 ist entfernt. Das Fenster zeigt nur „Farbe wählen“ wie im PDP-Prototyp. „Merken“ öffnet es weiterhin und merkt bei einer Farbwahl; der Hinweis „Konfiguration gemerkt“ bestätigt danach.
+- **Bottom-Sheet auf dem Handy:** Unter 768 px fährt das Farbfenster von unten hoch (Nutzer: „on mobile it is a bottom up window“, Vorlage: Screenshot aus dem PDP-Prototyp). Volle Breite, höchstens 70 % der Bildschirmhöhe (die Seite bleibt oben sichtbar), oben 12 px Radius, Schatten und abgedunkelter Hintergrund ohne Unschärfe wie beim Preis-Sheet der Seite (`.sheet__panel`). Die Liste scrollt im Sheet; Schließen, Esc und Fokus-Rückgabe bleiben. Ab 768 px bleibt das Seitenfenster rechts.
+- Hinweis: Der veröffentlichte PDP-Prototyp (https://sabavafa.github.io/product-detail-page/, Stand 17.11.) zeigt mit `?flow=b` noch das Seitenfenster; umgesetzt ist das Bottom-Sheet nach dem Screenshot.
+
+`pdp-b.css?v=731`, `pdp-b.js?v=299`, `merkliste.js?v=55`, `merkliste-pdp.css?v=28`.
+
+## 40 · Vergleich auf dem Handy – Lead-Design-Durchgang (17.11.2026)
+- **Gemeinsamkeiten in einer Zeile je Merkmal:** links das Merkmal mit ⓘ, rechts der gemeinsame Wert mit einem grünen Haken (z. B. „Typ ⓘ … ✓ Video“). Die Haken-Zeile unter jedem Modell entfällt auf dem Handy – die Überschrift sagt bereits, dass alles für alle Modelle gilt. Merkmal ohne Wert (Nachtsicht) zeigt „✓ Ja“. 88–108 px → 45 px je Merkmal. Passen Merkmal und Wert nicht nebeneinander (z. B. „Abmessungen (B × H × T)“ + „B 37 · H 37 · T 10,5 cm“), steht der Wert rechtsbündig in der Zeile darunter.
+- **Geöffnete Gemeinsamkeiten ohne Leerzeile:** die ausgeblendete Merkmalsvorschau belegte noch eine Zeile (87 → 68 px).
+- **Durchgehende Trennlinien:** Die Linien zwischen den Zeilen brachen in der Lücke zwischen den Modellspalten ab; jetzt laufen sie über die ganze Zeile.
+- **Abmessungen:** „T k. A.“ bricht nicht mehr um („… · T“ / „k. A.“).
+- **Bewusst nicht geändert:** die Modellnamen im Kopf bleiben die vollständigen Shop-Namen (Nutzerentscheidung 11.11., „Text nie abschneiden“ aus dem Responsive-Audit); die mitlaufende Leiste zeigt wie bisher die Kurznamen.
+- Desktop unverändert (geprüft bei 1280 px: Haken je Modell, kein „Ja“). Ergebnis bei 375 px, SDM10X + Colson, Gemeinsamkeiten offen: Vergleich 3011 → 2697 px hoch, kein horizontales Scrollen.
+
+`vergleichen.js?v=131`, `vergleichen.css?v=183`.
