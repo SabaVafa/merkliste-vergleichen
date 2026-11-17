@@ -463,15 +463,14 @@ Durchgespielt mit drei Ständen der Merkliste: leer · passendes Modell + bereit
 
 `vergleichen.js?v=147`, `merkliste.js?v=59`, `merkliste.css?v=51`.
 
-## 55 · Handy mit drei Modellen: Paar-Vergleich (17.11.2026, Nutzer-Entscheidung „A“)
-Ausgangslage: Auf dem Handy passen zwei Spalten; bei drei Modellen war eins verborgen und wurde über den Namen gewechselt („2 von 3 Modellen sichtbar – zum Wechseln den Namen antippen“). Eine Wisch-Variante (zwei Spalten plus angeschnittene dritte) wurde verworfen – oben scrollte es seitlich, unten nicht.
+## 55 · Handy mit drei Modellen: zwei sichtbar, Auswahl im Blatt (17.11.2026)
+Ausgangslage: Auf dem Handy passen zwei Spalten; bei drei Modellen war eins verborgen und wurde über den Namen gewechselt („2 von 3 Modellen sichtbar – zum Wechseln den Namen antippen“). Verworfen auf dem Weg hierher: eine Wisch-Variante (oben scrollte es seitlich, unten nicht), eine Modellwahl über den Fotos mit Kacheln, danach als Tab-Zeile mit Fotos, und ⇄-Symbole auf den Fotos – Nutzer: „it is too much! we need just a label“. Produktnamen wie „Maxior“ kennen Besucher nicht; erkannt wird am Foto.
 - **Immer zwei vollständige Spalten**, nichts angeschnitten, kein seitliches Scrollen. Das Maximum bleibt auf allen Geräten 3.
-- **Modellwahl über den Fotos:** drei Schaltflächen mit Vorschaubild und Kurzname (Design-Name, z. B. „Horizon“, „Colson“ – „VDM10 2.0 …“ war doppelt); die beiden angezeigten Teal umrandet (`aria-pressed`), das dritte ruhig. Ein Tippen auf das dritte tauscht es in die rechte Spalte.
-- **Tausch je Spalte:** auf jedem Foto oben links, gegenüber dem ×, „⇄ Tauschen“ (Vergleichen-Pfeile) – ersetzt genau diese Spalte durch das verborgene Modell (Screenreader: „Tauschen – SDM10X statt XDM10 Maxior anzeigen“). Tippfläche 2,75 rem hoch. Zuerst stand dort der Name des verborgenen Modells („⇄ Maxior“) – auf fremden Fotos las er sich wie deren Beschriftung (Nutzer: „Maxior is fixed“).
-- **Reihenfolge:** Die Spalten folgen immer der Reihenfolge der Modellwahl – vorher konnte die Wahl „Maxior · Colson · SDM10X“ lauten und die Spalten „SDM10X | Colson“.
-- **Auswertung für das angezeigte Paar:** Unterschiede, „Nicht für alle gepflegt“ und Gemeinsamkeiten werden für die zwei sichtbaren Modelle berechnet („gilt für beide angezeigten Modelle“); „Bestwert“ ebenfalls nur zwischen den beiden. Die Zeilenunterschrift „Unterschied bei: …“ (verwies auf das verborgene Modell) entfällt.
-- Nach dem Tausch bleibt die Leseposition; der Fokus bleibt auf dem benutzten Bedienelement; Screenreader hören „Spalte n zeigt jetzt … Unterschiede gelten für die beiden angezeigten Modelle.“
-- Unverändert: zwei Modelle auf dem Handy (keine Modellwahl, „Modell hinzufügen“ bleibt), Tablet und Desktop (alle Spalten, Auswertung über alle Modelle). Druck blendet Modellwahl und Chips aus.
+- **Eine ruhige Zeile über den Fotos:** „**2 von 3 Modellen sichtbar** · Auswahl ändern“ (Link, Teal, unterstrichen, Tippfläche 2,75 rem), darunter grau „Alle 3 nebeneinander sehen Sie am Computer.“ Keine Steuerelemente auf den Fotos – dort bleibt nur das ×.
+- **„Auswahl ändern“ öffnet ein Blatt von unten** (das vorhandene Auswahl-Blatt): „Modelle für die Ansicht wählen“ – „Auf dem Handy passen 2 Modelle nebeneinander. Wählen Sie 2 von 3.“ Jede Zeile: Kästchen, Foto, Name, Preis. Sind zwei gewählt, ist das dritte gesperrt, bis eins abgewählt ist; der Knopf zeigt dann „Noch 1 Modell wählen“ (gesperrt), sonst „Anzeigen“. Schließen mit ×, Escape oder Tippen daneben; nach „Anzeigen“ bleibt die Leseposition und der Fokus geht zurück auf den Link; Screenreader hören „Angezeigt: Colson und SDM10X. Unterschiede gelten für diese beiden Modelle.“
+- **Auswertung für die angezeigten zwei:** Unterschiede, „Nicht für alle gepflegt“ und Gemeinsamkeiten („gilt für beide angezeigten Modelle“) sowie „Bestwert“ werden für die sichtbaren Modelle berechnet; die Spalten folgen der Reihenfolge des Vergleichs.
+- **Mitlaufende Modellleiste:** „Zum Produkt ›“ einzeilig und in beiden Spalten auf einer Höhe (Namen haben zwei Zeilen Platz); oben und unten je 12 px (vorher 3 px).
+- Unverändert: zwei Modelle auf dem Handy (keine Zeile, „Modell hinzufügen“ bleibt), Tablet und Desktop (alle Spalten, Auswertung über alle Modelle). Druck blendet die Zeile aus.
 - Geprüft: 375 px und 440 px (Türsprechanlagen und Briefkästen), 2 Modelle auf dem Handy, Desktop 1440 px.
 
-`vergleichen.js?v=152`, `vergleichen.css?v=212`.
+`vergleichen.js?v=158`, `vergleichen.css?v=223`.

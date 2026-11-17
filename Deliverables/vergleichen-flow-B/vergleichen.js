@@ -229,8 +229,8 @@
       var opt=e.target.closest('[data-addid]');if(opt){chooseAdd(opt.getAttribute('data-addid'));return;}
       var po=e.target.closest('[data-pickid]');if(po){choosePick(po.getAttribute('data-pickid'));return;}
       var pb=e.target.closest('[data-pick]');if(pb){if(pickEl&&pickBtn===pb)closePick(true);else openPick(pb);return;}
-      var pp=e.target.closest('[data-pairpick]');if(pp){if(pp.getAttribute('aria-pressed')!=='true')swapIn(visCols.length-1,pp.getAttribute('data-pairpick'));return;}
-      var sw=e.target.closest('[data-swapcol]');if(sw&&cur&&cur.hidden.length){swapIn(+sw.getAttribute('data-swapcol'),cur.items[cur.hidden[0]].id);return;}
+      var vs=e.target.closest('[data-vissheet]');if(vs){if(pickEl&&pickBtn===vs)closePick(true);else openVis(vs);return;}
+      var vg=e.target.closest('[data-visgo]');if(vg){applyVis();return;}
       var a=e.target.closest('[data-vgl]');
       if(a&&a.getAttribute('data-vgl')==='body')a=null;   /* the body container carries data-vgl too */
       if(a){var k=a.getAttribute('data-vgl');
@@ -1027,7 +1027,7 @@
       /* (a) photo tile with remove in its corner (the bookmark left it 13.11. – bookmarks are made on the product page);
              the photo is inset, so the icons never sit on it. The label column's "add" slot spans the whole header
              (an empty product slot) instead of leaving three empty cells under it. */
-      row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick&&c.hidden.length?'<button class="vgl-swap" type="button" data-swapcol="'+vis.indexOf(i)+'" aria-label="Tauschen – '+esc(c.titles[c.hidden[0]].t)+' statt '+esc(t.t)+' anzeigen">'+SCALE+'<span>Tauschen</span></button>':'')+'</div>');}).join(''))+
+      row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+'</div>');}).join(''))+
       /* (b) names = the column headers */
       row('name','',vis.map(function(i,k){return '<th class="vgl-hc" scope="col" role="columnheader" data-id="'+esc(items[i].id)+'">'+nameCell(items[i],i,k,c)+'</th>';}).join(''))+
       /* (c) price + UVP on one line */
@@ -1197,12 +1197,12 @@
     var capTxt='Vergleich von '+n+' '+LENS.label+(pick?' – sichtbar: '+vis.map(function(i){return titles[i].t;}).join(', '):'');
     /* phones (Responsive audit 14): the label column with the add slot is hidden there, so one line above the header carries
        "Modell hinzufügen" and — when not all models fit — how many are visible and how to switch (CSS shows it < 48 rem only) */
-    var pairSel=pick?'<div class="vgl-pair" role="group" aria-label="Angezeigte Modelle: '+nv+' von '+n+'">'+items.map(function(p,i){
-        var on=vis.indexOf(i)>-1;
-        return '<button class="vgl-pair__m'+(on?' is-on':'')+'" type="button" data-pairpick="'+esc(p.id)+'" aria-pressed="'+on+'"'+(on?'':' aria-label="'+esc(titles[i].t)+' anzeigen – ersetzt '+esc(titles[vis[nv-1]].t)+'"')+'>'+
-          '<span class="vgl-pair__img"><img src="'+esc(p.img)+'" alt="" width="32" height="32" decoding="async"></span><span class="vgl-pair__t">'+esc(refs[i].n)+'</span></button>';
-      }).join('')+'</div>':'';
-    var mbar=(pick||n<MAX)?'<div class="vgl-mbar'+(pick?' vgl-mbar--pair':'')+'">'+pairSel+
+    /* Phones with three models (17.11., user: "we need just a label … they can press the link then a bottom up window opens
+       to provide the product list, also let them know that on desktop they have the full view"): one line says how many
+       are shown, the link "Auswahl ändern" opens the product list as a bottom sheet, a second line says where all fit */
+    var pairSel=pick?'<p class="vgl-mbar__t vgl-mbar__vis"><b>'+nv+' von '+n+' Modellen sichtbar</b> · <button class="vgl-mbar__link" type="button" data-vissheet aria-haspopup="dialog" aria-expanded="false">Auswahl ändern</button>'+
+      '<span class="vgl-mbar__hint">Alle '+n+' nebeneinander sehen Sie am Computer.</span></p>':'';
+    var mbar=(pick||n<MAX)?'<div class="vgl-mbar">'+pairSel+
       (n<MAX?'<button class="vgl-tb vgl-tb--teal vgl-mbar__add" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+'</div>':'';
     var table=mbar+'<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
 
@@ -1348,6 +1348,40 @@
     setPickAct(c.vis[pickCol]);
     list.focus();
   }
+  /* "Auswahl ändern" (phones, three models): the product list as a bottom sheet – photo, name, price, a checkbox each;
+     two fit side by side, so a third box is locked until one is cleared; "Anzeigen" shows the two. It lives in the
+     picker slot, so tapping beside it, × and Escape close it like the other sheets. */
+  function openVis(btn){
+    closePick(false);closeAdd(false);if(!cur)return;
+    var c=cur,max=c.vis.length;
+    pickBtn=btn;pickCol=-1;
+    var opts=c.items.map(function(p,i){var on=c.vis.indexOf(i)>-1;return '<li><label class="vgl-visopt"><input type="checkbox" value="'+esc(p.id)+'"'+(on?' checked':'')+'><span class="vgl-box" aria-hidden="true">'+CHK+'</span><span class="vgl-addopt__img"><img src="'+esc(p.img)+'" alt=""></span><span class="vgl-pickopt__t"><b>'+esc(c.titles[i].t)+'</b><span class="vgl-pickopt__p">ab '+euro(p.price)+'</span></span></label></li>';}).join('');
+    pickEl=h('<div class="vgl-pick is-sheet vgl-vis" role="dialog" aria-labelledby="vglVisH" aria-describedby="vglVisS">'+
+      '<div class="vgl-pick__head"><p class="vgl-pick__h" id="vglVisH">Modelle für die Ansicht wählen</p><button class="vgl-addsearch__x" type="button" data-vgl="pickclose" aria-label="Auswahl schließen">'+IC_X+'</button></div>'+
+      '<p class="vgl-vis__sub" id="vglVisS">Auf dem Handy passen '+max+' Modelle nebeneinander. Wählen Sie '+max+' von '+c.items.length+'.</p>'+
+      '<ul class="vgl-vis__list">'+opts+'</ul>'+
+      '<button class="btn btn--primary vgl-vis__go" type="button" data-visgo>Anzeigen</button></div>');
+    var scrim=h('<div class="vgl-addsearch__scrim" aria-hidden="true"></div>');view.appendChild(scrim);pickEl._scrim=scrim;
+    view.appendChild(pickEl);
+    btn.setAttribute('aria-expanded','true');
+    function sync(){
+      var box=pickEl.querySelectorAll('input'),on=pickEl.querySelectorAll('input:checked').length;
+      Array.prototype.forEach.call(box,function(x){var lock=!x.checked&&on>=max;x.disabled=lock;x.closest('.vgl-visopt').classList.toggle('is-disabled',lock);});
+      var go=pickEl.querySelector('[data-visgo]');go.disabled=on!==max;
+      go.textContent=on===max?'Anzeigen':'Noch '+(max-on)+' Modell wählen';
+    }
+    pickEl.addEventListener('change',sync);sync();
+    var f=pickEl.querySelector('input:checked');if(f)f.focus();
+  }
+  function applyVis(){
+    if(!pickEl)return;
+    var ids=Array.prototype.map.call(pickEl.querySelectorAll('input:checked'),function(x){return x.value;});
+    if(!cur||ids.length!==cur.vis.length)return;
+    var st=scrollEl.scrollTop;closePick(false);
+    visCols=ids;renderView();scrollEl.scrollTop=st;
+    var b=view.querySelector('[data-vissheet]');if(b)b.focus({preventScroll:true});
+    announce('Angezeigt: '+ids.map(refName).join(' und ')+'. Unterschiede gelten für diese beiden Modelle.');
+  }
   function setPickAct(i){
     if(!pickEl)return;var list=pickEl.querySelector('ul'),o=list.querySelectorAll('[role="option"]');if(!o.length)return;
     pickAct=(i+o.length)%o.length;
@@ -1361,14 +1395,6 @@
     pickEl.remove();pickEl=null;
     var b=pickBtn;pickBtn=null;
     if(b){b.setAttribute('aria-expanded','false');if(refocus&&document.contains(b))b.focus();}
-  }
-  /* pair mode: put model id into column col, keep the reading position; focus stays on the control that was used */
-  function swapIn(col,id){
-    if(!visCols||col<0||col>=visCols.length||visCols[col]===id)return;
-    var st=scrollEl.scrollTop,ae=document.activeElement,pair=ae&&ae.hasAttribute&&ae.hasAttribute('data-pairpick');
-    visCols[col]=id;renderView();scrollEl.scrollTop=st;
-    var f=pair?view.querySelector('[data-pairpick="'+id+'"]'):view.querySelector('[data-swapcol="'+col+'"]');if(f)f.focus({preventScroll:true});
-    announce('Spalte '+(col+1)+' zeigt jetzt '+refName(id)+'. Unterschiede gelten für die beiden angezeigten Modelle.');
   }
   function choosePick(id){
     var col=pickCol,was=visCols[col];
