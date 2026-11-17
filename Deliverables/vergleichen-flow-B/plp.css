@@ -774,6 +774,14 @@
 .faq__item[open] .faq__q-icon { background: none; border: 0; color: var(--teal); }
 .faq__item[open] .faq__q-icon svg { transform: scaleY(-1); }   /* down chevron flips to up */
 .faq__a { padding: 0 40px var(--sp-5) var(--sp-5); color: var(--ink-72); line-height: 1.6; max-width: none; }
+/* Phones (17.11. mobile check): at 18px bold with 20px padding + 16px gap the questions only got ~250px and broke
+   into 3–4 lines (121–148px per closed row). Body-size questions, a tighter frame and an answer without the desktop's
+   40px right inset keep each question to 1–2 lines. Desktop stays exactly as in the PLP prototype. */
+@media (max-width: 767px) {
+  .faq .section-title { font-size: 1.5rem; }
+  .faq__q { gap: var(--sp-3); padding: var(--sp-4) var(--sp-1) var(--sp-4) var(--sp-4); font-size: 1rem; line-height: 1.4; }
+  .faq__a { padding: 0 var(--sp-4) var(--sp-4); font-size: 0.9375rem; }
+}
 
 /* ============================================================
    Responsive

@@ -322,4 +322,6 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Linke Spalte so breit wie die Filterleiste (`var(--sidebar-w)`, 288 px statt 340 px): Die Karte „Warum Metzler?“ fluchtet mit den Filtern darüber – wie im PLP-Prototyp.
 - Text „Über 1,8 Mio. zufriedene Kunden“ (statt „Hauseigentümer“), Sprechanlagen und Briefkästen. Die Gedankenstriche bleiben als „ – “ (Halbgeviertstrich mit Leerzeichen), auch wo der Prototyp „—“ setzt.
 
-`plp.css?v=269`.
+- **Mobil-Check (17.11.):** Auf dem Handy (375 px) brachen die Fragen in 18 px fett mit 20 px Innenabstand und 16 px Lücke auf 3–4 Zeilen um (121–148 px je geschlossener Frage). Nur unter 768 px gilt jetzt: Fragen 16 px (Zeilenhöhe 1,4), Innenabstand 16 px, Lücke 12 px, Antworten 15 px ohne die 40 px Einzug rechts, Überschrift 24 px. Ergebnis: 2–3 Zeilen, 77–99 px je Frage (Briefkästen 56–77 px), kein horizontales Scrollen. „Warum Metzler?“ steht unter den Fragen und bleibt unverändert. Desktop bleibt wie im PLP-Prototyp.
+
+`plp.css?v=270`.
