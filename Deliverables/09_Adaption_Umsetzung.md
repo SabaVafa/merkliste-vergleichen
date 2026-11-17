@@ -474,3 +474,14 @@ Ausgangslage: Auf dem Handy passen zwei Spalten; bei drei Modellen war eins verb
 - Geprüft: 375 px und 440 px (Türsprechanlagen und Briefkästen), 2 Modelle auf dem Handy, Desktop 1440 px.
 
 `vergleichen.js?v=158`, `vergleichen.css?v=223`.
+
+## 56 · Blätter von unten: weiches Öffnen und Schließen (17.11.2026, Nutzer: „enhance the expand / collapse behavior to make it smooth and professional“)
+Die Blätter des Vergleichs auf dem Handy („Auswahl ändern“, Modellsuche) sprangen ohne Bewegung auf und verschwanden schlagartig; der helle Hintergrund ließ den Vergleich durchscheinen. Jetzt wie das Blatt im PDP-Prototyp:
+- **Öffnen:** fährt in 0,34 s von unten herein (cubic-bezier(.2,.7,.2,1)), der Hintergrund blendet in 0,3 s auf ein dunkles rgba(20,22,25,.45) ein.
+- **Schließen** (×, Escape, Tippen daneben, „Anzeigen“): fährt in 0,26 s beschleunigend nach unten, der Hintergrund blendet aus; währenddessen für Screenreader verborgen und nicht antippbar. Der Fokus geht sofort zurück zum auslösenden Link.
+- **Ziehen:** Griff und Titelzeile lassen sich nach unten ziehen – das Blatt folgt dem Finger; über ein Drittel der Höhe oder ein schnelles Wischen schließt es, sonst federt es in 0,25 s zurück. Knöpfe in der Titelzeile (×) bleiben normal antippbar.
+- **Aussehen:** Griff oben (2,5 rem, Graphite-200), weicher Schatten nach oben wie im PDP; Scrollen in der Liste schiebt die Seite dahinter nicht mit.
+- Bewegung reduziert (Systemeinstellung): kein Fahren und Blenden.
+- Geprüft: 375 px – Öffnen, kurzes Ziehen (federt zurück), langes Ziehen (schließt, Fokus auf „Auswahl ändern“), „Anzeigen“ (fährt hinaus, Spalten gewechselt).
+
+`vergleichen.js?v=159`, `vergleichen.css?v=224`.

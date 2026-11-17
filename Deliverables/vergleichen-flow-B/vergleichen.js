@@ -384,7 +384,7 @@
       '<div class="vgl-addsearch__foot">'+(addMkl?'<button class="vgl-link" type="button" data-vgl="addall">Alle Modelle durchsuchen</button>':'<button class="vgl-link" type="button" data-vgl="addgrid">Auf der Produktliste wählen</button>'+(nM?'<button class="vgl-link" type="button" data-vgl="addmkl">Aus der Merkliste ('+nM+')</button>':''))+'</div>'+
     '</div>');
     if(mobile){var scrim=h('<div class="vgl-addsearch__scrim" aria-hidden="true"></div>');view.appendChild(scrim);addPanel._scrim=scrim;}
-    view.appendChild(addPanel);
+    view.appendChild(addPanel);sheetDrag(addPanel,function(){closeAdd(true);});
     var inp=addPanel.querySelector('input');
     inp.addEventListener('input',renderAddList);
     inp.addEventListener('keydown',function(e){
@@ -404,8 +404,7 @@
   }
   function closeAdd(refocus){
     if(!addPanel)return;
-    if(addPanel._scrim)addPanel._scrim.remove();
-    addPanel.remove();addPanel=null;
+    sheetOut(addPanel);addPanel=null;
     var a=addAnchor;addAnchor=null;
     if(refocus&&a&&document.contains(a))a.focus();
   }
@@ -457,6 +456,35 @@
   function firstShown(sel){var l=view.querySelectorAll(sel);for(var i=0;i<l.length;i++)if(l[i].getClientRects().length)return l[i];return null;}
   /* new column from "Ähnliche Modelle": its image tile lights up once, so the eye finds it after the jump to the top */
   function reduced(){return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);}
+  /* Bottom sheets on phones (17.11., user: "enhance the expand / collapse behavior to make it smooth and professional"):
+     the motion of the PDP prototype's sheet – in from below in 0.34 s (ease-out) while the backdrop fades in, out in
+     0.26 s (ease-in); the grip and title can be dragged down: past a third of the height, or a quick flick, closes it,
+     otherwise it springs back. While leaving, the sheet is hidden from screen readers and ignores taps.
+     Reduced motion: no movement. */
+  function sheetOut(el){
+    if(!el)return;var sc=el._scrim;
+    if(!el.classList.contains('is-sheet')||reduced()){if(sc)sc.remove();el.remove();return;}
+    el.setAttribute('aria-hidden','true');el.classList.remove('is-dragging');el.style.transform='';
+    el.classList.add('is-leaving');if(sc)sc.classList.add('is-leaving');
+    setTimeout(function(){if(sc)sc.remove();el.remove();},280);
+  }
+  function sheetDrag(el,close){
+    if(!el.classList.contains('is-sheet'))return;
+    var y0=null,dy=0,t0=0;
+    el.addEventListener('touchstart',function(e){
+      var head=el.querySelector('.vgl-pick__head,.vgl-addsearch__head'),lim=head?head.getBoundingClientRect().bottom:el.getBoundingClientRect().top+48;
+      if(e.touches.length!==1||e.touches[0].clientY>lim||e.target.closest('button'))return;
+      y0=e.touches[0].clientY;dy=0;t0=Date.now();el.classList.add('is-dragging');
+    },{passive:true});
+    el.addEventListener('touchmove',function(e){if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);el.style.transform=dy?'translateY('+dy+'px)':'';},{passive:true});
+    function end(){
+      if(y0===null)return;y0=null;
+      var fast=dy>24&&dy/Math.max(1,Date.now()-t0)>.5;
+      if(dy>el.offsetHeight/3||fast){close();return;}
+      el.classList.remove('is-dragging');el.style.transform='';
+    }
+    el.addEventListener('touchend',end);el.addEventListener('touchcancel',end);
+  }
   /* Ähnliche Modelle = the PLP product card (12.11., user: "consistent with our current PLP"): the PLP renders the
      card (window.MTZ_PLP_CARD, same markup and plp.css styles, Merkliste bookmark added by merkliste.js); the
      comparison adds the differences above the price and "Zum Vergleich hinzufügen" at the foot. */
@@ -1334,7 +1362,7 @@
       '<div class="vgl-pick__head"><p class="vgl-pick__h" id="vglPickH">Modell für Spalte '+(pickCol+1)+' wählen</p><button class="vgl-addsearch__x" type="button" data-vgl="pickclose" aria-label="Auswahl schließen">'+IC_X+'</button></div>'+
       '<ul class="vgl-pick__list" role="listbox" tabindex="0" aria-labelledby="vglPickH">'+opts+'</ul></div>');
     if(mobile){var scrim=h('<div class="vgl-addsearch__scrim" aria-hidden="true"></div>');view.appendChild(scrim);pickEl._scrim=scrim;}
-    view.appendChild(pickEl);
+    view.appendChild(pickEl);sheetDrag(pickEl,function(){closePick(true);});
     if(!mobile)placePop(pickEl,btn);
     btn.setAttribute('aria-expanded','true');
     var list=pickEl.querySelector('ul');
@@ -1362,7 +1390,7 @@
       '<ul class="vgl-vis__list">'+opts+'</ul>'+
       '<button class="btn btn--primary vgl-vis__go" type="button" data-visgo>Anzeigen</button></div>');
     var scrim=h('<div class="vgl-addsearch__scrim" aria-hidden="true"></div>');view.appendChild(scrim);pickEl._scrim=scrim;
-    view.appendChild(pickEl);
+    view.appendChild(pickEl);sheetDrag(pickEl,function(){closePick(true);});
     btn.setAttribute('aria-expanded','true');
     function sync(){
       var box=pickEl.querySelectorAll('input'),on=pickEl.querySelectorAll('input:checked').length;
@@ -1391,8 +1419,7 @@
   }
   function closePick(refocus){
     if(!pickEl)return;
-    if(pickEl._scrim)pickEl._scrim.remove();
-    pickEl.remove();pickEl=null;
+    sheetOut(pickEl);pickEl=null;
     var b=pickBtn;pickBtn=null;
     if(b){b.setAttribute('aria-expanded','false');if(refocus&&document.contains(b))b.focus();}
   }
