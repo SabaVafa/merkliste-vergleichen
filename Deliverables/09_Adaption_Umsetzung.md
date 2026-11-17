@@ -309,3 +309,11 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Barrierefreiheit:** „Merken“ ist nicht mehr `aria-disabled`, sondern `aria-haspopup="dialog"` mit `aria-expanded`; Name „Merken: VDM10 2.0 Video-Türsprechanlage – Farbe wählen“. Die Farbfelder haben je den Farbnamen als Namen.
 
 `merkliste.js?v=52`, `merkliste-pdp.css?v=26`.
+
+## 36 · „Merken“ öffnet das vorhandene Farbfenster; Link „Alle Farben“ wie im PDP-Prototyp (13.11.2026, Nutzerentscheidung)
+- **Kein zusätzliches Fenster:** „Merken“ vor der Farbwahl öffnet jetzt das vorhandene Seitenfenster „Farbe wählen“ der Produktseite (`#colorwin`, Variante v2 des PDP-Prototyps). Das kleine Farbfenster am Knopf aus §35 ist entfernt.
+- **Link wie im Prototyp:** Die Produktseite zeigt standardmäßig Variante v2 (`?flow=b`): Unter den Farbfeldern steht der Link „Alle Farben mit Bezeichnung ansehen“, der dasselbe Seitenfenster öffnet. v1 bleibt unter `?flow=a` erreichbar, v3/v4 unter `?flow=c` / `?flow=d`. (`review=1` blendet im Prototyp nur den internen Varianten-Umschalter ein und wird hier nicht gebraucht.)
+- **Verhalten:** Öffnet „Merken“ das Fenster, steht unter dem Titel „Gemerkt wird Ihre Konfiguration – mit der Farbe, die Sie hier wählen.“ (auch als Beschreibung des Dialogs). Eine Farbe wählen setzt sie auf der Seite und merkt die Konfiguration im selben Schritt; schließen (✕, Esc, Hintergrund) merkt nichts und gibt den Fokus an „Merken“ zurück. Über den Link geöffnet, fehlt die Zeile, und eine Wahl setzt nur die Farbe. „Wunschfarbe nach RAL“ führt wie bisher zum RAL-Wähler. Aus der Kaufleiste gewählt, landet der Fokus auf „Merken“ in der Galerie (die Leiste tritt nach der Farbwahl zurück).
+- **Technik:** Das Fenster ist in jeder Variante verdrahtet; `MTZ_PDP.colours(opener, hinweis, callback(gewählt))` öffnet es von außen. „Merken“ hat dabei `aria-haspopup="dialog"`, `aria-controls="colorwin"` und `aria-expanded`.
+
+`merkliste.js?v=54`, `merkliste-pdp.css?v=27`, `pdp-b.js?v=298`.

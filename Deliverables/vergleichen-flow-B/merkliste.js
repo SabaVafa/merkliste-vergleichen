@@ -915,93 +915,37 @@
     if (sw) { sw.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); hintSwatches(); if (!sw.hasAttribute('tabindex')) sw.setAttribute('tabindex', '-1'); sw.focus({ preventScroll: true }); }
     toast('Bitte wählen Sie zuerst eine Farbe – dann können Sie Ihre Konfiguration merken.', 'info');
   }
-  /* ---- "Merken" before a colour opens the colour choice at the button (13.11., lead UX) ----
-     A greyed "Merken" only explained itself after a press, with a message far from the finger. Now it is a normal button
-     that opens a small colour panel right where the visitor pressed: pick a colour there and the page takes it (picture,
-     title, price, buy button) and the build is bookmarked in the same step – the answer to "why can't I?" is the way
-     forward. The page's own swatches stay the main route. "Wunschfarbe nach RAL" needs the RAL picker on the page, so
-     that tile sets it and leads there. Same panel for the gallery button and the sticky-bar echo (opens upwards). */
-  var cpop = null, cpopFor = null;
-  function pageSwatches() { return Array.prototype.slice.call(document.querySelectorAll('#pdpSwatches .pdp-swatch')); }
+  /* ---- "Merken" before a colour opens the page's colour window (13.11., lead UX; user: the existing side window, no
+     extra panel) ----
+     A greyed "Merken" only explained itself after a press. Now it is a normal button that answers with the way forward:
+     the page's labelled side window "Farbe wählen" opens, with a line saying the build is bookmarked with the colour
+     picked there. The pick runs through the page's swatches (picture, title, price, buy button follow) and the build is
+     bookmarked in the same step; closing without a pick saves nothing. "Wunschfarbe nach RAL" needs its RAL tone, so
+     that row leads to the RAL picker. Same for the gallery button and the sticky-bar echo. */
+  var pickFor = null;
   function openPick(btn) {
-    var sws = pageSwatches(); if (!sws.length) { askColour(); return; }
-    if (cpop) { var same = cpopFor === btn; closePick(false); if (same) return; }
-    cpopFor = btn;
-    var tiles = sws.map(function (sw) {
-      var f = sw.getAttribute('data-finish'), d = +sw.getAttribute('data-delta') || 0, im = sw.querySelector('img');
-      var nm = f + (d ? ' · + ' + euro(d) : '') + (/Wunschfarbe/.test(f) ? ' – RAL-Ton auf der Seite wählen' : '');
-      return '<button class="mkl-cpop__sw" type="button" data-fin="' + esc(f) + '" data-nm="' + esc(nm) + '" aria-label="' + esc(nm) + '"><img src="' + esc(im ? im.getAttribute('src') : '') + '" alt=""></button>';
-    }).join('');
-    cpop = h('<div class="mkl-cpop" role="dialog" aria-labelledby="mklCpopT" aria-describedby="mklCpopD">' +
-      '<div class="mkl-cpop__head"><p class="mkl-cpop__t" id="mklCpopT">Farbe wählen und merken</p>' +
-      '<button class="mkl-cpop__x" type="button" data-cpop="x" aria-label="Schließen">' + IC_X + '</button></div>' +
-      '<p class="mkl-cpop__d" id="mklCpopD">Gemerkt wird Ihre Konfiguration – mit der Farbe, die Sie hier wählen.</p>' +
-      '<div class="mkl-cpop__grid">' + tiles + '</div>' +
-      '<p class="mkl-cpop__name" aria-hidden="true">Wählen Sie eine Farbe</p></div>');
-    cpop.classList.toggle('is-up', !!btn.closest('#pdpStickyBar'));
-    document.body.appendChild(cpop);
-    placePick();
-    btn.setAttribute('aria-expanded', 'true');
-    var nameEl = cpop.querySelector('.mkl-cpop__name'), rest = nameEl.textContent;
-    /* the line names the hovered or keyboard-focused colour; the focus set on opening shows nothing (it would read as chosen) */
-    var kbd = function (el) { try { return el.matches(':focus-visible'); } catch (x) { return false; } };
-    var show = function (e) { var t = e.target.closest && e.target.closest('.mkl-cpop__sw'); nameEl.textContent = t && (e.type !== 'focusin' || kbd(t)) ? t.getAttribute('data-nm') : rest; };
-    cpop.addEventListener('pointerover', show); cpop.addEventListener('focusin', show);
-    cpop.addEventListener('pointerleave', function () { var a = document.activeElement; nameEl.textContent = (a && a.classList.contains('mkl-cpop__sw') && kbd(a)) ? a.getAttribute('data-nm') : rest; });
-    cpop.addEventListener('click', function (e) {
-      if (e.target.closest('[data-cpop="x"]')) { closePick(true); return; }
-      var t = e.target.closest('.mkl-cpop__sw'); if (t) choosePick(t.getAttribute('data-fin'));
+    if (!window.MTZ_PDP.colours) { askColour(); return; }
+    pickFor = btn; btn.setAttribute('aria-expanded', 'true');
+    window.MTZ_PDP.colours(btn, 'Gemerkt wird Ihre Konfiguration – mit der Farbe, die Sie hier wählen.', function (picked) {
+      pickFor = null; btn.setAttribute('aria-expanded', 'false');
+      if (picked) choosePick(btn);
     });
-    cpop.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { e.stopPropagation(); closePick(true); return; }
-      var a = Array.prototype.slice.call(cpop.querySelectorAll('.mkl-cpop__sw')), i = a.indexOf(document.activeElement); if (i < 0) return;
-      var step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 4, ArrowUp: -4 }[e.key]; if (!step) return;
-      e.preventDefault(); a[Math.max(0, Math.min(a.length - 1, i + step))].focus();
-    });
-    cpop.addEventListener('focusout', function () { setTimeout(function () { if (cpop && !cpop.contains(document.activeElement) && document.activeElement !== cpopFor) closePick(false); }, 0); });
-    var first = cpop.querySelector('.mkl-cpop__sw'); if (first) first.focus({ preventScroll: true });
-    if (reduced()) cpop.classList.add('is-in'); else requestAnimationFrame(function () { if (cpop) cpop.classList.add('is-in'); });
-    live('Farbe wählen und merken: ' + sws.length + ' Farben');
   }
-  function placePick() {
-    if (!cpop || !cpopFor) return;
-    var r = cpopFor.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
-    if (r.bottom < 0 || r.top > vh || r.width === 0) { closePick(false); return; }   /* the button left the screen */
-    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, gap = rem / 2, w = cpop.offsetWidth, ht = cpop.offsetHeight;
-    var up = cpop.classList.contains('is-up') || (r.bottom + gap + ht > vh && r.top - gap - ht > 0);
-    cpop.classList.toggle('is-up', up);
-    cpop.style.left = Math.max(rem, Math.min(r.right - w, vw - rem - w)) + 'px';
-    cpop.style.top = (up ? r.top - gap - ht : r.bottom + gap) + 'px';
-  }
-  function closePick(back) {
-    if (!cpop) return;
-    var el = cpop, btn = cpopFor; cpop = null; cpopFor = null;
-    el.remove();
-    if (btn) { btn.setAttribute('aria-expanded', 'false'); if (back) btn.focus({ preventScroll: true }); }
-  }
-  function choosePick(fin) {
-    var btn = cpopFor, sw = pageSwatches().filter(function (x) { return x.getAttribute('data-finish') === fin; })[0];
-    closePick(false);
-    if (!sw) return;
-    sw.click();   /* the page takes the colour first – picture, title, price and buy button follow */
+  function choosePick(btn) {
     var st = pdpState();
     if (!st.s1) { askRal(); return; }
     pdpLast = btn;
     if (st.on) toast('Diese Konfiguration ist bereits gemerkt.', 'info', { label: 'Zur Merkliste', fn: openDrawer });
     else { addConfig(st.sn); stampPdp(); }   /* a new entry: never overwrite an earlier build of the same colour */
-    if (btn && btn.getBoundingClientRect().width) btn.focus({ preventScroll: true });
-    /* picked from the sticky bar: the colour opens the page's options, its buy button comes into view and the bar steps
-       away – focus would fall to the page, so it goes to the gallery "Merken" (same state) instead */
-    setTimeout(function () { var a = document.activeElement; if ((!a || a === document.body) && pdpBtn) pdpBtn.focus({ preventScroll: true }); }, 400);
+    /* opened from the sticky bar: the colour opens the page's options, its buy button comes into view and the bar steps
+       away – focus would fall to the page or stay in the closed window, so it goes to the gallery "Merken" (same state) */
+    setTimeout(function () { var a = document.activeElement; if ((!a || a === document.body || a.closest('#colorwin') || !a.getBoundingClientRect().width) && pdpBtn) pdpBtn.focus({ preventScroll: true }); }, 400);
   }
   function askRal() {
     var rp = document.getElementById('ralPick') || document.getElementById('pdpSwatches');
     if (rp) rp.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
     toast('Wählen Sie Ihren RAL-Ton – dann können Sie Ihre Konfiguration merken.', 'info');
   }
-  document.addEventListener('pointerdown', function (e) { if (cpop && !cpop.contains(e.target) && !(cpopFor && cpopFor.contains(e.target))) closePick(false); }, true);
-  window.addEventListener('scroll', function () { if (cpop) placePick(); }, { passive: true });
-  window.addEventListener('resize', function () { if (cpop) placePick(); });
   function addConfig(sn) {
     if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }, true); live(m); return; }
     var it = cfgItemFor(sn), cid = 'c-' + (sn.article || 'x') + '-' + Math.random().toString(36).slice(2, 8);
@@ -1023,7 +967,7 @@
   }
   function syncPdpMarks() {
     if (!PDP || !pdpBtn || !window.MTZ_PDP) return;
-    var st = pdpState(); if (cpop && st.s1) closePick(false);
+    var st = pdpState();
     var nm = shortName({ name: PDP.name, lens: LENS }).main, colour = st.sn.finishText || '';
     var label = st.s1 ? (st.on ? 'Konfiguration gemerkt' : 'Konfiguration merken') : (st.on ? 'Gemerkt' : 'Merken');
     var alt = st.s1 ? (st.on ? 'Konfiguration merken' : 'Konfiguration gemerkt') : (st.on ? 'Merken' : 'Gemerkt');
@@ -1040,7 +984,7 @@
       var s = b.querySelector('.mkl-pdp-save__short'); if (s) { s.textContent = shortL; s.setAttribute('data-alt', shortAlt); }
       b.classList.toggle('is-changed', !!st.changed); if (st.changed) b.setAttribute('aria-describedby', 'mklPdpChanged'); else b.removeAttribute('aria-describedby');
       b.classList.toggle('is-limit', lim); b.classList.toggle('is-wait', wait); if (lim) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
-      if (wait && !st.sn.finish) { b.setAttribute('aria-haspopup', 'dialog'); b.setAttribute('aria-expanded', cpopFor === b ? 'true' : 'false'); } else { b.removeAttribute('aria-haspopup'); b.removeAttribute('aria-expanded'); }
+      if (wait && !st.sn.finish) { b.setAttribute('aria-haspopup', 'dialog'); b.setAttribute('aria-controls', 'colorwin'); b.setAttribute('aria-expanded', pickFor === b ? 'true' : 'false'); } else { b.removeAttribute('aria-haspopup'); b.removeAttribute('aria-controls'); b.removeAttribute('aria-expanded'); }
     });
     pdpChanged.hidden = !st.changed; pdpRow.hidden = !st.changed;   /* the caption row only exists while it has something to say (no empty gap in the checkout stack) */
     if (pdpBand && !(st.on && st.hit && st.hit.configId === bandCfgId) && !(bandHash && st.hash === bandHash)) removeBand();   /* the band describes the restored build; the first change turns it into the caption */

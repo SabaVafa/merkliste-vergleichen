@@ -2608,12 +2608,12 @@ var MZSwipe = (function () {
    matching #pdpSwatches button (by data-article), so v1's whole
    selection engine (article, price delta, image swap, RAL picker,
    config unlock, refresh) is reused unchanged. The v1 grid stays
-   visible for one-click selection. Inert unless ?flow=b.
+   visible for one-click selection. v2 is the default on this PDP.
    ============================================================ */
 (function () {
   'use strict';
-  var htmlCls = document.documentElement.classList;
-  if (!htmlCls.contains('flow-b') && !htmlCls.contains('flow-c') && !htmlCls.contains('flow-d')) return;   /* v2 + v3 + v4 share this module */
+  /* wired in every flow: v2–v4 open it from their own link / field (hidden in v1), and the Merkliste "Merken" opens it
+     before a colour is chosen (MTZ_PDP.colours below, 13.11.) */
   var grid = document.getElementById('pdpSwatches');
   var link = document.getElementById('colorListLink');   /* v2 opener – "Alle Farben" text link */
   var card = document.getElementById('colorCardLink');   /* v3 opener – selected-finish summary card */
@@ -2666,19 +2666,30 @@ var MZSwipe = (function () {
     }
   }
 
-  var lastFocus = null;
-  function open(opener) {
+  var lastFocus = null, onDone = null;
+  /* optional line under the title – says why the window opened when another control opens it (e.g. "Merken") */
+  var panel = win.querySelector('.colorwin__panel'), headText = win.querySelector('.colorwin__headtext'), note = null;
+  function setNote(msg) {
+    if (!note && msg && headText) { note = document.createElement('p'); note.className = 'colorwin__note'; note.id = 'colorwinNote'; headText.appendChild(note); }
+    if (!note) return;
+    note.textContent = msg || ''; note.hidden = !msg;
+    if (msg) panel.setAttribute('aria-describedby', 'colorwinNote'); else panel.removeAttribute('aria-describedby');
+  }
+  function open(opener, msg, cb) {
+    if (win.classList.contains('is-open')) return;
     win.classList.add('is-open'); win.setAttribute('aria-hidden', 'false');
-    setExpanded('true');
+    setExpanded('true'); setNote(msg); onDone = cb || null;
     lock(); lastFocus = opener || triggers[0]; markRows();
     var target = win.querySelector('.colorwin__row.is-selected') || rows[0];
     if (target) target.focus({ preventScroll: true });
   }
-  function close() {
+  function close(picked) {
+    if (!win.classList.contains('is-open')) return;
     win.classList.remove('is-open'); win.setAttribute('aria-hidden', 'true');
     setExpanded('false');
     unlock();
     if (lastFocus) lastFocus.focus({ preventScroll: true });
+    var cb = onDone; onDone = null; if (cb) cb(picked === true);   /* the opener learns whether a colour was picked */
   }
 
   /* When the swatch row scrolls horizontally (mobile), bring the picked swatch into view.
@@ -2712,11 +2723,12 @@ var MZSwipe = (function () {
     r.addEventListener('click', function () {
       var sw = swatchFor(r);
       if (sw) { sw.click(); markRows(); revealSwatch(sw); placeSwlineDesktop(sw); }   /* proxy → runs all of v1's selection logic */
-      close();                                                                        /* Wunschfarbe then reveals the inline RAL picker */
+      close(true);                                                                    /* Wunschfarbe then reveals the inline RAL picker */
     });
   });
   if (link) link.addEventListener('click', function () { win.classList.contains('is-open') ? close() : open(link); });
   if (card) card.addEventListener('click', function () { win.classList.contains('is-open') ? close() : open(card); });
+  if (window.MTZ_PDP) window.MTZ_PDP.colours = open;   /* (opener, note, callback(picked)) */
   win.addEventListener('click', function (e) { if (e.target.closest('[data-cw-close]')) close(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && win.classList.contains('is-open')) close(); });
 

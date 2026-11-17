@@ -22,12 +22,12 @@
 <!-- Version B – inline build panel -->
 <link rel="stylesheet" href="pdp-b.css?v=729" />
 <link rel="stylesheet" href="../merkliste.css?v=48" /><!-- Merkliste add-on (shared with the PLPs) -->
-<link rel="stylesheet" href="../merkliste-pdp.css?v=26" /><!-- Merkliste on the PDP (07a/07b) -->
-<!-- Prototype variant switch – append ?flow=b (v2) or ?flow=c (v3) to load an alternative
-     color-selection flow. Default (no param) renders v1 exactly as-is. Runs in <head> so the
+<link rel="stylesheet" href="../merkliste-pdp.css?v=27" /><!-- Merkliste on the PDP (07a/07b) -->
+<!-- Prototype variant switch – v2 (flow-b) is the default here (13.11., user: like the PDP prototype, a link opens the
+     side window); ?flow=a renders v1, ?flow=c (v3) / ?flow=d (v4) the other color-selection flows. Runs in <head> so the
      class is set before paint. v2 = "Alle Farben" text link → side window; v3 = a selected-
      finish summary card (Sephora pattern) above the grid → same side window. -->
-<script>(function(){var f=new URLSearchParams(location.search).get('flow');if(f==='b'){document.documentElement.classList.add('flow-b');}else if(f==='c'){document.documentElement.classList.add('flow-c');}else if(f==='d'){document.documentElement.classList.add('flow-d');}})();</script>
+<script>(function(){var f=new URLSearchParams(location.search).get('flow');if(f==='c'){document.documentElement.classList.add('flow-c');}else if(f==='d'){document.documentElement.classList.add('flow-d');}else if(f!=='a'){document.documentElement.classList.add('flow-b');}})();</script>
 <!-- Trusted-Shops placement experiment: ?ts=feat|buybox|cta|reviews reveals ONE
      candidate position for the Trusted Shops signal (none shown without the param).
      Compare them side by side via ts-variants.html. -->
@@ -533,7 +533,7 @@
             <button type="button" class="pdp-swatch" aria-pressed="false" data-finish="Wunschfarbe nach RAL" data-delta="49" data-article="31108"><img src="assets/swatches/wunschfarbe-nach-ral.jpg" alt="Wunschfarbe nach RAL"><span class="pdp-swatch__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></button>
           </div>
 
-          <!-- v2 (flow-b) only: opens the full labelled color list (see #colorwin). Hidden in v1. -->
+          <!-- v2 (flow-b, the default here): opens the full labelled color list (see #colorwin). Hidden in v1 (?flow=a). -->
           <button type="button" class="bx-color__listlink" id="colorListLink" aria-haspopup="dialog" aria-expanded="false" aria-controls="colorwin">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
             Alle Farben mit Bezeichnung ansehen
@@ -1699,7 +1699,7 @@
 
 <!-- ===== v2 (flow-b) · FARBAUSWAHL – beschriftete Liste im Seitenfenster ===== -->
 <!-- Rows proxy-click the matching #pdpSwatches button (matched by data-article) so the
-     existing selection engine is reused. Inert in v1 (link hidden, JS gated on flow-b). -->
+     existing selection engine is reused. Also opens from "Merken" before a colour. -->
 <div class="colorwin" id="colorwin" aria-hidden="true">
   <div class="colorwin__backdrop" data-cw-close></div>
   <div class="colorwin__panel" role="dialog" aria-modal="true" aria-label="Farbe wählen">
@@ -1973,9 +1973,9 @@
 </div>
 
 <script src="chrome.js?v=15"></script>
-<script src="pdp-b.js?v=296"></script>
+<script src="pdp-b.js?v=298"></script>
 <script>window.MTZ_MKL_BASE='../';window.MTZ_LENS='sprechanlage';window.MTZ_PDP_PRODUCT={id:'colson1',lens:'sprechanlage',price:699,uvp:822,url:'pdp/index.html'};</script><!-- product descriptor for the Merkliste (JTL: Vaterartikel + Grundpreis) -->
-<script src="../merkliste.js?v=52"></script><!-- Merkliste add-on -->
+<script src="../merkliste.js?v=54"></script><!-- Merkliste add-on -->
 <style id="pf-lockdown-css">
 footer a,[class*="topbar"] a,[class*="top-bar"] a,[class*="trustbar"] a,[class*="claims"] a{pointer-events:none !important;cursor:default !important;}
 </style>
