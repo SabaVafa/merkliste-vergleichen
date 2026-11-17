@@ -317,3 +317,9 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Technik:** Das Fenster ist in jeder Variante verdrahtet; `MTZ_PDP.colours(opener, hinweis, callback(gewählt))` öffnet es von außen. „Merken“ hat dabei `aria-haspopup="dialog"`, `aria-controls="colorwin"` und `aria-expanded`.
 
 `merkliste.js?v=54`, `merkliste-pdp.css?v=27`, `pdp-b.js?v=298`.
+
+## 37 · FAQ-Bereich „Warum Metzler?“ nach dem PLP-Prototyp (17.11.2026)
+- Linke Spalte so breit wie die Filterleiste (`var(--sidebar-w)`, 288 px statt 340 px): Die Karte „Warum Metzler?“ fluchtet mit den Filtern darüber – wie im PLP-Prototyp.
+- Text „Über 1,8 Mio. zufriedene Kunden“ (statt „Hauseigentümer“), Sprechanlagen und Briefkästen. Die Gedankenstriche bleiben als „ – “ (Halbgeviertstrich mit Leerzeichen), auch wo der Prototyp „—“ setzt.
+
+`plp.css?v=269`.
