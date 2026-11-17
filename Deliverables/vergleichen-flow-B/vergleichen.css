@@ -1592,14 +1592,16 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 
 /* ==== Ähnliche Modelle: DS NavigationArrows on the strip (17.11., user: "provide chevrons … consistent with the Metzler
    design system") ====
-   Metzler Design System › NavigationArrows (medium): square 2.625 rem button, 4 px radius (--radius), white, 1 px teal
-   border, teal chevron 0.75 rem high (NAV-09 / NAV-10); hover teal-100, pressed teal fill with white chevron, disabled
+   Metzler Design System › NavigationArrows, mobile size (17.11., user: "you have to grab the mobile versions" – the DS
+   strips keep small arrows on phones, cf. the Türöffnungsmöglichkeiten slider, 2.125 rem): btn-nav-sm, square
+   2.1875 rem, 4 px radius (--radius), white, 1 px teal border, teal chevron 0.625 rem high (NAV-09 / NAV-10); hover
+   teal-100, pressed teal fill with white chevron, disabled
    graphite-500. Always a pair, right of the heading. Phones only – the desktop grid does not scroll (the script also
    hides the pair whenever nothing scrolls). ==== */
 .vgl-alts__hd{display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .vgl-alts__nav{display:none;gap:.5rem;flex:none}
-.vgl-navbtn{display:inline-flex;align-items:center;justify-content:center;width:2.625rem;height:2.625rem;padding:0;border:.0625rem solid var(--v-teal);border-radius:var(--v-r-m);background:var(--v-white);color:var(--v-teal);cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
-.vgl-navbtn svg{display:block;width:auto;height:.75rem;flex-shrink:0}
+.vgl-navbtn{display:inline-flex;align-items:center;justify-content:center;width:2.1875rem;height:2.1875rem;padding:0;border:.0625rem solid var(--v-teal);border-radius:var(--v-r-m);background:var(--v-white);color:var(--v-teal);cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
+.vgl-navbtn svg{display:block;width:auto;height:.625rem;flex-shrink:0}
 .vgl-navbtn:hover{background:var(--v-teal-100)}
 .vgl-navbtn:active{background:var(--v-teal);color:var(--v-white)}
 .vgl-view .vgl-alts .vgl-navbtn[aria-disabled="true"],.vgl-view .vgl-alts .vgl-navbtn[aria-disabled="true"]:hover,.vgl-view .vgl-alts .vgl-navbtn[aria-disabled="true"]:active{color:var(--graphite-500,#A1A1A1);border-color:var(--graphite-500,#A1A1A1);background:var(--v-white);cursor:default}
@@ -1666,21 +1668,34 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    · link, print, close: graphite-100 fill (paper was too faint on the white bar – same visual weight as red-50), ink glyph;
    · trash: the DS delete hover – red-50 fill, red-600 glyph (as the tray's and the Merkliste's trash).
    Phones show link / print / trash as icons; on desktop they keep their labels and the full-button hover, and the
-   close × gets the same square. Keyboard: the teal focus ring stays. ==== */
+   close × gets the same square. Keyboard: the teal focus ring stays.
+   Touch (17.11., user: "on mobile we do not have hover, so I meant pressing"): the square shows while the icon is
+   pressed (:active, same fills); hover only on devices that hover – after a tap a phone keeps :hover, which would
+   leave the square standing. No grey browser tap flash on these icons. ==== */
+.vgl-view .vgl-close,.vgl-view .vgl-bar__act .vgl-tb{-webkit-tap-highlight-color:transparent}
 .vgl-view .vgl-close{position:relative}
 .vgl-view .vgl-close::before{content:'';position:absolute;inset:.375rem;border-radius:var(--v-r-m);background:transparent;transition:background-color .15s ease}
 .vgl-view .vgl-close svg{position:relative}
-.vgl-view .vgl-close:hover,.vgl-view .vgl-bar__act+.vgl-close:hover{background:transparent;color:var(--v-ink)}
-.vgl-view .vgl-close:hover::before{background:var(--v-g100)}
+.vgl-view .vgl-close:hover,.vgl-view .vgl-bar__act+.vgl-close:hover,.vgl-view .vgl-close:active{background:transparent;color:var(--v-ink)}
+.vgl-view .vgl-close:active::before{background:var(--v-g100)}
+@media(hover:hover){.vgl-view .vgl-close:hover::before{background:var(--v-g100)}}
 @media(max-width:47.99rem){
   .vgl-view .vgl-bar__act .vgl-tb{position:relative}
   .vgl-view .vgl-bar__act .vgl-tb::before{content:'';position:absolute;inset:.25rem;border-radius:var(--v-r-m);background:transparent;transition:background-color .15s ease}
   .vgl-view .vgl-bar__act .vgl-tb svg{position:relative}
-  .vgl-view .vgl-bar__act .vgl-tb:hover,.vgl-view .vgl-bar__act .vgl-tb--clear:hover{background:transparent}
-  .vgl-view .vgl-bar__act .vgl-tb:hover::before{background:var(--v-g100)}
+  .vgl-view .vgl-bar__act .vgl-tb:hover,.vgl-view .vgl-bar__act .vgl-tb--clear:hover,.vgl-view .vgl-bar__act .vgl-tb:active{background:transparent}
   .vgl-view .vgl-bar__act .vgl-tb:hover{color:var(--v-ink)}
+  .vgl-view .vgl-bar__act .vgl-tb:active::before{background:var(--v-g100)}
+  .vgl-view .vgl-bar__act .vgl-tb--clear:active{color:var(--color-red-600,#B52320)}
+  .vgl-view .vgl-bar__act .vgl-tb--clear:active::before{background:var(--color-red-50,#FFF0EF)}
+}
+@media(max-width:47.99rem) and (hover:hover){
+  .vgl-view .vgl-bar__act .vgl-tb:hover::before{background:var(--v-g100)}
   .vgl-view .vgl-bar__act .vgl-tb--clear:hover{color:var(--color-red-600,#B52320)}
   .vgl-view .vgl-bar__act .vgl-tb--clear:hover::before{background:var(--color-red-50,#FFF0EF)}
+}
+@media(max-width:47.99rem) and (hover:none){
+  .vgl-view .vgl-bar__act .vgl-tb--clear:hover:not(:active){color:var(--v-ink)}   /* the desktop red hover rule must not stick after a tap */
 }
 @media(prefers-reduced-motion:reduce){.vgl-view .vgl-close::before,.vgl-view .vgl-bar__act .vgl-tb::before{transition:none}}
 

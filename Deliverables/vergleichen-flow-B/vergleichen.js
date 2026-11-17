@@ -214,6 +214,8 @@
     /* Responsive audit 14: a toggletip is placed before it shows (hover, keyboard focus or tap) so it stays inside the viewport */
     view.addEventListener('pointerover',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
     view.addEventListener('focusin',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
+    /* iOS Safari only applies :active (pressed states of the top-bar icons, the strip arrows) with a touch listener */
+    view.addEventListener('touchstart',function(){},{passive:true});
     /* a tip closed by pressing its (i) again stays closed until the pointer leaves or focus moves on */
     view.addEventListener('pointerout',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib.is-dismissed');if(b&&!b.contains(e.relatedTarget))b.classList.remove('is-dismissed');});
     view.addEventListener('focusout',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib.is-dismissed');if(b)b.classList.remove('is-dismissed');});

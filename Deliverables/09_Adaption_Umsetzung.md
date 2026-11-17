@@ -400,3 +400,10 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Die Titelleisten „Unterschiede“, „Nicht für alle gepflegt“ und „Gemeinsamkeiten“ waren weiß wie ihre Zeilen. Jetzt tragen sie DS Teal-50 (#F2F6F6, `--color-teal-50` aus dem Metzler Design System / PDP), so liest sich jede Karte als Titel + Inhalt. Rahmen, Radius und Haarlinie bleiben; „Gemeinsamkeiten“ behält den Ton beim Hover und eingeklappt. Alle Breiten.
 
 `vergleichen.css?v=201`.
+
+## 47 · Handy: Drücken statt Hover, Pfeile in Mobilgröße (17.11.2026, Nutzer: „on mobile we do not have hover, so I meant pressing“, „you have to grab the mobile versions“)
+- **Kopfleisten-Symbole beim Drücken:** Das Quadrat hinter Link, Drucker, Papierkorb und × erscheint jetzt beim Drücken (`:active`, dieselben Flächen: Graphite-100; Papierkorb Red-50 mit Red-600-Symbol). Hover nur noch auf Geräten mit Hover (`(hover:hover)`) – nach dem Antippen bleibt `:hover` auf dem Handy sonst stehen. Kein grauer Tipp-Blitz des Browsers. iOS Safari wendet `:active` nur mit Touch-Listener an – passiver `touchstart` auf dem Vergleich.
+- **Pfeile in Mobilgröße:** Das Metzler Design System zeigt Streifen auf dem Handy mit kleinen Pfeilen (vgl. Türöffnungsmöglichkeiten-Slider, 2,125 rem; der Hero blendet seine Pfeile auf dem Foto zugunsten von Punkten aus). Die Pfeile bei „Ähnliche Modelle“ sind jetzt NavigationArrows **klein** (btn-nav-sm): 2,1875 rem (35 px), Chevron 0,625 rem; Farben und Zustände unverändert.
+- Geprüft bei 375 px als Touch-Gerät (kein Hover): Pfeile 35 × 35 px, Chevron 10 px; Hover-Regeln aus, Drück-Regeln aktiv.
+
+`vergleichen.js?v=141`, `vergleichen.css?v=202`.
