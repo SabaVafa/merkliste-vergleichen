@@ -938,11 +938,17 @@
   function imgHTML(p){return '<img src="'+esc(p.img)+'" alt="'+esc(p.name)+'" width="160" height="160" decoding="async">';}
   /* ---- Product header (Visual redesign 06.11.): five table rows, so action icons, photo, name, price and CTA share one
      row grid across all columns. It scrolls away; a slim identity strip (.vgl-pin) takes over once it is out of view. ---- */
-  function titleHTML(t){return '<span class="vgl-ph__t">'+esc(t.full||t.base)+((!t.full||t.dup)&&t.seg?'<span class="vgl-ph__seg"> · '+esc(t.seg)+'</span>':'')+'</span>';}
+  function titleHTML(t,ic){
+    if(!ic)return '<span class="vgl-ph__t">'+esc(t.full||t.base)+((!t.full||t.dup)&&t.seg?'<span class="vgl-ph__seg"> · '+esc(t.seg)+'</span>':'')+'</span>';
+    /* switch button (17.11.): the chevron stays with the last word – it fell onto a line of its own ("Colson" / "⌄") */
+    var nw=function(x){var k=x.lastIndexOf(' ');return esc(x.slice(0,k+1))+'<span class="vgl-nw">'+esc(x.slice(k+1))+ic+'</span>';};
+    var seg=(!t.full||t.dup)&&t.seg;
+    return '<span class="vgl-ph__t">'+(seg?esc(t.full||t.base)+'<span class="vgl-ph__seg">'+nw(' · '+t.seg)+'</span>':nw(t.full||t.base))+'</span>';
+  }
   function nameCell(p,i,k,c){
     var t=c.titles[i];
     /* title and star rating share one line (wrap below only when the column is too narrow) */
-    return '<div class="vgl-ph__nameline">'+(c.pick?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+titleHTML(t)+IC_CHD+'</button>':'<div class="vgl-ph__title">'+titleHTML(t)+'</div>')+starsHTML(p,'side')+'</div>';
+    return '<div class="vgl-ph__nameline">'+(c.pick?'<button class="vgl-ph__pick" type="button" data-pick="'+k+'" aria-haspopup="listbox" aria-expanded="false" aria-label="Spalte '+(k+1)+' von '+c.vis.length+': '+esc(t.t)+'. Modell wechseln, '+c.items.length+' Modelle im Vergleich">'+titleHTML(t,IC_CHD)+'</button>':'<div class="vgl-ph__title">'+titleHTML(t)+'</div>')+starsHTML(p,'side')+'</div>';
   }
   /* star rating as on the live PLP card (full / half / empty, review count); the line is reserved in every column */
   /* where: 'side' = right end of the title line (wide columns), 'row' = own line under the title (tight columns) */

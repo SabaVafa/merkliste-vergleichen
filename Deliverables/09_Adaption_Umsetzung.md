@@ -361,3 +361,12 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Geprüft bei 390 px (SDM10X + Colson) und 360 px (drei Briefkästen, zwei sichtbar): kein horizontales Scrollen, kein Überlauf. Desktop unverändert (1280 px geprüft).
 
 `vergleichen.css?v=187`.
+
+## 42 · Vergleich auf dem Handy – feste Positionen und Modellwechsel (17.11.2026, Nutzer: „fix the placement of the additional info … professional“, „shared elements must be at the same positioning“)
+- **ⓘ immer an derselben Stelle:** Das ⓘ war absolut am Merkmalsnamen ausgerichtet – es saß zu hoch und lief beim Nutzer in „Namensschild“ / „Anzahl Klingeltaster“ hinein. Jetzt steht jedes ⓘ in allen Abschnitten (Unterschiede, Nicht für alle gepflegt, Gemeinsamkeiten) in einer Spalte am rechten Zeilenrand, mittig auf der ersten Zeile des Merkmals; im Fluss bzw. Raster gesetzt, nichts wird nachgemessen. Gemessen bei 375 px: alle ⓘ bei x = 328, höchstens 1 px neben der Textmitte.
+- **Gemeinsamkeiten im Spaltenraster:** Haken und gemeinsamer Wert beginnen genau dort, wo die Werte des zweiten Modells beginnen (x = 200 bei 375 px) – alle Haken stehen in einer Spalte, bündig mit der Tabelle darüber; vorher rechtsbündig, jeder Haken an einer anderen Stelle. Lange Werte brechen in dieser Spalte um.
+- **Erklärungen:** öffnen weiterhin ganz im Bild, der Zeiger sitzt genau auf dem ⓘ.
+- **Modellwechsel im Kopf (3 Modelle):** Namen mit Wechsel-Pfeil hatten weitere Zeilenabstände als normale Namen (24 statt 19,6 px) – angeglichen; der Pfeil ⌄ hängt am letzten Wort und rutscht nicht mehr allein in eine neue Zeile.
+- Geprüft: Türsprechanlagen (2 Modelle) und Briefkästen (3 Modelle) bei 375 px, kein horizontales Scrollen; Desktop unverändert (1280 px: ⓘ am Rand der Merkmalsspalte, Haken je Modell).
+
+`vergleichen.js?v=134`, `vergleichen.css?v=190`.

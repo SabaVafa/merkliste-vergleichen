@@ -1499,7 +1499,7 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
      and the strip use a 1.5 rem gap with a .75 rem inset – the same x for every column edge, so each value sits
      exactly under its model name and the strip's divider continues the body's column line (any number of models).
    2 Label and values form one block: the label sits .25 rem above its values, the hairline between features keeps
-     the full rhythm; the (i) follows the label text instead of the far edge.
+     the full rhythm (placement of the (i): see "One grid for repeated elements" below).
    3 Cells are transparent – the row carries the card's white, frame and rounded bottom. ==== */
 @media(max-width:47.99rem){
   /* 1 */
@@ -1512,8 +1512,6 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   /* 2 */
   table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>th[scope="row"]:nth-child(n){padding:.875rem .75rem .25rem}
   table.vgl-t tbody tr:not(.vgl-sec__h)>td.vgl-val:nth-child(n){padding-top:.25rem;padding-bottom:.875rem}
-  table.vgl-t tbody th[scope="row"] .rh__row{display:inline-block;max-width:100%;vertical-align:top}
-  table.vgl-t tbody th[scope="row"] .rh__l{padding-right:1.75rem}
   /* 3 */
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>th,.vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>td{background:transparent}
   /* header card: the photo tiles keep the same .75 rem inset at the top as at the sides (they touched the frame) */
@@ -1521,3 +1519,36 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 }
 /* "k. A." never splits across lines (it broke as "… · T k." / "A." in a narrow column) */
 .vgl-ka{white-space:nowrap}
+
+/* ==== Model switch in the header (17.11., mobile check) ====
+   The switch button kept the cell's 16 px / 24 px line box around its 14 px name, so switchable names ran on looser
+   lines than plain ones (7 lines of 24 px instead of 19.6 px). The name sets its own size at every breakpoint, so the
+   button's own line box is zeroed. The chevron is joined to the last word (.vgl-nw) – it no longer drops onto a line
+   of its own. ==== */
+.vgl-ph__pick{font-size:0;line-height:0}
+.vgl-nw{white-space:nowrap}
+
+/* ==== One grid for repeated elements on phones (17.11., user: "fix the placement of the additional info … professional",
+   "shared elements must be at the same positioning") ====
+   Before: the (i) was absolutely positioned against the label box – it sat high, and on the user's screen ran into
+   "Namensschild"; next to the label text it moved with every label length; in Gemeinsamkeiten the checks and values were
+   right-aligned, so each check sat at a different x. Now every repeated element has one fixed position:
+   · labels start on the left edge of the row (as before);
+   · every (i) sits in one column at the right edge of the row, on the label's first line – in Unterschiede, Nicht für
+     alle gepflegt and Gemeinsamkeiten alike (laid out in flow / grid, nothing measured);
+   · in Gemeinsamkeiten the check and the shared value start where the second model's values start (same 1.5 rem
+     gutter + .75 rem inset as header and strip), so all checks stand in one column and line up with the table above.
+   Desktop unchanged. ==== */
+@media(max-width:47.99rem){
+  /* label line: label left, (i) right */
+  .vgl-view table.vgl-t tbody th[scope="row"] .rh__row{display:flex;align-items:flex-start;gap:.75rem;position:static}
+  .vgl-view table.vgl-t tbody th[scope="row"] .rh__l{display:block;flex:1 1 auto;min-width:0;padding-right:0}
+  .vgl-view table.vgl-t tbody th[scope="row"] .rh__row .rh__w{position:relative;top:auto;right:auto;transform:none;flex:none;display:block;margin:.125rem 0 0 auto;line-height:0}
+  .vgl-view table.vgl-t tbody th[scope="row"] .rh__row .vgl-ib{margin:0}
+  /* Gemeinsamkeiten: label | check + value on the table's column grid, (i) at the same right edge */
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx>th.rh:nth-child(n){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:1.5rem;align-items:start}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .rh__row{display:contents}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .rh__l{grid-column:1;grid-row:1}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .rh__row .rh__w{grid-column:2;grid-row:1;justify-self:end;margin:.125rem 0 0}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .vgl-gval{grid-column:2;grid-row:1;justify-self:stretch;display:flex;align-items:flex-start;gap:.375rem;margin:0;padding-right:1.875rem;text-align:left}
+}
