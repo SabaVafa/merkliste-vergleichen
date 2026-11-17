@@ -982,7 +982,8 @@
     if(pendingCol&&ids.indexOf(pendingCol)>-1&&visCols.indexOf(pendingCol)<0){if(visCols.length>=maxC)visCols[maxC-1]=pendingCol;else visCols.push(pendingCol);}
     pendingCol=null;
     ids.forEach(function(id){if(visCols.length<maxC&&visCols.indexOf(id)<0)visCols.push(id);});
-    visCols=visCols.slice(0,maxC);
+    /* columns keep the order of the comparison, so the pair selector on phones reads left to right like the columns (17.11.) */
+    visCols=visCols.slice(0,maxC).sort(function(a,b){return ids.indexOf(a)-ids.indexOf(b);});
     return visCols.map(function(id){return ids.indexOf(id);});
   }
   function imgHTML(p){return '<img src="'+esc(p.img)+'" alt="'+esc(p.name)+'" width="160" height="160" decoding="async">';}
@@ -1026,7 +1027,7 @@
       /* (a) photo tile with remove in its corner (the bookmark left it 13.11. – bookmarks are made on the product page);
              the photo is inset, so the icons never sit on it. The label column's "add" slot spans the whole header
              (an empty product slot) instead of leaving three empty cells under it. */
-      row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick&&c.hidden.length?'<button class="vgl-swap" type="button" data-swapcol="'+vis.indexOf(i)+'" aria-label="Statt '+esc(t.t)+': '+esc(c.titles[c.hidden[0]].t)+' anzeigen">'+SCALE+'<span>'+esc(c.refs[c.hidden[0]].n)+'</span></button>':'')+'</div>');}).join(''))+
+      row('img','<th class="vgl-lc" scope="col" role="columnheader" rowspan="4"><span class="vgl-visually-hidden">Merkmal</span><div class="vgl-lc__slot">'+lc.tile+lc.mkl+'</div></th>',vis.map(function(i){var p=items[i],t=c.titles[i];return td('<div class="vgl-ph__img"><div class="vgl-ph__bar"><div class="vgl-ph__media"><span data-rm="'+esc(p.id)+'" hidden></span></div><button class="vgl-ph__rm" type="button" data-rm="'+esc(p.id)+'" aria-label="'+esc(t.t)+' aus dem Vergleich entfernen">'+IC_X+'</button></div>'+imgHTML(p)+(c.pick&&c.hidden.length?'<button class="vgl-swap" type="button" data-swapcol="'+vis.indexOf(i)+'" aria-label="Tauschen – '+esc(c.titles[c.hidden[0]].t)+' statt '+esc(t.t)+' anzeigen">'+SCALE+'<span>Tauschen</span></button>':'')+'</div>');}).join(''))+
       /* (b) names = the column headers */
       row('name','',vis.map(function(i,k){return '<th class="vgl-hc" scope="col" role="columnheader" data-id="'+esc(items[i].id)+'">'+nameCell(items[i],i,k,c)+'</th>';}).join(''))+
       /* (c) price + UVP on one line */
