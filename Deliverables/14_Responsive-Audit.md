@@ -95,3 +95,5 @@ Ohne Befund geprüft:
 | `plp.css` | Block „14 · Responsive-Audit“ (Filter-Sheet, Bedienflächen) | 263 (index, briefkasten) |
 | `merkliste.js` | `placeHint()`, „Leeren“-Kurzlabel, Resize misst den Footer neu | 19 (index, briefkasten, pdp) |
 | `merkliste.css` | Block „16 · Responsive-Audit“ | 17 (index, briefkasten, pdp) |
+
+**Nachtrag 17.11.2026:** Für das Responsive-Verhalten gilt jetzt vollständig der PLP-Prototyp (https://sabavafa.github.io/product-listing-page/). Die sichtbaren Änderungen dieses Audits in `plp.css` (44-px-Flächen für „Filter“ und Schließen, 12-px-Textwerte aus Teil 2) sind zurückgenommen; behalten sind nur Korrekturen ohne sichtbare Wirkung (scrollbares Filter-Sheet, Tab-Reihenfolge, unsichtbare Tippflächen). Details: `09_Adaption_Umsetzung.md` §38.

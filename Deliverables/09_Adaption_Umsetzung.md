@@ -325,3 +325,12 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - **Mobil-Check (17.11.):** Auf dem Handy (375 px) brachen die Fragen in 18 px fett mit 20 px Innenabstand und 16 px Lücke auf 3–4 Zeilen um (121–148 px je geschlossener Frage). Nur unter 768 px gilt jetzt: Fragen 16 px (Zeilenhöhe 1,4), Innenabstand 16 px, Lücke 12 px, Antworten 15 px ohne die 40 px Einzug rechts, Überschrift 24 px. Ergebnis: 2–3 Zeilen, 77–99 px je Frage (Briefkästen 56–77 px), kein horizontales Scrollen. „Warum Metzler?“ steht unter den Fragen und bleibt unverändert. Desktop bleibt wie im PLP-Prototyp.
 
 `plp.css?v=270`.
+
+## 38 · Responsive wie im PLP-Prototyp (17.11.2026, Nutzerentscheidung)
+- **Vorgabe:** „for responsiveness follow the plp prototype fully“ – Referenz https://sabavafa.github.io/product-listing-page/ (identisch mit dem lokalen PLP-Prototyp: `plp.css`, `Home/styles-v2.css`).
+- **Abgleich:** Prototyp und unsere Seite nebeneinander bei 375, 768 und 1024 px gemessen (Boxen, Schriftgrößen, Abstände, Rasterspalten). Ergebnis jetzt: gleiche Werte; Unterschiede nur noch im Inhalt (24 statt 12 Artikel je Seite wie im Live-Shop, längere Kategorienamen der Live-Seite, Version-B-Link, „Vergleichen“).
+- **Zurückgenommen (sichtbar):** die Handy-Regel für die FAQ aus §37 (Fragen wieder 18 px, Überschrift 27 px), aus dem Responsive-Audit Teil 2 die 12-px-Werte für Pills, „ab“/UVP, „POWERED BY“ und den Zähler im Header, sowie die 44-px-Flächen für „Filter“ und das Schließen des Filter-Sheets (wieder 34 / 36 px, erfüllt WCAG 2.5.8 AA).
+- **Ergänzt aus dem Prototyp:** SEO-Überschrift auf dem Handy 20 px (`--text-h3`), Produktberater in der Spalte ohne Abstand oben.
+- **Behalten (unsichtbar, ändert am Bild nichts):** Filter-Sheet bis zum Bildschirmrand gestreckt, damit es in sich scrollt – im Prototyp ist es auf dem Handy 1379 px hoch bei 812 px Bildschirm, die unteren Filter sind nicht erreichbar; geschlossener Filter-Drawer nicht in der Tab-Reihenfolge; unsichtbare 24-px-Tippflächen für kleine Textlinks. Ebenso die nicht-responsiven Punkte: ausgeblendete leere Filteroptionen, Checkbox-Radius 4 px (DS).
+
+`plp.css?v=271`.

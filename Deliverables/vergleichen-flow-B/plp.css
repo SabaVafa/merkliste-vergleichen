@@ -774,14 +774,6 @@
 .faq__item[open] .faq__q-icon { background: none; border: 0; color: var(--teal); }
 .faq__item[open] .faq__q-icon svg { transform: scaleY(-1); }   /* down chevron flips to up */
 .faq__a { padding: 0 40px var(--sp-5) var(--sp-5); color: var(--ink-72); line-height: 1.6; max-width: none; }
-/* Phones (17.11. mobile check): at 18px bold with 20px padding + 16px gap the questions only got ~250px and broke
-   into 3–4 lines (121–148px per closed row). Body-size questions, a tighter frame and an answer without the desktop's
-   40px right inset keep each question to 1–2 lines. Desktop stays exactly as in the PLP prototype. */
-@media (max-width: 767px) {
-  .faq .section-title { font-size: 1.5rem; }
-  .faq__q { gap: var(--sp-3); padding: var(--sp-4) var(--sp-1) var(--sp-4) var(--sp-4); font-size: 1rem; line-height: 1.4; }
-  .faq__a { padding: 0 var(--sp-4) var(--sp-4); font-size: 0.9375rem; }
-}
 
 /* ============================================================
    Responsive
@@ -850,6 +842,7 @@
   .pcard__tags { gap: 6px; }
 
   .catalog__title { font-size: 17px; }
+  .seo__title { font-size: var(--text-h3); }   /* h2 (24px) is too heavy on phones — step down to h3 (20px) */
   .catalog__count { font-size: var(--text-body-sm); }
   .catalog__filter-btn { height: 34px; padding: 0 14px; }
 
@@ -1107,6 +1100,9 @@
    Colour comments name the DS token; hex is the token value.
    ════════════════════════════════════════════════════════════════════ */
 .advisor { padding-block: var(--sp-4); }   /* symmetric top/bottom */
+/* In-column placement: advisor sits at the top of the product list, flush with the
+   top of the filter sidebar (no top padding); keeps a gap before the product cards. */
+.catalog__main > .advisor { padding-top: 0; }
 
 /* ── Collapsible dropdown: slim bar (default) ⇄ full card ── */
 .advisor__bar {
@@ -1587,12 +1583,6 @@
      Chromium (box alignment for positioned boxes) — the sheet grew to its content height (≈ 2360 px at 320 px) and
      every filter below the first screen was unreachable. Stretch it between top:0 and bottom:0 again; it scrolls inside. */
   .filters { align-self: stretch; max-height: 100vh; max-height: 100dvh; overscroll-behavior: contain; }
-  /* close control of the sheet: 2.75 rem target (was 36 px) */
-  .filters__close { width: 2.75rem; height: 2.75rem; margin-right: -.25rem; }
-}
-@media (max-width: 767px) {
-  /* "Filter" is the only entry to the filters on phones: 2.75 rem target (was 34 px) */
-  .catalog__filter-btn { height: 2.75rem; }
 }
 
 /* ==== Closed filter drawer out of reach (13.11., responsive audit) ====
@@ -1604,20 +1594,10 @@
   .filters.is-open { visibility: visible; transition-delay: 0s; }
 }
 
-/* ==== Responsive audit, part 2 (13.11., user: "fix all … follow the live shop to keep the same layout") ====
-   Values taken from edelstahl-tuerklingel.de (read-only, 375 px): feature pills 12 px ("pcard__pill"), "ab" and UVP
-   13.6 px, "POWERED BY" 12 px on desktop. Only the text that was below 12 px changes; layout, card and hover stay.
-   1 Phone cards: system and feature pills 11 → 12 px like the live pills; "ab" and UVP 10–11.3 → 12 px (live 13.6 px,
-     kept just below our 12.9 px price so the price stays the strongest figure).
-   2 "POWERED BY" chip 11 → 12 px (live desktop value).
-   3 Header count badge 10 → 12 px.
-   4 Small text links get a 24 px tap area (WCAG 2.5.8) without moving anything: an invisible ::after over the link –
-     "+ n weitere" (18 px), breadcrumb (21 px), footer hotline numbers (21 px), footer legal links (18 px), the guarantee claim in the top bar (18 px). ==== */
-@media (max-width: 767px) {
-  .pcard__sys, .pcard__feat { font-size: 12px; }
-  .pcard__uvp, .pcard__ab { font-size: 12px; }
-}
-.hero-chip { font-size: 12px; }
-.icon-btn .badge { font-size: 12px; }
+/* ==== Responsive audit, part 2 (13.11.) – visible changes withdrawn 17.11. (user: "for responsiveness follow the PLP
+   prototype fully"): card pills, "ab"/UVP, "POWERED BY" chip, header badge and the 44 px Filter / close targets are back
+   to the prototype's values. Kept, because they change nothing on screen: the filter sheet stretched to the screen so
+   it scrolls (in the prototype the lower filters are out of reach on phones), the closed drawer out of the tab order,
+   and invisible 24 px tap areas on small text links (WCAG 2.5.8). ==== */
 .pcard__more, .crumb a, .footer__hotline-num, .footer__legal-links a, .topbar__claims a { position: relative; }
 .pcard__more::after, .crumb a::after, .footer__hotline-num::after, .footer__legal-links a::after, .topbar__claims a::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5rem; transform: translateY(-50%); }
