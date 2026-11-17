@@ -1472,7 +1472,7 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
      The row of checks under every model (88–108 px per feature) carried no information on a phone: the section already
      says the features apply to all models. ~3 rem per feature now.
    2 The opened Gemeinsamkeiten heading kept an empty line (the hidden feature preview still took its row).
-   3 Row dividers run across the full row – they broke at the gap between the model columns. ==== */
+   3 Row dividers run across the full row (see the structure pass below: the value columns now touch). ==== */
 .vgl-gval__mk,.vgl-gval--bool{display:none}
 @media(max-width:47.99rem){
   /* 1 */
@@ -1486,6 +1486,38 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   /* 2 */
   .vgl-gdisc[aria-expanded="true"] .vgl-gdisc__peek{display:none}
   /* 3 */
-  table.vgl-t tbody tr:not(.vgl-sec__h):not(:last-child):has(>td.vgl-val){background-image:linear-gradient(var(--v-g100),var(--v-g100));background-repeat:no-repeat;background-position:0 100%;background-size:100% .0625rem}   /* the cells keep their own line; this fills the gap between them */
   table.vgl-t .vgl-sec--s tr.vgl-gx>th.rh:nth-child(n){border-bottom:.0625rem solid var(--v-g100) !important}
 }
+
+/* ==== Comparison on phones, structure pass (17.11., user: "on mobile it looks fully cluttered and not organized") ====
+   What made it read as clutter: the values floated – no column lines in the body although the sticky model strip has
+   one, and the second column sat 12 px right of its model name; every label stood ~2.5 rem above its values but only a
+   hairline from the previous feature, so labels read as rows of their own; the (i) sat at the far right edge of every
+   row; the white cells painted over the card's rounded bottom corners.
+   Now one column system from the strip down to the last row:
+   1 Columns touch (no gap); each value cell has .75 rem inner padding and a hairline between models. The header rows
+     and the strip use a 1.5 rem gap with a .75 rem inset – the same x for every column edge, so each value sits
+     exactly under its model name and the strip's divider continues the body's column line (any number of models).
+   2 Label and values form one block: the label sits .25 rem above its values, the hairline between features keeps
+     the full rhythm; the (i) follows the label text instead of the far edge.
+   3 Cells are transparent – the row carries the card's white, frame and rounded bottom. ==== */
+@media(max-width:47.99rem){
+  /* 1 */
+  table.vgl-t tbody tr:not(.vgl-sec__h){column-gap:0}
+  table.vgl-t thead tr.vgl-hr{column-gap:1.5rem}
+  .vgl-pin__row{column-gap:1.5rem}
+  .vgl-pin__col::before{left:-.75rem}
+  table.vgl-t tbody td.vgl-val:nth-child(n){padding-left:.75rem;padding-right:.75rem}
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>td.vgl-val+td.vgl-val{border-left:.0625rem solid var(--v-g100)}   /* beats the card rule that clears cell frames */
+  /* 2 */
+  table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>th[scope="row"]:nth-child(n){padding:.875rem .75rem .25rem}
+  table.vgl-t tbody tr:not(.vgl-sec__h)>td.vgl-val:nth-child(n){padding-top:.25rem;padding-bottom:.875rem}
+  table.vgl-t tbody th[scope="row"] .rh__row{display:inline-block;max-width:100%;vertical-align:top}
+  table.vgl-t tbody th[scope="row"] .rh__l{padding-right:1.75rem}
+  /* 3 */
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>th,.vgl-view table.vgl-t tbody tr:not(.vgl-sec__h)>td{background:transparent}
+  /* header card: the photo tiles keep the same .75 rem inset at the top as at the sides (they touched the frame) */
+  .vgl-view table.vgl-t thead tr.vgl-hr--img>*:nth-child(n){padding-top:.75rem}
+}
+/* "k. A." never splits across lines (it broke as "… · T k." / "A." in a narrow column) */
+.vgl-ka{white-space:nowrap}

@@ -351,3 +351,13 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Desktop unverändert (geprüft bei 1280 px: Haken je Modell, kein „Ja“). Ergebnis bei 375 px, SDM10X + Colson, Gemeinsamkeiten offen: Vergleich 3011 → 2697 px hoch, kein horizontales Scrollen.
 
 `vergleichen.js?v=131`, `vergleichen.css?v=183`.
+
+## 41 · Vergleich auf dem Handy – Struktur (17.11.2026, Nutzer: „on mobile it looks fully cluttered and not organized“)
+- **Befund:** Die Werte schwebten – im Tabellenkörper fehlte die Spaltenlinie, die die mitlaufende Modellleiste hat, und die zweite Spalte stand 12 px rechts neben ihrem Modellnamen. Jedes Merkmal stand ~2,5 rem über seinen Werten, aber nur eine Haarlinie vom vorigen Merkmal entfernt – die Merkmale lasen sich wie eigene Zeilen. Das ⓘ stand in jeder Zeile am rechten Rand. Die weißen Zellen übermalten die runden Ecken der Karten unten. „k. A.“ brach in schmalen Spalten um („T k.“ / „A.“).
+- **Ein Spaltensystem von der Leiste bis zur letzten Zeile:** Die Wertespalten stoßen aneinander (0,75 rem Innenabstand, Haarlinie zwischen den Modellen). Kopf und mitlaufende Leiste haben 1,5 rem Abstand bei 0,75 rem Einzug – damit liegen alle Spaltenkanten auf derselben x-Position, jeder Wert steht genau unter seinem Modellnamen, und die Trennlinie der Leiste setzt die Spaltenlinie des Körpers fort (für jede Modellzahl). Gemessen: Namen in der Leiste, im Kopf und Werte bei 29 / 207 px (390 px Breite), Trennlinie bei 195 px in Leiste und Körper.
+- **Merkmal und Werte als ein Block:** Merkmal 0,25 rem über seinen Werten, Haarlinie zwischen den Merkmalen; das ⓘ folgt dem Merkmalsnamen statt am rechten Rand zu stehen (wie bei den Gemeinsamkeiten).
+- **Saubere Karten:** Zellen transparent, die Zeile trägt Weiß, Rahmen und runde Ecken. Fotos im Kopf mit 0,75 rem Abstand oben wie an den Seiten.
+- **„k. A.“** bricht nie um.
+- Geprüft bei 390 px (SDM10X + Colson) und 360 px (drei Briefkästen, zwei sichtbar): kein horizontales Scrollen, kein Überlauf. Desktop unverändert (1280 px geprüft).
+
+`vergleichen.css?v=187`.
