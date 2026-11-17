@@ -370,3 +370,13 @@ Ein Merklisten-Eintrag ist jetzt immer eine konkrete Ausführung (Modell + Farbe
 - Geprüft: Türsprechanlagen (2 Modelle) und Briefkästen (3 Modelle) bei 375 px, kein horizontales Scrollen; Desktop unverändert (1280 px: ⓘ am Rand der Merkmalsspalte, Haken je Modell).
 
 `vergleichen.js?v=134`, `vergleichen.css?v=190`.
+
+## 43 · Vergleich auf dem Handy – Tabellen, Ähnliche Modelle, Aktionen, Erklärungen (17.11.2026, Nutzer: „enhance the tables“, „horizontal scrollable strip“, „chevrons … consistent with metzler-seiten“, „fix the mess“, „repressing the icon must collapse the tooltip“, „right padding to the tooltip box“)
+- **Tabellen-Typografie:** Die Rangfolge war verkehrt – Merkmalsnamen fett 14 px schwarz, Werte normal 14 px schwarz. Jetzt die Sprache der PDP-Fakten (`.pdp-specs`): Merkmal als ruhige Beschriftung (DS-Caption 12 px, 700, Versalien, 0,08 em Laufweite, grau; die PDP nutzt dieselbe Beschriftung mit 11 px), Werte als Hauptinformation (16 px schwarz, Tabellenziffern), „k. A.“ tritt zurück (14 px grau). Abschnittstitel 18 px. ⓘ mittig auf der Beschriftung.
+- **Ähnliche Modelle als waagrechter Streifen:** statt 2 × 2-Raster eine Reihe der PLP-Karten (10,5 rem breit, ~1,8 Karten sichtbar, rastet je Karte am Anfang ein, ohne sichtbare Scrollleiste). Abschnitt 901 → 495 px hoch.
+- **Pfeile nach dem Metzler Design System (NavigationArrows, mittel):** 2,625 rem quadratisch, 4 px Radius, weiß, 1 px Teal-Rand, Teal-Chevron 0,75 rem (NAV-09 / NAV-10); Hover Teal-100, gedrückt Teal mit weißem Chevron, deaktiviert Graphite-500. Paar rechts neben der Überschrift, je Druck eine Karte; am Anfang links, am Ende rechts deaktiviert (`aria-disabled`, der Fokus bleibt). Nur auf dem Handy (Desktop-Raster scrollt nicht).
+- **Aktionen am Ende:** statt einer umbrechenden Zeile aus fünf Links in zwei Farben zwei Gruppen – „Modell hinzufügen“ und „Aus der Merkliste“ als DS-Sekundärbuttons (volle Breite, untereinander), darunter unter einer Haarlinie „Teilen“, „Drucken“ links und „Vergleich leeren“ rechts abgesetzt.
+- **Erklärungen (ⓘ):** Erneutes Drücken schließt die Erklärung – auch wenn Zeiger/Fokus noch auf dem ⓘ liegen (vorher hielt Hover sie offen). Auf dem Handy hält das Fenster 1,5 rem Abstand zum rechten Bildschirmrand, also 8 px innerhalb der Karte statt bündig mit ihrem Rand; der Zeiger sitzt weiter auf dem ⓘ.
+- Geprüft bei 375 und 457 px; Desktop unverändert (1280 px: Raster mit 4 Karten, keine Pfeile, Werkzeugleiste statt Aktionsbereich).
+
+`vergleichen.js?v=138`, `vergleichen.css?v=195`.

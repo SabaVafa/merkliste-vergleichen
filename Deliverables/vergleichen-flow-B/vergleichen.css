@@ -1552,3 +1552,84 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .rh__row .rh__w{grid-column:2;grid-row:1;justify-self:end;margin:.125rem 0 0}
   .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .vgl-gval{grid-column:2;grid-row:1;justify-self:stretch;display:flex;align-items:flex-start;gap:.375rem;margin:0;padding-right:1.875rem;text-align:left}
 }
+
+/* ==== Table typography on phones (17.11., user: "enhance the tables", lead product design) ====
+   The hierarchy was inverted: feature names bold 14 px ink, values regular 14 px ink – the labels outweighed the data
+   people actually compare. Now the tables speak the PDP's language for facts (.pdp-specs: uppercase caption over the
+   value): the feature name is a quiet caption (DS caption 12 px, 700, .08 em tracking, uppercase, muted grey – the
+   PDP uses the same caption at 11 px; 12 px is the DS caption token), the values are the main read (body 16 px ink,
+   tabular figures), "k. A." recedes (14 px muted) so a missing value reads as absence, not as data. Section titles step
+   up to h4 (18 px) to stay above the values. The (i) is centred on the caption line. Desktop unchanged. ==== */
+@media(max-width:47.99rem){
+  .vgl-view table.vgl-t tbody th[scope="row"] .rh__l{font-size:var(--v-fs-cap);font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.125rem;color:var(--v-muted)}
+  .vgl-view table.vgl-t tbody th[scope="row"] .rh__row .rh__w{margin-top:0}
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>th[scope="row"]:nth-child(n){padding-bottom:.375rem}
+  .vgl-view table.vgl-t tbody td.vgl-val{font-size:var(--v-fs-body);line-height:1.45;color:var(--v-ink);font-variant-numeric:tabular-nums}
+  .vgl-view table.vgl-t tbody td.vgl-val .vgl-ka{font-size:var(--v-fs-sm);color:var(--v-muted)}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .vgl-gval{font-size:var(--v-fs-body);line-height:1.45;font-variant-numeric:tabular-nums}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .vgl-gval__mk{height:1.45em}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .rh__l{padding-top:.1875rem}
+  .vgl-view table.vgl-t .vgl-sec--s tr.vgl-gx .rh__row .rh__w{margin-top:.1875rem}
+  .vgl-view .vgl-sec__h .vgl-sec__t{font-size:var(--v-fs-h4)}
+}
+
+/* ==== Ähnliche Modelle on phones = horizontal strip (17.11., user: "on mobile, the recommended products layout must be a
+   horizontal scrollable strip") ====
+   Was a 2 × 2 grid (~900 px of scrolling for four cards). Now one row of the PLP cards that scrolls sideways: cards
+   10.5 rem wide, so ~1.8 cards show and the cut-off card says "more"; each swipe snaps a card to the start edge (aligned
+   with the heading); the strip bleeds to the panel's edges and keeps its .75 rem inset; no visible scrollbar (the peek
+   carries the cue). Cards keep equal heights. Keyboard: every card holds focusable controls, focus scrolls them into
+   view. Desktop / tablet keep the grid. ==== */
+@media(max-width:47.99rem){
+  .vgl-view .vgl-alts__list:has(.vgl-altc){display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:10.5rem;gap:.75rem;align-items:stretch;
+    margin:0 -.75rem;padding:0 .75rem .25rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:.75rem;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .vgl-view .vgl-alts__list:has(.vgl-altc)::-webkit-scrollbar{display:none}
+  .vgl-view .vgl-alts__list>.vgl-altc{scroll-snap-align:start}
+}
+/* plain "k. A." cells (td.na) stay muted and smaller under the 16 px values (they had turned ink) */
+@media(max-width:47.99rem){.vgl-view table.vgl-t tbody td.vgl-val.na{font-size:var(--v-fs-sm);color:var(--v-muted)}}
+
+/* ==== Ähnliche Modelle: DS NavigationArrows on the strip (17.11., user: "provide chevrons … consistent with the Metzler
+   design system") ====
+   Metzler Design System › NavigationArrows (medium): square 2.625 rem button, 4 px radius (--radius), white, 1 px teal
+   border, teal chevron 0.75 rem high (NAV-09 / NAV-10); hover teal-100, pressed teal fill with white chevron, disabled
+   graphite-500. Always a pair, right of the heading. Phones only – the desktop grid does not scroll (the script also
+   hides the pair whenever nothing scrolls). ==== */
+.vgl-alts__hd{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.vgl-alts__nav{display:none;gap:.5rem;flex:none}
+.vgl-navbtn{display:inline-flex;align-items:center;justify-content:center;width:2.625rem;height:2.625rem;padding:0;border:.0625rem solid var(--v-teal);border-radius:var(--v-r-m);background:var(--v-white);color:var(--v-teal);cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
+.vgl-navbtn svg{display:block;width:auto;height:.75rem;flex-shrink:0}
+.vgl-navbtn:hover{background:var(--v-teal-100)}
+.vgl-navbtn:active{background:var(--v-teal);color:var(--v-white)}
+.vgl-view .vgl-alts .vgl-navbtn[aria-disabled="true"],.vgl-view .vgl-alts .vgl-navbtn[aria-disabled="true"]:hover,.vgl-view .vgl-alts .vgl-navbtn[aria-disabled="true"]:active{color:var(--graphite-500,#A1A1A1);border-color:var(--graphite-500,#A1A1A1);background:var(--v-white);cursor:default}
+.vgl-navbtn:focus-visible{outline:.125rem solid var(--v-teal);outline-offset:.125rem}
+@media(max-width:47.99rem){
+  .vgl-alts__nav:not([hidden]){display:flex}
+  .vgl-alts__hd{margin-bottom:.75rem}
+  .vgl-alts__hd .vgl-alts__h{margin:0}
+}
+@media(prefers-reduced-motion:reduce){.vgl-navbtn{transition:none}}
+
+/* ==== Action area at the end on phones (17.11., user: "fix the mess") ====
+   Was one wrapping line of five links in two colours ("Modell hinzufügen", "Aus der Merkliste" teal; "Teilen",
+   "Drucken", "Vergleich leeren" grey) – growing the comparison, utilities and the destructive "leeren" all looked
+   alike and broke into ragged rows. Now two groups:
+   1 grow the comparison – DS secondary buttons (2 px teal outline, 48 px), full width, stacked;
+   2 utilities in one quiet row under a hairline – "Teilen" and "Drucken" left, "Vergleich leeren" at the far right,
+     set apart from the others. ==== */
+@media(max-width:47.99rem){
+  .vgl-view .vgl-actrow{display:flex;flex-direction:column;gap:1rem;margin-top:2rem;padding-top:0;border-top:0}
+  .vgl-actrow__grow{display:flex;flex-direction:column;gap:.75rem}
+  .vgl-view .vgl-actrow .vgl-actrow__btn{width:100%;justify-content:center;padding:0 1rem;font-family:inherit;cursor:pointer}
+  .vgl-view .vgl-actrow .vgl-actrow__btn svg{width:1.25rem;height:1.25rem;flex:none}
+  .vgl-actrow__util{display:flex;flex-wrap:wrap;align-items:center;gap:0 .5rem;padding-top:.5rem;border-top:.0625rem solid var(--v-g200)}
+  .vgl-view .vgl-actrow__util .vgl-tb{padding:0 .25rem}
+  .vgl-view .vgl-actrow__util .vgl-tb--clear{margin-left:auto}
+}
+
+/* ==== (i) toggles (17.11., user: "repressing the icon must collapse the tooltip") ====
+   The tip also shows on :hover and :focus-visible; after a tap a phone keeps the hover on the icon (and a mouse rests
+   on it), so a second press removed "is-open" but the box stayed. The second press now marks the icon dismissed –
+   that beats hover and focus until the pointer leaves or focus moves on. ==== */
+.vgl-view .vgl-ib.is-dismissed+.vgl-tip,.vgl-view .vgl-ib.is-dismissed:hover+.vgl-tip,.vgl-view .vgl-ib.is-dismissed:focus-visible+.vgl-tip{opacity:0;visibility:hidden;pointer-events:none}

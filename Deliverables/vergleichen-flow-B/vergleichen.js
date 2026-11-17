@@ -151,6 +151,9 @@
   var tray,traySlots,trayLabel,trayHint,trayCta,view,viewBody,viewCount,scrollEl,toastEl,toastT,barBtn,cancelBtn,lastFocus;
   var IC_TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   var IC_PRINT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
+  /* DS NavigationArrows chevrons (NAV-09 / NAV-10, Metzler Design System) */
+  var IC_NAVL='<svg overflow="visible" viewBox="7.12 4.62 8.31 14.77" fill="none" stroke="currentColor" stroke-width="2.03" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg>';
+  var IC_NAVR='<svg overflow="visible" viewBox="8.58 4.62 8.31 14.77" fill="none" stroke="currentColor" stroke-width="2.03" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg>';
   var IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   var IC_UNDO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>';
   var IC_ADD='<svg class="vgl-alt__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="vgl-alt__plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></g><polyline class="vgl-alt__chk" points="5 12.5 10 17.5 19 7" pathLength="1"/></svg>';
@@ -211,6 +214,9 @@
     /* Responsive audit 14: a toggletip is placed before it shows (hover, keyboard focus or tap) so it stays inside the viewport */
     view.addEventListener('pointerover',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
     view.addEventListener('focusin',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib');if(b)placeTip(b);});
+    /* a tip closed by pressing its (i) again stays closed until the pointer leaves or focus moves on */
+    view.addEventListener('pointerout',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib.is-dismissed');if(b&&!b.contains(e.relatedTarget))b.classList.remove('is-dismissed');});
+    view.addEventListener('focusout',function(e){var b=e.target.closest&&e.target.closest('.vgl-ib.is-dismissed');if(b)b.classList.remove('is-dismissed');});
 
     tray.addEventListener('click',function(e){var a=e.target.closest('[data-vgl]');if(a){var k=a.getAttribute('data-vgl');if(k==='reset')clearAll();if(k==='open')openView();return;}var rm=e.target.closest('[data-rm]');if(rm){var rid=rm.getAttribute('data-rm'),ri=selected.indexOf(rid);if(removeModel(rid,false)){var sl=tray.querySelectorAll('.vgl-slot__rm');(sl[Math.min(ri,sl.length-1)]||tray.querySelector('.vgl-tray__cta')||document.body).focus();}}});
     view.addEventListener('click',function(e){
@@ -239,7 +245,7 @@
         if(k==='print'){printView();}
         if(k==='common'){gShow=!gShow;onCommon();}
         return;}
-      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}
+      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();ti.classList.toggle('is-dismissed',was);if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}   /* pressed again: closed, and hover / focus no longer hold it open (17.11.) */
       var alt=e.target.closest('[data-alt]');if(alt){
         if(alt.classList.contains('is-added'))return;
         var aid=alt.getAttribute('data-alt');
@@ -459,6 +465,21 @@
       card.querySelectorAll('.pcard__tags').forEach(function(t){var upd=function(){var mx=t.scrollWidth-t.clientWidth,on=mx>1;t.classList.toggle('is-scroll',on);t.classList.toggle('at-start',!on||t.scrollLeft<=1);t.classList.toggle('at-end',!on||t.scrollLeft>=mx-1);};requestAnimationFrame(upd);t.addEventListener('scroll',upd,{passive:true});});
     });
   }
+  /* Ähnliche Modelle strip (phones): the DS arrow pair moves one card per press; at either end its arrow turns
+     aria-disabled (not disabled – focus stays on it); the pair hides when nothing scrolls (desktop grid) */
+  function bindAltNav(){
+    var l=viewBody.querySelector('.vgl-alts__list'),nav=viewBody.querySelector('.vgl-alts__nav');if(!l||!nav)return;
+    var bs=nav.querySelectorAll('[data-altnav]');
+    var upd=function(){var mx=l.scrollWidth-l.clientWidth;nav.hidden=mx<=1;bs[0].setAttribute('aria-disabled',l.scrollLeft<=1?'true':'false');bs[1].setAttribute('aria-disabled',l.scrollLeft>=mx-1?'true':'false');};
+    l.addEventListener('scroll',upd,{passive:true});
+    nav.addEventListener('click',function(e){
+      var b=e.target.closest('[data-altnav]');if(!b||b.getAttribute('aria-disabled')==='true')return;
+      var c=l.querySelector('li'),step=c?c.getBoundingClientRect().width+(parseFloat(getComputedStyle(l).columnGap)||0):l.clientWidth;
+      l.scrollBy({left:step*(+b.getAttribute('data-altnav')),behavior:reduced()?'auto':'smooth'});setTimeout(upd,450);
+    });
+    if(window.ResizeObserver)new ResizeObserver(upd).observe(l);
+    upd();
+  }
   function flashCol(id){var b=view.querySelector('.vgl-ph__rm[data-rm="'+id+'"]'),t=b&&b.closest('.vgl-ph__img');if(!t)return;t.classList.remove('is-arrived');void t.offsetWidth;t.classList.add('is-arrived');setTimeout(function(){t.classList.remove('is-arrived');},1800);}
   function focusIn(sel){(firstShown(sel)||firstShown('.vgl-ph__rm')||view.querySelector('#vglTitle')).focus();}
   function refName(id){if(cur){for(var i=0;i<cur.items.length;i++)if(cur.items[i].id===id)return cur.refs[i].n;}return BY_ID[id]?baseTitle(BY_ID[id]):id;}
@@ -525,7 +546,8 @@
   function placeTip(b){
     var t=b.nextElementSibling;if(!t||!t.classList.contains('vgl-tip'))return;
     t.style.left='';t.style.maxHeight='';t.classList.remove('is-up','is-clamp');var rp=remPx(),vw=document.documentElement.clientWidth,r=t.getBoundingClientRect(),bc=b.getBoundingClientRect(),dx=bc.left+bc.width/2-r.left-rp;   /* pointer 1 rem in from the tip's left edge */
-    if(r.right+dx>vw-rp)dx=vw-rp-r.right;
+    var edge=(vw<48*rp?1.5:1)*rp;   /* phones (17.11., user): the box keeps clear of the card's right edge instead of running flush with it */
+    if(r.right+dx>vw-edge)dx=vw-edge-r.right;
     if(r.left+dx<rp)dx=rp-r.left;
     if(dx)t.style.left=(dx/rp).toFixed(3)+'rem';
     /* pointer: on the (i)'s centre, wherever the tip was shifted to (kept 1 rem inside the corners) */
@@ -1145,7 +1167,8 @@
 
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
     var alts=isFull()?[]:alternatives(items),altHTML='';
-    if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3><ul class="vgl-alts__list">'+
+    if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><div class="vgl-alts__hd"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3>'+
+      '<div class="vgl-alts__nav" role="group" aria-label="Ähnliche Modelle blättern" hidden><button class="vgl-navbtn" type="button" data-altnav="-1" aria-label="Vorherige Modelle" aria-controls="vglAltList">'+IC_NAVL+'</button><button class="vgl-navbtn" type="button" data-altnav="1" aria-label="Weitere Modelle" aria-controls="vglAltList">'+IC_NAVR+'</button></div></div><ul class="vgl-alts__list" id="vglAltList">'+
       alts.map(function(o){
         var why=o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'';
         var add='<button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Zum Vergleich hinzufügen</span></button>';
@@ -1154,11 +1177,14 @@
       }).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
-    var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(n<MAX?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(hasMkl?'<button class="vgl-tb vgl-tb--teal" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste'+(nMkl?' ('+nMkl+')':'')+'</button>':'')+
-      '<button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div>';
+    /* phones (17.11., lead UX): two groups instead of one wrapping line of five mixed links – grow the comparison (DS
+       secondary buttons, full width), then the utilities in one quiet row; "Vergleich leeren" last, set apart */
+    var grow=(n<MAX?'<button class="btn btn--secondary vgl-actrow__btn" type="button" data-vgl="add">'+IC_PLUS+'Modell hinzufügen</button>':'')+(hasMkl?'<button class="btn btn--secondary vgl-actrow__btn" type="button" data-vgl="addmkl">'+IC_BM+'Aus der Merkliste'+(nMkl?' ('+nMkl+')':'')+'</button>':'');
+    var act='<div class="vgl-actrow" role="group" aria-label="Weitere Aktionen">'+(grow?'<div class="vgl-actrow__grow">'+grow+'</div>':'')+
+      '<div class="vgl-actrow__util"><button class="vgl-tb vgl-link--share" type="button" data-vgl="share">'+IC_LINK+'<span class="vgl-share__l">Teilen</span></button><button class="vgl-tb" type="button" data-vgl="print">'+IC_PRINT+'Drucken</button><button class="vgl-tb vgl-tb--clear" type="button" data-vgl="clear">'+IC_TRASH+'Vergleich leeren</button></div></div>';
 
     viewBody.innerHTML=pinHTML(c)+fz+table+altHTML+act;
-    fillAltCards();
+    fillAltCards();bindAltNav();
     lockHead();placePin();fitHeader();fitPeek();placeTips();watchPin();
   }
   /* collapsed Gemeinsamkeiten = a full section bar: heading + count + the shared features named (info scent) + "Anzeigen" */
