@@ -1761,7 +1761,7 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 .vgl-mbar__link:active{color:var(--v-ink)}
 .vgl-mbar__link:focus-visible{outline:.125rem solid var(--v-teal);outline-offset:.125rem;border-radius:var(--v-r-m)}
 .vgl-mbar__hint{display:block;margin-top:.125rem;font-size:var(--v-fs-cap);color:var(--v-muted)}
-.vgl-vis__sub{margin:-.25rem 0 0;font-size:var(--v-fs-sm);line-height:1.45;color:var(--v-muted)}
+.vgl-vis__sub{margin:-.25rem -1rem .25rem;padding:0 1rem .75rem;border-bottom:.0625rem solid var(--v-g200);font-size:var(--v-fs-sm);line-height:1.45;color:var(--v-muted)}   /* full-width divider under title + subtitle, like the PDP sheet head (17.11.) */
 .vgl-vis__list{list-style:none;margin:0;padding:0;overflow-y:auto;min-height:0}
 .vgl-visopt{display:grid;grid-template-columns:auto 2.5rem minmax(0,1fr);align-items:center;gap:.75rem;min-height:3.5rem;padding:.375rem .25rem;border-bottom:.0625rem solid var(--v-g200);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .vgl-vis__list li:last-child .vgl-visopt{border-bottom:0}

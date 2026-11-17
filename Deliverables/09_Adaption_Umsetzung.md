@@ -484,4 +484,6 @@ Die Blätter des Vergleichs auf dem Handy („Auswahl ändern“, Modellsuche) s
 - Bewegung reduziert (Systemeinstellung): kein Fahren und Blenden.
 - Geprüft: 375 px – Öffnen, kurzes Ziehen (federt zurück), langes Ziehen (schließt, Fokus auf „Auswahl ändern“), „Anzeigen“ (fährt hinaus, Spalten gewechselt).
 
-`vergleichen.js?v=159`, `vergleichen.css?v=224`.
+- **Trennlinie (Nutzer: „between the title/subtitle section, we need a divider“):** Unter Titel und Untertitel von „Modelle für die Ansicht wählen“ trennt eine durchgehende Linie (Graphite-200, volle Blattbreite) den Kopf von der Produktliste, wie im Kopf des PDP-Blatts; 12 px Abstand darüber und darunter.
+
+`vergleichen.js?v=159`, `vergleichen.css?v=225`.
