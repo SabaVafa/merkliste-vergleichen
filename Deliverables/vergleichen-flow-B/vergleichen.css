@@ -1848,3 +1848,12 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   .vgl-alts__hd{margin-bottom:1rem}
   .vgl-alts__hd .vgl-alts__h{margin:0}
 }
+
+/* ==== Ähnliche Modelle: prices never break inside an amount (17.11., user screenshot at 1092 px) ====
+   Four cards of ~221 px left the PLP price row 179 px; "1.490,00 € ab 1.266,50 €" needs ~183, so the amounts broke
+   ("1.266,50 / €") and that card's colours sat 24 px lower than its neighbours'. Amounts are kept whole; when the row does
+   not fit in any card the script sets .is-stack and every card shows the UVP on its own line above "ab … €" – one
+   height for all, colours and "Vergleichen" aligned. With room to spare the PLP card is unchanged. ==== */
+.vgl-view .vgl-altc .pcard__pricerow>*{flex-shrink:0;white-space:nowrap}
+.vgl-view .vgl-alts.is-stack .vgl-altc .pcard__pricerow{flex-wrap:wrap;row-gap:.125rem}
+.vgl-view .vgl-alts.is-stack .vgl-altc .pcard__uvp{flex-basis:100%}

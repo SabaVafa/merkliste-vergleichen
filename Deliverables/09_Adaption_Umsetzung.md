@@ -511,3 +511,12 @@ Zwischen 48 und 64 rem (Tablet, schmale Fenster – Screenshot bei 812 px) stand
 - Geprüft: 768, 812, 1000 px (eine Reihe, Pfeil scrollt eine Karte, kein seitliches Überlaufen der Seite), 1024 px (Raster, eine Reihe, keine Pfeile).
 
 `vergleichen.css?v=235`.
+
+## 60 · Ähnliche Modelle: Preise nie im Betrag getrennt (18.11.2026, Nutzer-Screenshot bei 1092 px: „issue“)
+Bei vier Karten in einer Reihe (~221 px) blieben der Preiszeile 179 px; „1.490,00 € ab 1.266,50 €“ braucht ~183 px. Die Beträge brachen in sich („1.266,50 / €“, „1.490,00 / €“), und die Farben dieser Karte standen 24 px tiefer als bei den Nachbarn – damit auch der Abstand zu „Vergleichen“ ungleich.
+- Beträge, „ab“ und UVP bleiben jeweils ganz.
+- Passt die Zeile in irgendeiner Karte nicht, steht in **allen** Karten die UVP in einer eigenen Zeile über „ab … €“: eine Höhe für alle, Farben und „Vergleichen“ auf einer Linie. Wird bei jeder Breitenänderung neu geprüft.
+- Mit genug Platz bleibt die PLP-Karte unverändert (eine Preiszeile).
+- Geprüft: 1092 px (gestapelt, alles auf einer Linie), 1440, 812, 375 px (eine Zeile, kein Überlauf).
+
+`vergleichen.js?v=165`, `vergleichen.css?v=236`.

@@ -510,7 +510,13 @@
      The variable rows get the tallest card's height – in the grid and in the phone strip; re-run when the width changes. */
   function alignAltCards(){
     var l=viewBody.querySelector('.vgl-alts__list');if(!l)return;
-    var run=function(){['.pcard__tags','.pcard__top','.pcard__title'].forEach(function(sel){
+    /* prices (17.11., user screenshot at 1092 px: "1.266,50 / €" broke inside the amount and pushed that card's colours
+       24 px lower): amounts never break; if UVP · ab · price does not fit one line in any card, every card puts the UVP on
+       its own line (.is-stack) – so colours and "Vergleichen" stay on one line across the row */
+    var run=function(){
+      var al=l.closest('.vgl-alts');if(al){al.classList.remove('is-stack');
+        if(Array.prototype.some.call(l.querySelectorAll('.vgl-altc .pcard__pricerow'),function(r){return r.scrollWidth>r.clientWidth+1;}))al.classList.add('is-stack');}
+      ['.pcard__tags','.pcard__top','.pcard__title'].forEach(function(sel){
       var els=l.querySelectorAll('.vgl-altc '+sel),mx=0;
       Array.prototype.forEach.call(els,function(e){e.style.minHeight='';});
       Array.prototype.forEach.call(els,function(e){mx=Math.max(mx,e.getBoundingClientRect().height);});
