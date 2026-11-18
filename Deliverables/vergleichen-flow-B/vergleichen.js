@@ -226,7 +226,7 @@
       if(addPanel&&!addPanel.contains(e.target)&&!(addAnchor&&addAnchor.contains(e.target)))closeAdd(false);   /* outside click closes the search */
       if(pickEl&&!pickEl.contains(e.target)&&!(pickBtn&&pickBtn.contains(e.target)))closePick(false);
       var pop=view.querySelector('.vgl-sharepop');if(pop&&!pop.contains(e.target)&&!e.target.closest('[data-vgl="share"]'))pop.remove();
-      if(view.querySelector('.vgl-i.is-open')&&!e.target.closest('.vgl-i,.vgl-tip,.vgl-tipin'))closeTip();   /* pressing anywhere outside closes an open tip (18.11.) */
+      if(view.querySelector('.vgl-i.is-open')&&!e.target.closest('.vgl-i,.vgl-tip'))closeTip();   /* pressing anywhere outside closes an open tip (18.11.) */
       var opt=e.target.closest('[data-addid]');if(opt){chooseAdd(opt.getAttribute('data-addid'));return;}
       var po=e.target.closest('[data-pickid]');if(po){choosePick(po.getAttribute('data-pickid'));return;}
       var pb=e.target.closest('[data-pick]');if(pb){if(pickEl&&pickBtn===pb)closePick(true);else openPick(pb);return;}
@@ -250,7 +250,7 @@
         if(k==='print'){printView();}
         if(k==='common'){gShow=!gShow;onCommon();}
         return;}
-      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();ti.classList.toggle('is-dismissed',was);if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');tipInline(ti);}return;}   /* pressed again: closed, and hover / focus no longer hold it open (17.11.) */
+      var ti=e.target.closest('.vgl-i');if(ti){var was=ti.classList.contains('is-open');closeTip();ti.classList.toggle('is-dismissed',was);if(!was){placeTip(ti);ti.classList.add('is-open');ti.setAttribute('aria-expanded','true');}return;}   /* pressed again: closed, and hover / focus no longer hold it open (17.11.) */
       var alt=e.target.closest('[data-alt]');if(alt){
         if(alt.classList.contains('is-added'))return;
         var aid=alt.getAttribute('data-alt');
@@ -598,16 +598,10 @@
     toast(free>0?'Wählen Sie '+(free===1?'ein weiteres Modell':'bis zu '+free+' weitere Modelle')+' auf den Karten – „Vergleichen“ führt zurück zum Vergleich.':'Der Vergleich ist vollständig.','info');
   }
   /* (i) toggletip: click/Enter opens a real tooltip node (aria-describedby), Escape closes it first */
-  function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');o.removeAttribute('aria-controls');}var p=view.querySelector('.vgl-tipin');if(p)p.remove();}
-  /* Phones (17.11., responsive audit – the floating box covered the very values it explains and the rows below): the
-     explanation opens inline under the caption and pushes the values down; a second tap, another (i), Escape or a tap
-     elsewhere closes it. Tablet/desktop keep the floating toggletip. */
-  function tipInline(b){
-    if(mq(MQ48,true))return;
-    var t=b.nextElementSibling,body=t&&t.querySelector('.vgl-tip__b'),row=b.closest('.rh__row');if(!body||!row)return;
-    var p=h('<span class="vgl-tipin" id="vglTipIn"><span class="vgl-tip__b">'+body.innerHTML+'</span></span>');
-    row.parentNode.insertBefore(p,row.nextSibling);b.setAttribute('aria-controls','vglTipIn');
-  }
+  function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');o.removeAttribute('aria-controls');}}
+  /* One behaviour on every screen (18.11., user: "the tooltip behavior must be universal" – replaces the inline box
+     of 17.11. on phones): the same floating card with title, opened by tap/click, closed by a second tap, another (i),
+     Escape or a tap anywhere else; placeTip keeps it inside the screen. */
   /* Responsive audit 14 (07.11.): the tip opens under its (i) and is shifted sideways only as far as needed to keep
      1 rem from both viewport edges (Gemeinsamkeiten grid at the right edge, phones); its width is capped in CSS */
   /* all tips are pre-placed on render/resize too: an unplaced hidden tip still widened the scroll area (scrollWidth) */

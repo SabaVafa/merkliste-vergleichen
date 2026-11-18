@@ -1806,17 +1806,6 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
    sheet may take the screen up to a 1 rem gap, the list scrolls inside */
 @media(max-height:30rem){.vgl-pick.is-sheet,.vgl-addsearch.is-sheet{max-height:calc(100vh - 1rem);max-height:calc(100dvh - 1rem)}}
 
-/* ==== (i) explanations on phones open inline (17.11., responsive audit; user screenshot at 332 px: the floating box
-   covered the values it explains and the next rows) ====
-   < 48 rem the toggletip is not shown; tapping (i) inserts the same text as a box under the caption, in the flow: the
-   values move down, nothing is covered, nothing can run off-screen. Same look as the desktop box without its title
-   (the caption above names it). ==== */
-@media(max-width:47.99rem){
-  .vgl-view .vgl-tip{display:none !important}
-  .vgl-tipin{display:block;grid-column:1 / -1;margin:.625rem 0 .25rem;overflow:hidden;border:.0625rem solid var(--v-g300);border-radius:var(--v-r-l);background:var(--v-white);font-size:var(--v-fs-sm);font-weight:400;line-height:1.5;letter-spacing:normal;text-transform:none;text-align:left;white-space:normal;color:var(--v-ink);animation:vglfade .2s ease}
-  .vgl-tipin .vgl-tip__b{font-size:var(--v-fs-sm)}
-}
-@media(max-width:47.99rem) and (prefers-reduced-motion:reduce){.vgl-tipin{animation:none}}
 /* long German captions (e.g. "Kameraauflösung" at 320–340 px) break with a hyphen instead of mid-word */
 .vgl-view table.vgl-t .rh__l{hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word}
 

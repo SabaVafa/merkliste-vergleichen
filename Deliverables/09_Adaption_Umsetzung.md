@@ -555,3 +555,10 @@ Eine per Klick oder Tippen geöffnete Erklärung (i) schließt jetzt auch, wenn 
 - Geprüft bei 320, 375 und 1280 px: Ruhe und Modus, kein seitliches Scrollen.
 
 `vergleichen.css?v=239`, `vergleichen.js?v=168`.
+
+## 66 · (i)-Erklärungen: überall dasselbe Verhalten (18.11.2026, Nutzer: „mobile: the tooltip behavior must be universal“)
+Ersetzt die Erklärung in der Zeile auf dem Handy aus §57. Auf allen Bildschirmen öffnet (i) jetzt dieselbe schwebende Karte wie am Desktop – mit Titel, Zeiger zum (i) und weißem Grund. Tippen oder Klicken öffnet, erneutes Tippen, ein anderes (i), Esc oder Tippen daneben (§63) schließt. Die Karte bleibt im Bild: seitlich mit Abstand zum Rand verschoben, nach oben geöffnet, wenn unten kein Platz ist, und bei sehr niedrigen Bildschirmen in der Höhe begrenzt und scrollbar.
+
+Geprüft: alle 13 Erklärungen im Vergleich mit 3 Modellen bei 375 × 812, 320 × 568 und quer 568 × 320 – sichtbar, im Bild, nicht abgeschnitten, kein seitliches Scrollen.
+
+`vergleichen.css?v=240`, `vergleichen.js?v=169`.
