@@ -1857,3 +1857,28 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 .vgl-view .vgl-altc .pcard__pricerow>*{flex-shrink:0;white-space:nowrap}
 .vgl-view .vgl-alts.is-stack .vgl-altc .pcard__pricerow{flex-wrap:wrap;row-gap:.125rem}
 .vgl-view .vgl-alts.is-stack .vgl-altc .pcard__uvp{flex-basis:100%}
+
+/* ==== Phones: toolbar "Vergleichen" and the bottom strip (18.11., user: "improve the consistency and placement of the
+   vergleich button", "bottom section looks cramped") ====
+   1 Placement: the button sat on the Filter row at rest ("Filter · 41 Artikel · Vergleichen", the count squeezed into
+     the middle) but jumped to a second, left-hugging row in compare mode ("Vergleich anzeigen (3)" + "Beenden", with
+     a ragged right edge). Now the PLP row stays as in the PLP prototype (Filter left, count right) and the compare
+     controls always have their own full-width row below it, in every state – same edges as the grid and the
+     Produktberater box. In compare mode the main button takes the width, "Beenden" its own.
+   2 Consistency with "Filter": same type size (16 px) and icon size (20 px); the 44 px height stays (touch target).
+   3 Strip: 10 → 14 px padding plus the iPhone safe area at the bottom, label 12 → 14 px, hint 11 → 12 px on one line
+     (at the maximum only "Maximum erreicht" – "/ max. 3" next to the count already says why), 12 px between the
+     status and the thumbnails so the × discs no longer crowd the hint. ==== */
+@media(max-width:47.99rem){
+  .vgl-barwrap{display:flex;flex:1 1 100%;gap:.5rem}
+  .vgl-bar-btn{flex:1 1 auto;justify-content:center;font-size:var(--text-body,1rem)}
+  .vgl-bar-btn svg{width:1.25rem;height:1.25rem}
+  .vgl-cancel.is-shown{flex:0 0 auto;justify-content:center;font-size:var(--text-body,1rem)}
+  .vgl-tray__inner{row-gap:.75rem;padding:.875rem 1rem calc(.875rem + env(safe-area-inset-bottom,0px))}
+  .vgl-tray__status{gap:.25rem}
+  .vgl-tray__label{font-size:var(--text-body-sm,.875rem);line-height:1.2}
+  .vgl-tray__label .of{font-size:.75rem}
+  .vgl-tray__hint{font-size:.75rem;line-height:1.3}
+  .vgl-tray__hint .vgl-tray__hd{display:none}
+}
+@media(max-width:22.49rem){.vgl-cancel.is-shown{flex:1 1 100%}}   /* < 360 px "Beenden" no longer fits beside the button: its own full row, same edges */

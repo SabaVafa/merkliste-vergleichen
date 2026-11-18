@@ -538,3 +538,11 @@ Regel unverändert: Die Option erscheint, sobald die Merkliste mindestens ein Mo
 Eine per Klick oder Tippen geöffnete Erklärung (i) schließt jetzt auch, wenn man irgendwo außerhalb drückt – in der Tabelle, im Kopf, in der Leiste oben. Ein Klick in die Erklärung selbst lässt sie offen (z. B. zum Markieren von Text). Weiterhin gilt: erneut auf (i) schließt sie, ein anderes (i) wechselt direkt, Esc schließt und setzt den Fokus zurück auf (i). Desktop (schwebende Erklärung) und Handy (Erklärung unter der Zeile, §57).
 
 `vergleichen.js?v=167`.
+
+## 64 · Handy: „Vergleichen“ in der Werkzeugleiste und die Vergleichsleiste unten (18.11.2026, Nutzer: „improve the consistency and placement of the vergleich button“, „bottom section looks cramped“)
+- **Platz:** In Ruhe stand „Vergleichen“ in der Zeile von „Filter“ (die Artikelzahl rutschte in die Mitte), im Vergleichsmodus sprang die Gruppe in eine zweite, links ausgerichtete Zeile mit unruhiger rechter Kante. Jetzt bleibt die PLP-Zeile wie im PLP-Prototyp (Filter links, Anzahl rechts); die Vergleichs-Bedienung hat in jedem Zustand eine eigene Zeile darunter, über die volle Breite – dieselben Kanten wie Raster und Produktberater. Im Modus nimmt „Vergleich anzeigen (n)“ die Breite, „Beenden“ seine eigene; unter 360 px steht „Beenden“ in voller Breite darunter.
+- **Einheitlich mit „Filter“:** gleiche Schriftgröße (16 px) und Icongröße (20 px). Die Höhe bleibt 44 px (Tippfläche); „Filter“ selbst ist PLP und unverändert.
+- **Leiste unten:** Innenabstand 10 → 14 px plus sicherer Bereich des iPhones unten, Titel 12 → 14 px, Hinweis 11 → 12 px in einer Zeile (beim Maximum nur „Maximum erreicht“ – „/ max. 3“ neben der Zahl sagt schon, warum), 12 px zwischen Status und Vorschaubildern, damit die ×-Knöpfe den Hinweis nicht mehr bedrängen.
+- Geprüft bei 320 und 390 px: Ruhe, Modus mit 0 und 3 Modellen, kein seitliches Scrollen. Desktop und Tablet unverändert.
+
+`vergleichen.css?v=238`.
