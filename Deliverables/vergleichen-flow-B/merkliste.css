@@ -605,3 +605,8 @@ button.mkl-rv__cta{padding:0;border:0;background:none;font-family:inherit;cursor
 .mkl-drawer.is-pick .mkl-item:has(.mkl-cmp:not(.is-disabled):not(.is-in)){cursor:pointer}
 .mkl-drawer.is-pick .mkl-item:has(.mkl-cmp:not(.is-disabled):not(.is-in)):hover{background:var(--paper-white,#F5F6FA)}
 .mkl-drawer.is-pick .mkl-item:has(.mkl-cmp:not(.is-in) input:checked){background:var(--color-teal-50,#F2F6F6)}
+
+/* ==== Audit 18.11. (all screen sizes) ====
+   Zuletzt angesehen: the variant line under the name, like the Merkliste rows (.mkl-item__sub) – similar models
+   ("VDM10 2.0 Video-Türsprechanlage" Kian / Niko) were only told apart by their price. One line, then "…". ==== */
+.mkl-rv__sub{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:var(--text-caption,.75rem);line-height:1.35;color:var(--text-muted,#6A6A6A)}

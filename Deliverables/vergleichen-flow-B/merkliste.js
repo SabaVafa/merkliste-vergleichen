@@ -492,16 +492,23 @@
     if (isOpen) render();
   }
   function recentShown() { return recentLoad().filter(function (x) { return !has(x.id) && !ghosts[x.id]; }).slice(0, RSHOW); }
+  /* soft hyphens at the joints of long German compounds (18.11., audit at 320 px: "Türsprechanlage" broke mid-word
+     without a hyphen); the hyphen only shows where a line really breaks – same approach as the comparison (shy()) */
+  var HY = [['Türsprechanlage', 'Tür­sprech­anlage'], ['Sprechanlage', 'Sprech­anlage'], ['Briefkasten', 'Brief­kasten'], ['Briefkästen', 'Brief­kästen'],
+    ['Klingeltaster', 'Klingel­taster'], ['Namensschild', 'Namens­schild'], ['Gesichtserkennung', 'Gesichts­erkennung'], ['Mehrfamilien', 'Mehr­familien'],
+    ['Paketbox', 'Paket­box'], ['Standbriefkasten', 'Stand­brief­kasten'], ['Unterputz', 'Unter­putz']];
+  function hy(s) { s = String(s); HY.forEach(function (h) { s = s.split(h[0]).join(h[1]); }); return s; }
   function recentRowHTML(it) {
     var nm = shortName(it), price = typeof it.priceFrom === 'number' ? 'ab ' + euro(it.priceFrom) : '';
     /* the whole row opens the model (17.11., user: "pressing the products must take them to the pdp") – the CTA's hit area
        is stretched over the row; a model without a product page in the prototype says so, as in the comparison */
     var ctaTxt = it.konfig ? 'Konfigurieren' : 'Zum Produkt', real = it.url && it.url !== '#';
-    var cta = real ? '<a class="mkl-rv__cta" href="' + esc(asset(it.url)) + '" aria-label="' + ctaTxt + ' – ' + esc(nm.main) + '">' + ctaTxt + IC_CHEV_R + '</a>'
-      : '<button class="mkl-rv__cta" type="button" data-mkl="rv-noproto" aria-label="' + ctaTxt + ' – ' + esc(nm.main) + '">' + ctaTxt + IC_CHEV_R + '</button>';
+    var cta = real ? '<a class="mkl-rv__cta" href="' + esc(asset(it.url)) + '" aria-label="' + ctaTxt + ' – ' + esc(nm.main) + (nm.sub ? ', ' + esc(nm.sub) : '') + '">' + ctaTxt + IC_CHEV_R + '</a>'
+      : '<button class="mkl-rv__cta" type="button" data-mkl="rv-noproto" aria-label="' + ctaTxt + ' – ' + esc(nm.main) + (nm.sub ? ', ' + esc(nm.sub) : '') + '">' + ctaTxt + IC_CHEV_R + '</button>';
     return '<li class="mkl-rv" data-id="' + esc(it.id) + '">' +
       '<div class="mkl-rv__media"><img src="' + esc(asset(it.img)) + '" alt=""></div>' +
-      '<div class="mkl-rv__text"><div class="mkl-rv__name" title="' + esc(it.name) + '">' + esc(nm.main) + '</div>' +
+      '<div class="mkl-rv__text"><div class="mkl-rv__name" title="' + esc(it.name) + '">' + hy(esc(nm.main)) + '</div>' +
+        (nm.sub ? '<div class="mkl-rv__sub">' + hy(esc(nm.sub)) + '</div>' : '') +   /* 18.11. audit: "Kian" and "Niko" both read "VDM10 2.0 Video-Türsprechanlage" – the variant line tells them apart, as in the Merkliste rows */
         (price ? '<div class="mkl-rv__price">' + esc(price) + '</div>' : '') +
         cta + '</div>' +
     '</li>';
@@ -535,8 +542,8 @@
       '<div class="mkl-item__media"><img src="' + esc(asset(it.img)) + '" alt=""></div>' +
       '<div class="mkl-item__text">' +
         (cfg ? '<span class="mkl-item__tag">Ihre Konfiguration' + (it.updatedAt ? ' · aktualisiert ' + esc(fmtDate(it.updatedAt)) : (it.addedAt ? ' · ' + esc(fmtDate(it.addedAt)) : '')) + '</span>' : '') +
-        '<div class="mkl-item__name">' + esc(nm.main) + '</div>' +
-        (nm.sub ? '<div class="mkl-item__sub">' + esc(nm.sub) + '</div>' : '') +
+        '<div class="mkl-item__name">' + hy(esc(nm.main)) + '</div>' +
+        (nm.sub ? '<div class="mkl-item__sub">' + hy(esc(nm.sub)) + '</div>' : '') +
         (price ? '<div class="mkl-item__price">' + esc(price) + uvp + '</div>' : '') + deltaHTML(it) +
         cfgHtml + avail +
       '</div>' +

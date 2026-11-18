@@ -583,3 +583,17 @@ Fall: Vergleichsmodus auf „Briefkästen“, ein Modell in der Leiste; für das
 - Unverändert: Liegt ein passendes Modell in der Merkliste, bleibt es bei „Vergleichen“ (gesperrt bis zur Auswahl); außerhalb des Vergleichsmodus ebenso.
 
 `merkliste.js?v=64`, `vergleichen.js?v=171`.
+
+## 70 · Merkliste: Prüfung auf allen Bildschirmgrößen (18.11.2026, Nutzer: „check the merkliste on mobile again“, „audit all screen sizes to ensure consistency“)
+Geprüft mit einem Prüfskript (Elemente außerhalb des Bildes, seitliches Scrollen, Wörter ohne Trennstrich getrennt) und Maßen je Größe (Breite, Ränder, Kopf, Zeilenaufbau, Lage von Foto, Name, Papierkorb, Kästchen und Link, Fuß, Schriftgrößen) bei 320 × 568, 360 × 740, 375 × 812, 390 × 844, 414 × 896, 440 × 956, quer 568 × 320 und 740 × 360, Tablet 768 × 1024, 1024 × 768, 1280 × 800 und 1440 × 900 – jeweils oben und unten in der Liste. Daten: 4 Türsprechanlagen (eine mit gesunkenem Preis), eine gemerkte Konfiguration, 2 Briefkästen, 3 zuletzt angesehene Modelle.
+
+**Einheitlich:**
+- Handy 320–440 px: volle Breite, Ränder 16 px, Foto 72 px, Name, Papierkorb, „Vergleichen“ und „Zum Produkt/Konfigurieren ›“ an denselben Stellen, Kopf 77 px, Fuß mit 44 px-Knopf. Quer (568, 740): gleiche Zeilen, Kopf und Fuß bewusst flacher (Status und Knopf nebeneinander).
+- Tablet und Desktop 768–1440 px: Seitenfenster 448 px rechts, Ränder 20 px, Zeilen in allen Größen deckungsgleich.
+- Weitere Zustände bei 320 px ohne Befund: Vergleichs-Auswahl mit Kategorie-Hinweis, „Aus der Merkliste wählen“, leere Merkliste, „Teilen“, geteilte Merkliste mit „Übernehmen“, Entfernen mit „Rückgängig“ in der Zeile (gespeichert, Rückgängig stellt wieder her).
+
+**Behoben:**
+- **„Türsprechanlage“ ohne Trennstrich getrennt** (320 px, Modellname): Namen und Variantenzeilen bekommen weiche Trennstellen an den Wortfugen (Tür-sprech-anlage, Brief-kasten, Klingel-taster, Namens-schild, Gesichts-erkennung, Mehr-familien …) – wie im Vergleich; der Strich erscheint nur, wo die Zeile bricht.
+- **„Zuletzt angesehen“ nicht unterscheidbar:** Die Zeilen zeigten nur den gekürzten Namen – „Kian“ und „Niko“ hießen beide „VDM10 2.0 Video-Türsprechanlage“, nur der Preis war anders. Jetzt steht darunter die Variantenzeile wie in der Merkliste („1 Klingeltaster · Kian“, „mit Fingerprint · 1 Klingeltaster · Niko“), eine Zeile, sonst „…“; der Screenreader-Name des Links nennt sie mit.
+
+`merkliste.js?v=65`, `merkliste.css?v=52`.
