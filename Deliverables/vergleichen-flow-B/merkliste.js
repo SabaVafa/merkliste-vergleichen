@@ -933,8 +933,9 @@
   /* ---- "Merken" before a colour opens the page's colour window (13.11., lead UX; user: the existing side window, no
      extra panel) ----
      A greyed "Merken" only explained itself after a press. Now it is a normal button that answers with the way forward:
-     the page's labelled side window "Farbe wählen" opens – exactly as in the PDP prototype (17.11., user: no extra line
-     in it); the "Konfiguration gemerkt" toast confirms the save. The pick runs through the page's swatches (picture, title, price, buy button follow) and the build is
+     the page's labelled side window "Farbe wählen" opens – as in the PDP prototype, plus one line under its title saying
+     why (18.11., user: "must provide short explanation that color must be selected to be able to save the product");
+     the "Konfiguration gemerkt" toast confirms the save. The pick runs through the page's swatches (picture, title, price, buy button follow) and the build is
      bookmarked in the same step; closing without a pick saves nothing. "Wunschfarbe nach RAL" needs its RAL tone, so
      that row leads to the RAL picker. Same for the gallery button and the sticky-bar echo. */
   var pickFor = null;
@@ -944,7 +945,7 @@
     window.MTZ_PDP.colours(btn, function (picked) {
       pickFor = null; btn.setAttribute('aria-expanded', 'false');
       if (picked) choosePick(btn);
-    });
+    }, 'Um das Modell zu merken, wählen Sie bitte eine Farbe. Es wird dann direkt in dieser Farbe gemerkt.');
   }
   function choosePick(btn) {
     var st = pdpState();
@@ -984,8 +985,10 @@
     if (!PDP || !pdpBtn || !window.MTZ_PDP) return;
     var st = pdpState();
     var nm = shortName({ name: PDP.name, lens: LENS }).main, colour = st.sn.finishText || '';
-    var label = st.s1 ? (st.on ? 'Konfiguration gemerkt' : 'Konfiguration merken') : (st.on ? 'Gemerkt' : 'Merken');
-    var alt = st.s1 ? (st.on ? 'Konfiguration merken' : 'Konfiguration gemerkt') : (st.on ? 'Merken' : 'Gemerkt');
+    /* one short label in every state (18.11., user: "Konfiguration gemerkt" – "this label is too long"); the screen-reader
+       name still names model and colour */
+    var label = st.on ? 'Gemerkt' : 'Merken';
+    var alt = st.on ? 'Merken' : 'Gemerkt';
     var shortL = st.on ? 'Gemerkt' : 'Merken', shortAlt = st.on ? 'Merken' : 'Gemerkt';
     var wait = !st.s1;
     var aria = label + ': ' + nm + (st.s1 && colour ? ', ' + colour : '') + (wait ? ' – Farbe wählen' : '');   /* starts with the visible label (WCAG 2.5.3) */

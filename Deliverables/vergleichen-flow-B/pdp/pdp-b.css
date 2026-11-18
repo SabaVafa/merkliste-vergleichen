@@ -3342,3 +3342,9 @@ body.is-scrolled #quickbar {
   .colorwin__head { padding: 1rem 1.25rem; }
   .colorwin__title { font-size: 1.125rem; }
 }
+
+/* Merken → colour window: one line under the title says why a colour is needed (18.11.); the close button then sits at
+   the title line instead of the middle of the block */
+.colorwin__note { margin: 0.375rem 0 0; font-size: 0.875rem; line-height: 1.45; color: var(--color-graphite-600); }
+.colorwin__note[hidden] { display: none; }
+.colorwin__head:has(.colorwin__note:not([hidden])) { align-items: flex-start; }

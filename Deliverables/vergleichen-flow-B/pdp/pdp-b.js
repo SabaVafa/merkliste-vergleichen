@@ -2667,8 +2667,13 @@ var MZSwipe = (function () {
   }
 
   var lastFocus = null, onDone = null;
-  function open(opener, cb) {
+  /* note (18.11., user): opened by "Merken" the window says in one line why a colour is needed – the plain "Alle Farben"
+     window stays as in the PDP prototype */
+  var noteEl = document.getElementById('colorwinNote'), panel = win.querySelector('.colorwin__panel');
+  function open(opener, cb, note) {
     if (win.classList.contains('is-open')) return;
+    if (noteEl) { noteEl.textContent = note || ''; noteEl.hidden = !note; }
+    if (panel) { if (note) panel.setAttribute('aria-describedby', 'colorwinNote'); else panel.removeAttribute('aria-describedby'); }
     win.classList.add('is-open'); win.setAttribute('aria-hidden', 'false');
     setExpanded('true'); onDone = cb || null;
     lock(); lastFocus = opener || triggers[0]; markRows();
@@ -2720,7 +2725,7 @@ var MZSwipe = (function () {
   });
   if (link) link.addEventListener('click', function () { win.classList.contains('is-open') ? close() : open(link); });
   if (card) card.addEventListener('click', function () { win.classList.contains('is-open') ? close() : open(card); });
-  if (window.MTZ_PDP) window.MTZ_PDP.colours = open;   /* (opener, callback(picked)) */
+  if (window.MTZ_PDP) window.MTZ_PDP.colours = open;   /* (opener, callback(picked), note) */
   win.addEventListener('click', function (e) { if (e.target.closest('[data-cw-close]')) close(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && win.classList.contains('is-open')) close(); });
 

@@ -526,3 +526,10 @@ Regel unverändert: Die Option erscheint, sobald die Merkliste mindestens ein Mo
 - Geprüft (live, ohne Neuladen): leere Merkliste → keine Option; nur Briefkasten → keine; nur Modelle, die schon im Vergleich sind → keine; passendes Modell gemerkt → „Aus der Merkliste (1)“; zweites → „(2)“; ein gemerktes Modell aus dem Vergleich entfernt → zählt wieder mit (auch im leeren Vergleich).
 
 `vergleichen.js?v=166`, `merkliste.js?v=61`.
+
+## 62 · Produktseite: Farbfenster über „Merken“ erklärt, warum (18.11.2026, Nutzer: „this version of the color side window must provide short explanation that color must be selected to be able to save the product“)
+„Merken“ öffnet vor der Farbwahl das vorhandene Seitenfenster „Farbe wählen“ (§36). In dieser Fassung steht jetzt unter dem Titel eine Zeile: „Um das Modell zu merken, wählen Sie bitte eine Farbe. Es wird dann direkt in dieser Farbe gemerkt.“ Sie sagt, warum das Fenster kommt und was danach passiert (die Wahl merkt das Modell im selben Schritt, Hinweis „Konfiguration gemerkt“). Screenreader hören sie als Beschreibung des Fensters. Über „Alle Farben mit Bezeichnung ansehen“ bleibt das Fenster wie im PDP-Prototyp – ohne Zeile. Desktop (Seitenfenster) und Handy (Blatt von unten); das × steht auf Höhe des Titels.
+
+- **Kurzes Label (Nutzer: „this label is too long“):** Nach der Farbwahl hieß der Knopf „Konfiguration merken“ / „Konfiguration gemerkt“. Jetzt in jedem Zustand „Merken“ / „Gemerkt“ (Galerie und Leiste unten); der Screenreader-Name nennt weiter Modell und Farbe („Gemerkt: VDM10 2.0 Video-Türsprechanlage, Anthrazit RAL 7016“). Die Bestätigung „Konfiguration gemerkt“ bleibt.
+
+`pdp-b.js?v=300`, `pdp-b.css?v=732`, `merkliste.js?v=63`.
