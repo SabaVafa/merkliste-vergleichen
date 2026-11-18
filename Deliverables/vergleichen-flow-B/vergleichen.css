@@ -1870,10 +1870,6 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
      (at the maximum only "Maximum erreicht" – "/ max. 3" next to the count already says why), 12 px between the
      status and the thumbnails so the × discs no longer crowd the hint. ==== */
 @media(max-width:47.99rem){
-  .vgl-barwrap{display:flex;flex:1 1 100%;gap:.5rem}
-  .vgl-bar-btn{flex:1 1 auto;justify-content:center;font-size:var(--text-body,1rem)}
-  .vgl-bar-btn svg{width:1.25rem;height:1.25rem}
-  .vgl-cancel.is-shown{flex:0 0 auto;justify-content:center;font-size:var(--text-body,1rem)}
   .vgl-tray__inner{row-gap:.75rem;padding:.875rem 1rem calc(.875rem + env(safe-area-inset-bottom,0px))}
   .vgl-tray__status{gap:.25rem}
   .vgl-tray__label{font-size:var(--text-body-sm,.875rem);line-height:1.2}
@@ -1881,4 +1877,35 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
   .vgl-tray__hint{font-size:.75rem;line-height:1.3}
   .vgl-tray__hint .vgl-tray__hd{display:none}
 }
-@media(max-width:22.49rem){.vgl-cancel.is-shown{flex:1 1 100%}}   /* < 360 px "Beenden" no longer fits beside the button: its own full row, same edges */
+
+/* ==== Phones: fewer buttons, safe area, larger trash icon (18.11., user: "too much buttons on mobile view",
+   "we need safe area, also the trash icon looks tiny") ====
+   1 The full-width "Vergleichen" box (§64) made three stacked buttons – Filter, Vergleichen, Produktberater. Now
+     "Vergleichen" is a text button with its icon right next to "Filter" in the PLP row (Filter · Vergleichen …
+     41 Artikel): no box, no extra row, same type and icon size as Filter, the 34 px row height of Filter with a
+     44 px tap area. A stored selection shows as a small count on the icon (like the header badges).
+     In compare mode the same spot reads "× Beenden"; the comparison opens from the strip at the bottom (its
+     "Vergleichen" button), so the toolbar no longer repeats it. Below 360 px the control moves to its own row.
+   2 Safe area: the pages now use viewport-fit=cover, so iOS reports the home-indicator inset – the strip keeps its
+     buttons above it (at least 14 px, or the inset). Sides follow the notch in landscape.
+   3 Trash icon in the strip 18 → 24 px (same visual weight as the × and the header icons). ==== */
+@media(max-width:47.99rem){
+  .catalog__bar>.catalog__filter-btn{order:-2}
+  .vgl-barwrap{order:-1;margin:0;gap:0}
+  .vgl-bar-btn,.vgl-bar-btn:hover,.vgl-bar-btn.has-saved,.vgl-bar-btn.is-active,.vgl-bar-btn.is-wait{position:relative;height:2.125rem;min-height:0;padding:0 .25rem;border:0;background:none;color:var(--teal,#015253);font-size:var(--text-body,1rem);gap:.5rem}
+  .vgl-bar-btn::before,.vgl-cancel::before{content:'';position:absolute;inset:-.3125rem 0}
+  .vgl-bar-btn:hover .lbl{text-decoration:underline;text-underline-offset:.1875rem}
+  .vgl-bar-btn svg{width:1.25rem;height:1.25rem}
+  .vgl-bar-btn .cnt,.vgl-bar-btn:hover .cnt{position:absolute;top:-.125rem;left:1rem;min-width:1rem;height:1rem;padding:0 .25rem;font-size:.625rem;background:var(--teal,#015253);color:var(--white,#fff);box-shadow:0 0 0 .125rem var(--white,#fff)}
+  .vgl-barwrap.is-mode .vgl-bar-btn{display:none}
+  .vgl-cancel.is-shown{position:relative;display:inline-flex;align-items:center;gap:.5rem;height:2.125rem;padding:0 .25rem;border:0;background:none;color:var(--schwarz,#1A171B);font-size:var(--text-body,1rem);font-weight:700}
+  .vgl-cancel:hover{text-decoration:underline;text-underline-offset:.1875rem}
+  .vgl-cancel svg{width:1.25rem;height:1.25rem}
+  .vgl-tray__inner{padding-bottom:max(.875rem,env(safe-area-inset-bottom,0px))}
+  .vgl-tray .vgl-tray__clear svg{width:1.5rem;height:1.5rem}
+}
+@media(min-width:48rem){.vgl-cancel svg{display:none}}
+@media(max-width:22.49rem){.vgl-barwrap{flex:1 1 100%;order:0}}
+body{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.vgl-tray__inner{padding-left:max(1rem,env(safe-area-inset-left,0px));padding-right:max(1rem,env(safe-area-inset-right,0px))}
+@media(min-width:48rem){.vgl-tray__inner{padding-left:max(clamp(1.5rem,4vw,3.5rem),env(safe-area-inset-left,0px));padding-right:max(clamp(1.5rem,4vw,3.5rem),env(safe-area-inset-right,0px))}}

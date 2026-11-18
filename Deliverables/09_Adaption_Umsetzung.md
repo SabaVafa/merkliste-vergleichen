@@ -546,3 +546,12 @@ Eine per Klick oder Tippen geöffnete Erklärung (i) schließt jetzt auch, wenn 
 - Geprüft bei 320 und 390 px: Ruhe, Modus mit 0 und 3 Modellen, kein seitliches Scrollen. Desktop und Tablet unverändert.
 
 `vergleichen.css?v=238`.
+
+## 65 · Handy: weniger Knöpfe, sicherer Bereich, größeres Papierkorb-Icon (18.11.2026, Nutzer: „too much buttons on mobile view“, „we need safe area, also the trash icon looks tiny“)
+- **Weniger Knöpfe (ersetzt die volle Breite aus §64):** Die breite „Vergleichen“-Fläche machte drei Knöpfe übereinander (Filter, Vergleichen, Produktberater). Jetzt steht „Vergleichen“ als Textknopf mit Icon direkt neben „Filter“ in der PLP-Zeile: „Filter · Vergleichen … 41 Artikel“ – ohne Kasten, ohne eigene Zeile, gleiche Schrift- und Icongröße wie Filter, 34 px Zeilenhöhe wie Filter mit 44 px Tippfläche. Eine gespeicherte Auswahl zeigt eine kleine Zahl am Icon (wie die Zähler im Kopf).
+- **Im Vergleichsmodus** steht an derselben Stelle „× Beenden“. Geöffnet wird der Vergleich über die Leiste unten (deren Knopf „Vergleichen“); die Werkzeugleiste wiederholt ihn auf dem Handy nicht mehr. Unter 360 px rückt die Bedienung in eine eigene Zeile unter Filter. Desktop und Tablet unverändert.
+- **Sicherer Bereich:** Die Kategorieseiten nutzen jetzt `viewport-fit=cover`; erst damit meldet iOS den Bereich des Home-Balkens. Die Leiste unten hält ihre Knöpfe darüber (mindestens 14 px oder der gemeldete Bereich), im Querformat halten Seite und Leiste Abstand zur Notch.
+- **Papierkorb** in der Leiste 18 → 24 px.
+- Geprüft bei 320, 375 und 1280 px: Ruhe und Modus, kein seitliches Scrollen.
+
+`vergleichen.css?v=239`, `vergleichen.js?v=168`.

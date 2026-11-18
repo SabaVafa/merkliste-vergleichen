@@ -635,7 +635,7 @@
      in mode: "Vergleich anzeigen (n)", grey until ≥2, teal + opens comparison from 2. */
   function injectBarButton(){
     var bar=document.querySelector('.catalog__bar'); if(!bar||bar.querySelector('.vgl-barwrap'))return;
-    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt" aria-hidden="true">0</span></button><button class="vgl-cancel" type="button" aria-label="Vergleich beenden"><span class="vgl-m-hide">Vergleich beenden</span><span class="vgl-m-only">Beenden</span></button></div>');
+    var wrap=h('<div class="vgl-barwrap"><button class="vgl-bar-btn" type="button">'+SCALE+'<span class="lbl">Vergleichen</span> <span class="cnt" aria-hidden="true">0</span></button><button class="vgl-cancel" type="button" aria-label="Vergleich beenden">'+IC_X+'<span class="vgl-m-hide">Vergleich beenden</span><span class="vgl-m-only">Beenden</span></button></div>');
     barBtn=wrap.querySelector('.vgl-bar-btn');
     cancelBtn=wrap.querySelector('.vgl-cancel');
     barBtn.addEventListener('click',function(){if(!compareMode){enterMode();}else if(canCompare()){openView();}});
@@ -710,6 +710,7 @@
       barBtn.setAttribute('aria-disabled',String(!canCompare()));
     }
     if(cancelBtn)cancelBtn.classList.toggle('is-shown',compareMode);
+    if(barBtn.parentNode)barBtn.parentNode.classList.toggle('is-mode',compareMode);   /* phones: the strip opens the comparison, the toolbar only offers "Beenden" (18.11.) */
   }
   function syncTray(){
     var n=selected.length;
