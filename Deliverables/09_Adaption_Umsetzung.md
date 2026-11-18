@@ -562,3 +562,8 @@ Ersetzt die Erklärung in der Zeile auf dem Handy aus §57. Auf allen Bildschirm
 Geprüft: alle 13 Erklärungen im Vergleich mit 3 Modellen bei 375 × 812, 320 × 568 und quer 568 × 320 – sichtbar, im Bild, nicht abgeschnitten, kein seitliches Scrollen.
 
 `vergleichen.css?v=240`, `vergleichen.js?v=169`.
+
+## 67 · Handy: Merkmal und Werte deutlich zwei Ebenen (18.11.2026, Nutzer: „title and body are not distinguishable“)
+Merkmal-Überschrift und Werte hatten denselben weißen Grund und je eine Haarlinie darunter – die Überschrift las sich wie eine weitere Zeile. Jetzt ist die Überschrift ein Kopfband: hellgrauer Grund (Token „paper“) über die ganze Kartenbreite, Text in Schwarz statt Grau (gleiche kleine fette Versalien), die Linie (§ vom 17.11.) als Unterkante des Bands über die volle Breite. Die Werte stehen darunter auf Weiß, jede Zeile liest sich „Überschrift → Werte“. Gemeinsamkeiten (Überschrift und Wert in einer Zeile), Tablet und Desktop unverändert; die (i)-Karte liegt weiter über den Bändern.
+
+`vergleichen.css?v=241`.

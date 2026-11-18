@@ -1898,3 +1898,15 @@ table.vgl-t tbody th[scope="row"] .rh__w:hover,table.vgl-t tbody th[scope="row"]
 body{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 .vgl-tray__inner{padding-left:max(1rem,env(safe-area-inset-left,0px));padding-right:max(1rem,env(safe-area-inset-right,0px))}
 @media(min-width:48rem){.vgl-tray__inner{padding-left:max(clamp(1.5rem,4vw,3.5rem),env(safe-area-inset-left,0px));padding-right:max(clamp(1.5rem,4vw,3.5rem),env(safe-area-inset-right,0px))}}
+
+/* ==== Phones: caption and values clearly two levels (18.11., user: "title and body are not distinguishable") ====
+   Caption and values had the same white ground and a hairline under each – the caption read as one more row. Now the
+   caption is a header band: light grey ground (paper token) across the card, ink text (was grey) in the same small
+   bold capitals, its hairline at the band's lower edge and full width. The values stay on white below it, so every
+   row reads "header → values". Gemeinsamkeiten rows (caption and value on one line) are unchanged. ==== */
+@media(max-width:47.99rem){
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>th[scope="row"]:nth-child(n){padding-top:.625rem;padding-bottom:.625rem;background:var(--v-paper)}
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>th[scope="row"]::after{left:0;right:0}
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>th[scope="row"] .rh__l{color:var(--v-ink)}
+  .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>td.vgl-val:nth-child(n){padding-top:.75rem}
+}
