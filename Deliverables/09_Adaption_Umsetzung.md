@@ -567,3 +567,10 @@ Geprüft: alle 13 Erklärungen im Vergleich mit 3 Modellen bei 375 × 812, 320 �
 Merkmal-Überschrift und Werte hatten denselben weißen Grund und je eine Haarlinie darunter – die Überschrift las sich wie eine weitere Zeile. Jetzt ist die Überschrift ein Kopfband: hellgrauer Grund (Token „paper“) über die ganze Kartenbreite, Text in Schwarz statt Grau (gleiche kleine fette Versalien), die Linie (§ vom 17.11.) als Unterkante des Bands über die volle Breite. Die Werte stehen darunter auf Weiß, jede Zeile liest sich „Überschrift → Werte“. Gemeinsamkeiten (Überschrift und Wert in einer Zeile), Tablet und Desktop unverändert; die (i)-Karte liegt weiter über den Bändern.
 
 `vergleichen.css?v=241`.
+
+## 68 · Blatt „Auswahl ändern“: × je Modell (18.11.2026, Nutzer: „what if we provide delete option here as well“)
+Jede Zeile im Blatt endet jetzt mit dem ×, mit dem die Modellkacheln entfernt werden (gleiches Zeichen, gedämpft, rote Lösch-Hervorhebung, 44 px Tippfläche). Es steht außerhalb des Kästchens – Tippen darauf hakt nichts an; in der gedimmten (gesperrten) Zeile bleibt es voll sichtbar, weil es weiter wirkt. Bisher ließ sich das ausgeblendete dritte Modell auf dem Handy gar nicht entfernen, ohne es erst einzublenden.
+
+Nach dem Entfernen bleiben zwei Modelle, die nebeneinander passen: Das Blatt schließt, beide stehen im Vergleich, die übliche Meldung „… entfernt. Rückgängig“ erscheint, der Fokus liegt auf dem × einer Kachel. „Rückgängig“ stellt alle drei und die Zeile „2 von 3 Modellen sichtbar“ wieder her. Geprüft bei 390 px mit dem ausgeblendeten und mit einem sichtbaren Modell.
+
+`vergleichen.css?v=242`, `vergleichen.js?v=170`.

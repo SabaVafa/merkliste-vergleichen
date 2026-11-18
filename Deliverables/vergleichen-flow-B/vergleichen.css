@@ -1910,3 +1910,13 @@ body{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inse
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>th[scope="row"] .rh__l{color:var(--v-ink)}
   .vgl-view table.vgl-t tbody tr:not(.vgl-sec__h):not(.vgl-gx)>td.vgl-val:nth-child(n){padding-top:.75rem}
 }
+
+/* ==== "Auswahl ändern" sheet: × per model (18.11., user: "what if we provide delete option here as well") ====
+   Each row ends in the remove × of the model tiles (same glyph, muted, red delete hover, 44 px target). It sits outside
+   the label, so tapping it never ticks the box; on a dimmed (locked) row it stays at full strength because it still
+   works. Removing leaves two models, which fit side by side: the sheet closes and the usual "… entfernt – Rückgängig"
+   message appears. It is also the only way to remove the hidden model on a phone. ==== */
+.vgl-vis__list li{display:flex;align-items:center;border-bottom:.0625rem solid var(--v-g200)}
+.vgl-vis__list li:last-child{border-bottom:0}
+.vgl-vis__list .vgl-visopt{flex:1 1 auto;min-width:0;border-bottom:0}
+.vgl-visrm{margin-right:-.5rem}

@@ -232,6 +232,7 @@
       var pb=e.target.closest('[data-pick]');if(pb){if(pickEl&&pickBtn===pb)closePick(true);else openPick(pb);return;}
       var vs=e.target.closest('[data-vissheet]');if(vs){if(pickEl&&pickBtn===vs)closePick(true);else openVis(vs);return;}
       var vg=e.target.closest('[data-visgo]');if(vg){applyVis();return;}
+      var vr=e.target.closest('[data-visrm]');if(vr){closePick(false);removeColumn(vr.getAttribute('data-visrm'));return;}   /* two left: both fit, the sheet has done its job */
       var a=e.target.closest('[data-vgl]');
       if(a&&a.getAttribute('data-vgl')==='body')a=null;   /* the body container carries data-vgl too */
       if(a){var k=a.getAttribute('data-vgl');
@@ -1411,7 +1412,7 @@
     closePick(false);closeAdd(false);if(!cur)return;
     var c=cur,max=c.vis.length;
     pickBtn=btn;pickCol=-1;
-    var opts=c.items.map(function(p,i){var on=c.vis.indexOf(i)>-1;return '<li><label class="vgl-visopt"><input type="checkbox" value="'+esc(p.id)+'"'+(on?' checked':'')+'><span class="vgl-box" aria-hidden="true">'+CHK+'</span><span class="vgl-addopt__img"><img src="'+esc(p.img)+'" alt=""></span><span class="vgl-pickopt__t"><b>'+esc(c.titles[i].t)+'</b><span class="vgl-pickopt__p">ab '+euro(p.price)+'</span></span></label></li>';}).join('');
+    var opts=c.items.map(function(p,i){var on=c.vis.indexOf(i)>-1;return '<li><label class="vgl-visopt"><input type="checkbox" value="'+esc(p.id)+'"'+(on?' checked':'')+'><span class="vgl-box" aria-hidden="true">'+CHK+'</span><span class="vgl-addopt__img"><img src="'+esc(p.img)+'" alt=""></span><span class="vgl-pickopt__t"><b>'+esc(c.titles[i].t)+'</b><span class="vgl-pickopt__p">ab '+euro(p.price)+'</span></span></label><button class="vgl-ph__rm vgl-visrm" type="button" data-visrm="'+esc(p.id)+'" aria-label="'+esc(c.titles[i].t)+' aus dem Vergleich entfernen">'+IC_X+'</button></li>';}).join('');   /* × per row (18.11., user: "what if we provide delete option here as well") – also the only way to remove the hidden model on phones */
     pickEl=h('<div class="vgl-pick is-sheet vgl-vis" role="dialog" aria-labelledby="vglVisH" aria-describedby="vglVisS">'+
       '<div class="vgl-pick__head"><p class="vgl-pick__h" id="vglVisH">Modelle für die Ansicht wählen</p><button class="vgl-addsearch__x" type="button" data-vgl="pickclose" aria-label="Auswahl schließen">'+IC_X+'</button></div>'+
       '<p class="vgl-vis__sub" id="vglVisS">Auf dem Handy passen '+max+' Modelle nebeneinander. Wählen Sie '+max+' von '+c.items.length+'.</p>'+
