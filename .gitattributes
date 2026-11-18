@@ -1,0 +1,16 @@
+# One line ending for everyone: text files are stored and checked out with LF
+* text=auto eol=lf
+
+# Binary files: never touched
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.avif binary
+*.ico  binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
+*.glb  binary
+*.mp4  binary
