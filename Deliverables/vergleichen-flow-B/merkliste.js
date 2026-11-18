@@ -619,6 +619,7 @@
     footHint.firstChild.textContent = status; footHint.lastChild.textContent = detail;
   }
   function syncCmp() {
+    if (cta) cta.removeAttribute('data-grid');
     if (pick) { syncPick(); return; }
     if (pickNote) pickNote.hidden = true;
     var n = cmpSel.length, lock = n ? lensOfCmp(cmpSel[0]) : null, full = n >= CMP_MAX;
@@ -674,8 +675,13 @@
     pickNote.hidden = cand > 0 || !viewItems().length;
     if (!pickNote.hidden) pickNote.innerHTML = IC_INFO + '<span><b>Keine weiteren ' + esc(lab0) + ' in Ihrer Merkliste.</b> ' +
       (otherTxt ? 'Verglichen werden nur Modelle einer Kategorie.' : 'Die gemerkten Modelle sind bereits im Vergleich.') +
-      ' Weitere Modelle merken Sie auf ihrer Produktseite, sobald Sie eine Farbe gewählt haben.</span>';
-    if (!cand && !n) setFoot('Keine Modelle zum Vergleichen', 'Merken Sie zuerst ' + ({ sprechanlage: 'eine Türsprechanlage', briefkasten: 'einen Briefkasten' }[pick.lens] || 'ein Modell dieser Kategorie') + ' auf der Produktseite.');
+      ' Weitere ' + esc(lab0) + ' wählen Sie direkt in der Produktliste.</span>';
+    /* nothing to add (18.11., user: "what if users for the 2nd item … then it is disabled"): no dead end with a disabled
+       button and a detour via product page + colour + Merken – the button leads to the product list in compare mode,
+       where the next model is ticked directly */
+    var dead = !cand && !n;
+    if (dead) { cta.textContent = 'Modell hinzufügen'; cta.disabled = false; cta.setAttribute('data-grid', ''); } else cta.removeAttribute('data-grid');
+    if (dead) setFoot('Keine passenden Modelle', 'Weitere ' + lab0 + ' wählen Sie in der Produktliste.');
     else setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' Modelle ausgewählt') : 'Keine Modelle ausgewählt',
       free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
@@ -844,6 +850,7 @@
      09b P0-4 · Print / PDF: a separate document node, not the scrolling drawer
      ===================================================================== */
   function startCompare() {
+    if (pick && cta.hasAttribute('data-grid')) { closeDrawer(); if (window.MTZ_VGL && typeof window.MTZ_VGL.fromGrid === 'function') window.MTZ_VGL.fromGrid(); return; }
     if (pick) { var add = cmpSel.slice(0, pick.slots), fn = pick.onAdd; if (!add.length) return; closeDrawer(); if (typeof fn === 'function') fn(add); return; }
     var ids = cmpSel.slice(0, CMP_MAX); if (ids.length < CMP_MIN) return;
     var lens = lensOfCmp(ids[0]) || LENS;

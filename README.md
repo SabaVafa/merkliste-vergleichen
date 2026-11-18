@@ -77,7 +77,7 @@ Json Folder/                 product-finder exports, background only; the protot
 
 | API | Purpose |
 |---|---|
-| `MTZ_VGL.compare(ids)`, `.add(ids)`, `.enterMode()`, `.isMode()`, `.selected()`, `.max` | Comparison (max 3, min 2 models) |
+| `MTZ_VGL.compare(ids)`, `.add(ids)`, `.enterMode()`, `.isMode()`, `.selected()`, `.max`, `.fromGrid()` | Comparison (max 3, min 2 models); `fromGrid()` = go to the product list in compare mode to pick more models |
 | `MTZ_MKL.open({pick})`, `.close()`, `.items()`, `.has(id)` | Merkliste drawer; `pick` = "Aus der Merkliste" mode of the comparison |
 
 **Events:** `mtz-mkl-change` (window; the Merkliste changed – the comparison updates "Aus der Merkliste (n)"), `mtz:pdp-change` (document; the product page configuration changed).

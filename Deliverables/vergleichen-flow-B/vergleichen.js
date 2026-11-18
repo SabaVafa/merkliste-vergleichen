@@ -589,14 +589,14 @@
   /* back to the category page in compare mode: the cards carry their compare checkboxes, the strip keeps the current
      selection and "Vergleichen" returns to the comparison */
   function addFromGrid(){
-    var free=MAX-selected.length;
+    var free=MAX-selected.length,back=view.classList.contains('is-open');
     closeView();
     if(!compareMode){setMode(true);syncAll();}
     var gr=document.getElementById('productGrid');
     if(gr)try{gr.scrollIntoView({block:'start',behavior:'smooth'});}catch(e){}
     var nx=null;if(gr)gr.querySelectorAll('.vgl-toggle input').forEach(function(i){if(!nx&&!i.checked)nx=i;});
     if(nx)setTimeout(function(){nx.focus({preventScroll:true});},350);
-    toast(free>0?'Wählen Sie '+(free===1?'ein weiteres Modell':'bis zu '+free+' weitere Modelle')+' auf den Karten – „Vergleichen“ führt zurück zum Vergleich.':'Der Vergleich ist vollständig.','info');
+    toast(free>0?'Wählen Sie '+(free===1?'ein weiteres Modell':'bis zu '+free+' weitere Modelle')+' auf den Karten'+(back?' – „Vergleichen“ führt zurück zum Vergleich.':'.'):'Der Vergleich ist vollständig.','info');
   }
   /* (i) toggletip: click/Enter opens a real tooltip node (aria-describedby), Escape closes it first */
   function closeTip(){var o=view.querySelector('.vgl-i.is-open');if(o){o.classList.remove('is-open');o.setAttribute('aria-expanded','false');o.removeAttribute('aria-controls');}}
@@ -1514,7 +1514,8 @@
     compare:function(ids){var n=setSelection(ids);if(!n)return 0;fromMkl=true;syncAll();if(canCompare())openView();return n;},
     enterMode:function(){if(!compareMode)enterMode();},
     isMode:function(){return compareMode;},
-    add:function(ids){return addIds(ids);},   /* Merkliste drawer on the category page (10.11.) adds to the selection in the strip */
+    add:function(ids){return addIds(ids);},
+    fromGrid:function(){addFromGrid();},   /* Merkliste with nothing to add: "Modell hinzufügen" → product list (18.11.) */   /* Merkliste drawer on the category page (10.11.) adds to the selection in the strip */
     max:MAX,
     selected:function(){return selected.slice();}
   };

@@ -574,3 +574,12 @@ Jede Zeile im Blatt endet jetzt mit dem ×, mit dem die Modellkacheln entfernt w
 Nach dem Entfernen bleiben zwei Modelle, die nebeneinander passen: Das Blatt schließt, beide stehen im Vergleich, die übliche Meldung „… entfernt. Rückgängig“ erscheint, der Fokus liegt auf dem × einer Kachel. „Rückgängig“ stellt alle drei und die Zeile „2 von 3 Modellen sichtbar“ wieder her. Geprüft bei 390 px mit dem ausgeblendeten und mit einem sichtbaren Modell.
 
 `vergleichen.css?v=242`, `vergleichen.js?v=170`.
+
+## 69 · Merkliste ohne passendes Modell: kein toter Punkt (18.11.2026, Nutzer: „what if users for the 2nd item to compare press the bemerken icon then it is disabled“)
+Fall: Vergleichsmodus auf „Briefkästen“, ein Modell in der Leiste; für das zweite öffnet man die Merkliste über das Kopf-Symbol (oder „Aus der Merkliste“ im Vergleich). Gemerkt ist aber nur eine Türsprechanlage – gesperrt, weil nur innerhalb einer Kategorie verglichen wird. Bisher: Hinweis, gesperrtes Kästchen, gesperrter Knopf und der Umweg „auf der Produktseite merken, sobald Sie eine Farbe gewählt haben“ – obwohl das zweite Modell direkt auf der Produktliste angehakt werden kann.
+
+- **Knopf statt Sackgasse:** Gibt es nichts hinzuzufügen, heißt der Knopf unten „Modell hinzufügen“ (aktiv, Wortwahl nach §51). Er schließt die Merkliste, führt zur Produktliste im Vergleichsmodus, setzt den Fokus auf das nächste „Vergleichen“-Kästchen und meldet „Wählen Sie bis zu 2 weitere Modelle auf den Karten.“ (aus dem geöffneten Vergleich mit dem Zusatz „– „Vergleichen“ führt zurück zum Vergleich.“).
+- **Text:** Hinweis „Keine weiteren Briefkästen in Ihrer Merkliste. Verglichen werden nur Modelle einer Kategorie. Weitere Briefkästen wählen Sie direkt in der Produktliste.“; unten „Keine passenden Modelle – Weitere Briefkästen wählen Sie in der Produktliste.“
+- Unverändert: Liegt ein passendes Modell in der Merkliste, bleibt es bei „Vergleichen“ (gesperrt bis zur Auswahl); außerhalb des Vergleichsmodus ebenso.
+
+`merkliste.js?v=64`, `vergleichen.js?v=171`.
