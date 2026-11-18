@@ -361,7 +361,9 @@
     hdrBtn.setAttribute('aria-label', 'Merkliste, ' + n + ' Artikel');
   }
   function pulseBadge() { if (!hdrBadge || reduced()) return; hdrBadge.classList.remove('is-pulse'); void hdrBadge.offsetWidth; hdrBadge.classList.add('is-pulse'); setTimeout(function () { hdrBadge.classList.remove('is-pulse'); }, 220); }
-  function syncAll() { syncHeader(); if (isOpen) render(); if (PDP) syncPdpMarks(); }
+  /* mtz-mkl-change (18.11.): the comparison shows "Aus der Merkliste (n)" only while a model of its category waits in the
+     list – it re-checks on every change, in this tab or another */
+  function syncAll() { syncHeader(); if (isOpen) render(); if (PDP) syncPdpMarks(); try { window.dispatchEvent(new Event('mtz-mkl-change')); } catch (e) {} }
 
   /* ---- Mutations ---- */
   function addItem(id, cardEl) {

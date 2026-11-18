@@ -1163,7 +1163,7 @@
          that is left, a numbered empty slot), one clear next step (primary "Modell hinzufügen"), the Merkliste as the
          second way, and the undo after "Vergleich leeren" as a quiet text link below. */
       var slots=[0,1].map(function(i){var p=items[i];return p?'<div class="vgl-empty__slot is-filled">'+imgHTML(p)+'</div>':'<div class="vgl-empty__slot"><span>'+(i+1)+'</span></div>';}).join('');
-      var nMk=mklCount();
+      var nMk=mklCount();shownMkl=nMk;
       viewBody.innerHTML='<div class="vgl-empty" role="group" aria-labelledby="vglEmptyT">'+
         '<div class="vgl-empty__slots" aria-hidden="true">'+slots+'</div>'+
         '<h3 class="vgl-empty__t" id="vglEmptyT">'+(items.length?'Wählen Sie ein zweites Modell':'Wählen Sie zwei Modelle')+'</h3>'+
@@ -1197,7 +1197,7 @@
        opens the Merkliste, which shows what is saved and "Zuletzt angesehen" to bookmark a model first */
     /* "Aus der Merkliste" (17.11., UX review): only when the Merkliste holds a model of this category that is not compared
        yet – it led into an empty Merkliste otherwise – and always with the number, so the visitor knows what waits */
-    var nMkl=n<MAX?mklCount():0,hasMkl=nMkl>0;
+    var nMkl=n<MAX?mklCount():0,hasMkl=nMkl>0;shownMkl=nMkl;
     var lc={
       tile:n>=MAX?'<div class="vgl-lc__full" role="note">'+IC_OK+'<b>Maximale Anzahl erreicht</b><span>Es können bis zu '+MAX+' Modelle verglichen werden.'+(pick?' '+nv+' davon sind sichtbar – zum Wechseln den Namen wählen.':'')+'</span></div>':
         '<button class="vgl-addtile" type="button" data-vgl="add">'+IC_PLUS+'<span class="vgl-addtile__l">Modell hinzufügen</span><span class="vgl-addtile__n">noch '+(MAX-n)+' möglich</span></button>',
@@ -1383,6 +1383,7 @@
   }
 
   /* ---- Spaltenwahl picker: list of ALL models with their place; neighbour = swap ---- */
+  var shownMkl=-1;   /* "Aus der Merkliste (n)" as last drawn – see mtz-mkl-change */
   var pickEl=null,pickBtn=null,pickCol=-1,pickAct=-1;
   function openPick(btn){
     closePick(false);closeAdd(false);if(!cur)return;
@@ -1550,6 +1551,15 @@
     if(window.ResizeObserver){var roW=0,roF=0;new ResizeObserver(function(es){var w=Math.round(es[0].contentRect.width);if(!w||w===roW)return;roW=w;cancelAnimationFrame(roF);roF=requestAnimationFrame(relayout);}).observe(scrollEl);}
     /* another tab changed this category's selection */
     window.addEventListener('storage',function(e){if(e.key!==KEY)return;selected=ownIds();syncAll();});
+    /* "Aus der Merkliste (n)" follows the Merkliste live (18.11., user: "the marked option must appear if there is any
+       relevant bookmarked item"): it was only counted when the comparison was drawn, so a model bookmarked meanwhile (e.g.
+       on a product page in another tab) did not bring the option back until a reload. Redrawn only when the number of
+       addable models changes; the reading position stays. */
+    window.addEventListener('mtz-mkl-change',function(){
+      if(!view.classList.contains('is-open')||printing)return;
+      var n=selected.length<MAX?mklCount():0;if(n===shownMkl)return;
+      var st=scrollEl.scrollTop;renderView();scrollEl.scrollTop=st;
+    });
   }
   function arrive(arr){
     var uniq=[];arr.raw.forEach(function(id){if(uniq.indexOf(id)<0)uniq.push(id);});

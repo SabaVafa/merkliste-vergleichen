@@ -520,3 +520,9 @@ Bei vier Karten in einer Reihe (~221 px) blieben der Preiszeile 179 px; „1.490
 - Geprüft: 1092 px (gestapelt, alles auf einer Linie), 1440, 812, 375 px (eine Zeile, kein Überlauf).
 
 `vergleichen.js?v=165`, `vergleichen.css?v=236`.
+
+## 61 · „Aus der Merkliste (n)“ folgt der Merkliste sofort (18.11.2026, Nutzer: „the marked option must appear if there is any relevant bookmarked item“)
+Regel unverändert: Die Option erscheint, sobald die Merkliste mindestens ein Modell **dieser Kategorie** enthält, das **noch nicht im Vergleich** ist – mit der Anzahl; sonst nicht. Lücke: Gezählt wurde nur, wenn der Vergleich gezeichnet wurde. Ein währenddessen gemerktes Modell (z. B. auf der Produktseite in einem anderen Tab) brachte die Option erst nach Neuladen. Jetzt meldet die Merkliste jede Änderung (in diesem und anderen Tabs); der offene Vergleich zeichnet sich neu, wenn sich die Anzahl ändert, und behält die Leseposition.
+- Geprüft (live, ohne Neuladen): leere Merkliste → keine Option; nur Briefkasten → keine; nur Modelle, die schon im Vergleich sind → keine; passendes Modell gemerkt → „Aus der Merkliste (1)“; zweites → „(2)“; ein gemerktes Modell aus dem Vergleich entfernt → zählt wieder mit (auch im leeren Vergleich).
+
+`vergleichen.js?v=166`, `merkliste.js?v=61`.
