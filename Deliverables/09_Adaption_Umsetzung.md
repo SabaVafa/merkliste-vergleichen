@@ -533,3 +533,8 @@ Regel unverändert: Die Option erscheint, sobald die Merkliste mindestens ein Mo
 - **Kurzes Label (Nutzer: „this label is too long“):** Nach der Farbwahl hieß der Knopf „Konfiguration merken“ / „Konfiguration gemerkt“. Jetzt in jedem Zustand „Merken“ / „Gemerkt“ (Galerie und Leiste unten); der Screenreader-Name nennt weiter Modell und Farbe („Gemerkt: VDM10 2.0 Video-Türsprechanlage, Anthrazit RAL 7016“). Die Bestätigung „Konfiguration gemerkt“ bleibt.
 
 `pdp-b.js?v=300`, `pdp-b.css?v=732`, `merkliste.js?v=63`.
+
+## 63 · Vergleich: Erklärung schließt beim Tippen daneben (18.11.2026, Nutzer: „pressing outside must close the tool tip“)
+Eine per Klick oder Tippen geöffnete Erklärung (i) schließt jetzt auch, wenn man irgendwo außerhalb drückt – in der Tabelle, im Kopf, in der Leiste oben. Ein Klick in die Erklärung selbst lässt sie offen (z. B. zum Markieren von Text). Weiterhin gilt: erneut auf (i) schließt sie, ein anderes (i) wechselt direkt, Esc schließt und setzt den Fokus zurück auf (i). Desktop (schwebende Erklärung) und Handy (Erklärung unter der Zeile, §57).
+
+`vergleichen.js?v=167`.

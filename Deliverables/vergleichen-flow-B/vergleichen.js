@@ -226,6 +226,7 @@
       if(addPanel&&!addPanel.contains(e.target)&&!(addAnchor&&addAnchor.contains(e.target)))closeAdd(false);   /* outside click closes the search */
       if(pickEl&&!pickEl.contains(e.target)&&!(pickBtn&&pickBtn.contains(e.target)))closePick(false);
       var pop=view.querySelector('.vgl-sharepop');if(pop&&!pop.contains(e.target)&&!e.target.closest('[data-vgl="share"]'))pop.remove();
+      if(view.querySelector('.vgl-i.is-open')&&!e.target.closest('.vgl-i,.vgl-tip,.vgl-tipin'))closeTip();   /* pressing anywhere outside closes an open tip (18.11.) */
       var opt=e.target.closest('[data-addid]');if(opt){chooseAdd(opt.getAttribute('data-addid'));return;}
       var po=e.target.closest('[data-pickid]');if(po){choosePick(po.getAttribute('data-pickid'));return;}
       var pb=e.target.closest('[data-pick]');if(pb){if(pickEl&&pickBtn===pb)closePick(true);else openPick(pb);return;}
