@@ -1920,3 +1920,51 @@ body{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inse
 .vgl-vis__list li:last-child{border-bottom:0}
 .vgl-vis__list .vgl-visopt{flex:1 1 auto;min-width:0;border-bottom:0}
 .vgl-visrm{margin-right:-.5rem}
+
+/* §78 toolbar order (19.11., user: "the article number doesn't have a good placement"): the PLP puts the count alone at
+   the right end; the add-on's „Vergleichen“ came after it, so the count floated in the middle, glued to the button.
+   Now the count leads the row and belongs to the results, „Vergleichen“ closes it on the right. From 64rem (filter
+   sidebar visible) the row starts at the grid column, so count and button frame the product grid. Phones keep §65. */
+@media(min-width:48rem){
+  .catalog__bar>.catalog__filter-btn{order:-2}
+  .catalog__bar>.catalog__count{order:-1}
+  .catalog__bar>.vgl-barwrap{margin-left:auto}
+}
+@media(min-width:64rem){.catalog__bar{padding-left:calc(var(--sidebar-w,18rem) + clamp(var(--sp-8,2rem),3vw,var(--sp-12,3rem)))}}
+
+/* §79 the count heads the results (19.11., user: "looks floating! ask the designer to find a good placement" – UI
+   option A): on desktop „41 Artikel“ is the results heading – dark, bold, on the baseline of the compare button, closer
+   to the grid than to the tiles. Active filter chips get their own line under row 1 (the ::after breaks the row), so
+   count and compare buttons keep fixed places and chips no longer squeeze into the middle in compare mode. Phones: the
+   count goes to the right end of the §65 row. #resultCount keeps its live region; only the visual order changes. */
+.catalog__bar:has(.chip)::after{content:'';order:1;flex:0 0 100%;height:0}
+.catalog__bar>.catalog__chips{order:2;flex:0 1 auto}
+.catalog__bar>.catalog__chips:empty{display:none}   /* no chips: no extra gap at the row's end */
+.catalog__bar>.catalog__clear{order:2}
+.catalog__bar:has(.chip){row-gap:var(--sp-2,.5rem)}
+@media(max-width:47.99rem){.catalog__bar>.catalog__count{margin-left:auto}}
+@media(min-width:64rem){
+  .catalog__bar{align-items:baseline;column-gap:var(--sp-4,1rem);padding-top:var(--sp-6,1.5rem);margin-bottom:var(--sp-3,.75rem)}
+  /* §80 desktop swap (19.11., user: "what if we swap the placement of the article number and vergleich button?" –
+     "on desktop"): „Vergleichen“ opens the results row at the grid's left edge, „41 Artikel“ closes it at the right
+     edge as a quiet status (PLP type, as in the reference PLP and the live shop) – the §79 heading style is dropped */
+  .catalog__bar>.vgl-barwrap{order:-1;margin-left:0}
+  .catalog__bar>.catalog__count{order:0;margin-left:auto}
+}
+
+/* §81 desktop: „Vergleichen“ heads the filter column (19.11., user: "place the vergleich button top of the filtering
+   section same width as the filtering section"). The toolbar row mirrors the page grid: left the compare control at the
+   sidebar width, then – from the grid column – active filter chips, and „41 Artikel“ at the grid's right edge. In compare
+   mode „Vergleich anzeigen (n)“ fills the column and „Beenden“ (short label, as on phones) sits beside it. */
+@media(min-width:64rem){
+  .catalog__bar{padding-left:0;column-gap:var(--sp-4,1rem)}
+  .catalog__bar>.vgl-barwrap{order:-1;flex:0 0 var(--sidebar-w,18rem);width:var(--sidebar-w,18rem);gap:var(--sp-2,.5rem);margin:0 calc(clamp(var(--sp-8,2rem),3vw,var(--sp-12,3rem)) - var(--sp-4,1rem)) 0 0}
+  .catalog__bar>.vgl-barwrap .vgl-bar-btn{flex:1 1 auto;justify-content:center}
+  .catalog__bar>.vgl-barwrap .vgl-cancel.is-shown{flex:0 0 auto;padding-inline:var(--sp-3,.75rem)}   /* both fit the 288px column */
+  .catalog__bar>.vgl-barwrap .vgl-bar-btn{min-width:0}
+  .catalog__bar>.vgl-barwrap .vgl-m-hide{display:none}
+  .catalog__bar>.vgl-barwrap .vgl-m-only{display:inline}
+  .catalog__bar:has(.chip)::after{display:none}
+  .catalog__bar>.catalog__chips,.catalog__bar>.catalog__clear{order:0}
+  .catalog__bar>.catalog__count{order:1;margin-left:auto}
+}

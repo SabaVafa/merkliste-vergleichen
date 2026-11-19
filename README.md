@@ -119,7 +119,7 @@ Options: `--src <export.json>`, `--out <file.js>`, `--report <file.md>` (coverag
 
 ## Which documents are current
 
-Where documents disagree, the **prototype** wins, then the **newest dated section** of [09 · Umsetzung](Deliverables/09_Adaption_Umsetzung.md). That file is the running decision log since 31.10.2026 (§1–77); later sections replace earlier ones and replace the specs below.
+Where documents disagree, the **prototype** wins, then the **newest dated section** of [09 · Umsetzung](Deliverables/09_Adaption_Umsetzung.md). That file is the running decision log since 31.10.2026 (§1–81); later sections replace earlier ones and replace the specs below.
 
 **Read first (binding)**
 

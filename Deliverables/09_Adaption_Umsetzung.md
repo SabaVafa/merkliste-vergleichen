@@ -704,7 +704,9 @@ Geprüft: Kategorieseite 1440 px (Karte → Fenster neben dem Kästchen, Tausch 
 
 **Nachtrag – „Vergleichen“ nach dem Tausch** (Nutzer: „after pressing the replace, the vergleich button is still disable“): Im Auswahlmodus („Aus der Merkliste“, auch automatisch im Vergleichsmodus der Kategorieseite) zählte der Knopf nur neue Haken. Jetzt: nichts Neues angehakt, Vergleich hat 2–3 Modelle → „Vergleichen“ aktiv und öffnet ihn; Fuß „3 Türsprechanlagen im Vergleich – Vergleich vollständig“. Der Hinweis über der Liste sagt bei vollem Vergleich nicht mehr „entfernen Sie dort ein Modell“.
 
-`vergleich-tausch.js?v=3`, `vergleich-tausch.css?v=3`, `vergleichen.js?v=175`, `merkliste.js?v=78`.
+**Nachtrag – Trennlinie unter dem Titel** (Nutzer: „title section needs a divider“): Die Titelzeile („Ihr Vergleich ist voll“ + ×) hat eine Linie über die ganze Breite des Fensters (graphite-200, wie der Kopf der Merkliste); Titel und Erklärtext stehen an derselben linken Kante.
+
+`vergleich-tausch.js?v=4`, `vergleich-tausch.css?v=4`, `vergleichen.js?v=176`, `merkliste.js?v=80`.
 
 ## 77 · Merkliste-Fuß auf allen Breiten wie auf dem Telefon (19.11.2026, Nutzer: „what if we make the bottom section on desktop like the mobile view?“)
 
@@ -714,3 +716,54 @@ Geprüft: Kategorieseite 1440 px (Karte → Fenster neben dem Kästchen, Tausch 
 Geprüft: 1440 px (Seitenfenster 448 px, Knopf 408 px breit unter dem Status), 844 × 390 quer (eine Zeile).
 
 `merkliste.css?v=55`, `merkliste.js?v=79`.
+
+## 78 · Werkzeugleiste der Kategorieseite: Anzahl führt, „Vergleichen“ schließt ab (19.11.2026, Nutzer: „the article number doesn't have a good placement“)
+
+**Befund:** Die PLP setzt „41 Artikel“ allein ans rechte Ende der Leiste. Das Add-on hängte „Vergleichen“ dahinter – die Anzahl schwebte dadurch mitten in der Zeile, klebte am Knopf und stand über dem Filter-Bereich statt über den Ergebnissen.
+
+**Gebaut (nur im Add-on-CSS, PLP-Markup unverändert):**
+- Ab 48rem: Reihenfolge Filter (Tablet) · **„41 Artikel“** · aktive Filter-Chips · „Alle entfernen“ · … · **„Vergleichen“** rechts.
+- Ab 64rem (Filter-Seitenleiste sichtbar): Die Leiste beginnt an der Kante des Produktrasters – „41 Artikel“ steht genau über der ersten Karte, „Vergleichen“ endet an der rechten Rasterkante. Anzahl und Knopf rahmen die Ergebnisse, zu denen sie gehören.
+- Telefon unverändert (§65).
+
+Geprüft: 1440 px (Anzahl x = Rasterkante 431 px, Knopf endet bei 1325 px = Rasterende; mit zwei Filter-Chips und Vergleichsmodus alles in einer Zeile), 900 px (Filter · Anzahl · … · Knopf, kein seitliches Scrollen), 375 px wie bisher.
+
+`vergleichen.css?v=243`.
+
+## 79 · „41 Artikel“ als Überschrift der Ergebnisse (19.11.2026, Nutzer: „looks floating! ask the designer to find a good placement for that“ – UI-Vorschlag Option A, „go ahead“)
+
+**Befund (UI):** Nach §78 stand die Anzahl zwar an der Rasterkante, aber als kleiner grauer Text gleich weit von den Kategorie-Kacheln (≈ 27 px) und vom Raster (≈ 31 px) – sie gehörte zu keinem; das nächste Element (der Knopf) war ≈ 450 px entfernt. Im Live-Shop hält „Sortierung“ die Anzahl; die gibt es im Prototyp nicht.
+
+**Gebaut (nur Add-on-CSS, kein Markup, Karten unberührt):**
+- **Desktop (ab 64rem):** „41 Artikel“ ist die Überschrift der Ergebnisspalte – `--text-h4` (18 px), fett, `--schwarz`, auf der Grundlinie von „Vergleichen“ / „Vergleich anzeigen (n)“; 1,5rem Abstand nach oben, 0,75rem zum Inhalt (gemessen ≈ 53 px zu den Kacheln, ≈ 20 px zum Raster) – die Zeile gehört sichtbar zu den Ergebnissen.
+- **Aktive Filter-Chips (alle Breiten):** eigene Zeile unter Zeile 1, an derselben linken Kante, „Alle entfernen“ dahinter. Anzahl und Vergleichs-Knöpfe bleiben an festen Plätzen; vorher drängten sich im Vergleichsmodus bis zu sieben Chips in ≈ 300 px Mitte und stapelten sich 4 Zeilen hoch.
+- **Tablet (48–63,99rem):** wie §78 – Filter · Anzahl (klein, grau) · … · Vergleichen.
+- **Telefon:** Zeile aus §65 bleibt – Filter · Vergleichen · … „79 Artikel“ am rechten Rand (bündig mit der Inhaltskante; ein leerer Chip-Container erzeugte vorher 12 px Lücke).
+- `#resultCount` bleibt Live-Region; nur die sichtbare Reihenfolge ändert sich.
+
+**Hinweis für die Umsetzung:** Behält das JTL-Template „Sortierung“, gehört sie in Zeile 1 direkt links von „Vergleichen“ – dann liest sich die Anzahl noch klarer als Zeilenanfang.
+
+Geprüft: Türsprechanlagen und Briefkästen 1440 px (ohne Filter; mit 4 Chips + Vergleichsmodus: Zeile 1 Anzahl … Vergleich anzeigen · beenden, Zeile 2 Chips · Alle entfernen), 900 px, 375 px (mit Chip), kein seitliches Scrollen.
+
+`vergleichen.css?v=245`.
+
+## 80 · Desktop: „Vergleichen“ links, „41 Artikel“ rechts (19.11.2026, Nutzer: „what if we swap the placement of the article number and vergleich button?“ – „on desktop“; „the font style of the article number is too much“)
+
+- **Ab 64rem:** „Vergleichen“ (bzw. im Vergleichsmodus „Vergleich anzeigen (n)“ · „Vergleich beenden“) eröffnet die Zeile an der linken Rasterkante; „41 Artikel“ schließt sie an der rechten Rasterkante ab. Aktive Filter-Chips bleiben in Zeile 2 an der linken Kante (§79).
+- **Schrift der Anzahl:** zurück auf die PLP-Schrift – 14 px (`--text-body-sm`), Gewicht 500, Grau (`--ink-60`), wie Referenz-PLP, Live-Shop und Tablet/Telefon. Die fette 18-px-Überschrift aus §79 entfällt: als Zeilenende ist die Anzahl ein ruhiger Status, keine Überschrift.
+- Tablet und Telefon unverändert (§78, §79).
+
+Geprüft (1440 px): Knopf 431 px (= Rasterkante), Anzahl endet bei 1325 px (= Rasterende); mit 3 Chips und Vergleichsmodus: Zeile 1 Vergleich anzeigen · beenden … 14 Artikel, Zeile 2 Chips · Alle entfernen; 900 px unverändert, kein seitliches Scrollen.
+
+`vergleichen.css?v=246`.
+
+## 81 · Desktop: „Vergleichen“ über der Filterspalte, in ihrer Breite (19.11.2026, Nutzer: „lets place the vergleich button top of the filtering section same width as the filtering section“)
+
+- **Ab 64rem** spiegelt die Werkzeugleiste das Seitenraster: links „Vergleichen“ genau über der Filter-Box und genau so breit (Seitenleistenbreite 288 px), rechts davon – ab der Rasterkante – aktive Filter-Chips und „Alle entfernen“, am rechten Rasterrand „41 Artikel“ (PLP-Schrift, §80).
+- **Vergleichsmodus:** in derselben Spalte „Vergleich anzeigen (n)“ (füllt die Breite) und „Beenden“ (Kurzform wie auf dem Telefon; Screenreader-Name weiterhin „Vergleich beenden“) – zusammen exakt 288 px.
+- Chips stehen auf dem Desktop wieder in Zeile 1 (die Mitte ist jetzt frei); die Zeilenumbruch-Regel aus §79 gilt weiter für Tablet und Telefon.
+- Tablet und Telefon unverändert.
+
+Geprüft: Türsprechanlagen und Briefkästen 1440 px (Knopf 100–388 px = Filter-Box 100–388 px; Anzahl endet an der Rasterkante 1325 px; mit 5 Chips: Chips ab 431 px = Rasterkante), Vergleichsmodus (Anzeigen 100–295 · Beenden 303–388 px), 1100 px (44–332 px = Filter-Box), kein seitliches Scrollen.
+
+`vergleichen.css?v=248`.
