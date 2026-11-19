@@ -14,9 +14,9 @@
        intro: 'optional sentence that replaces the default question',
        onPick: function (id) {}, onCancel: function () {}
      })
-   Always a bottom sheet that rises from below (19.11., user: "it must be bottom up window and not a pop up"): inside
-   the Merkliste drawer at the drawer's width, on the page centred and at most 32rem wide on large screens, full
-   width on phones. Modal dialog: focus on the first „Ersetzen“, Tab stays inside, Escape / „Abbrechen“ / the scrim cancel.
+   Inside the Merkliste drawer a sheet that rises from below at the drawer's width (user: "it must be bottom up window
+   and not a pop up"); elsewhere a centred dialog from 48rem (user: "it must be a normal popup when the side bookmark is
+   not open"); on phones always the bottom sheet. Modal dialog: focus on the first „Ersetzen“, Tab stays inside, Escape / „Abbrechen“ / the scrim cancel.
    ===================================================================== */
 (function () {
   'use strict';
@@ -54,7 +54,7 @@
     el.innerHTML =
       '<div class="vgl-swap__head"><h2 class="vgl-swap__t" id="vglSwapT">Ihr Vergleich ist voll</h2>' +
         '<button class="vgl-swap__x" type="button" data-swap="cancel" aria-label="Schließen, nichts ersetzen">' + IC_X + '</button></div>' +
-      '<p class="vgl-swap__d" id="vglSwapD">' + (opts.intro ? esc(opts.intro) : 'Sie vergleichen bereits ' + MAX + ' Modelle – mehr sind nicht möglich. Um <b>' + nm + '</b> aufzunehmen, ersetzen Sie eines davon:') + '</p>' +
+      '<p class="vgl-swap__d" id="vglSwapD">' + (opts.intro ? esc(opts.intro) : 'Sie vergleichen bereits ' + MAX + ' Modelle – mehr sind nicht möglich. Um dieses Modell aufzunehmen, ersetzen Sie eines davon:'   /* no product name in the text (19.11., user) – the buttons' names keep it */) + '</p>' +
       '<ul class="vgl-swap__list" role="list">' + models.map(function (m) {
         return '<li class="vgl-swap__row"><span class="vgl-swap__img">' + (m.img ? '<img src="' + esc(m.img) + '" alt="" loading="lazy">' : '') + '</span>' +
           '<span class="vgl-swap__txt"><span class="vgl-swap__n">' + esc(m.name || m.id) + '</span>' + (euro(m.price) ? '<span class="vgl-swap__p">' + euro(m.price) + '</span>' : '') + '</span>' +

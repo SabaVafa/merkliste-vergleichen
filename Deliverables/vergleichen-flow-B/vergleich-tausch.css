@@ -5,7 +5,10 @@
    Above the Merkliste drawer (960) and its toast (970). Tokens with fallbacks for the category and product pages. */
 .vgl-swap__scrim{position:fixed;inset:0;z-index:974;background:rgba(10,20,20,.45);animation:vglswapfade .2s ease backwards}
 .vgl-swap{position:fixed;z-index:975;left:0;right:0;bottom:0;box-sizing:border-box;width:100%;max-height:80vh;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:var(--sp-3,.75rem);--vs-px:max(var(--sp-4,1rem),env(safe-area-inset-left,0px),env(safe-area-inset-right,0px));padding:var(--sp-4,1rem) var(--vs-px) max(var(--sp-4,1rem),env(safe-area-inset-bottom,0px));background:var(--white,#fff);border-top:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-xl,.75rem) var(--r-xl,.75rem) 0 0;box-shadow:0 -.25rem 1.25rem rgba(20,22,25,.14);color:var(--schwarz,#1A171B);font-family:inherit;text-align:left;animation:vglswapup .3s cubic-bezier(.2,.7,.2,1) backwards}
-@media (min-width:48rem){.vgl-swap:not(.is-within){--vs-px:var(--sp-5,1.25rem);width:min(32rem,100%);margin:0 auto;padding-top:var(--sp-5,1.25rem);padding-bottom:var(--sp-4,1rem);border:.0625rem solid var(--graphite-300,#DADADA);border-bottom:0}}
+/* not in the Merkliste (19.11., user: "it must be a normal popup when the side bookmark is not open"): from 48rem a
+   centred dialog with all corners rounded; phones keep the bottom sheet; inside the drawer it still rises from below */
+@media (min-width:48rem){.vgl-swap:not(.is-within){--vs-px:var(--sp-5,1.25rem);inset:0;width:min(32rem,calc(100% - 2rem));height:fit-content;max-height:calc(100vh - 4rem);margin:auto;padding-top:var(--sp-5,1.25rem);padding-bottom:var(--sp-4,1rem);border:.0625rem solid var(--graphite-300,#DADADA);border-radius:var(--r-xl,.75rem);box-shadow:var(--shadow-xl,0 1.5rem 4rem rgba(0,0,0,.18));animation:vglswappop .2s cubic-bezier(.2,.8,.2,1) backwards}}
+@keyframes vglswappop{from{opacity:0;transform:scale(.97)}}
 .vgl-swap.is-within{--vs-px:var(--sp-5,1.25rem)}
 @media (max-width:47.99rem){.vgl-swap.is-within{--vs-px:var(--sp-4,1rem)}}
 .vgl-swap.no-motion{animation:none}

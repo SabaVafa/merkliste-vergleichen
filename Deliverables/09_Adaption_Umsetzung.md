@@ -706,7 +706,11 @@ Geprüft: Kategorieseite 1440 px (Karte → Fenster neben dem Kästchen, Tausch 
 
 **Nachtrag – Trennlinie unter dem Titel** (Nutzer: „title section needs a divider“): Die Titelzeile („Ihr Vergleich ist voll“ + ×) hat eine Linie über die ganze Breite des Fensters (graphite-200, wie der Kopf der Merkliste); Titel und Erklärtext stehen an derselben linken Kante.
 
-`vergleich-tausch.js?v=4`, `vergleich-tausch.css?v=4`, `vergleichen.js?v=176`, `merkliste.js?v=80`.
+**Nachtrag – Darstellung je Ort** (Nutzer: „it must be a normal popup when the side bookmark is not open“): Außerhalb der Merkliste (Produktkarten, „Ähnliche Modelle“, Übergabe) ab 48rem ein **mittig zentriertes Dialogfenster** (max. 32rem, alle Ecken gerundet, kurzes Einblenden); in der Merkliste weiterhin das Fenster, das im Seitenfenster von unten hochfährt; auf dem Telefon überall das Bottom Sheet.
+
+**Nachtrag – kein Produktname im Text** (Nutzer: „do not mention product name“): „Sie vergleichen bereits 3 Modelle – mehr sind nicht möglich. Um dieses Modell aufzunehmen, ersetzen Sie eines davon:“; bei der Übergabe „… Um das Modell aus Ihrer Merkliste aufzunehmen, …“. Die Screenreader-Namen der „Ersetzen“-Knöpfe nennen weiter beide Modelle, die Meldung danach ebenso („SDM10X durch VDM10 2.0 Colson ersetzt.“).
+
+`vergleich-tausch.js?v=6`, `vergleich-tausch.css?v=5`, `vergleichen.js?v=177`, `merkliste.js?v=80`.
 
 ## 77 · Merkliste-Fuß auf allen Breiten wie auf dem Telefon (19.11.2026, Nutzer: „what if we make the bottom section on desktop like the mobile view?“)
 
@@ -767,3 +771,13 @@ Geprüft (1440 px): Knopf 431 px (= Rasterkante), Anzahl endet bei 1325 px (= Ra
 Geprüft: Türsprechanlagen und Briefkästen 1440 px (Knopf 100–388 px = Filter-Box 100–388 px; Anzahl endet an der Rasterkante 1325 px; mit 5 Chips: Chips ab 431 px = Rasterkante), Vergleichsmodus (Anzeigen 100–295 · Beenden 303–388 px), 1100 px (44–332 px = Filter-Box), kein seitliches Scrollen.
 
 `vergleichen.css?v=248`.
+
+## 82 · „Vergleichen“ als Link wie auf dem Telefon, gegenüber der Anzahl (19.11.2026, Nutzer: „let's turn vergleich into a link like the mobile and place it opposite of the article number“ – ersetzt §81)
+
+- **Ab 48rem** hat „Vergleichen“ in der Werkzeugleiste die Telefon-Form aus §65: Textlink in Teal mit Symbol, Zähler der gespeicherten Auswahl als kleines Abzeichen am Symbol, kein Kasten. Im Vergleichsmodus steht dort nur „× Vergleich beenden“ (Telefon: „Beenden“); der Vergleich öffnet sich über die Leiste unten – wie auf dem Telefon.
+- **Desktop (ab 64rem):** Link an der linken Rasterkante, aktive Filter-Chips dahinter, „41 Artikel“ gegenüber an der rechten Rasterkante. Der Knopf über der Filterspalte (§81) entfällt.
+- **Tablet:** Filter · Anzahl … Link rechts.
+
+Geprüft: 1440 px (Link 431 px = Rasterkante, Anzahl endet bei 1325 px; Vergleichsmodus „× Vergleich beenden“ an derselben Stelle), 900 px, kein seitliches Scrollen.
+
+`vergleichen.css?v=249`.

@@ -1612,7 +1612,7 @@
        for the second one – not "only one model available" */
     if(valid.length===1&&arr.fromMkl){
       if(!compareMode)setMode(true);
-      if(isFull()&&selected.indexOf(valid[0])<0){syncAll();var nm1=baseTitle(BY_ID[valid[0]]);setTimeout(function(){askSwap(valid[0],barBtn,'„'+nm1+'“ aus Ihrer Merkliste: Sie vergleichen bereits '+MAX+' Modelle – mehr sind nicht möglich. Ersetzen Sie eines davon:');},400);return;}   /* full: ask (§76) */
+      if(isFull()&&selected.indexOf(valid[0])<0){syncAll();setTimeout(function(){askSwap(valid[0],barBtn,'Sie vergleichen bereits '+MAX+' Modelle – mehr sind nicht möglich. Um das Modell aus Ihrer Merkliste aufzunehmen, ersetzen Sie eines davon:');},400);return;}   /* full: ask (§76) */
       addIds(valid);syncAll();addFromGrid();return;}
     if(valid.length===1){
       var prev1=selected.slice(),keep1=!arr.fromMkl&&prev1.length>0&&prev1.join()!==valid.join();   /* never drop the visitor's own selection silently */
