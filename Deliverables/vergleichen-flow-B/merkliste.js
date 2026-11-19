@@ -141,7 +141,7 @@
   /* hint glyph (11.11., user decision): info circle = "Hinweis"; replaces the device icon. DS icon style: inline,
      currentColor stroke 1.8, round caps; decorative (the sentence carries the meaning). */
   var IC_HINT = '<svg class="mkl-hint__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.75" r=".6" fill="currentColor" stroke="none"/></svg>';
-  var OWN_HINT = IC_HINT + '<span class="mkl-hint__t"><b>Auf diesem Gerät gespeichert.</b> <a href="#konto" data-mkl="login">Anmelden</a>, um Ihre Merkliste auf allen Geräten zu nutzen.</span>';
+  var OWN_HINT = IC_HINT + '<span class="mkl-hint__t"><b>Nur in diesem Browser gespeichert.</b> Beim Löschen der Browserdaten geht die Liste verloren. <a href="#konto" data-mkl="login">Anmelden</a>, um sie auf allen Geräten zu sichern.</span>';
   var SHARED_HINT = IC_HINT + '<span class="mkl-hint__t"><b>Geteilte Ansicht.</b> Wird erst gespeichert, wenn Sie sie übernehmen.</span>';
   var isOpen = false, opener = null, prevOverflow = '', toastHome = null;
   var cmpSel = [];   /* ids ticked for "Auswahl vergleichen" (session UI state, never persisted) */
@@ -183,7 +183,7 @@
         '<p class="mkl-picknote" role="status" hidden></p>' +
         '<ul class="mkl-list" role="list"></ul>' +
         '<section class="mkl-recent" aria-labelledby="mklRecentH" hidden><div class="mkl-recent__head"><h3 class="mkl-recent__h" id="mklRecentH">Zuletzt angesehen</h3><button class="mkl-link" type="button" data-mkl="recent-clear">Verlauf löschen</button></div><ul class="mkl-recent__list" role="list"></ul></section>' +
-        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Wählen Sie auf der Produktseite eine Farbe und merken Sie Ihre Konfiguration – sie bleibt auf diesem Gerät gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
+        '<div class="mkl-empty" hidden>' + HEART + '<h3 class="mkl-empty__title">Ihre Merkliste ist leer</h3><p class="mkl-empty__body">Wählen Sie auf der Produktseite eine Farbe und merken Sie Ihre Konfiguration – sie wird in diesem Browser gespeichert.</p><button class="btn btn--secondary" type="button" data-mkl="back">' + (PDP ? 'Zurück zum Produkt' : 'Zurück zu ' + esc(LENSES[LENS].label)) + '</button></div>' +
       '</div>' +
       '<div class="mkl-foot">' +
         '<p class="mkl-hint">' + OWN_HINT + '</p>' +
@@ -331,13 +331,14 @@
   var toastLeft = 0, toastStart = 0, toastPaused = false;
   /* img (12.11., user: "add the product images, the same approach as Airbnb"): a single product added or removed shows
      its photo as a small tile in place of the status icon, so the visitor sees at once which model it was */
-  function toast(msg, type, action, quiet, img) {
+  /* sub (19.11., user: the guest list's limits must reach people): an optional second line under the message */
+  function toast(msg, type, action, quiet, img, sub) {
     type = type || 'ok';
     toastEl.setAttribute('aria-live', quiet ? 'off' : 'polite');   /* spec 10 §4.4: announced once — the live region already spoke */
     var vt = document.querySelector('.vgl-toast.show'); if (vt) vt.classList.remove('show');   /* a Merkliste toast replaces a compare toast (§5.7) */
     toastEl.className = 'mkl-toast t-' + type + (action ? ' has-act' : '') + (action && action.undo ? ' is-undo' : '') + (isOpen ? ' is-drawer' : (document.querySelector('.vgl-view.is-open') ? ' is-view' : (document.querySelector('.vgl-tray.is-open') ? ' is-raised' : ((pdpBarVisible && pdpBarVisible()) ? ' is-pdp-bar' : ''))));
     toastEl.classList.toggle('has-img', !!img);
-    toastEl.innerHTML = (img ? '<span class="mkl-toast__img"><img src="' + esc(asset(img)) + '" alt=""></span>' : (type === 'limit' ? IC_LIMIT : (type === 'info' ? IC_INFO : IC_OK))) + '<span class="mkl-toast__msg">' + esc(msg) + '</span>' + (action ? '<button class="mkl-toast__act" type="button">' + esc(action.label) + '</button>' : '');
+    toastEl.innerHTML = (img ? '<span class="mkl-toast__img"><img src="' + esc(asset(img)) + '" alt=""></span>' : (type === 'limit' ? IC_LIMIT : (type === 'info' ? IC_INFO : IC_OK))) + '<span class="mkl-toast__msg">' + esc(msg) + (sub ? '<span class="mkl-toast__sub">' + esc(sub) + '</span>' : '') + '</span>' + (action ? '<button class="mkl-toast__act" type="button">' + esc(action.label) + '</button>' : '');
     if (action) toastEl.querySelector('.mkl-toast__act').addEventListener('click', function () { hideToast(); action.fn(); });
     toastEl.classList.add('show');
     var ms = (action && action.ms) || TOAST_MS;
@@ -366,12 +367,21 @@
   function syncAll() { syncHeader(); if (isOpen) render(); if (PDP) syncPdpMarks(); try { window.dispatchEvent(new Event('mtz-mkl-change')); } catch (e) {} }
 
   /* ---- Mutations ---- */
+  /* First save into an empty list (19.11., user: "is it communicated to the users?"): the drawer hint only reaches people
+     who open the drawer, so the toast of that save says once where the list lives and stays longer to be read. No extra
+     storage key: after the list was emptied or lost, the next first save says it again – exactly when it matters. */
+  var FIRST_SUB = 'Nur in diesem Browser gespeichert – mit den Browserdaten geht die Liste verloren.';
+  function isFirstSave() { return items.length === 1 && storageOk; }
+  function savedToast(msg, it) {
+    var first = isFirstSave();
+    toast(msg + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer, ms: first ? 9000 : 0 }, true, it.img, first ? FIRST_SUB : '');
+  }
   function addItem(id, cardEl) {
     var p = BY_ID[id]; if (!p) return false;
     if (isFull()) { var m = 'Ihre Merkliste ist voll (' + LIMIT + ' Artikel).'; toast(m, 'limit', { label: 'Zur Merkliste', fn: openDrawer }, true); live(m); return false; }
     var it = itemFrom(p, cardEl); items.push(it); save(); syncAll(); pulseBadge();
-    live('Gemerkt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Gemerkt', 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true, it.img);
+    live('Gemerkt: ' + shortName(it).main + '. Merkliste: ' + items.length + ' Artikel' + (isFirstSave() ? '. ' + FIRST_SUB : ''));
+    savedToast('Gemerkt', it);
     return true;
   }
   /* Single removals (12.11., lead fullstack review): 10 s to undo like "Merkliste leeren"; removals made while their
@@ -603,13 +613,14 @@
     fitDrawer();
   }
   /* Responsive audit 14 (07.11.): on phones the storage hint (3–4 lines) leaves the pinned footer and closes the list
-     instead — the footer keeps only the selection and the compare CTA, so the list gets the room (320×568: footer 223 → ~130 px) */
+     instead — the footer keeps only the selection and the compare CTA, so the list gets the room (320×568: footer 223 → ~130 px).
+     19.11.: it sits right under the saved items, before "Zuletzt angesehen", so it is not pushed out of sight */
   var MQ_PHONE = window.matchMedia ? window.matchMedia('(max-width:47.99rem)') : null;
   function placeHint() {
     if (!hintEl || !footEl) return;
     var body = drawer.querySelector('.mkl-body'), inBody = !!(MQ_PHONE && MQ_PHONE.matches);
     hintEl.classList.toggle('mkl-hint--body', inBody);
-    if (inBody) { if (hintEl.parentNode !== body) body.appendChild(hintEl); }
+    if (inBody) { if (hintEl.previousElementSibling !== listEl) body.insertBefore(hintEl, listEl.nextSibling); }
     else if (hintEl.parentNode !== footEl) footEl.insertBefore(hintEl, footEl.firstChild);
   }
   /* Responsive audit (2026-11-02): on short viewports (landscape phones) or with enlarged text the pinned head +
@@ -983,8 +994,8 @@
     var mi = indexOf(PDP.id); if (mi > -1) items.splice(mi + 1, 0, it); else items.push(it);   /* the build sits right behind its model row */
     setCfgOfSession(sn.article, cid);
     save(); syncAll(); pulseBadge();
-    live('Konfiguration gemerkt: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total) + '. Merkliste: ' + items.length + ' Artikel');
-    toast('Konfiguration gemerkt' + (storageOk ? '' : ' – nur in dieser Sitzung'), 'ok', { label: 'Zur Merkliste', fn: openDrawer }, true, it.img);
+    live('Konfiguration gemerkt: ' + shortName(it).main + ', ' + (sn.finishText || '') + ', Gesamt ' + euro(sn.total) + '. Merkliste: ' + items.length + ' Artikel' + (isFirstSave() ? '. ' + FIRST_SUB : ''));
+    savedToast('Konfiguration gemerkt', it);
   }
   function updateConfig(cid, sn) {
     var it = byId('cfg:' + cid); if (!it) { addConfig(sn); return; }

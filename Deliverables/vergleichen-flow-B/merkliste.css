@@ -610,3 +610,6 @@ button.mkl-rv__cta{padding:0;border:0;background:none;font-family:inherit;cursor
    Zuletzt angesehen: the variant line under the name, like the Merkliste rows (.mkl-item__sub) – similar models
    ("VDM10 2.0 Video-Türsprechanlage" Kian / Niko) were only told apart by their price. One line, then "…". ==== */
 .mkl-rv__sub{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:var(--text-caption,.75rem);line-height:1.35;color:var(--text-muted,#6A6A6A)}
+
+/* §72 first save: second line in the toast (19.11.) */
+.mkl-toast__sub{display:block;font-weight:400;color:var(--schwarz,#1A171B)}

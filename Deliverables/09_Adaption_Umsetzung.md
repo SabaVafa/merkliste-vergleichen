@@ -597,3 +597,32 @@ Geprüft mit einem Prüfskript (Elemente außerhalb des Bildes, seitliches Scrol
 - **„Zuletzt angesehen“ nicht unterscheidbar:** Die Zeilen zeigten nur den gekürzten Namen – „Kian“ und „Niko“ hießen beide „VDM10 2.0 Video-Türsprechanlage“, nur der Preis war anders. Jetzt steht darunter die Variantenzeile wie in der Merkliste („1 Klingeltaster · Kian“, „mit Fingerprint · 1 Klingeltaster · Niko“), eine Zeile, sonst „…“; der Screenreader-Name des Links nennt sie mit.
 
 `merkliste.js?v=65`, `merkliste.css?v=52`.
+
+## 71 · Merkliste: Hinweis nennt das Risiko der Gast-Liste (19.11.2026, Nutzer: „it is not communicated in the prototype that a guest list only lives on one device and is lost if the browser data is cleared“)
+
+**Befund:** Der Hinweis im Seitenfenster lautete „Auf diesem Gerät gespeichert. Anmelden, um Ihre Merkliste auf allen Geräten zu nutzen.“ Das liest sich als Zusage, nicht als Grenze: Es fehlte, dass die Liste an diesen einen Browser gebunden ist (ein anderer Browser auf demselben Gerät sieht sie nicht) und dass sie mit den Browserdaten gelöscht wird.
+
+**Entscheidung:** Gäste merken weiter ohne Anmeldung (04, 05 §3.7 – keine Login-Hürde), der Hinweis sagt aber ehrlich, was das heißt, und bietet die Anmeldung als Lösung an – kein Zwang, kein zusätzliches Fenster:
+
+- Hinweis (Seitenfenster, sobald die Liste Einträge hat): **„Nur in diesem Browser gespeichert.“** Beim Löschen der Browserdaten geht die Liste verloren. **Anmelden**, um sie auf allen Geräten zu sichern.
+- Leere Merkliste: „… merken Sie Ihre Konfiguration – sie wird in diesem Browser gespeichert.“ (statt „bleibt auf diesem Gerät gespeichert“).
+- Die Meldung beim Merken („Gemerkt“) bleibt kurz; der Hinweis steht dort, wo die Liste steht.
+
+Länge geprüft: Desktop 1440 px drei Zeilen im festen Fuß (eine erste, längere Fassung brauchte vier und wurde gekürzt); Telefon 375 px unter der Liste, nicht im festen Fuß, kein seitliches Scrollen.
+
+`merkliste.js?v=67`.
+
+## 72 · Merkliste: Hinweis auch beim ersten Merken (19.11.2026, Nutzer: „is it communicated to the users?“ – „go ahead“)
+
+**Befund nach §71:** Der Hinweis stand richtig, erreichte aber nur, wer das Seitenfenster öffnet – und auf dem Telefon erst nach „Zuletzt angesehen“, also oft außer Sicht. Beim Merken selbst (Produktseite) stand nichts dazu; viele öffnen die Merkliste erst Tage später.
+
+**Gebaut:**
+- **Erstes Merken in eine leere Liste:** Die Meldung bekommt eine zweite Zeile – „Konfiguration gemerkt“ / *„Nur in diesem Browser gespeichert – mit den Browserdaten geht die Liste verloren.“* – und bleibt 9 s statt 5 s stehen. Aktion bleibt „Zur Merkliste“ (eine Aktion pro Meldung; „Anmelden“ steht im Seitenfenster). Screenreader hören den Satz in derselben Ansage wie „Konfiguration gemerkt …“.
+- **Jedes weitere Merken:** kurze Meldung wie bisher – kein Nachrichten-Dauerfeuer.
+- Kein neuer Speicherschlüssel: Maßstab ist „Liste war leer“. Wurde die Liste geleert oder ist sie verloren gegangen, kommt der Satz beim nächsten ersten Merken wieder – genau dann, wenn er zählt.
+- Ist der Speicher blockiert, bleibt es bei „… – nur in dieser Sitzung“ und dem Hinweis oben im Seitenfenster.
+- **Telefon:** Der Hinweis im Seitenfenster steht jetzt direkt unter den gemerkten Artikeln, vor „Zuletzt angesehen“.
+
+Geprüft: Produktseite 1440 px (Meldung drei Zeilen, mit Produktbild) und 375 px (vier Zeilen, über der festen Kaufleiste, kein seitliches Scrollen); Seitenfenster 375 px: Liste → Hinweis → Zuletzt angesehen.
+
+`merkliste.js?v=68`, `merkliste.css?v=53`.
