@@ -44,6 +44,7 @@ Deliverables/
     vergleichen.js / .css      ADD-ON  comparison: tray, comparison overlay, verdict, column picker, print
     merkliste.js / .css        ADD-ON  Merkliste: card bookmarks, drawer, sharing, print, PDP saving
     merkliste-pdp.css          ADD-ON  Merkliste styles that only apply on the product page
+    vergleich-tausch.js / .css ADD-ON  "Vergleich voll" swap picker, shared by both add-ons (all three pages)
     vergleich-daten.js         DATA    comparison values per article (generated, do not edit by hand)
     tools/                     DATA    generator for vergleich-daten.js + shop main images
     index.html, sprechanlage.js   HOST  category page Türsprechanlagen (copied from the PLP prototype)
@@ -77,8 +78,10 @@ Json Folder/                 product-finder exports, background only; the protot
 
 | API | Purpose |
 |---|---|
-| `MTZ_VGL.compare(ids)`, `.add(ids)`, `.enterMode()`, `.isMode()`, `.selected()`, `.max`, `.fromGrid()` | Comparison (max 3, min 2 models); `fromGrid()` = go to the product list in compare mode to pick more models |
+| `MTZ_VGL.compare(ids)`, `.add(ids)`, `.remove(id)`, `.enterMode()`, `.isMode()`, `.selected()`, `.max`, `.fromGrid()` | Comparison (max 3, min 2 models); `fromGrid()` = go to the product list in compare mode to pick more models; `remove(id)` = take a model out (Merkliste: unticking „Im Vergleich“) |
+| `MTZ_VGL.swap(oldId, newId)`, `.label(id)` | Swap a compared model in place (the new one takes its column); short distinctive name, e.g. „VDM10 2.0 Colson“ |
 | `MTZ_MKL.open({pick})`, `.close()`, `.items()`, `.has(id)` | Merkliste drawer; `pick` = "Aus der Merkliste" mode of the comparison |
+| `MTZ_SWAP.ask({newName, models, anchor, intro, onPick, onCancel})` | „Ihr Vergleich ist voll – welches Modell soll Platz machen?“ – pure UI; the caller swaps and offers „Rückgängig“ |
 
 **Events:** `mtz-mkl-change` (window; the Merkliste changed – the comparison updates "Aus der Merkliste (n)"), `mtz:pdp-change` (document; the product page configuration changed).
 
@@ -87,15 +90,15 @@ Json Folder/                 product-finder exports, background only; the protot
 | Key | Where | Content |
 |---|---|---|
 | `mtz_merkliste` | localStorage | `{v:1, updatedAt, items[]}`, max 50 entries |
-| `mtz_vgl` | localStorage | Comparison selection, one slot per category, 30 days (`mtz_vgl_flow` = old key, migrated) |
+| `mtz_vgl` | localStorage | Comparison selection, one slot per category, 30 days: `{v:2, lenses:{<lens>:{ids[], updatedAt, meta:{<id>:{n, img, p}}}}}` – `meta` (short name, photo, price) lets the swap picker show the models on pages that do not know them (`mtz_vgl_flow` = old key, migrated) |
 | `mtz_mkl_shared` | sessionStorage | A shared list being viewed (read-only until it is taken over) |
 | `mtz_vgl_mode` | sessionStorage | Comparison mode on/off for this session |
-| `mtz_vgl_prev` | sessionStorage | Last comparison, for "Vorherigen Vergleich wiederherstellen" |
+| `mtz_vgl_prev` | sessionStorage | Last comparison, for "Vorherigen Vergleich wiederherstellen" (also the own selection after a shared comparison was changed and so taken over) |
 | `mtz_recent` | sessionStorage | Recently viewed models |
 | `mtz_return` | sessionStorage | Way back from a product page to the comparison |
 | `mtz_mkl_pdp` | sessionStorage | Product page state for saved configurations |
 
-**URLs:** `?vergleich=id,id[,id]` opens a comparison; `#liste=…` is a shared Merkliste (in the fragment, so it never reaches the server); `pdp/index.html?merkliste=<configId>` opens a saved configuration. Prototype-only switches on the product page: `?flow=a|c|d` (other colour-selection variants; default is Version B) and `?touch=1`.
+**URLs:** `?vergleich=id,id[,id]` opens a comparison – if the visitor already has one of their own, as a temporary view that does not overwrite it until it is changed; `#liste=…` is a shared Merkliste (in the fragment, so it never reaches the server); `pdp/index.html?merkliste=<configId>` opens a saved configuration. Prototype-only switches on the product page: `?flow=a|c|d` (other colour-selection variants; default is Version B) and `?touch=1`.
 
 A full inventory with the JTL mapping (plugins, Wawi attributes, what needs admin access) is in [15 · Technical feasibility](Deliverables/15_Technische-Machbarkeit_JTL.md). It was written on 10.11.2026; where it differs from this list, this list and the code are newer.
 
@@ -116,7 +119,7 @@ Options: `--src <export.json>`, `--out <file.js>`, `--report <file.md>` (coverag
 
 ## Which documents are current
 
-Where documents disagree, the **prototype** wins, then the **newest dated section** of [09 · Umsetzung](Deliverables/09_Adaption_Umsetzung.md). That file is the running decision log since 31.10.2026 (§1–72); later sections replace earlier ones and replace the specs below.
+Where documents disagree, the **prototype** wins, then the **newest dated section** of [09 · Umsetzung](Deliverables/09_Adaption_Umsetzung.md). That file is the running decision log since 31.10.2026 (§1–77); later sections replace earlier ones and replace the specs below.
 
 **Read first (binding)**
 
@@ -141,6 +144,7 @@ Where documents disagree, the **prototype** wins, then the **newest dated sectio
 - No „In den Warenkorb“ in the Merkliste or in the comparison.
 - Bookmark glyph, not a heart.
 - Comparison: max 3 models of one category. On phones two are visible at a time; „Auswahl ändern“ opens a bottom sheet.
+- A full comparison never locks a „Vergleichen“ box and never replaces a model silently: the visitor chooses which model makes room („Ersetzen“, then „Rückgängig“).
 - Add-to-comparison labels: „Modell hinzufügen“ (general), „Vergleichen“ (on a specific product) – never a bare „Hinzufügen“.
 - Product page: „Merken“ needs a colour first. Without one, it opens the existing colour window (side window on desktop, bottom sheet on phones), which explains why.
 - Product photos have a white ground and always sit on white.

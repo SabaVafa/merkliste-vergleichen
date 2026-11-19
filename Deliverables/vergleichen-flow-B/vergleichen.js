@@ -128,7 +128,14 @@
     }
   }
   /* writes only this category's slot — read fresh first so a parallel tab of the other category is kept */
-  function persist(){var s=readStore();if(selected.length)s.lenses[LENSKEY]={ids:selected.slice(),updatedAt:new Date().toISOString()};else delete s.lenses[LENSKEY];mem=s;try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
+  /* meta (19.11., §76): short name, photo and price per id – the swap picker shows the compared models on pages that
+     do not know these products (product page). On JTL the server resolves them; ids stay the source of truth. */
+  function metaOf(ids){var m={};ids.forEach(function(id){var p=BY_ID[id];if(p)m[id]={n:baseTitle(p),img:p.img,p:p.price};});return m;}
+  /* a shared comparison is a temporary view (§76): the visitor's own selection stays saved until they change the shared one */
+  var sharedOwn=null;
+  function persist(){
+    if(sharedOwn){try{sessionStorage.setItem('mtz_vgl_prev',JSON.stringify(sharedOwn));}catch(e){}sharedOwn=null;}   /* changed → it becomes theirs; the old one stays restorable */
+    var s=readStore();if(selected.length)s.lenses[LENSKEY]={ids:selected.slice(),updatedAt:new Date().toISOString(),meta:metaOf(selected)};else delete s.lenses[LENSKEY];mem=s;try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
   function modeStored(){try{return !!(JSON.parse(sessionStorage.getItem(MODEKEY)||'{}')||{})[LENSKEY];}catch(e){return false;}}
   function storeMode(on){try{var m=JSON.parse(sessionStorage.getItem(MODEKEY)||'{}')||{};if(on)m[LENSKEY]=1;else delete m[LENSKEY];sessionStorage.setItem(MODEKEY,JSON.stringify(m));}catch(e){}}
   function setMode(on){compareMode=!!on;document.body.classList.toggle('vgl-mode',compareMode);storeMode(compareMode);}
@@ -203,7 +210,8 @@
       '</div></div>'+
       '<div class="vgl-view__scroll"><div class="vgl-view__scroll-in" data-vgl="body"></div></div>'+
       '<div class="vgl-visually-hidden" aria-live="polite" aria-atomic="true" data-vgl="live"></div></div>');
-    document.body.appendChild(view);liveEl=view.querySelector('[data-vgl="live"]');shareBtn=view.querySelector('[data-vgl="share"]');
+    document.body.appendChild(view);liveEl=view.querySelector('[data-vgl="live"]');
+    var fullNote=h('<span id="vglFullNote" hidden>Vergleich voll – Sie wählen danach, welches Modell Platz macht.</span>');document.body.appendChild(fullNote);shareBtn=view.querySelector('[data-vgl="share"]');
     viewBody=view.querySelector('[data-vgl="body"]');viewCount=view.querySelector('[data-vgl="count"]');
     scrollEl=view.querySelector('.vgl-view__scroll');
 
@@ -255,7 +263,7 @@
       var alt=e.target.closest('[data-alt]');if(alt){
         if(alt.classList.contains('is-added'))return;
         var aid=alt.getAttribute('data-alt');
-        if(isFull()){toggle(aid,true);return;}
+        if(isFull()){askSwap(aid,alt);return;}
         alt.classList.add('is-added');alt.setAttribute('aria-disabled','true');alt.querySelector('.vgl-alt__l').textContent='Hinzugefügt';
         setTimeout(function(){pendingCol=aid;if(toggle(aid,true)){var anm=shopName(BY_ID[aid]);toast(esc(anm)+' hinzugefügt.','ok',null,BY_ID[aid].img);announce(anm+' hinzugefügt. Vergleich mit '+selected.length+' Modellen.');scrollEl.scrollTop=0;focusIn('.vgl-ph__rm[data-rm="'+aid+'"]');flashCol(aid);}},reduced()?0:650);
         return;}
@@ -675,16 +683,37 @@
     var foot=cardEl.querySelector('.pcard__footer')||cardEl.querySelector('.pcard__body')||cardEl;
     var on=selected.indexOf(id)>-1;
     var lbl=h('<label class="vgl-toggle"><input type="checkbox" '+(on?'checked':'')+' aria-label="'+esc(BY_ID[id].name)+' zum Vergleich hinzufügen"><span class="vgl-box" aria-hidden="true">'+CHK+'</span>Vergleichen</label>');
-    lbl.querySelector('input').addEventListener('change',function(e){var ok=toggle(id,e.target.checked);if(!ok)e.target.checked=false;});
+    lbl.querySelector('input').addEventListener('change',function(e){var ok=toggle(id,e.target.checked,e.target);if(!ok)e.target.checked=false;});
     foot.appendChild(lbl);
     cardEl.classList.toggle('is-vgl',on);
   }
   function scanCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(injectToggle);syncCards();}
 
-  function toggle(id,on){var i=selected.indexOf(id);if(on&&i<0){if(isFull()){toast('Maximal '+MAX+' Modelle. Bitte entfernen Sie zuerst eines.','limit');return false;}selected.push(id);}else if(!on&&i>-1){selected.splice(i,1);}persist();syncAll();return true;}
+  function toggle(id,on,anchor){var i=selected.indexOf(id);if(on&&i<0){if(isFull()){askSwap(id,anchor||document.activeElement);return false;}selected.push(id);}else if(!on&&i>-1){selected.splice(i,1);}persist();syncAll();return true;}
+  /* Vergleich voll (19.11., §76 – user: "replacing … without notification is not a good solution", UX option A):
+     the visitor picks which model makes room; the new one takes its column; „Rückgängig“ swaps back (6 s) */
+  function askSwap(nid,anchor,intro){
+    if(!BY_ID[nid])return;
+    if(!window.MTZ_SWAP){toast('Maximal '+MAX+' Modelle. Bitte entfernen Sie zuerst eines.','limit');return;}
+    window.MTZ_SWAP.ask({newName:baseTitle(BY_ID[nid]),intro:intro,anchor:anchor,
+      models:selected.map(function(id){var q=BY_ID[id];return {id:id,name:refName(id),img:q&&q.img,price:q&&q.price};}),
+      onPick:function(old){swapIn(old,nid,{undo:true,anchor:anchor});},onCancel:syncCards});
+  }
+  function swapIn(old,nid,o){
+    o=o||{};var i=selected.indexOf(old);if(i<0||selected.indexOf(nid)>-1||!BY_ID[nid])return false;
+    var on=refName(old);
+    selected[i]=nid;pendingCol=nid;persist();syncAll();
+    var nn=refName(nid);
+    if(!o.quiet)announce(on+' durch '+nn+' ersetzt. Vergleich mit '+selected.length+' Modellen.'+(o.undo?' Rückgängig in der Meldung möglich.':''));
+    if(o.undo)toast(esc(on)+' durch '+esc(nn)+' ersetzt.','ok',{label:'Rückgängig',aria:nn+' wieder durch '+on+' ersetzen',fn:function(){swapIn(nid,old,{});}},BY_ID[nid].img);
+    if(o.quiet)return true;
+    if(view.classList.contains('is-open')){flashCol(nid);focusIn('.vgl-ph__rm[data-rm="'+nid+'"]');}
+    else if(o.anchor&&document.contains(o.anchor))try{o.anchor.focus({preventScroll:true});}catch(e){}
+    return true;
+  }
   function clearAll(){selected=[];persist();syncAll();}
 
-  function syncCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(function(c){var id=c.dataset.id,on=selected.indexOf(id)>-1,cb=c.querySelector('.vgl-toggle input'),lab=c.querySelector('.vgl-toggle');if(cb)cb.checked=on;c.classList.toggle('is-vgl',on);var dis=!on&&isFull();if(cb){if(dis)cb.setAttribute('aria-disabled','true');else cb.removeAttribute('aria-disabled');}if(lab)lab.classList.toggle('is-disabled',dis);});}
+  function syncCards(){var grid=document.getElementById('productGrid');if(!grid)return;grid.querySelectorAll('.pcard[data-id]').forEach(function(c){var id=c.dataset.id,on=selected.indexOf(id)>-1,cb=c.querySelector('.vgl-toggle input'),lab=c.querySelector('.vgl-toggle');if(cb)cb.checked=on;c.classList.toggle('is-vgl',on);var full=!on&&isFull();if(cb){cb.removeAttribute('aria-disabled');if(full)cb.setAttribute('aria-describedby','vglFullNote');else cb.removeAttribute('aria-describedby');}if(lab)lab.classList.remove('is-disabled');});}   /* full: no lock – ticking asks which model makes room (§76) */
   function syncBar(){
     if(!barBtn)return;
     var n=selected.length;
@@ -720,7 +749,7 @@
       trayHint.innerHTML=IC_INFO+'Noch <b>'+need+'</b> Modell'+(need>1?'e':'')+' wählen, um zu vergleichen';
     }else if(n>=MAX){
       trayHint.classList.add('limit');
-      trayHint.innerHTML=IC_LIMIT+'<span><b>Maximum erreicht</b> <span class="vgl-tray__hd">– mehr als '+MAX+' Modelle sind nicht vergleichbar</span></span>';   /* colour on the icon only, text: bold headline + grey detail (12.11.) */
+      trayHint.innerHTML=IC_LIMIT+'<span><b>Maximum erreicht</b> <span class="vgl-tray__hd">– ein weiteres Modell ersetzt eines Ihrer Wahl</span></span>';   /* colour on the icon only, text: bold headline + grey detail (12.11.) */
     }else{
       var more=MAX-n;
       trayHint.classList.add('ready');
@@ -1258,7 +1287,7 @@
     var table=mbar+'<table class="vgl-t vgl-t--n'+nv+(pick?' is-pick':'')+'" role="table" style="--vgl-n:'+nv+'"><caption class="vgl-visually-hidden">'+esc(capTxt)+'</caption><colgroup><col class="rl">'+vis.map(function(){return '<col class="pc">';}).join('')+'</colgroup>'+headHTML(c,lc)+tbody+'</table>';
 
     /* ---- Ähnliche Modelle (nearly identical models only) ---- */
-    var alts=isFull()?[]:alternatives(items),altHTML='';
+    var alts=alternatives(items),altHTML='';   /* also at 3 – the moment a near alternative matters; „Vergleichen“ then asks which model makes room (§76) */
     if(alts.length)altHTML='<section class="vgl-alts" aria-labelledby="vglAltH"><div class="vgl-alts__hd"><h3 class="vgl-alts__h" id="vglAltH">Ähnliche Modelle</h3>'+
       '<div class="vgl-alts__nav" role="group" aria-label="Ähnliche Modelle blättern" hidden><button class="vgl-navbtn" type="button" data-altnav="-1" aria-label="Vorherige Modelle" aria-controls="vglAltList">'+IC_NAVL+'</button><button class="vgl-navbtn" type="button" data-altnav="1" aria-label="Weitere Modelle" aria-controls="vglAltList">'+IC_NAVR+'</button></div></div><ul class="vgl-alts__list" id="vglAltList">'+
       alts.map(function(o){
@@ -1266,10 +1295,10 @@
         /* Labels (17.11., user decision): one label per action – a product card puts THIS product into the comparison:
            "Vergleichen" with the PLP's compare icon (the PLP card's own word for it), at every width; the general action
            (no product chosen) is "Modell hinzufügen". No bare "Hinzufügen" (next to a price it reads like the cart). */
-        var add='<button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Vergleichen<span class="vgl-visually-hidden"> – in den Vergleich aufnehmen</span></span></button>';
+        var add='<button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'">'+IC_ADD+'<span class="vgl-alt__l">Vergleichen<span class="vgl-visually-hidden"> – in den Vergleich aufnehmen</span></span></button>';
         /* the PLP card as it is – no extra differences box on it (17.11., user: "do not add the extra sections!") */
         if(window.MTZ_PLP_CARD)return '<li class="vgl-altc" data-altc="'+esc(o.p.id)+'">'+add+'</li>';
-        return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div>'+(o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'')+'<div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'"'+(isFull()?' disabled':'')+'>'+IC_ADD+'<span class="vgl-alt__l">Vergleichen<span class="vgl-visually-hidden"> – in den Vergleich aufnehmen</span></span></button></div></li>';
+        return '<li class="vgl-alt"><div class="vgl-alt__media"><img src="'+esc(o.p.img)+'" alt="" width="64" height="64"></div><div class="vgl-alt__body"><div class="vgl-alt__name">'+esc(shopName(o.p))+'</div>'+(o.why.length?'<span class="vgl-visually-hidden">Abweichend von Ihrer Auswahl:</span><dl class="vgl-alt__why">'+o.why.map(function(w){return '<div><dt>'+esc(w.l)+'</dt><dd>'+esc(w.v)+'</dd></div>';}).join('')+(o.more?'<div class="vgl-alt__more"><dt class="vgl-visually-hidden">Außerdem</dt><dd>+ '+o.more+' weitere'+(o.more===1?'r Unterschied':' Unterschiede')+'</dd></div>':'')+'</dl>':'')+'<div class="vgl-alt__price">ab '+euro(o.p.price)+'</div><button type="button" class="vgl-alt__add" data-alt="'+esc(o.p.id)+'">'+IC_ADD+'<span class="vgl-alt__l">Vergleichen<span class="vgl-visually-hidden"> – in den Vergleich aufnehmen</span></span></button></div></li>';
       }).join('')+'</ul></section>';
 
     /* ---- mobile action row ---- */
@@ -1486,6 +1515,7 @@
   }
   function closeView(fromPop){
     if(!view.classList.contains('is-open'))return;
+    if(sharedOwn){selected=sharedOwn;sharedOwn=null;setTimeout(syncAll,0);}   /* leaving an unchanged shared comparison: the own selection is back (§76) */
     closeAdd(false);closePick(false);var sp=view.querySelector('.vgl-sharepop');if(sp)sp.remove();
     closeTip();if(pinIO){pinIO.disconnect();pinIO=null;}view.classList.remove('is-open','is-pinned');view.setAttribute('aria-hidden','true');document.body.classList.remove('vgl-overlay');document.body.style.overflow='';
     if(toastEl.parentNode===view){hideToast();document.body.appendChild(toastEl);}
@@ -1515,6 +1545,9 @@
     enterMode:function(){if(!compareMode)enterMode();},
     isMode:function(){return compareMode;},
     add:function(ids){return addIds(ids);},
+    remove:function(id){return toggle(String(id),false);},   /* Merkliste: unticking "Im Vergleich" (19.11.) */
+    label:function(id){id=String(id);return BY_ID[id]?refName(id):null;},   /* short distinctive name ("VDM10 2.0 Colson") for the Merkliste swap picker (§76) */
+    swap:function(oldId,newId){return swapIn(String(oldId),String(newId),{quiet:true});},   /* Merkliste swap picker (§76): the caller announces and offers the undo */
     fromGrid:function(){addFromGrid();},   /* Merkliste with nothing to add: "Modell hinzufügen" → product list (18.11.) */   /* Merkliste drawer on the category page (10.11.) adds to the selection in the strip */
     max:MAX,
     selected:function(){return selected.slice();}
@@ -1548,7 +1581,7 @@
     if(window.ResizeObserver)new ResizeObserver(function(){trayPad();}).observe(tray);
     if(window.ResizeObserver){var roW=0,roF=0;new ResizeObserver(function(es){var w=Math.round(es[0].contentRect.width);if(!w||w===roW)return;roW=w;cancelAnimationFrame(roF);roF=requestAnimationFrame(relayout);}).observe(scrollEl);}
     /* another tab changed this category's selection */
-    window.addEventListener('storage',function(e){if(e.key!==KEY)return;selected=ownIds();syncAll();});
+    window.addEventListener('storage',function(e){if(e.key!==KEY)return;if(sharedOwn){sharedOwn=ownIds();return;}selected=ownIds();syncAll();});
     /* "Aus der Merkliste (n)" follows the Merkliste live (18.11., user: "the marked option must appear if there is any
        relevant bookmarked item"): it was only counted when the comparison was drawn, so a model bookmarked meanwhile (e.g.
        on a product page in another tab) did not bring the option back until a reload. Redrawn only when the number of
@@ -1565,16 +1598,22 @@
     valid=valid.slice(0,MAX);fromMkl=arr.fromMkl;
     if(valid.length>=MIN){
       var prev=selected.slice(),differs=!arr.fromMkl&&prev.length>0&&prev.slice().sort().join()!==valid.slice().sort().join();
-      if(differs)try{sessionStorage.setItem('mtz_vgl_prev',JSON.stringify(prev));}catch(e){}
-      setSelection(valid);syncAll();openView({arrived:true});
+      if(differs){sharedOwn=prev;selected=valid;setMode(true);}else setSelection(valid);   /* shared: shown, not saved (§76) */
+      syncAll();openView({arrived:true});
       var msg=null,act=null;
-      if(differs){msg='Geteilter Vergleich geöffnet.';act={label:'Meine Auswahl ('+prev.length+')',aria:'Meine Auswahl ('+prev.length+' Modelle) wiederherstellen',fn:function(){setSelection(prev);syncAll();if(!view.classList.contains('is-open')&&selected.length>=MIN)openView({push:false});}};}
+      if(differs){msg='Geteilter Vergleich – Ihre eigene Auswahl bleibt gespeichert.';act={label:'Meine Auswahl ('+prev.length+')',aria:'Zu Ihrer eigenen Auswahl wechseln ('+prev.length+' Modelle)',fn:function(){if(!sharedOwn)return;selected=sharedOwn;sharedOwn=null;syncAll();if(!view.classList.contains('is-open')&&selected.length>=MIN)openView({push:false});}};}
       else if(over)msg='Es werden die ersten '+MAX+' Modelle verglichen.';
       else if(bad)msg=(bad>1?bad+' Modelle':'1 Modell')+' aus dem Link '+(bad>1?'sind':'ist')+' nicht mehr verfügbar.';
       if(msg)toastSoon(msg,'info',act);
       return;
     }
     try{history.replaceState(null,'',pageUrl([]));}catch(e){}
+    /* one model handed over by the Merkliste (19.11.): it joins the selection and the product list opens in compare mode
+       for the second one – not "only one model available" */
+    if(valid.length===1&&arr.fromMkl){
+      if(!compareMode)setMode(true);
+      if(isFull()&&selected.indexOf(valid[0])<0){syncAll();var nm1=baseTitle(BY_ID[valid[0]]);setTimeout(function(){askSwap(valid[0],barBtn,'„'+nm1+'“ aus Ihrer Merkliste: Sie vergleichen bereits '+MAX+' Modelle – mehr sind nicht möglich. Ersetzen Sie eines davon:');},400);return;}   /* full: ask (§76) */
+      addIds(valid);syncAll();addFromGrid();return;}
     if(valid.length===1){
       var prev1=selected.slice(),keep1=!arr.fromMkl&&prev1.length>0&&prev1.join()!==valid.join();   /* never drop the visitor's own selection silently */
       setSelection(valid);syncAll();

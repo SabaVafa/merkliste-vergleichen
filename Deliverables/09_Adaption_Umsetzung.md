@@ -626,3 +626,91 @@ Länge geprüft: Desktop 1440 px drei Zeilen im festen Fuß (eine erste, länger
 Geprüft: Produktseite 1440 px (Meldung drei Zeilen, mit Produktbild) und 375 px (vier Zeilen, über der festen Kaufleiste, kein seitliches Scrollen); Seitenfenster 375 px: Liste → Hinweis → Zuletzt angesehen.
 
 `merkliste.js?v=68`, `merkliste.css?v=53`.
+
+## 73 · Merkliste: ein einzelnes Modell führt weiter statt in die Sackgasse (19.11.2026, Nutzer: „selecting a product at the bookmark side window for comparison as the first product to compare the cta remains disable“)
+
+**Befund:** Liegt nur ein Modell einer Kategorie in der Merkliste (typisch: gerade das erste gemerkt), ist es nach dem Anhaken das einzige mögliche – der Knopf „Vergleichen“ blieb grau, darüber „Noch mindestens 1 weiteres Modell“. Ein zweites Modell hätte man nur über Produktseite → Farbe → Merken in die Liste bekommen. Dieselbe Sackgasse wie §69, nur außerhalb des Vergleichs.
+
+**Gebaut:**
+- **Ein Modell angehakt, kein weiteres der Kategorie in der Liste:** Der Knopf heißt **„Modell hinzufügen“** und ist aktiv; Fuß: „1 Modell ausgewählt“ / „Weitere Türsprechanlagen wählen Sie in der Produktliste“.
+- Klick: Das Modell kommt in die Vergleichsauswahl, die Produktliste der Kategorie öffnet im Vergleichsmodus (Karten mit „Vergleichen“, das Modell ist angehakt), Meldung „Wählen Sie bis zu 2 weitere Modelle auf den Karten.“ Auf der Kategorieseite ohne Seitenwechsel, von der Produktseite über `?vergleich=<id>&von=merkliste`.
+- Eine bestehende Auswahl der Kategorie bleibt erhalten; das Modell kommt dazu. Ist sie voll (3), bleibt sie unverändert.
+- **Liegt ein zweites Modell der Kategorie in der Liste:** unverändert – „Noch mindestens 1 weiteres Modell“, nach dem zweiten Haken „Vergleichen“.
+
+Geprüft (1440 px): Produktseite mit einer gemerkten Konfiguration → Haken → „Modell hinzufügen“ → Türsprechanlagen im Vergleichsmodus, Modell angehakt; dasselbe auf der Kategorieseite; zwei Modelle einer Kategorie → „Vergleichen“ wie bisher.
+
+`merkliste.js?v=69`, `vergleichen.js?v=172`.
+
+## 74 · Merkliste kennt den bestehenden Vergleich (19.11.2026, Nutzer: „conflict, when there are already max (3) in the vergleich“)
+
+**Befund:** Die Merkliste führte eigene Haken und kannte die gespeicherte Vergleichsauswahl nicht (außer im Auswahlmodus aus dem offenen Vergleich). Folge: Ein Modell, das schon im Vergleich war, stand ohne Haken da; „Modell hinzufügen“ (§73) schickte in die Produktliste, obwohl der Vergleich mit 3 Modellen schon voll war – dort ging nichts mehr.
+
+**Gebaut:** Die Merkliste liest die Vergleichsauswahl je Kategorie (derselbe Speicher `mtz_vgl` und dieselben 30 Tage wie der Vergleich) – auch auf der Produktseite. Dieselbe Darstellung wie im Auswahlmodus:
+- Modelle im Vergleich: Haken gesetzt, gesperrt, Text **„Im Vergleich“** (Screenreader: „… ist bereits im Vergleich“).
+- Gezählt wird Vergleich + neue Haken: höchstens 3, mindestens 2. Neue Modelle kommen zum bestehenden Vergleich dazu („1 Modell aus Ihrer Merkliste zum Vergleich hinzugefügt“), nichts wird ersetzt.
+- Nichts angehakt, Vergleich der Seitenkategorie hat 2–3 Modelle: „Vergleichen“ ist aktiv und öffnet ihn; Fuß „3 Türsprechanlagen im Vergleich“.
+- **Vergleich voll:** weitere Modelle der Kategorie sind gesperrt; Fuß „Vergleich voll – zum Tauschen dort ein Modell entfernen“ (bei mehreren Kategorien zusätzlich im Gruppenkopf). „Vergleichen“ öffnet den Vergleich, dort wird getauscht (× je Modell, §68).
+- „Modell hinzufügen“ (§73) erscheint nur noch, wenn wirklich nur dieses eine Modell da ist – nicht, wenn der Vergleich schon Modelle hat.
+
+Geprüft (Produktseite, 1440 und 375 px): Vergleich voll mit dem gemerkten Modell → „Im Vergleich“, „Vergleichen“ öffnet die 3; Vergleich mit 2 anderen → Haken → „Zusammen mit 2 Modellen aus Ihrem Vergleich“ → Vergleich mit 3; Vergleich voll ohne das Modell → Haken gesperrt, Tausch-Hinweis; kein seitliches Scrollen.
+
+`merkliste.js?v=71`.
+
+## 75 · „Im Vergleich“ lässt sich abwählen (19.11.2026, Nutzer: „the vergleich box is not possible to be deselected“)
+
+**Befund:** Modelle, die schon im Vergleich sind, standen in der Merkliste mit gesetztem, aber gesperrtem Haken da. Ein Haken, der sich nicht lösen lässt, wirkt kaputt – und die Merkliste bot keinen Weg, ein Modell aus dem Vergleich zu nehmen.
+
+**Gebaut:**
+- „Im Vergleich“ ist ein normaler, aktiver Haken (nicht mehr grau). **Abwählen nimmt das Modell aus dem Vergleich** – wie das × dort. Auf der Kategorieseite über den Vergleich selbst (Leiste und Karten folgen sofort, neue Schnittstelle `MTZ_VGL.remove(id)`), auf der Produktseite oder für die andere Kategorie in der gespeicherten Auswahl.
+- Danach steht das Modell wieder auf „Vergleichen“; erneutes Anhaken nimmt es mit dem nächsten „Vergleichen“ wieder auf, solange Platz ist. Fuß und Plätze zählen sofort neu („2 Türsprechanlagen im Vergleich“ / „Noch 1 Platz im Vergleich frei“). Screenreader: „… aus dem Vergleich entfernt“, der Fokus bleibt auf dem Haken.
+- Gilt in beiden Modi der Merkliste (vom Kopf geöffnet und „Aus der Merkliste“ im Vergleich) – ein Verhalten.
+
+**Mitbehoben (Auswahlmodus):** Bei vollem Vergleich, in dem alle gemerkten Modelle schon stecken, bot der Knopf noch „Modell hinzufügen“ in die Produktliste an, und der Hinweis sagte „Weitere … wählen Sie direkt in der Produktliste“. Jetzt: Knopf aus, Fuß „Vergleich vollständig – maximal 3 Modelle“, Hinweis „Der Vergleich ist voll – entfernen Sie dort ein Modell, um ein anderes zu vergleichen.“
+
+Geprüft (1440 px): Produktseite – Abwählen nimmt das Modell aus der gespeicherten Auswahl (3 → 2); Kategorieseite im Vergleichsmodus – Leiste 3 → 2, erneut anhaken → „Vergleichen“.
+
+`merkliste.js?v=74`, `merkliste.css?v=54`, `vergleichen.js?v=173`.
+
+## 76 · Vergleich voll: „Welches Modell soll Platz machen?“ (19.11.2026, Nutzer: „replacing the pre added products in the vergleich with the new one without notification is not a good solution … we need a smart solution“ – UX-Vorschlag Option A, „go ahead“)
+
+**Befund (UX):** Ein voller Vergleich bekam je nach Ort eine andere Antwort, keine half beim eigentlichen Wunsch – tauschen: Karte grau mit „Maximal 3 Modelle. Bitte entfernen Sie zuerst eines.“; Merkliste gesperrt mit „zum Tauschen dort ein Modell entfernen“; Übergabe aus der Merkliste verwarf das Modell oder ersetzte (online) die ganze Auswahl stumm; ein geteilter Link überschrieb die eigene Auswahl; „Ähnliche Modelle“ verschwand bei 3 – genau dann, wenn eine Alternative zählt.
+
+**Entscheidung – ein Muster überall:** Wer ein 4. Modell anhakt, wählt, welches Platz macht.
+> **Ihr Vergleich ist voll**
+> Sie vergleichen bereits 3 Modelle – mehr sind nicht möglich. Um **VDM10 2.0 Colson** aufzunehmen, ersetzen Sie eines davon:
+> *(Nachtrag 19.11., Nutzer: „does it say that you have already max in the vergleich and you have to replace?“ – vorher „Bis zu 3 Modelle lassen sich vergleichen. Welches soll für … Platz machen?“: nannte die Regel, nicht die Lage)*
+> [Foto · SDM10X · ab 1.266,50 €] **Ersetzen** (×3) · Abbrechen
+
+- Ein Tipp auf „Ersetzen“ tauscht; das neue Modell nimmt die Spalte des ersetzten. Meldung „SDM10X durch VDM10 2.0 Colson ersetzt.“ mit **„Rückgängig“ (6 s)** – tauscht zurück, auch bei vollem Vergleich.
+- **Immer ein Fenster, das von unten hochfährt** (Nachtrag 19.11., Nutzer: „it must be bottom up window and not a pop up“ – ersetzt das kleine Fenster neben dem Kästchen): in der Merkliste in der Breite des Seitenfensters, auf der Seite unten mittig (höchstens 32rem breit, auf dem Telefon volle Breite); Hintergrund abgedunkelt. Buttons 44 px, ab 320 px ohne seitliches Scrollen.
+- Dialog mit Titel; Fokus auf dem ersten „Ersetzen“ (Name „SDM10X durch VDM10 2.0 Colson ersetzen“); Tab bleibt im Dialog; Escape, „Abbrechen“ oder Klick daneben brechen ab, der Fokus kehrt zum Kästchen zurück (nicht angehakt). Screenreader: „SDM10X durch VDM10 2.0 Colson ersetzt. Vergleich mit 3 Modellen. Rückgängig in der Meldung möglich.“
+- **Nie gesperrt, weil der Vergleich voll ist.** Kästchen tragen die Beschreibung „Vergleich voll – Sie wählen danach, welches Modell Platz macht.“; Leiste „**Maximum erreicht** – ein weiteres Modell ersetzt eines Ihrer Wahl“; Merkliste-Fuß „Vergleich voll – beim Anhaken wählen Sie, welches Modell Platz macht“.
+
+**Wo es greift:**
+1. Produktkarten der Kategorieseite (Kästchen wird nach dem Tausch angehakt, Fokus bleibt dort).
+2. Merkliste – auf der Kategorie- und auf der Produktseite. Der Tausch wird sofort gespeichert; Namen, Fotos und Preise der verglichenen Modelle kommen aus dem gespeicherten Vergleich (`mtz_vgl` → `meta`), so funktioniert es auch dort, wo der Vergleich nicht auf der Seite ist.
+3. „Aus der Merkliste“ im Vergleich (Auswahlmodus).
+4. Übergabe aus der Merkliste in einen vollen Vergleich: „„VDM10 2.0 Colson“ aus Ihrer Merkliste: Sie vergleichen bereits 3 Modelle – mehr sind nicht möglich. Ersetzen Sie eines davon:“ – nie stumm verworfen.
+5. „Ähnliche Modelle“ bleiben bei 3 sichtbar; „Vergleichen“ fragt, die neue Spalte leuchtet an der Stelle der ersetzten auf, Fokus dorthin.
+
+**Mitgebaut:**
+- „Im Vergleich“ in der Merkliste abwählen: Meldung „… aus dem Vergleich entfernt.“ mit „Rückgängig“ (6 s, an die alte Stelle).
+- **Geteilter Link = vorübergehende Ansicht:** Wer schon einen eigenen Vergleich hat, sieht den geteilten, ohne dass der eigene überschrieben wird („Geteilter Vergleich – Ihre eigene Auswahl bleibt gespeichert.“ · „Meine Auswahl (n)“). Schließen bringt die eigene Auswahl zurück. Erst wenn der geteilte Vergleich verändert wird, wird er zum eigenen; der alte bleibt über „Vorherigen Vergleich wiederherstellen“ erreichbar.
+- Reine Ansicht ohne eigenen Vergleich: wie bisher übernommen.
+
+**Technik:** neues gemeinsames Modul `vergleich-tausch.js` / `.css` (`MTZ_SWAP.ask`), auf allen drei Seiten geladen; neue Schnittstellen `MTZ_VGL.swap(alt, neu)` und `MTZ_VGL.label(id)`; `mtz_vgl` speichert je Kategorie zusätzlich `meta` (Kurzname, Foto, Preis).
+
+Geprüft: Kategorieseite 1440 px (Karte → Fenster neben dem Kästchen, Tausch an Ort und Stelle, Rückgängig, Escape), Vergleich mit „Ähnliche Modelle“ bei 3, Produktseite (Merkliste: Tausch, Rückgängig, Abwählen mit Rückgängig an die alte Stelle), Auswahlmodus, Übergabe in vollen Vergleich (320 px), geteilter Link (eigene Auswahl bleibt; Ändern übernimmt), Telefon 375/320 px.
+
+**Nachtrag – „Vergleichen“ nach dem Tausch** (Nutzer: „after pressing the replace, the vergleich button is still disable“): Im Auswahlmodus („Aus der Merkliste“, auch automatisch im Vergleichsmodus der Kategorieseite) zählte der Knopf nur neue Haken. Jetzt: nichts Neues angehakt, Vergleich hat 2–3 Modelle → „Vergleichen“ aktiv und öffnet ihn; Fuß „3 Türsprechanlagen im Vergleich – Vergleich vollständig“. Der Hinweis über der Liste sagt bei vollem Vergleich nicht mehr „entfernen Sie dort ein Modell“.
+
+`vergleich-tausch.js?v=3`, `vergleich-tausch.css?v=3`, `vergleichen.js?v=175`, `merkliste.js?v=78`.
+
+## 77 · Merkliste-Fuß auf allen Breiten wie auf dem Telefon (19.11.2026, Nutzer: „what if we make the bottom section on desktop like the mobile view?“)
+
+- **Gebaut:** Auch auf Tablet und Desktop steht oben der Status (fett) mit dem nächsten Schritt darunter, darunter „Vergleichen“ in voller Breite (44 px hoch) – eine Lesereihenfolge, ein großes Ziel, auf allen Breiten gleich. Ausnahme bleibt der flache Bildschirm (Telefon quer, Höhe ≤ 30rem): Status und Knopf in einer Zeile, damit die Liste Platz behält (§ Responsive-Audit 13.11.).
+- **Mitbehoben (Text):** War im Auswahlmodus genau ein Platz frei und angehakt, stand „1 Modell ausgewählt – Vergleich voll – beim Anhaken wählen Sie …“ – liest sich wie eine Warnung. Jetzt: „1 Modell ausgewählt – Damit ist der Vergleich vollständig“.
+
+Geprüft: 1440 px (Seitenfenster 448 px, Knopf 408 px breit unter dem Status), 844 × 390 quer (eine Zeile).
+
+`merkliste.css?v=55`, `merkliste.js?v=79`.

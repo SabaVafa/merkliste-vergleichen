@@ -247,12 +247,22 @@
       var rm = e.target.closest('.mkl-rm');
       if (rm) { removeFromRow(rm.getAttribute('data-id'), rm); return; }
       var cmp = e.target.closest('.mkl-cmp');
-      if (cmp) { var inp = cmp.querySelector('input'); if (inp.disabled) { e.preventDefault(); if (cmp.classList.contains('is-in')) toast('Dieses Modell ist bereits im Vergleich', 'info'); else if (cmp.classList.contains('is-lens')) toast('Vergleich nur innerhalb einer Kategorie', 'info'); else toast(pick ? 'Kein Platz mehr im Vergleich – maximal ' + CMP_MAX + ' Modelle' : 'Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); } }
+      if (cmp) { var inp = cmp.querySelector('input'); if (inp.disabled) { e.preventDefault(); if (cmp.classList.contains('is-lens')) toast('Vergleich nur innerhalb einer Kategorie', 'info'); else toast(pick ? 'Kein Platz mehr im Vergleich – maximal ' + CMP_MAX + ' Modelle' : 'Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); } }
     });
     drawer.addEventListener('change', function (e) {
       var inp = e.target.closest('.mkl-cmp input'); if (!inp) return;
       var id = inp.getAttribute('data-id'), i = cmpSel.indexOf(id);
-      if (inp.checked && i < 0) { if (cmpSel.length >= (pick ? pick.slots : CMP_MAX)) { inp.checked = false; toast(pick ? 'Kein Platz mehr im Vergleich – maximal ' + CMP_MAX + ' Modelle' : 'Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); return; } cmpSel.push(id); }
+      if (!inp.checked && inp.closest('.mkl-cmp').classList.contains('is-in')) { leaveCmp(id, inp.getAttribute('data-lens'), inp); return; }
+      if (inp.checked && i < 0) {
+        var ln = pick ? pick.lens : (cmpSel.length ? lensOfCmp(cmpSel[0]) : inp.getAttribute('data-lens')), kIn = pick ? pick.inCmp.length : vglIds(ln).length;
+        if (pick ? cmpSel.length >= pick.slots : kIn + cmpSel.length >= CMP_MAX) {
+          inp.checked = false;
+          if (kIn) askSwapMkl(id, ln, inp);   /* full comparison: which model makes room? (§76) */
+          else toast('Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit');
+          return;
+        }
+        cmpSel.push(id);
+      }
       else if (!inp.checked && i > -1) cmpSel.splice(i, 1);
       syncCmp();
     });
@@ -636,35 +646,141 @@
     footHint.hidden = false;
     footHint.firstChild.textContent = status; footHint.lastChild.textContent = detail;
   }
+  /* The comparison the visitor already has (19.11., user: "conflict, when there are already max (3) in the vergleich"):
+     the Merkliste kept its own ticks and ignored it – a model already compared looked unticked, a full comparison
+     still sent people to the product list. It now reads the saved selection per category (same store and 30-day rule
+     as vergleichen.js), so it works on the product page too. */
+  function vglIds(lens) {
+    try {
+      var s = JSON.parse(localStorage.getItem('mtz_vgl') || 'null'), sl = s && s.v === 2 && s.lenses && s.lenses[lens];
+      return sl && Array.isArray(sl.ids) && Date.now() - Date.parse(sl.updatedAt) < 30 * 864e5 ? sl.ids.slice(0, CMP_MAX) : [];
+    } catch (e) { return []; }
+  }
+  function markIn(lab, inp, isIn) {
+    var t = lab.querySelector('.mkl-cmp__t'); if (t) t.textContent = isIn ? 'Im Vergleich' : 'Vergleichen';
+    inp.setAttribute('aria-label', inp.getAttribute('aria-label').replace(/ (zum Vergleich auswählen|ist bereits im Vergleich)$/, isIn ? ' ist bereits im Vergleich' : ' zum Vergleich auswählen'));
+  }
+  /* The saved comparison, edited from the Merkliste where the comparison itself is not on the page (product page,
+     other category). On the category page the comparison's own API is used, so its strip and cards follow at once. */
+  function storeEdit(lens, fn) {
+    try {
+      var s = JSON.parse(localStorage.getItem('mtz_vgl') || 'null'); if (!s || s.v !== 2 || !s.lenses) s = { v: 2, lenses: {} };
+      var sl = s.lenses[lens] || { ids: [] }; if (!Array.isArray(sl.ids)) sl.ids = [];
+      sl.meta = sl.meta || {};
+      fn(sl); sl.updatedAt = new Date().toISOString();
+      if (sl.ids.length) s.lenses[lens] = sl; else delete s.lenses[lens];
+      localStorage.setItem('mtz_vgl', JSON.stringify(s));
+    } catch (e) {}
+  }
+  /* name, photo and price of a compared model: the comparison's saved meta, else the Merkliste row, else the page's products */
+  /* the comparison's short name: "VDM10 2.0 Colson", not the shared "VDM10 2.0 Video-Türsprechanlage" (§76) */
+  function cmpName(it, lens) {
+    var parts = String(it.name || '').split('|').map(function (x) { return x.trim(); }).filter(Boolean);
+    var head = parts.length > 1 && lens !== 'briefkasten' ? parts[0].replace(/\s*(Video-|Audio-)?(Tür)?[Ss]prechanlage\b.*$/, '').trim() : '';
+    return head ? head + ' ' + parts[parts.length - 1] : shortName({ name: it.name, lens: lens }).main;
+  }
+  function cmpModel(id, lens) {
+    var v = window.MTZ_VGL, vn = v && typeof v.label === 'function' && lens === LENS ? v.label(id) : null;
+    var md = cmpModelRaw(id, lens); if (vn) md.name = vn; return md;
+  }
+  function cmpModelRaw(id, lens) {
+    var m = null; try { var s = JSON.parse(localStorage.getItem('mtz_vgl') || 'null'); m = s && s.lenses && s.lenses[lens] && s.lenses[lens].meta && s.lenses[lens].meta[id]; } catch (e) {}
+    if (m) return { id: id, name: m.n || id, img: asset(m.img), price: m.p };
+    var it = viewItems().concat(items).filter(function (x) { return (x.articleId || x.id) === id; })[0];
+    if (it) return { id: id, name: cmpName(it, lens), img: asset(it.img), price: typeof it.priceFrom === 'number' ? it.priceFrom : it.priceAtAdd };
+    var p = BY_ID[id]; return p ? { id: id, name: cmpName(p, lens), img: asset(p.img), price: p.price } : { id: id, name: id };
+  }
+  function cmpBox(id) { return listEl.querySelector('.mkl-cmp input[data-id="' + cssId(id) + '"]'); }
+  /* "Im Vergleich" can be unticked (19.11., user: "the vergleich box is not possible to be deselected"): unticking takes
+     the model out of the comparison – like its × there – with „Rückgängig“ (6 s, §76) */
+  function leaveCmp(id, lens, inp, quiet) {
+    var v = window.MTZ_VGL, at = vglIds(lens).indexOf(id), md = cmpModel(id, lens);
+    if (v && typeof v.remove === 'function' && lens === LENS) v.remove(id);
+    else storeEdit(lens, function (sl) { sl.ids = sl.ids.filter(function (x) { return x !== id; }); });
+    if (pick) { pick.inCmp = pick.inCmp.filter(function (x) { return x !== id; }); pick.slots = Math.min(CMP_MAX, pick.slots + 1); }
+    syncCmp();
+    var box = cmpBox(id) || inp; if (box) box.focus({ preventScroll: true });
+    if (quiet) return;
+    live(md.name + ' aus dem Vergleich entfernt. Rückgängig in der Meldung möglich.');
+    toast(md.name + ' aus dem Vergleich entfernt.', 'ok', { label: 'Rückgängig', ms: 6000, fn: function () { joinCmp(id, lens, at, md); } }, true, md.img);
+  }
+  function joinCmp(id, lens, at, md) {
+    if (vglIds(lens).length >= CMP_MAX || vglIds(lens).indexOf(id) > -1) return;
+    var v = window.MTZ_VGL;
+    if (v && typeof v.add === 'function' && lens === LENS) v.add([id]);
+    else storeEdit(lens, function (sl) { sl.ids.splice(at < 0 ? sl.ids.length : Math.min(at, sl.ids.length), 0, id); if (md) sl.meta[id] = { n: md.name, img: md.img, p: md.price }; });
+    if (pick) { pick.inCmp.push(id); pick.slots = Math.max(0, pick.slots - 1); }
+    syncCmp(); live(md.name + ' wieder im Vergleich');
+  }
+  /* Vergleich voll (19.11., §76 – user: "replacing … without notification is not a good solution", UX option A):
+     a tick on a 4th model asks which compared model makes room; the swap is saved at once, „Rückgängig“ for 6 s */
+  function askSwapMkl(nid, lens, inp) {
+    var ids = pick ? pick.inCmp.slice() : vglIds(lens);
+    if (!window.MTZ_SWAP || !ids.length) { toast('Maximal ' + CMP_MAX + ' Modelle. Bitte entfernen Sie zuerst eines.', 'limit'); return; }
+    window.MTZ_SWAP.ask({ newName: cmpModel(nid, lens).name, anchor: inp, within: drawer, models: ids.map(function (id) { return cmpModel(id, lens); }),
+      onPick: function (old) { swapMkl(old, nid, lens, true); } });
+  }
+  function swapMkl(old, nid, lens, undo) {
+    var mo = cmpModel(old, lens), mn = cmpModel(nid, lens), v = window.MTZ_VGL;
+    if (v && typeof v.swap === 'function' && lens === LENS) { if (!v.swap(old, nid)) return; }
+    else storeEdit(lens, function (sl) { var i = sl.ids.indexOf(old); if (i > -1 && sl.ids.indexOf(nid) < 0) { sl.ids[i] = nid; sl.meta[nid] = { n: mn.name, img: mn.img, p: mn.price }; } });
+    if (pick) { var j = pick.inCmp.indexOf(old); if (j > -1) pick.inCmp[j] = nid; }
+    var k = cmpSel.indexOf(nid); if (k > -1) cmpSel.splice(k, 1);
+    syncCmp();
+    var box = cmpBox(nid); if (box) box.focus({ preventScroll: true });
+    live(mo.name + ' durch ' + mn.name + ' ersetzt.' + (undo ? ' Rückgängig in der Meldung möglich.' : ''));
+    if (undo) toast(mo.name + ' durch ' + mn.name + ' ersetzt.', 'ok', { label: 'Rückgängig', ms: 6000, fn: function () { swapMkl(nid, old, lens, false); } }, true, mn.img);
+  }
+  function footH() { try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {} fitDrawer(); }
   function syncCmp() {
-    if (cta) cta.removeAttribute('data-grid');
+    if (cta) { cta.removeAttribute('data-grid'); cta.removeAttribute('data-open'); }
     if (pick) { syncPick(); return; }
     if (pickNote) pickNote.hidden = true;
-    var n = cmpSel.length, lock = n ? lensOfCmp(cmpSel[0]) : null, full = n >= CMP_MAX;
+    var inC = {}, inOf = function (l) { return inC[l] || (inC[l] = vglIds(l)); };
+    var n = cmpSel.length, lock = n ? lensOfCmp(cmpSel[0]) : null, k = lock ? inOf(lock).length : 0, total = k + n, full = total >= CMP_MAX;
     listEl.querySelectorAll('.mkl-cmp').forEach(function (lab) {
-      var inp = lab.querySelector('input'), id = inp.getAttribute('data-id'), on = cmpSel.indexOf(id) > -1;
-      var otherLens = !!(lock && inp.getAttribute('data-lens') !== lock);
-      var dis = !on && (full || otherLens);
-      inp.checked = on; inp.disabled = dis;
-      lab.classList.toggle('is-disabled', dis); lab.classList.toggle('is-lens', otherLens && !on);
+      var inp = lab.querySelector('input'), id = inp.getAttribute('data-id'), l = inp.getAttribute('data-lens'), on = cmpSel.indexOf(id) > -1;
+      var isIn = inOf(l).indexOf(id) > -1, otherLens = !!(lock && l !== lock);
+      var dis = !isIn && !on && otherLens;   /* never locked because the comparison is full – ticking asks which model makes room (§76) */
+      inp.checked = isIn || on; inp.disabled = dis;
+      lab.classList.toggle('is-in', isIn); lab.classList.toggle('is-disabled', dis && !isIn); lab.classList.toggle('is-lens', otherLens && !on && !isIn);
+      markIn(lab, inp, isIn);
     });
     listEl.querySelectorAll('.mkl-group').forEach(function (g) {
-      var hint = g.querySelector('.mkl-group__hint'), other = !!(lock && g.getAttribute('data-lens') !== lock);
-      hint.hidden = !other; if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie – Ihre Auswahl läuft bei ' + (LENSES[lock] || LENSES[LENS]).label;
+      var gl = g.getAttribute('data-lens'), hint = g.querySelector('.mkl-group__hint'), other = !!(lock && gl !== lock), gFull = !other && inOf(gl).length >= CMP_MAX;
+      hint.hidden = !other && !gFull;
+      if (other) hint.textContent = 'Vergleich nur innerhalb einer Kategorie – Ihre Auswahl läuft bei ' + (LENSES[lock] || LENSES[LENS]).label;
+      else if (gFull) hint.textContent = 'Ihr Vergleich ist voll – beim Anhaken wählen Sie, welches Modell Platz macht.';
     });
-    /* footer status (11.11., user: "not professional"): what is selected (bold) + what comes next (muted); the
-       button just says "Vergleichen" */
     var lab = (LENSES[lock] || LENSES[LENS]).label;
     cta.textContent = 'Vergleichen';
-    cta.disabled = n < CMP_MIN;
-    setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' ' + lab + ' ausgewählt') : 'Keine Modelle ausgewählt',
-      !n ? CMP_MIN + ' bis ' + CMP_MAX + ' Modelle einer Kategorie'
-        : n < CMP_MIN ? 'Noch mindestens 1 weiteres Modell'
+    /* nothing ticked: a comparison of this page's category that is ready opens from here as well */
+    if (!n) {
+      var kp = inOf(LENS).length, labP = (LENSES[LENS] || {}).label || lab;
+      cta.disabled = kp < CMP_MIN; if (kp >= CMP_MIN) cta.setAttribute('data-open', '');
+      setFoot(kp ? kp + ' ' + (kp === 1 ? 'Modell' : labP) + ' im Vergleich' : 'Keine Modelle ausgewählt',
+        !kp ? CMP_MIN + ' bis ' + CMP_MAX + ' Modelle einer Kategorie'
+          : kp >= CMP_MAX ? 'Vergleich voll – beim Anhaken wählen Sie, welches Modell Platz macht'
+          : 'Weitere Modelle hier anhaken');
+      footH(); return;
+    }
+    /* one model ticked and nothing else of its category to tick or already compared (19.11., user: "the cta remains
+       disabled"): no dead end – the button takes it into the comparison and leads to the product list for the next one */
+    var alone = total === 1 && !viewItems().some(function (it) { var id = it.articleId || it.id; return id !== cmpSel[0] && (it.lens || LENS) === lock; });
+    if (alone) {
+      cta.textContent = 'Modell hinzufügen'; cta.disabled = false; cta.setAttribute('data-grid', '');
+      setFoot('1 Modell ausgewählt', 'Weitere ' + lab + ' wählen Sie in der Produktliste');
+      footH(); return;
+    }
+    cta.disabled = total < CMP_MIN;
+    /* footer status (11.11., user: "not professional"): what is selected (bold) + what comes next (muted) */
+    setFoot(n === 1 ? '1 Modell ausgewählt' : n + ' ' + lab + ' ausgewählt',
+      k ? 'Zusammen mit ' + k + ' Modell' + (k === 1 ? '' : 'en') + ' aus Ihrem Vergleich'
+        : total < CMP_MIN ? 'Noch mindestens 1 weiteres Modell'
         : lock && lock !== LENS ? 'Der Vergleich öffnet bei ' + lab
         : full ? 'Maximum von ' + CMP_MAX + ' Modellen erreicht'
-        : (CMP_MAX - n === 1 ? '1 weiteres' : 'Bis zu ' + (CMP_MAX - n) + ' weitere') + ' möglich');
-    try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
-    fitDrawer();
+        : (CMP_MAX - total === 1 ? '1 weiteres' : 'Bis zu ' + (CMP_MAX - total) + ' weitere') + ' möglich');
+    footH();
   }
 
   /* Pick mode (10.11.): the drawer adds models to an open comparison. Models already compared stay ticked and locked
@@ -673,9 +789,9 @@
     var n = cmpSel.length, free = pick.slots - n, lab0 = (LENSES[pick.lens] || LENSES[LENS]).label;
     listEl.querySelectorAll('.mkl-cmp').forEach(function (lab) {
       var inp = lab.querySelector('input'), id = inp.getAttribute('data-id'), inCmp = pick.inCmp.indexOf(id) > -1, on = cmpSel.indexOf(id) > -1;
-      var otherLens = inp.getAttribute('data-lens') !== pick.lens, dis = inCmp || (!on && (free <= 0 || otherLens));
+      var otherLens = inp.getAttribute('data-lens') !== pick.lens, dis = !inCmp && !on && otherLens;
       inp.checked = inCmp || on; inp.disabled = dis;
-      lab.classList.toggle('is-in', inCmp); lab.classList.toggle('is-disabled', dis && !inCmp); lab.classList.toggle('is-lens', otherLens && !inCmp);
+      lab.classList.toggle('is-in', inCmp); lab.classList.toggle('is-disabled', dis); lab.classList.toggle('is-lens', otherLens && !inCmp);
       var t = lab.querySelector('.mkl-cmp__t'); if (t) t.textContent = inCmp ? 'Im Vergleich' : 'Vergleichen';
       inp.setAttribute('aria-label', inp.getAttribute('aria-label').replace(/ (zum Vergleich auswählen|ist bereits im Vergleich)$/, inCmp ? ' ist bereits im Vergleich' : ' zum Vergleich auswählen'));
     });
@@ -693,15 +809,23 @@
     pickNote.hidden = cand > 0 || !viewItems().length;
     if (!pickNote.hidden) pickNote.innerHTML = IC_INFO + '<span><b>Keine weiteren ' + esc(lab0) + ' in Ihrer Merkliste.</b> ' +
       (otherTxt ? 'Verglichen werden nur Modelle einer Kategorie.' : 'Die gemerkten Modelle sind bereits im Vergleich.') +
-      ' Weitere ' + esc(lab0) + ' wählen Sie direkt in der Produktliste.</span>';
+      (pick.slots > 0 ? ' Weitere ' + esc(lab0) + ' wählen Sie direkt in der Produktliste.' : '') + '</span>';   /* full: nothing to explain – „Vergleichen“ opens it (19.11.) */
     /* nothing to add (18.11., user: "what if users for the 2nd item … then it is disabled"): no dead end with a disabled
        button and a detour via product page + colour + Merken – the button leads to the product list in compare mode,
        where the next model is ticked directly */
-    var dead = !cand && !n;
+    var dead = !cand && !n && pick.slots > 0;   /* a full comparison has nothing to add – no way into the product list (19.11.) */
     if (dead) { cta.textContent = 'Modell hinzufügen'; cta.disabled = false; cta.setAttribute('data-grid', ''); } else cta.removeAttribute('data-grid');
+    /* nothing newly ticked but the comparison is ready – e.g. right after „Ersetzen“ (19.11., user: "after pressing the
+       replace, the vergleich button is still disable"): „Vergleichen“ shows it */
+    var k = pick.inCmp.length;
+    if (!dead && !n && k >= CMP_MIN) { cta.disabled = false; cta.setAttribute('data-open', ''); }
     if (dead) setFoot('Keine passenden Modelle', 'Weitere ' + lab0 + ' wählen Sie in der Produktliste.');
+    else if (!n && k) setFoot(k + ' ' + (k === 1 ? 'Modell' : lab0) + ' im Vergleich',
+      free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' frei' : cand ? 'Vergleich voll – beim Anhaken wählen Sie, welches Modell Platz macht' : 'Vergleich vollständig');
     else setFoot(n ? (n === 1 ? '1 Modell ausgewählt' : n + ' Modelle ausgewählt') : 'Keine Modelle ausgewählt',
-      free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei' : 'Vergleich vollständig – maximal ' + CMP_MAX + ' Modelle');
+      free > 0 ? 'Noch ' + free + (free === 1 ? ' Platz' : ' Plätze') + ' im Vergleich frei'
+        : n ? 'Damit ist der Vergleich vollständig'   /* the tick fills the last place – not a warning (19.11.) */
+        : 'Vergleich voll – beim Anhaken wählen Sie, welches Modell Platz macht');
     try { document.documentElement.style.setProperty('--mkl-foot-h', (footEl.hidden ? 0 : footEl.offsetHeight / 16) + 'rem'); } catch (e) {}
     fitDrawer();
   }
@@ -869,14 +993,28 @@
      ===================================================================== */
   function startCompare() {
     if (pick && cta.hasAttribute('data-grid')) { closeDrawer(); if (window.MTZ_VGL && typeof window.MTZ_VGL.fromGrid === 'function') window.MTZ_VGL.fromGrid(); return; }
+    if (pick && !cmpSel.length && cta.hasAttribute('data-open')) {   /* nothing new: show the comparison as it is (19.11.) */
+      var v0 = window.MTZ_VGL; closeDrawer();
+      if (v0 && !document.querySelector('.vgl-view.is-open') && typeof v0.compare === 'function') v0.compare(v0.selected());
+      return;
+    }
     if (pick) { var add = cmpSel.slice(0, pick.slots), fn = pick.onAdd; if (!add.length) return; closeDrawer(); if (typeof fn === 'function') fn(add); return; }
-    var ids = cmpSel.slice(0, CMP_MAX); if (ids.length < CMP_MIN) return;
-    var lens = lensOfCmp(ids[0]) || LENS;
+    if (cta.hasAttribute('data-grid') && cmpSel.length === 1) {   /* the only model of its category: on into the product list */
+      var one = cmpSel[0], l1 = lensOfCmp(one) || LENS;
+      if (l1 === LENS && window.MTZ_VGL && typeof window.MTZ_VGL.fromGrid === 'function') { closeDrawer(); cmpSel = []; window.MTZ_VGL.add([one]); window.MTZ_VGL.fromGrid(); }
+      else { live('Öffnet die Produktliste ' + (LENSES[l1] || LENSES[LENS]).label); location.href = BASE + (LENSES[l1] || LENSES[LENS]).page + '?vergleich=' + encodeURIComponent(one) + '&von=merkliste'; }
+      return;
+    }
+    /* ticked models join the comparison the visitor already has; nothing ticked = open that comparison */
+    var lens = cmpSel.length ? (lensOfCmp(cmpSel[0]) || LENS) : LENS, had = vglIds(lens), ids = had.slice();
+    cmpSel.forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); });
+    ids = ids.slice(0, CMP_MAX); if (ids.length < CMP_MIN) return;
+    var nNew = ids.length - had.length;
     if (lens === LENS && window.MTZ_VGL && typeof window.MTZ_VGL.compare === 'function') {
       closeDrawer();
       var n = window.MTZ_VGL.compare(ids);
       cmpSel = [];
-      if (n) toast('Vergleich mit ' + n + ' Modellen aus Ihrer Merkliste', 'ok');
+      if (n && nNew > 0) toast(had.length ? (nNew === 1 ? '1 Modell' : nNew + ' Modelle') + ' aus Ihrer Merkliste zum Vergleich hinzugefügt' : 'Vergleich mit ' + n + ' Modellen aus Ihrer Merkliste', 'ok');
     } else {
       var page = (LENSES[lens] || LENSES[LENS]).page;
       live('Öffnet den Vergleich auf der Seite ' + (LENSES[lens] || LENSES[LENS]).label);

@@ -21,7 +21,8 @@
 <link rel="stylesheet" href="pdp.css?v=35" />
 <!-- Version B – inline build panel -->
 <link rel="stylesheet" href="pdp-b.css?v=732" />
-<link rel="stylesheet" href="../merkliste.css?v=53" /><!-- Merkliste add-on (shared with the PLPs) -->
+<link rel="stylesheet" href="../merkliste.css?v=55" /><!-- Merkliste add-on (shared with the PLPs) -->
+<link rel="stylesheet" href="../vergleich-tausch.css?v=3" /><!-- Vergleich voll: swap picker (shared by Vergleichen + Merkliste) -->
 <link rel="stylesheet" href="../merkliste-pdp.css?v=28" /><!-- Merkliste on the PDP (07a/07b) -->
 <!-- Prototype variant switch – v2 (flow-b) is the default here (13.11., user: like the PDP prototype, a link opens the
      side window); ?flow=a renders v1, ?flow=c (v3) / ?flow=d (v4) the other color-selection flows. Runs in <head> so the
@@ -1976,7 +1977,8 @@
 <script src="chrome.js?v=15"></script>
 <script src="pdp-b.js?v=300"></script>
 <script>window.MTZ_MKL_BASE='../';window.MTZ_LENS='sprechanlage';window.MTZ_PDP_PRODUCT={id:'colson1',lens:'sprechanlage',price:699,uvp:822,url:'pdp/index.html'};</script><!-- product descriptor for the Merkliste (JTL: Vaterartikel + Grundpreis) -->
-<script src="../merkliste.js?v=68"></script><!-- Merkliste add-on -->
+<script src="../vergleich-tausch.js?v=4"></script><!-- Vergleich voll: swap picker (shared by Vergleichen + Merkliste) -->
+<script src="../merkliste.js?v=80"></script><!-- Merkliste add-on -->
 <style id="pf-lockdown-css">
 footer a,[class*="topbar"] a,[class*="top-bar"] a,[class*="trustbar"] a,[class*="claims"] a{pointer-events:none !important;cursor:default !important;}
 </style>
